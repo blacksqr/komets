@@ -18,6 +18,7 @@ method LogicalActivator constructor {name descr args} {
                                                              {Activator_PM_P_ALX_TXT Ptf_ALX_TXT}      \
                                                              {Activator_PM_P_button_HTML Ptf_HTML}     \
                                                              {Activator_PM_P_BIGre_button Ptf_BIGre}   \
+															 {Activator_PM_P_button_FLEX Ptf_FLEX}     \
                                                        ] $objName]
 
  set this(init_ok) 1

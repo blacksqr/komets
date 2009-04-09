@@ -55,11 +55,12 @@ method PTF Accept_for_daughter {ptf} {
 
 if {[info exists PTF_defined]} {} else {
   set PTF_defined 1
-  PTF Ptf_ALL     *  *        *     0
-  PTF Ptf_TK      *  TCL_TK   *     0
-  PTF Ptf_HTML    *  PHP_HTML *     0
-  PTF Ptf_BIGre   PC BIGre    WinXP 0
+  PTF Ptf_ALL     *  *        *     0 gfx
+  PTF Ptf_TK      *  TCL_TK   *     0 gfx
+  PTF Ptf_HTML    *  PHP_HTML *     0 gfx
+  PTF Ptf_BIGre   PC BIGre    WinXP 0 gfx
   PTF Ptf_ALX_TXT *  TCL_TK_ALX_TXT  *     0  vocal
+  PTF Ptf_FLEX    *  FLEX     *     0 gfx
  } 
 
 set Tab_PTF(*)              Ptf_ALL
@@ -67,6 +68,7 @@ set Tab_PTF(TCL_TK)         Ptf_TK
 set Tab_PTF(PHP_HTML)       Ptf_HTML
 set Tab_PTF(BIGre)          Ptf_BIGre
 set Tab_PTF(TCL_TK_ALX_TXT) Ptf_ALX_TXT
+set Tab_PTF(FLEX)           Ptf_FLEX
 
 proc get_Tab_PTF {p} {
  global Tab_PTF
