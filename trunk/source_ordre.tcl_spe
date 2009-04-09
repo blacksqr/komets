@@ -1,0 +1,65 @@
+proc source_recusrif {{dec {}}} {
+set rep "puts \"$dec\"\n"
+ if { [catch {set L_f [glob -type f *.tcl]} err]} {set L_f ""}
+ set L {}; foreach f $L_f {lappend L [string tolower $f]}
+ set L_f [lsort $L]
+ foreach f $L_f {append rep "puts \"$dec : $f\"\n"
+ 				 append rep "source $f\n"}
+ if { [catch {set L_d [glob -type d *]} err] } {set L_d ""}
+ set L {}; foreach d $L_d {lappend L [string tolower $d]}
+ set L_d [lsort $L]
+ foreach d $L_d {append rep "cd $d\n"
+                 cd $d
+ 				   append rep [source_recusrif "$dec/$d"]
+ 				 cd ..
+ 				 append rep "cd ..\n"
+ 				}
+ return $rep
+}
+
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+if {[string equal [info proc Comet_files_root] ""]} {
+  set comet_files_root ""
+  proc Comet_files_root {{d {}}} {
+   global comet_files_root;
+   if {[string length $d] == 0} {
+     return $comet_files_root
+    } else {return [set comet_files_root $d]}
+  }
+ }
+ 
+set PM_BIGre_B207_files_root ""
+proc get_B207_files_root { } {global PM_BIGre_B207_files_root; return $PM_BIGre_B207_files_root;}
+proc set_B207_files_root {r} {global PM_BIGre_B207_files_root; set PM_BIGre_B207_files_root $r;}
+
+ 
+Comet_files_root    {C:/These/Projet Interface/COMETS/devCOMETS/}
+set_B207_files_root {C:/These/Projet Interface/BIGre/}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+source gml_Object.tcl
+
+cd models
+  eval [source_recusrif models]
+cd ..
+cd root
+  eval [source_recusrif root]
+cd ..
+cd container
+  eval [source_recusrif container]
+cd ..
+cd interleaving
+  eval [source_recusrif interleaving]
+cd ..
+
+eval [source_recusrif]
+cd ..
+cd GDD
+  eval [source_recusrif]
+cd ..
+cd Comets

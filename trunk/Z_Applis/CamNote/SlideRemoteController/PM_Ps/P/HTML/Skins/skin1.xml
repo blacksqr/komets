@@ -1,0 +1,9 @@
+<Remote_controler_Skin>
+  <bg img="Sf22.png" />
+  <z_txt x="80px" y="10px" width="135" color="blue" />
+  <go_to_bgn   img="img_fst.gif"  text="First"    x="11px"  y="80px" />
+  <go_to_end   img="img_last.gif" text="Last"     x="12px"  y="153px" />
+  <go_to_nxt   img="img_nxt.gif"  text="Next"     x="218px" y="153px" />
+  <go_to_prv   img="img_prv.gif"  text="Previous" x="217px" y="77px" />
+  <go_to_slide  text="slide"  x="100px" y="180px" />
+</Remote_controler_Skin>

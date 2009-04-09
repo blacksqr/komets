@@ -1,0 +1,7 @@
+set planet [CPool get_a_comet CometSWL_Planet]
+set player [CPool get_a_comet CometSWL_Player]
+set ship   [CPool get_a_comet CometSWL_Ship]; $ship set_X 100; $ship set_Y 200
+
+cr set_daughters_R [list $planet $player $ship]
+set PM [CSS++ cr "#cr->PMs.PM_BIGre $player\(COLOR)"]
+

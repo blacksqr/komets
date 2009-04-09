@@ -1,0 +1,59 @@
+#_________________________________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+inherit Interleaving_PM_P_tab_HTML PM_HTML
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_tab_HTML constructor {name descr args} {
+ this inherited $name $descr
+   this set_mark 0
+ eval "$objName configure $args"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Interleaving_PM_P_tab_HTML {}  {return $class(mark)}
+method PM_HTML Interleaving_PM_P_tab_HTML {m} {set class(mark) $m}
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_tab_HTML Render_JS {strm_name mark {dec {}}} {
+ upvar $strm_name strm
+
+ append strm $dec {function go_to_categ(c, L) } "\{" {document.getElementById(b).className=c;} "\}\;\n"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_tab_HTML Render {strm_name {dec {}}} {
+ upvar $strm_name strm
+ append strm $dec {<div } [this Style_class] ">\n"
+  append strm $dec " " {<div class="menu_heading">} "\n"
+   append strm $dec "  " {<script Language="Javascript"> } "\n"
+   append strm $dec "    " { <!-- } "\n"
+   append strm $dec "      " {function go_to_categ(b, c) } "\{" {document.getElementById(b).className=c;} "\}\;\n"
+   append strm $dec "    " { //--> } "\n"
+   append strm $dec "  " { </script> } "\n"
+   # Génération des rubriques
+   append strm $dec " <ul>\n"
+   foreach c [[this get_LC] get_daughters] {
+     append strm $dec "  " {<li class="} menu_$c {">} "\n"
+     append strm $dec "    " {<a href="javascript:go_to_categ('} "Categ_manager_$objName', 'categ_$c" {')">} [$c get_name] {</a>} "\n"
+     append strm $dec "  " {</li>} "\n"
+    }
+   append strm $dec " </ul>\n"
+  append strm $dec { </div>} "\n"
+  append strm $dec " " {<div class="menu_body" id="} Categ_manager_$objName {">} "\n"
+   this Render_daughters strm "$dec    "
+  append strm $dec { </div>} "\n"
+ append strm $dec {</div>} "\n"
+ 
+ append strm $dec "<script language=\"javascript\" type=\"text/javascript\">\n"
+ append strm $dec "  // <!\[CDATA\[\n"
+ append strm $dec "  var ${objName}_array_display = new Array();
+ foreach d [this get_out_daughters] {
+   append strm $dec "  ${objName}_array_display\($d\) = none;\n"
+  }
+ append strm $dec "  // \]\]>\n"
+ append strm $dec "</script>\n"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_tab_HTML maj_interleaved_daughters {} {}

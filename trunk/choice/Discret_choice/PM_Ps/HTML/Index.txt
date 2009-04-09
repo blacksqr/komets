@@ -1,0 +1,26 @@
+
+Les fichier ne doivent pas contenir de render ou de render_daughter sof si ils veulent 
+redefinir ceux de base (avec entrelacement et container)
+C'est notament le cas avec le menu.
+Ce dernier ne peut afficher que du texte et ne peut donc pas faire appel au render de ces fils.
+Car si dans ce cas le render renvoyé autre chose que du texte, il y aurait un probléme d'affichage.
+
+
+
+Format du nom:
+DChoice_PM_P_Nom_HTML
+
+Méthode:
+- inherit Dchoice_PM_P_Nom_HTML PM_HTML
+	Notre fonction hérite des propriété du modéle HTML (render, render_dauger...)
+
+- method Dchoice_PM_P_Nom_HTML constructor {name descr args}
+	Le constructeur prend trois paramétre.
+
+- method Dchoice_PM_P_Nom_HTML dispose {}
+	Ne fait rien
+
+- method Dchoice_PM_P_Nom_HTML maj_choices {}
+	Ne fait rien
+- Methodes_set_LC Dchoice_PM_P_Nom_HTML $L_methodes_set_choices {$this(FC)} {}
+- Methodes_get_LC Dchoice_PM_P_Nom_HTML $L_methodes_get_choices {$this(FC)}

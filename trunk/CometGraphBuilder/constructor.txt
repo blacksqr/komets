@@ -1,0 +1,1 @@
+CometSqueletton GraphBuilder [list handle_root handle_daughters] [list {Add_node_type {t}} {Add_node_instance {n}} {Sub_node {n}} {Add_rel {m d}} {Sub_rel {n d}}] [list LP] [list {set_handle_root {n}} {set_handle_daughters {n}} {Add_node_type {t}} {Add_node_instance {n}} {Sub_node {n}} {Add_rel {m d}} {Sub_rel {n d}}]

@@ -1,0 +1,38 @@
+<html>
+	<head>	
+		<title>Application temperature</title>
+		<link href="style.css" rel="stylesheet" type="text/css">
+	</head>	
+	<body>
+		<form action="action.php" method="post" >
+			<p>
+			<label>Choisissez la saison: </label>
+			<input type="radio" name="saison" value="été"
+			checked="checked" /> oui
+			<input type="radio" name="saison" value="hiver" /> non
+			</p>
+			<p>
+			<label>Choisissez le mode  </label>
+			<select name="utilise">
+			 <option value="toujours"> économique</option>
+			 <option value="parfois"> Confortable</option>
+			 <option value="jamais"> idéal</option>
+			</select>
+			</p>
+			<p>
+			<label>Votre email</label><br />
+			<input type="text" name="email" size="20" 
+			maxlength="40" value="email" />
+			</p>
+			<p>
+			<label>Vos commentaires :</label><br />
+			<textarea name="comments" cols="20" rows="4">
+			</textarea>
+			</p>
+			<p>
+			<input type="submit" value="Envoyer" class="bouton" />
+			<input type="reset" value="Annuler" class="bouton" />
+			</p>
+		</form>
+	</body>
+</html>

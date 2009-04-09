@@ -1,0 +1,10 @@
+	<html>
+		<body>
+			<title>Chez les bras</title>
+			<link href="style.css" rel="stylesheet" type="text/css">
+		</body>
+		<head>
+			<form action="action.php">
+			</form>
+		</head>
+	</html>

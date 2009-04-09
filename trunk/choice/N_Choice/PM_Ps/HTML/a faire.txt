@@ -1,0 +1,1 @@
+faire un choix pour des entiers avec menu deroulan ou zone de texte ou on ecrit lentier
