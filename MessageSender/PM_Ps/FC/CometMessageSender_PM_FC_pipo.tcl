@@ -1,0 +1,24 @@
+#_______________________________________________ Définition of the presentations __________________________________________________
+#___________________________________________________________________________________________________________________________________________
+inherit CometMessageSender_PM_FC_pipo Physical_model
+
+#___________________________________________________________________________________________________________________________________________
+method CometMessageSender_PM_FC_pipo constructor {name descr args} {
+ this inherited $name $descr
+   this set_GDD_id N_CometMessageSender_PM_FC_pipo
+ eval "$objName configure $args"
+ return $objName
+}
+#___________________________________________________________________________________________________________________________________________
+method CometMessageSender_PM_FC_pipo dispose {} {this inherited}
+
+#___________________________________________________________________________________________________________________________________________
+Methodes_set_LC CometMessageSender_PM_FC_pipo [P_L_methodes_set_CometMessageSender] {} {}
+Methodes_get_LC CometMessageSender_PM_FC_pipo [P_L_methodes_get_CometMessageSender] {$this(FC)}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometMessageSender_PM_FC_pipo send_message {} {
+ puts "$objName send_message\n  -      to : [this get_destination]\n  - subject : [this get_subject]\n  -     msg : [this get_message]"
+}

@@ -1,0 +1,4 @@
+On choisi que des entiers.
+
+Menu deroulant
+champs texte

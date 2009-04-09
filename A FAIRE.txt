@@ -1,0 +1,73 @@
+_____________________________________________________________________
+Les propriétés qu'on devrait pouvoir poser sur la sélection des PMs |
+--------------------------------------------------------------------|
+  * Contrainte de type : Définir un type auquel les PMs doivent se conformer (ex : Spec_PM_P_text)
+                         La vérification se fait sur le nom de la classe ou des classes ancêtres.
+                         Le type doit être un préfixe d'au moins une des classes.
+  * Subbordination BAO : Les contraintes peuvent dépendre de la BAO. Ex : TK => Spec_PM_P_entry
+  * Gestion des usines : Les LMs devraient pouvoir gérer des usines de production de PMs correspondant.
+                         Ces usines définissent les types de PM générables à la volé.
+                         ex : Usine de Spec_PM_P_TK_text
+  * Relations avec GDD : Le GDD doit permettre de rappatrier des usines
+
+                       _____________________
+                       |Solutions proposées|
+                       \-------------------/
+Une liste de doublet <x, y> repésentant :
+  si x alors y. Ex si x est préfixe d'une classe ancêtre (sens large) de PM alors la contrainte y s'y applique, PM doit vérifier y.
+
+_______________________________________________
+Les propriétés d'ajout d'éléments structurels |
+----------------------------------------------|
+Le but est de pouvoir ajouter dans la présentation des éléments non intrinsèques à la tâche.
+Il s'agira par exemple de placer un texte au dessus d'un combobox pour en expliquer la fonction.
+Comme on doit pouvoir non seulement ajouter un text mais en fait n'importe quoi d'autre (image, applis plus compexe etc...)
+il devient nécessaire de pouvoir parramétrer de façon précise ce qu'on veut rajouter.
+La difficulté est que l'ajout de ces éléments peut être spécifique à une classe de représentation donnée.
+  * Qui doit gérer ces classes ?
+  * Comment mettre en forme ces nouveaux éléments ?
+  * Où les insérer ?
+
+___________________________
+Les propriétés graphiques |
+--------------------------|
+Le but est de pouvoir jouer sur la forme, la texture... des primitives contenues dans les PMs.
+La difficulté est que ces primitives sont à priori inconnues du programmeur par COMET.
+Une piste est l'utilisation de feuille de style ou équivalent.
+
+________________________________
+Les propriétés de mise en page |
+-------------------------------|
+Essayer de définir des languages de placement relatifs, absolus...
+Relatif :
+  Line  (A, B, C) : ABC sur la même ligne
+  Colomn(A, B, C) : ABC sur la même colonne
+  Matrix(x, y, "A B...")
+  -A : A s'étend en largeur
+  |A : A s'étend en hauteur
+  +A : A s'étend de partout
+  A([-|+]x[%u]) : A prend x unités ou % de la largeur ou longueur ou les 2.
+
+Grammaire plus formelle (MEP  : Mise En Page)
+  MEP      : Line(MEP) | Column(MEP) | Matrix(MEP) | OP_SPACE(MEP) | SPACE | DIST | DIST, MEP | SPACE, MEP
+  OP_SPACE : '-' | '|' | '+'
+  SPACE    : set of predefined spaces, a word
+  DIST     : Number UNIT
+  UNIT     : '%' | 'u'
+
+___________________________________________________________________________________
+Style is a very important part. Without it a comet application is just awful looking.\\
+We think there are many kinds of style:
+* Layout ; the placement (relative and absolute)
+* Graphical ; colors, textures, fonts...
+* Structural; kind of enjolivures, elements that are added to the original structure to improve guiding for exemple (e.g. a textan image or anything else beside a menu to explain what is the choice about.
+\\
+Each of this kind of style has to be adressed in comet structure. We now explain principles :
+* Layout ; We define a placement language, given by the following grammar :\\
+L        -> Line(L) | Column(L) | Matrix(x,y,L) | OP(L) | DIST, L | SPACE, L | {}\\
+OP     -> '-' | '+' | '|' \\
+DIST -> NUMBER UNIT \\
+UNIT -> 'u' | '%' \\
+A renderer should be implemented for each toolkit.
+* Graphical ; use of CSS, generalised context à la Ubit. The graphical style language is specific for each primitive toolkit. If it does not exist then we could specify a generic one.
+* Structural ; Here we use the nested property of comet parts...

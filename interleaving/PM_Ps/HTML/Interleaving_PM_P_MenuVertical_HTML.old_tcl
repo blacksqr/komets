@@ -1,0 +1,42 @@
+#_________________________________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+inherit Interleaving_PM_P_MenuVertical_HTML PM_HTML
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuVertical_HTML constructor {name descr args} {
+ this inherited $name $descr
+ eval "$objName configure $args"
+}
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuVertical_HTML Render {strm_name {dec {}}} {
+ upvar $strm_name strm
+ append strm $dec <span [this Style_class] > [eval [this get_LC] get_name] { </span> } "\n"
+   append strm $dec "  " {<script Language="Javascript"> } "\n"
+   append strm $dec "  " "  " { <!-- } "\n"
+   append strm $dec "  " "  " "  " { var menu = new DynamicMenu(); } "\n"
+								 this Render_daughters strm "$dec        "
+   append strm $dec "  " "  " { //--> }   "\n"
+   append strm $dec "  " { </SCRIPT> } "\n"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuVertical_HTML maj_interleaved_daughters {} {} 
+
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuVertical_HTML Render_daughters {strm_name {dec {}}} {
+ upvar $strm_name rep
+ set L   [eval [this get_LC] get_daughters]
+ set pos 0
+ foreach c [this get_daughters] {
+	append rep $dec { menu.addParentV("} [eval [lindex $L $pos] get_name] {"); } "\n"
+	append rep $dec { menu.addChildV("} 
+	  set txt {}
+	  $c Render_all txt ""
+	  set txt [regsub -all "\n" $txt {}]
+	  set txt [regsub -all "\"" $txt {\"}]
+	  append rep $txt
+	append rep {"); } "\n"
+   incr pos
+  }
+}

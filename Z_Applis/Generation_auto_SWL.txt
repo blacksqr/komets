@@ -1,0 +1,29 @@
+# Génération automatique du squelette de SWL
+# CometSqueletton {name L_attributs L_actions L_LM L_mtd_COMET_RE}
+cd Comets/Z_Applis
+CometSqueletton SWL         [list L_players L_planets L_missiles] \
+                            [list Fire] \
+					        [list LP FC] \
+					        [list ]
+
+cd CometSWL/
+CometSqueletton SWL_Missile [list X Y VX VY ship] \
+                            [list ] \
+					        [list LP] \
+					        [list {set_X {v}} {set_Y {v}} {set_VX {v}} {set_VY {v}} {set_ship {v}}]
+
+CometSqueletton SWL_Ship    [list X Y player power angle mode] \
+                            [list ] \
+					        [list LP] \
+					        [list {set_X {v}} {set_Y {v}} {set_player {v}} {set_power {v}} {set_angle {v}} {set_mode {v}}]
+
+CometSqueletton SWL_Planet  [list X Y R density mode] \
+                            [list ] \
+					        [list LP] \
+					        [list {set_X {v}} {set_Y {v}} {set_R {v}} {set_density {v}} {set_mode {v}}]
+
+CometSqueletton SWL_Player  [list name color L_ships] \
+                            [list ] \
+					        [list LP] \
+					        [list {set_name {v}} {set_color {v}} {set_L_ships {v}} {Add_L_ships {v}} {Sub_L_ships {v}}]
+cd ../../..

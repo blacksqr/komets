@@ -1,0 +1,1313 @@
+set DEFINE_MODEL_COMET 1
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+proc Generate_accessors {class_name L_vars} {
+ foreach v $L_vars {
+   set    cmd "method $class_name get_$v \{ \} \{"
+   append cmd {return $this(} $v ")\}"
+     eval $cmd
+   set    cmd "method $class_name set_$v \{v\} \{"
+   append cmd {set this(} $v ") \$v\}"
+     eval $cmd
+  }
+}
+
+#_________________________________________________________________________________________________________
+# A comet is composed of three kind of elements, namely:
+#  - a logical consistency part : its aims to maintain consistence between logical models.
+#  - some logical models : each of them modelises an aspect of the comet. Typically a comet
+#                          has 2 logical models. One for the interaction and one for the functionnal core.
+#                          A L.M. aims to manage differents concrete models.
+#  - some concrete models : each of them is associated to a logical model.
+#                           A C.M. aims to be the interface to a core implementing the model.
+#                           For exemple a C.M. of the presentation of a button could be the
+#                           interface to the TK code.
+#_________________________________________________________________________________________________________
+proc Methodes_get_LC {classe L_methodes o_reference} {
+ set rep [list]
+ foreach methode $L_methodes {set    cmd "method $classe "
+                                 set methode_name [lindex $methode 0]
+                                 set params       [lindex $methode 1]
+                                 append cmd $methode_name " \{"
+                                 #// Adding parameters
+                                 foreach param $params {#// Managing the parameters
+                                                        append cmd $param " "}
+                               append cmd "\} \{"
+                                 #// Default comportment is to call equivalent funcion for each Logical Model
+                                 append cmd {return [} $o_reference { } $methode_name { }
+                                   foreach param $params {append cmd {$} [lindex $param 0]}
+                                 append cmd {]}
+                               append cmd "\}"
+                               eval $cmd
+                               append rep $cmd "\n"
+                              }
+ return $rep
+}
+#_________________________________________________________________________________________________________
+proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
+ set rep [list]
+ foreach methode $L_methodes {set    cmd "method $classe "
+                                 set methode_name [lindex $methode 0]
+                                 set params       [lindex $methode 1]
+                                 append cmd $methode_name " \{"
+                                 #// Adding parameters
+                                 foreach param $params {#// Managing the parameters
+                                                        append cmd $param " "}
+                               append cmd "\} \{"
+                                 if {[string equal $o_reference {}]} {} else {
+                                   append cmd $o_reference { } $methode_name { }
+                                     foreach param $params {append cmd {$} [lindex $param 0] " "}
+                                   append cmd ";\n"
+                                  } 
+                                 #// Default comportment is to call equivalent funcion for each Logical Model
+                                 if {[llength $attrib_L]} {
+                                   append cmd {foreach LM } $attrib_L { } "\{" {$LM } $methode_name { }
+                                     foreach param $params {append cmd {$} [lindex $param 0]}
+                                   append cmd "\}"
+                                  }
+                               append cmd "\}"
+                               eval $cmd
+                               append rep $cmd "\n"
+                              }
+ return $rep
+}
+
+#_________________________________________________________________________________________________________
+proc Manage_CallbackList {c L_m {pos begin}} {
+ set L_varL_to_declare_in_constr [list]
+ foreach m $L_m {
+# Init the callback mechanism
+   set L_CB_name "this\(L_CB_$m\)"
+   lappend L_varL_to_declare_in_constr $L_CB_name
+   set cmd "method $c Trigger_L_CB \{L_CB\} \{\n"
+     append cmd " foreach CB \[subst \$\$L_CB\] \{\n"
+     append cmd "   eval \[lindex \$CB 1\]\n"
+     append cmd "  \}\n"
+   append cmd "\}\n"
+   eval $cmd
+# Generate the callback accessors
+   set cmd "method $c Subscribe_to_$m \{id CB\} \{\n"
+     append cmd " lappend $L_CB_name \[list \$id \$CB\];\n"
+   append cmd "\}\n"
+   eval $cmd
+# Generate the callback mechanism
+   set body [gmlObject info body    $c $m]
+   set argL [gmlObject info arglist $c $m]
+   set cmd "method $c $m \{$argL\} \{\n"
+     if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
+       append cmd $avant {# INSERT CALLBACKS HERE} "\n this Trigger_L_CB $L_CB_name\n" $apres
+      } else {switch $pos {
+                begin {append cmd " this Trigger_L_CB $L_CB_name\n"
+                       append cmd $body "\n"
+                      }
+                end   {append cmd $body "\n"
+                       append cmd " this Trigger_L_CB $L_CB_name\n"
+                      }
+               }
+             }
+   append cmd "\}\n"
+   eval $cmd
+  }
+  
+# Add initialisation of lists of callbacks in the constructor
+ set body [gmlObject info body    $c constructor]
+ set argL [gmlObject info arglist $c constructor]
+ append body "\n#_________________________________\n#Definition of some callback lists\n#_________________________________\n"
+ foreach CB $L_varL_to_declare_in_constr {
+   append body " set $CB \[list\]\n"
+  }
+ set cmd "method $c constructor \{$argL\} \{\n"
+   append cmd $body
+ append cmd "\}\n"
+ eval $cmd
+}
+
+#_________________________________________________________________________________________________________
+proc Encapsulator {type element args} {
+ set name "Encapsulator_of_$element"
+ $type $name $args
+   
+ return $name
+}
+
+#_________________________________________________________________________________________________________
+#_____________________________________Common structure of elements________________________________________
+#_________________________________________________________________________________________________________
+method Comet_element constructor {name descr args} {
+ set this(name)  $name
+ set this(descr) $descr
+ set this(unique_CG_id) 0
+
+# Lists of predecessors and predecessors
+ set this(nb_max_mothers)   99999999
+ set this(nb_max_daughters) 99999999
+ set this(L_mothers)        [list]
+ set this(L_daughters)      [list]
+# List of out predecessors and successor, udefull to distinguish between nested comets and other ones
+# Those list are sublist of L_mothers and L_daughters !!!
+ set this(L_out_daughters)  [list]
+ set this(L_last_nested_daughters_subbed) {}
+
+# A handle for evolution engines
+ set this(L_E_engine) [list]
+ set this(handle_EE)  {}
+   set a0 [New_analyser]; set this(analyser)  [$a0 A_${objName}_$a0]
+   this Add_EE $this(analyser)
+   this set_Handle_EE $this(analyser)
+
+#______________________________________
+ set this(FC)         {}
+ set this(propagate_next_liste_cmd) {}
+ set this(propagate_prev_liste_cmd) {}
+ set this(is_propagating)            0
+# Data structure for composition
+## All the composing comets
+ set this(L_composing_comets)        [list]
+ set this(composing_extension)       {}
+## All the toplevel comets, subset of the set of composing comets, used to be connected to this cometPart
+ set this(L_handle_composing_comets) [list]
+## All the sublevel comets, subset of the set of composing comets, used to be connected to the daughters.
+ set this(L_handle_composing_daughters) [list]
+
+ set this(last_daughter_added) {}
+ 
+ set this(consistency_phase) 0
+
+ eval "$objName configure $args"
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element dispose {} {
+ foreach ee $this(L_E_engine)         {$ee dispose}
+ foreach lc $this(L_mothers)          {$lc Sub_daughter   $objName}
+ foreach lc $this(L_daughters)        {$lc Sub_mother $objName}
+ foreach sc $this(L_composing_comets) {$sc dispose}
+ this inherited
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element configure args {
+ set L_cmd [split $args -]
+ foreach cmd $L_cmd {
+   if {[string equal $cmd {}]} {continue}
+   eval "$objName $cmd"
+  }
+}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+method Comet_element Substitute_by {e} {
+ $e   set_mothers   [this get_mothers]
+ $e   set_daughters [this get_daughters]
+ this set_mothers   {}
+ this set_daughters {}
+}
+#_________________________________________________________________________________________________________
+method Comet_element Ensure_mothers_consistency {} {
+ foreach m [this get_mothers] {
+   $m Be_consistent_with_daughter $objName
+  }
+}
+#_________________________________________________________________________________________________________
+method Comet_element Be_consistent_with_daughter {d} {
+
+}
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+method Comet_element get_unique_daughter_id {} {
+ return [incr this(unique_CG_id)]
+}
+#_________________________________________________________________________________________________________
+method Comet_element get_last_daughter_added {} {return $this(last_daughter_added)}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_composing_extension {}  {return $this(composing_extension)}
+method Comet_element set_composing_extension {e} {set this(composing_extension) $e}
+#_________________________________________________________________________________________________________
+#__________________________________ Hierarchy of the comets parts ________________________________________
+#_________________________________________________________________________________________________________
+method Comet_element get_mothers   {} {return $this(L_mothers)}
+method Comet_element get_daughters {} {return $this(L_daughters)}
+method Comet_element set_mothers   {v} {set this(L_mothers)   $v}
+method Comet_element set_daughters {v} {
+ set L [this get_daughters]
+ foreach d $L {
+   this Sub_daughter $d
+  }
+ foreach d $v {
+   this Add_daughter $d
+  }
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_out_daughters {} {return $this(L_out_daughters)}
+
+method Comet_element get_nb_max_mothers {}    {return $this(nb_max_mothers)}
+method Comet_element set_nb_max_mothers {n}   {set this(nb_max_mothers) $n}
+method Comet_element get_nb_max_daughters {}  {return $this(nb_max_daughters)}
+method Comet_element set_nb_max_daughters {n} {set this(nb_max_daughters) $n}
+
+#_________________________________________________________________________________________________________
+method Comet_element Has_for_nested_element {comet} {
+ return [lsearch $this(L_handle_composing_comets) $comet]
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element Has_for_daughter {e {dec " "}} {
+# puts "$dec Do $objName has $e for daughter?"
+ set pos 0
+# set ext [this get_composing_extension]
+ foreach d $this(L_handle_composing_daughters) {
+   set rep [$d Has_for_daughter $e "$dec| "]
+   if {[expr $rep != -1]} {
+     return $pos
+    }
+   incr pos
+  }
+ set plus [lsearch $this(L_out_daughters) $e]
+ if {[expr $plus >= 0]} {
+                         return [expr $pos + $plus]}
+
+ return -1
+}
+#_________________________________________________________________________________________________________
+method Comet_element Accept_more_mothers {}   {return [expr $this(nb_max_mothers)>[llength $this(L_mothers)]]}
+#_________________________________________________________________________________________________________
+method Comet_element Accept_more_daughters {} {return [expr $this(nb_max_daughters)>[llength $this(L_daughters)]]}
+#_________________________________________________________________________________________________________
+method Comet_element Add_mother    {m {index -1}} {
+# Is this mother still present ?
+ if {[expr [lsearch $this(L_mothers) $m]!=-1]} {return 2}
+# Can we had one more mother ?
+# if {[expr [this Accept_more_mothers] \
+#        && [$m Accept_more_daughters]]} {} else {return 3}
+ if {[this Accept_more_mothers]} {} else {return 3}
+# Ok, let's had this mother
+ if {[Add_element this(L_mothers) $m]} {
+   $m Add_daughter $objName $index
+   return 1
+  }
+# If we arrive here, then we had a big problems...
+ puts "$objName Add_mother $m $index :\n   BIG PROBLEME, insertion impossible in mothers list!!!"
+ return 0
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_mother    {m} {set pos [lsearch $this(L_mothers) $m]
+                                        if {[Sub_element this(L_mothers) $m]} {$m Sub_daughter $objName
+                                                                               return 1}
+                                        return 0}
+#_________________________________________________________________________________________________________
+method Comet_element Add_daughters {L_n {index -1}} {
+ set pos $index
+ foreach n $L_n {
+   this Add_daughter $n $pos
+   if {$index == -1} {} else {incr pos}
+  }
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_daughters {L_n} {
+ foreach n $L_n {
+   this Sub_daughter $n $pos
+  }
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element Add_daughter    {m {index -1}} {
+ if {[string equal $m $objName]} {return 4}
+# Is this daughter still present ?
+ set has_m_for_daughter [this Has_for_daughter $m]
+ if {[expr $has_m_for_daughter != -1]} {return 2}
+# Can we had one more daughter ?
+# if {[expr [this Accept_more_daughters] \
+#        && [$m   Accept_more_mothers  ]]} {} else {return 3}
+ if {[this Accept_more_daughters]} {} else {return 3}
+# Ok, let's had this daughter
+# Is this daughter part of the nested daughters ?
+ set pos_nested [this Has_for_nested_element $m]
+# If not, then it is marqued as a out-daughter.
+ if {[expr $pos_nested == -1]} {
+   set this(L_out_daughters) [linsert $this(L_out_daughters) $index $m]
+  }
+# Has m to be attached to a nested node of this object ?
+ if {[expr ($index != -1) && ([llength $this(L_handle_composing_daughters)] > $index)]} {
+   set node [lindex $this(L_handle_composing_daughters) $index]
+   set this(last_daughter_added) $m
+   set rep [$node Add_daughter $m]
+   puts "IN $objName Add_daughter $m $index:\n  $node Add_daughter $m : $rep"
+   return $rep
+  } else {
+      set rep [Add_element this(L_daughters) $m $index]
+      if {[expr $rep != 0]} {
+        $m Add_mother $objName $index
+        set this(last_daughter_added) $m
+        return 1
+       }
+      set this(last_daughter_added) $m
+      return $rep
+     }
+
+ set this(last_daughter_added) $m
+ return 1
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_daughter    {m} {set this(last_nested_daughter_subbing) {}
+                                          if {[Sub_element this(L_daughters) $m]} {$m Sub_mother $objName
+                                                                                   Sub_element this(L_out_daughters)  $m
+                                                                                   return 1
+                                                                                  }
+                                          foreach d $this(L_handle_composing_daughters) {
+                                            if {[$d Sub_daughter $m]} {set this(last_nested_daughter_subbing)         $d
+                                                                       Sub_element this(L_composing_comets)           $d
+                                                                       Sub_element this(L_handle_composing_comets)    $d
+                                                                       Sub_element this(L_handle_composing_daughters) $d
+                                                                       Sub_element this(L_out_daughters)              $m
+                                                                       return 1
+                                                                      }
+                                           }
+                                          return 0
+}
+
+#_________________________________________________________________________________________________________
+#______________________________________ Managing nesting _________________________________________________
+#_________________________________________________________________________________________________________
+method Comet_element get_composing_comets {}   {return $this(L_handle_composing_daughters)}
+#_________________________________________________________________________________________________________
+method Comet_element set_composing_comets {Lc} {set this(L_handle_composing_daughters) $Lc}
+#_________________________________________________________________________________________________________
+method Comet_element Add_composing_comet {Lc} {
+ return [Add_list this(L_composing_comets) $Lc]}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_composing_comet {Lc} {
+ return [Sub_list this(L_composing_comets) $Lc]}
+#_________________________________________________________________________________________________________
+method Comet_element Add_handle_composing_comet {Lc index ext} {
+ global debug
+ set L [list]
+ foreach c $Lc {set n "$c$ext"
+                lappend L $n
+                if {$debug} {puts "$c : \[this Add_daughter $n\]"}
+                this Add_daughter $n
+               }
+ this Add_composing_comet $Lc
+ set rep [Add_list this(L_handle_composing_comets) $L]
+ if {$debug} {puts "Comet_element: $objName Add_handle_composing_comet \{$Lc\}"}
+ if {[expr $rep >= 1]} {foreach c $Lc {$c Add_EE_successor [this get_Handle_EE]}
+                       }
+ return
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_handle_composing_comet {Lc {ext {}}} {
+ set L [list]
+ foreach c $Lc {set n "$c$ext"
+                lappend L $n
+                this Sub_daughter $n}
+ set rep [Sub_list this(L_handle_composing_comets) $L]
+ if {[expr $rep >= 1]} {foreach c $Lc {$c Sub_EE_successor [this get_Handle_EE]}
+                       }
+ return $rep
+}
+#_________________________________________________________________________________________________________
+method Comet_element get_handle_comet_daughters {} {return $this(L_handle_composing_daughters)}
+#_________________________________________________________________________________________________________
+method Comet_element Add_handle_comet_daughters {Lc index ext} {
+ set L [list]
+ foreach c $Lc {lappend L "$c$ext"}
+ this Add_composing_comet $Lc
+
+ return [Add_list this(L_handle_composing_daughters) $L $index]
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_handle_comet_daughters {Lc {ext {}}} {
+ set L [list]
+ foreach c $Lc {lappend L "$c$ext"}
+ return [Sub_list this(L_handle_composing_daughters) $L]
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_objName {} {return $objName}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_name {}   {return $this(name)}
+method Comet_element set_name {n}  {set this(name) $n; return $n}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_descr {}  {return $this(descr)}
+method Comet_element set_descr {d} {set this(descr) $d; return $d}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_Common_FC {}   {return $this(FC)}
+method Comet_element set_Common_FC {fc} {set this(FC) $fc
+                                         return $fc}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_propagate_next_liste_cmd {}   {return $this(propagate_next_liste_cmd)}
+method Comet_element set_propagate_next_liste_cmd {n}  {set this(propagate_next_liste_cmd) $n; return $n}
+#_________________________________________________________________________________________________________
+method Comet_element get_propagate_prev_liste_cmd {}   {return $this(propagate_prev_liste_cmd)}
+method Comet_element set_propagate_prev_liste_cmd {n}  {set this(propagate_prev_liste_cmd) $n; return $n}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_is_propagating {} {return $this(is_propagating)}
+#_________________________________________________________________________________________________________
+method Comet_element Propagate_excusive {cmd {where 3}} {
+global debug
+ if {$debug} {puts "$objName Propagate $cmd $where"}
+ if {$this(is_propagating)} {
+   if {$debug} {puts "  !!!Still propagating"}
+   return 0
+  }
+ set this(is_propagating) 1
+   if {[expr "$where & 1"]} {set L [eval $this(propagate_prev_liste_cmd)]
+                             foreach obj $L {$obj Propagate $cmd $where}
+                            }
+   if {[expr "$where & 2"]} {set L [eval $this(propagate_next_liste_cmd)]
+                             foreach obj $L {$obj Propagate $cmd $where}
+                            }
+
+   set this(is_propagating) 0
+ return 1
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element Propagate {cmd {where 3}} {
+global debug
+ if {$debug} {puts "$objName Propagate $cmd $where"}
+ if {$this(is_propagating)} {
+   if {$debug} {puts "  !!!Still propagating"}
+   return 0
+  }
+ set this(is_propagating) 1
+   if { [catch {eval "this $cmd"} err] } {
+     puts "PROPAGATION ERROR : The following command generated an error:\n  \"$objName $cmd\"\n  ERROR GENERATED : $err"}
+   if {[expr "$where & 1"]} {set L [eval $this(propagate_prev_liste_cmd)]
+                             foreach obj $L {$obj Propagate $cmd $where}
+                            }
+   if {[expr "$where & 2"]} {set L [eval $this(propagate_next_liste_cmd)]
+                             foreach obj $L {$obj Propagate $cmd $where}
+                            }
+
+   set this(is_propagating) 0
+ return 1
+}
+
+#__________________________________ Managing the Evolutions engines_______________________________________
+#_________________________________________________________________________________________________________
+method Comet_element Add_EE {EE} {return [Add_element this(L_E_engine) $EE]}
+method Comet_element Sub_EE {EE} {return [Sub_element this(L_E_engine) $EE]}
+#_________________________________________________________________________________________________________
+method Comet_element get_Handle_EE {}   {return $this(handle_EE)}
+method Comet_element set_Handle_EE {EE} {set this(handle_EE) $EE; return $EE}
+#_________________________________________________________________________________________________________
+method Comet_element Add_EE_successor {EE} {$this(handle_EE) Add_successor $EE}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_EE_successor {EE} {$this(handle_EE) Sub_successor $EE}
+
+#_________________________________________________________________________________________________________
+#________________________________________Common functionnal core__________________________________________
+#_________________________________________________________________________________________________________
+method CommonFC constructor {} {
+# Can be UnDone, InProgress, Done
+ set this(state)            Undone
+# This is a validation function, emits a bool to say weather the task is validable
+ set this(fct_is_validable) {return 1}
+}
+
+method CommonFC get_state {}             {return $this(state)}
+method CommonFC set_state {v}            {set this(state) $v; return $v}
+method CommonFC get_fct_is_validable {}  {return $this(fct_is_validable)}
+method CommonFC set_fct_is_validable {v} {set this(fct_is_validable) $v; return $v}
+
+#_________________________________________________________________________________________________________
+#___________________________________________Logical consistency___________________________________________
+#_________________________________________________________________________________________________________
+inherit Logical_consistency Comet_element
+method Logical_consistency constructor {name descr args} {
+ this inherited $name $descr
+# A list of logical models (can be presentation, interaction, functionnal core...)
+ set this(L_LM)       [list]
+
+ set this(FC)          {}
+
+ this set_propagate_next_liste_cmd "this get_L_LM"
+ 
+ this Is_a_concept 0
+ this Is_a_task    1
+ this Is_an_op     1
+ 
+ eval "$objName configure $args"
+}
+#_________________________________________________________________________________________________________
+method Logical_consistency dispose {} {
+ set L [this get_L_LM]
+ if {[string equal $this(FC) {}]} {} else {$this(FC) dispose}
+ this inherited
+ foreach lm $L {$lm dispose}
+}
+
+#_________________________________________________________________________________________________________
+method Logical_consistency Style {LM args} {
+ return [$objName$LM Style $args]
+}
+
+#_________________________________________________________________________________________________________
+method Comet_element get_LC {}   {return $objName}
+
+#_________________________________________________________________________________________________________
+method Comet_element Add_daughters_R {L_n {index -1}} {
+ set pos $index
+ foreach n $L_n {
+   this Add_daughter_R $n $pos
+   if {$index == -1} {} else {incr pos}
+  }
+}
+#_________________________________________________________________________________________________________
+method Comet_element Sub_daughters_R {L_n} {
+ foreach n $L_n {
+   this Sub_daughter_R $n $pos
+  }
+}
+
+#_________________________________________________________________________________________________________
+# Check if m is a comet element, create a CometText elsewhere
+method Logical_consistency Add_daughter  {m {index -1}} {
+ set still_exists 0
+ if {[expr ([gmlObject info exists object $m] == 1)]} {
+   set L [eval gmlObject info classes [gmlObject info classofobject $m]]
+   set position [lsearch $L Logical_consistency]
+   if {[expr $position >= 0]} {set still_exists 1}
+  }
+ if {[expr $still_exists == 0]} {
+   set name_new_comet "CG_${objName}_$this(unique_CG_id)"
+   incr this(unique_CG_id)
+   CometText $name_new_comet $m {Comet generated on the fly} -set_text $m
+   return [this Add_daughter $name_new_comet $index]
+  }
+
+ return [this inherited $m $index]
+}
+
+#_________________________________________________________________________________________________________
+method Logical_consistency Add_daughter_R_of {c {index -1}} {
+ set pos $index
+ foreach n $L_n {
+   this Add_daughter_R_of $n $pos
+   if {$index == -1} {} else {incr pos}
+  }
+}
+#_________________________________________________________________________________________________________
+method Logical_consistency Add_daughter_R_of {c {index -1}} {
+ set pos $index
+ foreach d [$c get_daughters] {
+   this Add_daughter_R $d $pos
+   if {[expr $index == -1]} {} else {incr pos}
+  }
+ if {[expr $index == -1]} {set index 0}
+ $c Subscribe_to_Add_daughter_R $objName "upvar m comet; upvar index index_de_ref; $objName Add_daughter_R \$comet \[expr $index + \$index_de_ref\]"
+ $c Subscribe_to_Sub_daughter_R $objName "upvar m comet; $objName Sub_daughter_R \$comet"
+}
+#_________________________________________________________________________________________________________
+method Logical_consistency Add_daughter_R  {m {index -1}} {
+ set res [this Add_daughter $m $index]
+ if {[expr $res == 0]} {return $res}
+ set m   [this get_last_daughter_added]
+ if {[expr $res == 1]} {
+   set L_LM_objname  [this get_L_LM]
+   set L_LM_daugther [$m   get_L_LM]
+   foreach LM_objname $L_LM_objname {
+     if {[regexp "^${objName}(.*)" $LM_objname rep suffixe_objname]} {} else {continue}
+     foreach LM_daughter $L_LM_daugther {
+       set LC_daughter [$LM_daughter get_LC]
+       if {[string equal "$LC_daughter$suffixe_objname" $LM_daughter]} {
+         $LM_objname Add_daughter $LM_daughter $index
+         $LM_objname Connect_PM_descendants
+        }
+      }
+    }
+  }
+# INSERT CALLBACKS HERE
+ return $res
+}
+#_________________________________________________________________________________________________________
+# Prendre garde aux comets nestées dans cette affaire....notamment en ce qui va concerner les entrelacements
+method Logical_consistency Sub_daughter_R {m} {
+ set res [this Sub_daughter $m]
+ if {[expr $res == 1]} {
+# # Don't forget to consider the case where the LM is nested
+   set L_LM [this get_L_LM]
+   set L_LMD [$m get_L_LM]
+   foreach LM $L_LM {
+     foreach LMD $L_LMD {
+       set rep [$LM Has_for_daughter $LMD]
+       if {[expr $rep != -1]} {
+         $LM Sub_daughter $LMD
+        }
+      }
+    }
+  }
+
+# INSERT CALLBACKS HERE
+ return $res
+}
+
+#_________________________________________________________________________________________________________
+Manage_CallbackList Logical_consistency [list Add_daughter_R Sub_daughter_R]
+#_________________________________________________________________________________________________________
+method Logical_consistency set_daughters_R {v} {
+ set L [this get_daughters]
+ foreach d $L {
+   this Sub_daughter_R $d
+  }
+ foreach d $v {
+   this Add_daughter_R $d
+  }
+}
+
+#_________________________________________________________________________________________________________
+method Logical_consistency Add_mother    {m {index -1}} {set rep [this inherited $m $index]
+                                                         if {[expr $rep == 1]} {this Add_EE_successor [$m get_Handle_EE]
+#                                                                                #$m Connect_LM_descendants _LM_LP
+                                                                               }
+                                                         return $rep
+                                                        }
+method Logical_consistency Sub_mother    {m} {set rep [this inherited $m]
+                                              if {[expr $rep == 1]} {this Sub_EE_successor [$m get_Handle_EE]}
+                                              return $rep
+                                             }
+
+#_________________________________________________________________________________________________________
+method Logical_consistency set_Common_FC {fc} {this inherited $fc
+                                               foreach LM [this get_L_LM] {$LM set_Common_FC $fc}
+                                              }
+
+#____________________________________ Managing the Logicals Models________________________________________
+#_________________________________________________________________________________________________________
+method Logical_consistency get_L_LM {} {return $this(L_LM)}
+method Logical_consistency Add_LM {LM} {if {[Add_element this(L_LM) $LM]} {
+                                          $LM set_LC $objName
+                                          $LM set_Common_FC $this(FC)
+                                          $LM Add_EE_successor [this get_Handle_EE]
+                                         }
+                                       }
+method Logical_consistency Sub_LM {LM} {if {[Sub_element this(L_LM) $LM]} {
+                                           $LM set_LC {}
+                                           $LM Sub_EE_successor [this get_Handle_EE]
+                                          }
+                                       }
+#_________________________________________________________________________________________________________
+method Logical_consistency Connect_LM_descendants {suffixe {dec " "}} {
+global debug
+#puts "$dec $objName Connect_LM_descendants $suffixe"
+ set LM "$objName$suffixe"
+#puts "$dec# \{$this(L_daughters)\}"
+ foreach LCD $this(L_daughters) {
+#   puts "$dec| $LM Add_daughter $LCD$suffixe"
+   set rep [$LM Add_daughter "$LCD$suffixe"]
+   if {[expr $rep == 1 || $rep == 2]} {
+     $LCD Connect_LM_descendants $suffixe "$dec| "
+    } else {if {$debug} {puts "$dec| -> ERROR: $rep"}}
+  }
+# if {[expr [string equal $first 1] \
+#        && [string equal $suffixe _LM_LP]]} {$objName$suffixe Connect_PM_descendants}
+}
+
+#_______________________________ Managing the task or concept state_______________________________________
+#_________________________________________________________________________________________________________
+method Logical_consistency Is_a_concept {{v nop}} {if {[string equal $v nop]} {return $this(is_a_concept)} else {set this(is_a_concept) $v}}
+method Logical_consistency Is_a_task    {{v nop}} {if {[string equal $v nop]} {return $this(is_a_task)   } else {set this(is_a_task) $v}}
+method Logical_consistency Is_an_op     {{v nop}} {if {[string equal $v nop]} {return $this(is_an_op)    } else {set this(is_an_op) $v}}
+
+#_______________________________ Managing the common Functionnal Core_____________________________________
+#_________________________________________________________________________________________________________
+method Logical_consistency get_state {}             {return [$this(FC) get_state]}
+method Logical_consistency set_state {v}            {$this(FC) set_state $v; return $v}
+method Logical_consistency get_fct_is_validable {}  {return [$this(FC) get_fct_is_validable]}
+method Logical_consistency set_fct_is_validable {v} {$this(FC) set_fct_is_validable $v; return $v}
+
+#_________________________________________________________________________________________________________
+#____________________________________________ Logical model_______________________________________________
+#_________________________________________________________________________________________________________
+inherit Logical_model Comet_element
+method Logical_model constructor {name descr args} {
+ this inherited $name $descr
+
+# A list of physical models (can be presentation, interaction, functionnal core...)
+ set this(L_PM)         [list]
+ set this(L_actives_PM) [list]
+
+ set this(LC) {}
+ set this(FC) {}
+
+ set this(unique_PM_id) 0
+
+ this set_propagate_prev_liste_cmd "this get_LC"
+ this set_propagate_next_liste_cmd "this get_L_actives_PM"
+
+ set this(L_PM_factories) [list]
+
+ eval "$objName configure $args"
+}
+
+
+#_________________________________________________________________________________________________________
+method Logical_model dispose {} {
+ set L [this get_L_PM]
+ this inherited
+ foreach PM $L {$PM dispose}
+}
+
+#_________________________________________________________________________________________________________
+#______________________________________ Style related methods ____________________________________________
+#_________________________________________________________________________________________________________
+method Logical_model Style args {
+ set L_cmd [split $args -]
+ foreach cmd $L_cmd {
+   if {[string equal $cmd {}]} {continue}
+   eval "$objName $cmd"
+  }
+}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+method Logical_model set_Common_FC {fc} {this inherited $fc
+                                         foreach PM [this get_L_PM] {$PM set_Common_FC $fc}
+                                        }
+#_________________________________________________________________________________________________________
+#_______________________________ Managing the common Functionnal Core_____________________________________
+#_________________________________________________________________________________________________________
+method Logical_model get_FC {}   {return $this(FC)}
+method Logical_model set_FC {fc} {set this(FC) $fc; return $fc}
+#_________________________________________________________________________________________________________
+method Logical_model get_LC {}   {return $this(LC)}
+method Logical_model set_LC {lc} {set this(LC) $lc; set this(FC) [$this(LC) get_Common_FC]; return $lc}
+#_________________________________________________________________________________________________________
+method Logical_model Sub_daughter {m} {
+ set res [this inherited $m]
+ if {[expr $res == 1]} {
+# # Let's deconnect all PMs who only have for mothers PMs from $m
+   foreach PM [$m get_L_actives_PM] {
+     set L_mothers [$PM get_mothers]
+     set to_be_deconnected 1
+     foreach PM_mother $L_mothers {
+       set LM_mother [$PM_mother get_LM]
+       if {[string equal $LM_mother $objName]} {} else {set to_be_deconnected 0; break}
+      }
+     if {[expr $to_be_deconnected == 1 \
+            && ![string equal $L_mothers {}]]} {
+#     # It can only mean that L_mothers has only one element, which is the mother to remove
+       $L_mothers Sub_daughter $PM
+      }
+    }
+  }
+ return $res
+}
+#_________________________________________________________________________________________________________
+method Logical_model set_PM_active   {PM} {set added [Add_element this(L_actives_PM) $PM]
+                                           if {$added} {# Add PM in the hierarchy
+                                                        $PM set_LM $objName
+                                                        $PM Add_EE_successor [this get_Handle_EE]
+                                                        return 1
+                                                       }
+                                           return 0
+                                          }
+method Logical_model set_PM_inactive {PM} {set subed [Sub_element this(L_actives_PM) $PM]
+                                           if {$subed} {# Recursively sub in the PM hierarchy
+                                                        $PM set_LM {}
+                                                        $PM Sub_EE_successor [this get_Handle_EE]
+                                                        return 1
+                                                       }
+                                           return 0
+                                          }
+#_________________________________________________________________________________________________________
+method Logical_model get_L_actives_PM {}  {return $this(L_actives_PM)}
+method Logical_model set_L_actives_PM {L} {set this(L_actives_PM) {}
+                                           foreach c $L {this set_PM_active $c}
+                                          }
+#_________________________________________________________________________________________________________
+method Logical_model get_L_PM_mothers_of_in {PM LM_M}  {
+ set PMs_M    [$PM   get_mothers]
+ set PMs_LM_M [$LM_M get_L_actives_PM]
+ return [Liste_Intersection $PMs_M $PMs_LM_M]
+}
+#_________________________________________________________________________________________________________
+method Logical_model get_L_PM    {}   {set rep [list]
+                                       foreach e $this(L_PM) {
+                                         lappend rep [lindex $e 0]
+                                        }
+                                       return $rep
+                                      }
+method Logical_model get_L_PM+   {}   {return $this(L_PM)}
+method Logical_model get_PM_info {PM} {foreach e $this(L_PM) {
+                                         if {[string equal $PM [lindex $e 0]} {
+                                           return $e
+                                          }
+                                        }
+                                      }
+method Logical_model set_L_PM    {L}  {foreach c $L {this Add_PM $c}}
+#_________________________________________________________________________________________________________
+method Logical_model get_a_unique_id {} {
+ return [incr this(unique_PM_id)]
+}
+#_________________________________________________________________________________________________________
+method Logical_model Add_PM {PM args}  {
+ if {[string equal $PM ?]} {puts "Add_PM PM args\n  PM : A Physical Model compatible with $objName\n  args : -factory \"the command to create a new instance\"\n         -core \"Another PM of the same type, which is nested inside. This core PM is the one containing the right model to achieve the task. The PM in wich it is nested aims to provide a framework to do some styles.\""}
+ if {[string equal [$PM get_LM] ""]} {} else {return 0}
+ set PM_info $PM
+ set ok 0
+   set L_cmd [split $args -]
+   foreach cmd $L_cmd {
+     switch [lindex $cmd 0] {
+       factory {lappend this(L_PM_factories) [list [lindex $cmd 1] $PM]}
+       core    {set ok 1; lappend PM_info    [lindex $cmd 1]}
+      }
+    }
+ if {$ok} {} else {lappend PM_info $PM}
+ set ok 0; set pos 0
+ foreach e $this(L_PM) {
+   if {[string equal $PM [lindex $e 0]]} {
+     set this(L_PM) [lreplace $this(L_PM) $pos $pos $PM_info]
+     set ok 1
+     break
+    }
+   incr pos
+  }
+
+ if {$ok} {set added 0} else {set added [Add_element this(L_PM) $PM_info]}
+ if {$added} {$PM set_LM $objName
+              $PM set_Common_FC $this(FC)
+              return 1
+             }
+ return 0
+}
+#_________________________________________________________________________________________________________
+method Logical_model Sub_PM {PM}  {
+ set pos 0
+ foreach e $this(L_PM) {
+   if {[expr [string equal $PM [lindex $e 0]]
+          || [string equal $PM [lindex $e 1]] ]} {
+     $PM set_LM {}
+     set this(L_PM) [lreplace $this(L_PM) $pos $pos]
+     return 1
+    }
+   incr pos
+  }
+
+ return 0
+}
+#_________________________________________________________________________________________________________
+method Logical_model Add_daughter_PM {PM LMD} {
+# Find a valid PM in LMD to connect it to PM, wich is an active PM of objName
+ this Add_daughter           $LMD
+ this Add_PM                 $PM
+ this set_PM_active          $PM
+ this Connect_PM_descendants $PM $LMD
+}
+
+#_________________________________________________________________________________________________________
+method Logical_model Connect_PM_descendants {{L_PM ""} {L_LM ""} {dec " "}} {
+global debug
+if {$debug} {puts "$objName Connect_PM_descendants $L_PM"}
+
+# puts "$dec$objName Connect_PM_descendants \[list $L_PM\]"
+ if {[expr [llength $L_PM] == 0]} {set L_PM [this get_L_actives_PM]; if {$debug} {puts "${dec}L_PM <- $L_PM"}}
+ if {[expr [llength $L_LM] == 0]} {set L_LM [this get_daughters];    if {$debug} {puts "${dec}L_LM <- $L_LM"}}
+# L_PM contains a list of PM parts of actives PM of this logical model
+# Those PM have to be connected to theirs descendants
+ set pos 0
+
+#__________________________________
+ set L_LMs_to_connect [list]
+ set pos_LMD 0
+ foreach LMD $L_LM {
+   set L_PMs $L_PM
+   set LMD_PMs [$LMD get_L_actives_PM]
+   set pos_PM 0
+   set L_PMs_to_connect [list]
+   while {[expr [llength $L_PMs] > $pos_PM]} {
+     set PM [lindex $L_PMs $pos_PM]
+    if {$debug} {puts "On tente de trouver une PM-connection entre $objName->$PM et $LMD"}
+     set L_PMD [$PM get_daughters]
+     set L_inter [Liste_Intersection $L_PMD $LMD_PMs]
+     set length_L_inter [llength $L_inter]
+     if {[expr $length_L_inter > 1]} {
+       if {$debug} {puts "Problem : $PM has several daughters of the same LM:  - LM : $LMD\n  - PMs : $L_inter"}
+      }
+#   # Either a PM of this daughter is linked to a PM of objName
+#   # and then we just have to deconnect-reconnect it
+     if {[expr $length_L_inter == 1]} {
+       if {$debug} {puts "$PM a deja pour fils $L_inter"}
+       if {$debug} {puts "  $PM Sub_daughter $L_inter"}
+       $PM Sub_daughter $L_inter
+       if {$debug} {puts "  $PM Add_daughter $L_inter $pos_LMD"}
+       set rep [$PM Add_daughter $L_inter $pos_LMD]
+       if {$debug} {puts "  L_inter = \{$L_inter\}"}
+       lappend L_PMs_to_connect $L_inter
+       set new_L_PMs [list]
+         foreach elmt $L_PMs {
+           if {[$elmt Accept_PM_for_daughter $L_inter]} {
+            } else {lappend new_L_PMs $elmt}
+          }
+       set L_PMs $new_L_PMs
+       continue
+      }
+#   # Either it has not and we have to find a compatble PM
+     if {[expr $length_L_inter == 0]} {
+       set continue_go_go 0
+       foreach PMD $LMD_PMs {
+         if {[expr [$PM  Accept_PM_for_daughter $PMD]  \
+                && [$PM  Accept_more_daughters]        \
+                && [$PMD Accept_more_mothers]          \
+             ]} {set added [$PM Add_daughter $PMD]
+                 if {[expr $added == 1]} {
+                   lappend L_PMs_to_connect $PMD
+                   set new_L_PMs [list]
+                     foreach elmt $L_PMs {
+                       if {[$elmt Accept_PM_for_daughter $PMD]} {
+                        } else {lappend new_L_PMs $elmt}
+                      }
+                   set L_PMs $new_L_PMs
+                   if {$debug} {puts "  Reussite de \"$PM Add_daughter $PMD\""}
+                   set continue_go_go 1
+                   break
+                  } else {if {$debug} {puts "  Echec de branchement \[$PM Add_daughter $PMD\] => $added"}}
+                } else {if {$debug} {puts "$PM ne peut pas prendre pour fils $PMD => <[$PM  Accept_PM_for_daughter $PMD], [$PM  Accept_more_daughters], [$PMD Accept_more_mothers]>"}}
+        }
+       if {[expr $continue_go_go == 1]} {
+         continue
+        }
+      }
+     incr pos_PM
+    }
+   if {[expr [llength $L_PMs_to_connect] > 0]} {
+     lappend L_LMs_to_connect "$LMD $L_PMs_to_connect"
+    } else {
+           }
+   incr pos_LMD
+  }
+
+ foreach e $L_LMs_to_connect {
+   set LM  [lindex $e 0]
+   set PMs [lindex $e 1]
+   $LM Connect_PM_descendants $PMs "" "$dec  "
+  }
+
+ return
+}
+
+#_________________________________________________________________________________________________________
+method Logical_model Substitute {PM1 PM2} {
+ global debug
+ set subed [this set_PM_inactive $PM1]
+ if {$subed} {
+   set added [this set_PM_active $PM2]
+   set L_pos [list]
+   set L_PMM [$PM1 get_mothers]
+#   puts "____Structure before changes____"; Afficher_structure $PM1
+#   puts "** Let's manage mothers"
+   foreach PMM $L_PMM {set LMM   [$PMM get_LM]
+                       set L [$LMM get_daughters]
+                       set pos [lsearch -exact $L $objName]
+                       lappend L_pos $pos
+                       set res [$PMM Sub_daughter $PM1]
+                       puts "$PMM Sub_daughter $PM1 : $res"
+                       if {$debug} {puts "| $PMM Sub_daughter $PM1 : $res"}
+                      }
+   set index 0
+#   puts "____Structure after subbing mothers____"; Afficher_structure $PM1
+   foreach PMM $L_PMM {set pos [lindex $L_pos $index]
+                       set res [$PMM Add_daughter $PM2 $pos]
+                       puts "$PMM Add_daughter $PM2 $pos : $res"
+                       if {$debug} {puts "| $PMM Add_daughter $PM2 $pos : $res"}
+                       incr index}
+
+   set L_PMD [$PM1 get_daughters]
+   set L_LMD [this get_daughters]
+   set L_pos [list]
+#   puts "** Let's manage daughters"
+#   puts "____Structure before subbing daughters____"; Afficher_structure $PM1
+   foreach PMD $L_PMD {set LMD [$PMD get_LM]
+                       set pos [lsearch -exact $L_LMD $LMD]
+                       lappend L_pos $pos
+                       set res [$PM1 Sub_daughter $PMD]
+                       puts "$PM1 Sub_daughter $PMD : $res"
+                       if {$debug} {puts "| $PM1 Sub_daughter $PMD $pos : $res"}
+                      }
+   set index 0
+#   puts "____Structure after subbing daughters____"; Afficher_structure $PM1
+   foreach PMD $L_PMD {set pos [lindex $L_pos $index]
+                       set res [$PM2 Add_daughter $PMD $pos]
+                       puts "$PM2 Add_daughter $PMD $pos : $res"
+                       if {$debug} {puts "| $PM2 Add_daughter $PMD $pos : $res"}
+                       incr index}
+#   puts "____Structure PM2 after all____"; Afficher_structure $PM2
+   if {$debug} {puts "\n___________________________\n\
+                      this Connect_PM_descendants"}
+#   this Connect_PM_descendants
+   set L_LM_PMs_to_process [list]
+   foreach LM_M [this get_mothers] {
+#     set PMs_M     [$PM2  get_mothers]
+#     set PMs_LM_M  [$LM_M get_L_actives_PM]
+#     set real_PM_M [Liste_Intersection $PMs_M $PMs_LM_M]
+     set real_PMs_M [this get_L_PM_mothers_of_in $PM2 $LM_M]
+     if {[expr [llength $real_PMs_M] > 0]} {
+       if {$debug} {puts "\n___________________________\n\
+                          $LM_M Connect_PM_descendants $real_PMs_M"}
+       foreach PM $real_PMs_M {
+         set LM          [$PM get_LM]
+         foreach LM_grand_pere [$LM get_mothers] {
+           set L_PM_grand_peres [$LM get_L_PM_mothers_of_in $PM $LM_grand_pere]
+           if {[expr [llength $L_PM_grand_peres] > 0]} {
+             lappend L_LM_PMs_to_process [list $LM_grand_pere $L_PM_grand_peres]
+            }
+          }
+        }
+      }
+    }
+   if {[expr [llength $L_LM_PMs_to_process]==0]} {
+     if {$debug} {puts "\n___________________________\n\
+                        this Connect_PM_descendants"}
+     this Connect_PM_descendants
+    } else {foreach LM_PMs $L_LM_PMs_to_process {
+              set LM  [lindex $LM_PMs 0]
+              set PMs [lindex $LM_PMs 1]
+              puts " * $LM Connect_PM_descendants $PMs"
+              $LM Connect_PM_descendants $PMs
+             }
+           }
+  }
+}
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method Logical_model EE_State_NoPM {proposer} {
+ set nb_active_PM [llength $this(L_actives_PM)]
+ if {[expr $nb_active_PM > 0]} {return {}}
+ # Check if it is possible to plug this LM on one of its mothers
+ foreach LM_M $this(L_mothers) {# Check if a PM can be plugged
+                                foreach PM_M [$LM_M get_L_PM] {
+                                  foreach PM [this get_L_PM] {if {[$PM_M Accept_for_daughter $PM]} {
+                                                                # Propose to plug PM on PM_M
+                                                                 set p [$proposer New_proposition]
+                                                                 $p set_Conviction 0.8
+                                                                 $p set_Author Conceptor
+                                                                 $p set_Nature User_suitability
+                                                                 $p set_Fonction "$LM_M Add_PM_daughter $PM"
+                                                                 $proposer Add_action $p
+                                                               }
+                                                             }
+                                 }
+                               }
+ return "$objName EE_State_NoPM $proposer"
+}
+
+#___________________________________________________________________________________________________________________________________________
+#________________A state for an EE automat, replace a PM when its adequacy is under $threshold_min _________________________________________
+#________________________the PM is replaced by another which adequacy is upper than threshold_ok____________________________________________
+#___________________________________________________________________________________________________________________________________________
+method Logical_model EE_State_ChooseBestPM {proposer threshold_min threshold_ok} {
+## For each active MP, ask for the adequacy, if < 0.4 try to commut to another presentation
+## Have to get the context
+ #puts "  $objName EE_State_ChooseBestPM($proposer)"
+ foreach PM $this(L_actives_PM) {
+#   #puts " - PM=$PM"
+   set stop 0
+   foreach PMM [$PM get_mothers] {
+     set context    "<mother>$PMM</mother>; <PM>$PM</PM>; ws_w=[$PMM get_width $PM]; ws_h=[$PMM get_height $PM];"
+     set adequacy [$PM Adequacy $context]
+#     #puts "   * PMM=$PMM, PM=$PM : Adequacy=$adequacy"
+#     #puts "   * context=\"$context\""
+     if {[expr $adequacy < $threshold_min]} {# Look for another presentation
+       foreach Other_PM $this(L_PM) {
+                                     puts "     Could $Other_PM replace $PM?"
+                                     set cou [$Other_PM get_cou]
+#                                     #puts "Context : \"$context\""
+                                     set other_adeq [$Other_PM Adequacy $context]
+                                     if {[expr [$PMM Accept_for_daughter $cou]&&[$Other_PM Accept_more_mother]&&($other_adeq>$adequacy)]} {
+                                       puts "    <!!!> Proposing to replace $PM by $Other_PM, adequacy is $other_adeq <!!!>"
+                                       set p [$proposer New_proposition]
+                                       $p set_Conviction $adequacy
+                                       $p set_Author Conceptor
+                                       $p set_Nature User_suitability
+                                       set cmd_prop "$objName Substitute $PM $Other_PM; puts {$PM was replaced by $Other_PM}"
+#                                      #puts "     -> Ajout de \"$cmd_prop\""
+                                       $p set_Fonction $cmd_prop
+                                       $proposer Add_action $p
+                                       set stop 1
+                                       break
+                                      } else {
+#                                             #puts "       NOP :\n       $Other_PM adequacy is $other_adeq\n       $PMM Accept_for_daughter $cou:[$PMM Accept_for_daughter $cou]\n       $Other_PM Accept_more_mother:[$Other_PM Accept_more_mother]"
+                                             }
+        }
+      }
+    }
+  }
+ return "$objName EE_State_ChooseBestPM $proposer $threshold_min $threshold_ok"
+}
+
+
+#_________________________________________________________________________________________________________
+#____________________________________________ Logical presentation_______________________________________________
+#_________________________________________________________________________________________________________
+inherit Logical_presentation Logical_model
+method Logical_presentation constructor {name descr args} {
+ this inherited $name $descr
+ this set_composing_extension _LM_LP
+ 
+ eval "$objName configure $args"
+}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+
+
+#_________________________________________________________________________________________________________
+#_____________________________________________ Physical Model ____________________________________________
+#_________________________________________________________________________________________________________
+# Before all, let's define what is a platform, so we can use it in the concret model definition___________
+#source context_of_use.tcl
+#_________________________________________________________________________________________________________
+inherit Physical_model Comet_element
+method Physical_model constructor {name descr args} {
+ this inherited $name $descr
+ set this(LM) ""
+ set cou_name "${objName}_cou"
+ COU $cou_name
+ set this(cou) $cou_name
+ set this(primitives_handle) {}
+ set this(nb_max_mothers) 1
+ set this(nb_max_daughters) 99999999
+
+ this set_cmd_placement {YOU_SHOULD_DEFINE_A_PLACEMENT_COMMAND}
+ set this(root_for_daughters) NULL
+
+ set this(L_propagate)    [list]
+ this set_propagate_prev_liste_cmd "this get_LM"
+ this set_propagate_next_liste_cmd ""
+ 
+ eval "$objName configure $args"
+}
+#_________________________________________________________________________________________________________
+method Physical_model dispose {} {
+ $this(cou) dispose
+ foreach cm $this(L_mothers)   {catch {$cm Sub_daughter $objName}}
+ foreach cm $this(L_daughters) {catch {$cm Sub_mother   $objName}}
+ this inherited
+}
+
+#_________________________________________________________________________________________________________
+method Physical_model get_Common_FC {}   {if {[string equal $this(LM) {}]} {return ""}
+                                          set LC [$this(LM) get_LC]
+                                          return [$LC get_Common_FC]}
+#_________________________________________________________________________________________________________
+method Physical_model get_width  {{PM {}}} {return -1}
+method Physical_model get_height {{PM {}}} {return -1}
+#_________________________________________________________________________________________________________
+method Physical_model get_ideal_height {} {return 0}
+method Physical_model get_ideal_width  {} {return 0}
+#_________________________________________________________________________________________________________
+method Physical_model Adequacy {contexte {force_eval_ctx 0}} {return -1}
+#_________________________________________________________________________________________________________
+method Physical_model get_context {} {return {}}
+#_________________________________________________________________________________________________________
+method Physical_model get_LM {}   {return $this(LM)}
+method Physical_model set_LM {LM} {set this(LM) $LM; return $LM}
+#_________________________________________________________________________________________________________
+method Physical_model get_LC {}   {return [$this(LM) get_LC]}
+#_________________________________________________________________________________________________________
+method Physical_model get_cou {} {return $this(cou)}
+method Physical_model Accept_for_daughter {cou} {return [$this(cou) Accept_for_daughter $cou]}
+method Physical_model Accept_PM_for_daughter {PM} {set cou [$PM get_cou]
+                                                   return [$this(cou) Accept_for_daughter $cou]}
+#_________________________________________________________________________________________________________
+method Physical_model get_root_for_daughters {{index -1}}    {return $this(root_for_daughters)}
+method Physical_model set_root_for_daughters {r {index -1}}  {set this(root_for_daughters) $r}
+#_________________________________________________________________________________________________________
+method Physical_model get_prim_handle {{index -1}}  {return $this(primitives_handle)}
+method Physical_model set_prim_handle {h} {set this(primitives_handle) $h; return $h}
+#_________________________________________________________________________________________________________
+method Physical_model get_mothers {}  {return $this(L_mothers)}
+method Physical_model set_L_mothers {l} {set this(L_mothers) $l; return $l}
+#_________________________________________________________________________________________________________
+method Physical_model get_cmd_placement {}  {return $this(cmd_placement)}
+method Physical_model set_cmd_placement {c} {set this(cmd_placement) $c}
+#_________________________________________________________________________________________________________
+method Physical_model get_or_create_prims {root} {return [this get_prim_handle]}
+method Physical_model Add_prim_mother   {Lprims {index -1}} {return 1}
+method Physical_model Add_prim_daughter {Lprims {index -1}} {set rep 1
+                                                             foreach p $Lprims {
+                                                               if {[catch {eval $this(cmd_placement)} err]} {
+                                                                 puts " XXX ERROR XXX $objName Add_prim_daughter \{$Lprims\} $index"
+                                                                 puts "               $err"
+                                                                 set rep 0
+                                                                }
+                                                              }
+                                                             return $rep
+                                                            }
+method Physical_model Sub_prim_daughter {Lprims {index -1}} {}
+#_________________________________________________________________________________________________________
+method Physical_model Do_prims_still_exist {} {
+ return 1
+}
+#_________________________________________________________________________________________________________
+method Physical_model Add_daughter    {m {index -1}} {
+global debug
+                                                      if {$debug} {puts "$objName Add_daughter $m $index"}
+                                                      set rep [this inherited $m $index]
+                                                      if {[expr $rep == 1]} {set root [this get_root_for_daughters]
+                                                                             if {[string equal $root NULL]} {this Sub_daughter $m;
+                                                                                                             if {$debug} {puts "   !!! : La racine d'attache des fils de $objName est NULL"}
+                                                                                                             return 0}
+#                                                                             set prev_prim_daughters [$m get_prim_handle $root]
+                                                                             set prev_exists    [$m Do_prims_still_exist]
+                                                                             set prim_daughters [$m get_or_create_prims $root]
+                                                                             if {[string equal $prim_daughters NULL]} {this Sub_daughter $m;
+                                                                                                                       if {$debug} {puts "   !!! : La poignée de $m est NULL"}
+                                                                                                                       return 0}
+
+                                                                             $this(LM) set_PM_active $objName
+                                                                             if {$prev_exists} {puts "LE PROBLEME VIENDRAIT IL D'ICI???";
+                                                                                                return 2} else {
+                                                                               this Add_prim_daughter $prim_daughters $index
+                                                                               $m   Add_prim_mother   $root
+                                                                               return 1
+                                                                              }
+                                                                            }
+                                                      return $rep
+                                                     }
+method Physical_model Sub_daughter    {m} {set rep [this inherited $m]
+                                           if {[expr $rep == 1]} {set pos [lsearch $this(L_mothers) $m]
+                                                                  this Sub_prim_daughter [$m get_prim_handle $pos] $pos
+                                                                  $m set_prim_handle NULL
+                                                                  return 1}
+                                           return 0}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+# Fonctions d'affichage de la structure
+proc Connection {comet {L_LM _LM_LP}} {
+ foreach suffixe $L_LM {
+   $comet           Connect_LM_descendants $suffixe
+   "$comet$suffixe" Connect_PM_descendants
+  }
+
+}
+
+#_________________________________________________________________________________________________________
+proc Afficher_structure {racine {cmd {puts "$dec*$racine"}} {dec ""}} {
+ eval $cmd
+ append dec " |"
+ foreach n [$racine get_daughters] {Afficher_structure $n $cmd $dec}
+}
+
+proc dispose_all {racine {cmd {puts "$dec*$racine"}} {dec ""}} {
+ eval $cmd
+ append dec " |"
+ foreach n [$racine get_daughters] {dispose_all $n $cmd $dec}
+ $racine dispose
+}
+
