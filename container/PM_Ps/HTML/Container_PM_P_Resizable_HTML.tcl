@@ -25,7 +25,7 @@ method Container_PM_P_Resizable_HTML Render_JS {strm_name mark {dec {}}} {
 method Container_PM_P_Resizable_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec <div  [this Style_class] > "\n"
+ append strm $dec "<div style=\"border:1px solid grey;\" " [this Style_class] ">" "\n"
    this Render_daughters strm "$dec  "
  append strm $dec </div> "\n"
 }
