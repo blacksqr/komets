@@ -3,12 +3,12 @@
 #_______________________________________________ Définition of the presentations __________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit Activator_PM_P_button_FLEX PM_FLEX
+inherit Comet_root_PM_P_FLEX PM_FLEX
 
 #___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_FLEX constructor {name descr args} {
+method Comet_root_PM_P_FLEX constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id Activator_PM_P_button_FLEX
+   this set_GDD_id Comet_root_PM_P_FLEX
  eval "$objName configure $args"
  return $objName
 }
@@ -16,31 +16,14 @@ method Activator_PM_P_button_FLEX constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC Activator_PM_P_button_FLEX $L_methodes_set_Activator {}          {}
-Methodes_get_LC Activator_PM_P_button_FLEX $L_methodes_get_Activator {$this(FC)}
-
 #___________________________________________________________________________________________________________________________________________
-Generate_PM_setters Activator_PM_P_button_FLEX [list {activate {{type {}}}}]
-  Manage_CallbackList Activator_PM_P_button_FLEX prim_activate begin
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_FLEX Trigger_prim_activate {} {
- set cmd ""
- foreach {var val} [array get this PARAMS,*] {append cmd " " [string range $var 7 end] " $val"}
- this prim_activate $cmd
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_FLEX Render {strm_name {dec {}}} {
+method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
- append strm $dec "<mx:Script>\n"
- append strm $dec "  <!\[CDATA\[\n"
- append strm $dec "  private function buttonClickHandler_${objName}():void{\n"
- append strm $dec "    ${objName}.label=\"Hello World of Zero!\";\n"
- append strm $dec "   }\n"
- append strm $dec {  ]]>} "\n"
- append strm $dec {</mx:Script>} "\n"
- append strm $dec "<mx:Button id=\"$objName\" label=\"[this get_text]\" click=\"buttonClickHandler_${objName}()\"/>\n"
-  this Render_daughters strm "$dec  "
+ append strm {<?xml version="1.0" encoding="utf-8"?>} "\n"
+ append strm {<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" cornerRadius="0" alpha="1.0" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#1BA01B, #C2E6E5]" color="#22B21B" borderColor="#202FC1">} "\n"
+  
+   this Render_daughters strm "$dec  "
+
+ append strm {</mx:Application>} "\n"
 }
