@@ -38,6 +38,10 @@ method CometGraphBuilder_PM_P_B207_basic constructor {name descr args} {
  B_contact ctc_IN_$objName  "$this(poly_IN)  1"
  B_contact ctc_OUT_$objName "$this(poly_OUT) 1"
  
+ set this(rap_change_IN_OUT) [B_rappel [Interp_TCL] "$objName Update_display_IN_OUT"]
+   ctc_IN_$objName  abonner $this(rap_change_IN_OUT)
+   ctc_OUT_$objName abonner $this(rap_change_IN_OUT)
+ 
  B_configure $this(canvas) -Ajouter_fils $this(poly_IN)  \
                            -Ajouter_fils $this(poly_OUT) \
 						   -Ajouter_fils $this(rel,IN)   \
@@ -85,32 +89,43 @@ Generate_accessors CometGraphBuilder_PM_P_B207_basic [list canvas IN OUT]
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic set_IN  {e} {
+ this prim_set_handle_root [$e Val_MetaData u_id]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic set_handle_root {id} {
+ set this(IN) $this(preso,$id)
  if {$this(IN) != ""} {
    set txt [[$this(IN) Val_MetaData rap_change] Texte]
    [$this(IN) Val_MetaData rap_change] Texte [string map [list "; $objName Update_display_IN_OUT" ""] $txt]
   }
   
- set this(IN) $e
- #puts "$objName : IN point is $e"
- set txt [[$e Val_MetaData rap_change] Texte]; 
+ #puts "$objName : IN point is $this(IN)"
+ set txt [[$this(IN) Val_MetaData rap_change] Texte]; 
    set txt [string map [list "; $objName Update_display_IN_OUT" ""] $txt]
-   [$e Val_MetaData rap_change] Texte "$txt; $objName Update_display_IN_OUT"; [$e get_B_contact] abonner [$e Val_MetaData rap_change]
+   [$this(IN) Val_MetaData rap_change] Texte "$txt; $objName Update_display_IN_OUT"; 
+   [$this(IN) get_B_contact] abonner [$this(IN) Val_MetaData rap_change]
    
  this Update_display_IN_OUT
 }
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic set_OUT {e} {
+ this prim_set_handle_daughters [$e Val_MetaData u_id]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic set_handle_daughters {id} {
+ set this(OUT) $this(preso,$id)
  if {$this(OUT) != ""} {
    set txt [[$this(OUT) Val_MetaData rap_change] Texte]
    [$this(OUT) Val_MetaData rap_change] Texte [string map [list "; $objName Update_display_IN_OUT" ""] $txt]
   }
   
- set this(OUT) $e
- #puts "$objName : OUT point is $e"
- set txt [[$e Val_MetaData rap_change] Texte]; 
+ #puts "$objName : OUT point is $this(OUT)"
+ set txt [[$this(OUT) Val_MetaData rap_change] Texte]; 
    set txt [string map [list "; $objName Update_display_IN_OUT" ""] $txt]
-   [$e Val_MetaData rap_change] Texte "$txt; $objName Update_display_IN_OUT"; [$e get_B_contact] abonner [$e Val_MetaData rap_change]
+   [$this(OUT) Val_MetaData rap_change] Texte "$txt; $objName Update_display_IN_OUT"; [$this(OUT) get_B_contact] abonner [$this(OUT) Val_MetaData rap_change]
    
  this Update_display_IN_OUT
 }
@@ -160,7 +175,6 @@ method CometGraphBuilder_PM_P_B207_basic Add_a_type {n_zone infos} {
  set TYPE [$n_dragged Val_MetaData CometType]
  
  this Add_a_presentation_for_node TYPE $TYPE $x $y
- 
 }
 
 #_________________________________________________________________________________________________________
@@ -242,6 +256,15 @@ method CometGraphBuilder_PM_P_B207_basic get_a_poly_line {} {
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic New_rel {m d} {
+ puts "$objName New_rel $m $d"
+ this prim_Add_rel [$m Val_MetaData u_id] [$d Val_MetaData u_id]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic Add_rel {id_m id_d} {
+ set m $this(preso,$id_m)
+ set d $this(preso,$id_d)
+ 
  #puts "$objName detect the establishment of a new relationship from $m to $d"
  if {![info exists this(rel,$m,$d)]} {
    set poly_line       [this get_a_poly_line]
@@ -258,11 +281,10 @@ method CometGraphBuilder_PM_P_B207_basic New_rel {m d} {
 }
 
 #_________________________________________________________________________________________________________
-method CometGraphBuilder_PM_P_B207_basic Add_node_instance {e} {
- #puts "$objName Add_node_instance {$e}"
- if {[info exists this(instance_to_plug,$e)]} {
-   set preso $this(instance_to_plug,$e)
-   #puts "In $objName : Adding an instance node created locally:\n  -    e : $e\n  - preso : $preso"
+method CometGraphBuilder_PM_P_B207_basic Add_node_instance {id name} {
+ if {[info exists this(preso,$id)]} {
+   set preso $this(preso,$id)
+   #puts "In $objName : Adding an instance node created locally:\n  -   id : $id\n  - preso : $preso"
    [$preso get_root] Vider_peres
    $this(canvas) Ajouter_fils_au_debut [$preso get_root]
   } else {
@@ -270,20 +292,29 @@ method CometGraphBuilder_PM_P_B207_basic Add_node_instance {e} {
           set preso [this get_a_presentation_for_node LC $e]
           $preso set_position_center 50 50
           $preso Subscribe_to_Establish_rel $objName "$objName New_rel \$mother \$daughter"
+		  set this(preso,$id) $preso
          }
 }
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic Add_a_presentation_for_node {mark node x y} {
+ set u_id [this get_a_local_unique_id]
+ 
  set preso [this get_a_presentation_for_node $mark $node]
  $preso set_position_center $x $y
  $preso Subscribe_to_Establish_rel $objName "$objName New_rel \$mother \$daughter"
+ $preso Add_MetaData u_id $u_id
 
+ set this(preso,$u_id) $preso
+ 
  puts "$objName Add_a_presentation_for_node $mark $node $x $y" 
  [$preso get_root] Vider_peres
  set this(instance_to_plug,$node) $preso
  puts "$objName prim_Add_node_instance {$node}"
- this prim_Add_node_instance $node
+ 
+ if {$mark == "LC"} {
+   this prim_Add_node_instance $u_id $node
+  } else {this prim_Add_node_type $u_id $node}
 }
 
 #_________________________________________________________________________________________________________
@@ -366,7 +397,7 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node constructor {na
 # Callbacks for pointers events 
  set this(rap_press_on_mothers)   [B_rappel [Interp_TCL]]; $this(rap_press_on_mothers)   Texte "$objName Press_on_mothers   $this(rap_press_on_mothers)  "
  set this(rap_press_on_daughters) [B_rappel [Interp_TCL]]; $this(rap_press_on_daughters) Texte "$objName Press_on_daugthers $this(rap_press_on_daughters)"
- set this(rap_create_rel)         [B_rappel [Interp_TCL]]; $this(rap_create_rel)         Texte "if {\[catch {$objName Create_rel $this(rap_create_rel)} err\]} {puts \"ERROR in Create_rel:\n\$err\"}"
+ set this(rap_create_rel)         [B_rappel [Interp_TCL]]; $this(rap_create_rel)         Texte "if {\[catch {$objName Create_rel $this(rap_create_rel)} err\]} {puts \"ERROR in $objName Create_rel:\n\$err\"}"
  
  $this(poly_for_mothers)   abonner_a_detection_pointeur [$this(rap_press_on_mothers)   Rappel] [ALX_pointeur_enfonce]
  $this(poly_for_daughters) abonner_a_detection_pointeur [$this(rap_press_on_daughters) Rappel] [ALX_pointeur_enfonce]
