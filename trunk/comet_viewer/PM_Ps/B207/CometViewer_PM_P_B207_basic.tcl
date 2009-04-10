@@ -32,12 +32,14 @@ Generate_accessors CometViewer_PM_P_B207_basic [list B_canvas animation_time tkd
 
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_B207_basic Start_Anim_Enlight {} {
- set fond [$this(B_canvas) get_fond]; $fond Calculer_boites
- set box  [$fond Boite_noeud]; set X [$box BG_X]; set Y [$box BG_Y]; set Ex [$box Tx]; set Ey [$box Ty]
- 
- foreach n [$this(B_canvas) get_highlighters] {
-   $n Ajouter_MetaData_T params_transfo "$X $Y $Ex $Ey 0 [$n Px] [$n Py] [$n Ex] [$n Ey] [$n Couleur 3]"
-   $n maj $X $Y 0 $Ex $Ey
+ set fond [$this(B_canvas) get_fond]; 
+ if {$fond != ""} {
+   $fond Calculer_boites
+   set box  [$fond Boite_noeud]; set X [$box BG_X]; set Y [$box BG_Y]; set Ex [$box Tx]; set Ey [$box Ty]
+   foreach n [$this(B_canvas) get_highlighters] {
+     $n Ajouter_MetaData_T params_transfo "$X $Y $Ex $Ey 0 [$n Px] [$n Py] [$n Ex] [$n Ey] [$n Couleur 3]"
+     $n maj $X $Y 0 $Ex $Ey
+    }
   }
 }
 
