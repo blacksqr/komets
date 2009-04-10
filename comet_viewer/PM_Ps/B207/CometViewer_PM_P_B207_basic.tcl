@@ -105,7 +105,7 @@ method CometViewer_PM_P_B207_basic set_dot_description {v} {
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
  append this(tk_str) [read $s]
- puts "__________\nReceived__________\n$s"
+ #puts "__________\nReceived__________\n$s"
  if {[eof $s]} {
    #puts "in CometViewer_PM_P_B207_basic::$objName\n  - Server answered :\n$this(tk_str)"
    set c $this(B_canvas)

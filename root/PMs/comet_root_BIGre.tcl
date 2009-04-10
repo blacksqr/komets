@@ -90,7 +90,7 @@ method Root_PM_P_BIGre Display_highlighter {prim_PM box highlighter} {
 #_________________________________________________________________________________________________________
 method Root_PM_P_BIGre prim_Enlight {L_PM} {
  foreach PM $L_PM {
-   puts -nonewline "  - $PM ... "
+   #puts -nonewline "  - $PM ... "
    set highlighter [this     get_a_highlighter]
    set rap         [$highlighter Val_MetaData B_rappel_from_$objName]
    set prim_PM     [$PM      get_prim_handle]
@@ -100,7 +100,7 @@ method Root_PM_P_BIGre prim_Enlight {L_PM} {
    
    $prim_PM desabonner_de_LR_parcours [$prim_PM LR_Ap_aff] [$rap Rappel]
    $prim_PM abonner_a_LR_parcours     [$prim_PM LR_Ap_aff] [$rap Rappel]
-   puts "DONE"
+   #puts "DONE"
   }
 }
 
@@ -132,12 +132,13 @@ method Root_PM_P_BIGre Enlight {L_nodes} {
 	
    if {$done} {
      lappend L_B207_PM $n
-    } else {puts "set PM \[CSS++ $objName \"#${n}->PMs \\\\<--< $objName/\"\]"
+    } else {
+	        #puts "set PM \[CSS++ $objName \"#${n}->PMs \\\\<--< $objName/\"\]"
 	        set PM [CSS++ $objName "#${n}->PMs \\<--< $objName/"]
 	        if {$PM != ""} {set L_B207_PM [concat $L_B207_PM $PM]}
 	       }
   }
   
- puts "$objName Enlight {$L_nodes}\n  - L_B207_PM = {$L_B207_PM}"
+ #puts "$objName Enlight {$L_nodes}\n  - L_B207_PM = {$L_B207_PM}"
  this prim_Enlight $L_B207_PM
 }
