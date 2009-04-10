@@ -29,7 +29,7 @@ Generate_PM_setters CSS_Meta_IHM_PM_P_U_1 [L_methodes_set_CSS_Meta_IHM_LM_LP]
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_U_1 Select_elements {L} {
- puts "$objName Select_elements {$L}"
+ #puts "$objName Select_elements {$L}"
  if {[gmlObject info exists object $this(interleaving)]} {
    if {[$this(txt_sel) get_text] != $L} {
      puts "  OK"
