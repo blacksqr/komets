@@ -21,7 +21,7 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
  append strm {<?xml version="1.0" encoding="utf-8"?>} "\n"
- append strm {<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" cornerRadius="0" alpha="1.0" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#1BA01B, #C2E6E5]" color="#22B21B" borderColor="#202FC1">} "\n"
+ append strm {<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" cornerRadius="0" alpha="1.0" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#1BA01B, #C2E6E5]" color="#22B21B" borderColor="#202FC1">} "\n"
   
    this Render_daughters strm "$dec  "
 
