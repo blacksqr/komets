@@ -256,12 +256,13 @@ method CometGraphBuilder_PM_P_B207_basic get_a_poly_line {} {
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic New_rel {m d} {
- puts "$objName New_rel $m $d"
+ puts "___$objName New_rel $m $d"
  this prim_Add_rel [$m Val_MetaData u_id] [$d Val_MetaData u_id]
 }
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic Add_rel {id_m id_d} {
+ puts "$objName Add_rel $id_m $id_d"
  set m $this(preso,$id_m)
  set d $this(preso,$id_d)
  
