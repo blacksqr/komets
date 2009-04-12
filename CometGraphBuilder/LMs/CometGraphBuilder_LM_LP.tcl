@@ -22,5 +22,8 @@ proc P_L_methodes_set_CometGraphBuilder_COMET_RE {} {return [list {set_handle_ro
 Generate_LM_setters CometGraphBuilder_LM_LP [P_L_methodes_set_CometGraphBuilder_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-
+Inject_code CometGraphBuilder_LM_LP \
+            prim_Add_rel \
+			"puts \"\$objName prim_Add_rel \$id_d == \$id_m\"\nif {\$id_d == \$id_m  ||  \[this Has_for_descendant \$id_d \$id_m\]} {return}" \
+			""
 

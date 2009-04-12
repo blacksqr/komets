@@ -1,6 +1,14 @@
 set DEFINE_MODEL_COMET 1 
 
 #_________________________________________________________________________________________________________
+  proc CSS++ {root args} {
+    set cmd {};
+    foreach a $args {append cmd $a { }}
+    #puts "Style_CSSpp Interprets $cmd $root"; 
+    return [Style_CSSpp Interprets $cmd $root]
+   }
+
+#_________________________________________________________________________________________________________
 #____________________________________________ COMET POOL for all _________________________________________
 #_________________________________________________________________________________________________________
 method CometPool constructor {} {
@@ -158,6 +166,16 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
                               append rep $cmd "\n"
                              }
  return $rep
+}
+
+#_________________________________________________________________________________________________________
+proc Inject_code {C mtd code_bgn code_end} {
+ set body   [gmlObject info body    $C $mtd]
+ set L_args [gmlObject info arglist $C $mtd]
+ 
+ set cmd "method $C $mtd {$L_args} {\n$code_bgn; $body\n$code_end}"
+ 
+ eval $cmd
 }
 
 #_________________________________________________________________________________________________________
