@@ -24,7 +24,7 @@ method Marker_PM_P_CheckBox_HTML maj_choices {} {}
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_CheckBox_HTML Render_prim {strm_name {dec {}}} {
  upvar $strm_name rep
- append rep $dec <input [this Style_class] { type="checkbox" name="} [this get_HTML_var] {" value="} [this get_HTML_val] {"}
+ append rep $dec <input [this Style_class] { type="checkbox" onchange="javascript:addOutput(this)" name="} [this get_HTML_var] {" value="} [this get_HTML_val] {"}
    if {[this get_mark]} {append rep { checked="checked"}}
  append rep { />}
    this Render_daughters rep ""
