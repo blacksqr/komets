@@ -119,7 +119,7 @@ method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
             $this(B_canvas) Maj_MetaData_Markers CometPM
 			foreach n [$this(B_canvas) get_L_nodes] {
 			  if {[string range $n 12 end] == "alx_noeud_zone_texte_sdl_opengl"} {
-			    Drag_nodes $n 1 "puts {$n Start to be dragged}" "puts {End drag for $n}"
+			    Drag_nodes $n 1 "" ""
 			   }
 			 }
            }

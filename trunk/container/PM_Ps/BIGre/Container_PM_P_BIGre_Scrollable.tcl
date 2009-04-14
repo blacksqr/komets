@@ -29,7 +29,7 @@ Generate_accessors Container_PM_P_BIGre_Scrollable [list poly_background]
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_Scrollable Add_daughter    {m {index -1}} {
  set rep [this inherited $m $index]
-   if {$rep} {$this(scroll_list) Layout_elements}
+   if {$rep} {this Layout_elements}
    #puts "______ $rep"
  return $rep
 }
@@ -37,8 +37,13 @@ method Container_PM_P_BIGre_Scrollable Add_daughter    {m {index -1}} {
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_Scrollable Sub_daughter    {m} {
  set rep [this inherited $m]
-   $this(scroll_list) Layout_elements
+   this Layout_elements
  return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_BIGre_Scrollable Layout_elements {} {
+ $this(scroll_list) Layout_elements
 }
 
 #___________________________________________________________________________________________________________________________________________

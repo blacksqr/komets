@@ -73,7 +73,17 @@ method CometGraphBuilder_CFC Has_for_descendant {id_m id_d} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometGraphBuilder_CFC get_graph_description {{node {}}} {
+method CometGraphBuilder_CFC get_marks_for {id} {
+ return [$this(node_name,$id) get_marks]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometGraphBuilder_CFC set_marks_for {id L_marks} {
+ $this(node_name,$id) set_marks $L_marks
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometGraphBuilder_CFC get_graph_description {} {
  set str "[$this(node_name,$this(handle_daughters)) get_name] "
  if {$this(handle_root) != ""} {$this(node_name,$this(handle_root)) Serialize str}
  return $str
@@ -82,12 +92,15 @@ method CometGraphBuilder_CFC get_graph_description {{node {}}} {
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_get_CometGraphBuilder {} {return [list {get_handle_root { }} {get_handle_daughters { }} \
                                                          {get_a_local_unique_id {}} \
+														 {get_marks_for {id}} \
 														 {get_graph_description {}} \
 														 {Has_for_descendant {id_m id_d}} \
 												   ]}
 proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {set_handle_daughters {v}} \
                                                          {Add_node_type {id name}} {Add_node_instance {id name}} \
-														 {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_n id_d}} ]}
+														 {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_n id_d}} \
+														 {set_marks_for {id L_marks}} \
+	 											   ]}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -125,6 +138,7 @@ method CometGraphBuilder_CFC___NODE Has_for_descendant {e} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC___NODE Serialize {str_name} {
+ puts "$objName Serialize"
  upvar $str_name str
  
  append str $this(name) {(}

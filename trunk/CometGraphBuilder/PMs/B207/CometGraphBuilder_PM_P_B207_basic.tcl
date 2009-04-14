@@ -15,7 +15,8 @@ method CometGraphBuilder_PM_P_B207_basic constructor {name descr args} {
  
 # Scenegraph
  set this(canvas) [B_polygone]
-
+ B_contact ctc_$this(canvas) "$this(canvas) 1"
+ 
  set contour_ext [ProcOvale 0 0 15 15 60]
  set contour_int [ProcOvale 0 0 10 10 60]
    set this(rel,IN)      [B_polygone]; $this(rel,IN)  Mode_ligne
@@ -221,9 +222,14 @@ method CometGraphBuilder_PM_P_B207_basic Update_display_IN_OUT {} {
 method CometGraphBuilder_PM_P_B207_basic Update_display {m d} {
  set m_root [$m get_root]
  set d_root [$d get_root]
- set m_root_X [$m_root Px]; set m_root_Y [$m_root Py]
- set d_root_X [$d_root Px]; set d_root_Y [$d_root Py]
- set contour [ProcTabDouble "[expr $m_root_X + 1] [expr $m_root_Y - 30] $m_root_X [expr $m_root_Y - 30] $d_root_X [expr $d_root_Y + 31] $d_root_X [expr $d_root_Y + 30]"]
+ set m_root_X [$m_root Px]
+   set box [[$m get_poly_for_daughters] Boite_noeud_et_fils_glob]
+   set m_root_Y [expr [$m_root Py] + [$box Cy]]
+ set d_root_X [$d_root Px]
+   set box [[$d get_poly_for_mothers] Boite_noeud_et_fils_glob]
+   set d_root_Y [expr [$d_root Py] + [$box Cy]]
+ 
+ set contour [ProcTabDouble "[expr $m_root_X + 1] [expr $m_root_Y ] $m_root_X [expr $m_root_Y] $d_root_X [expr $d_root_Y + 1] $d_root_X [expr $d_root_Y]"]
    $this(rel,$m,$d) Vider
    $this(rel,$m,$d) Ajouter_contour $contour
  Detruire $contour
@@ -246,7 +252,7 @@ method CometGraphBuilder_PM_P_B207_basic get_a_poly_line {} {
    $e Mode_ligne
   }
  
- $this(canvas) Ajouter_fils_au_debut $e
+ $this(canvas) Ajouter_fils $e
  
  Add_list this(L_poly_line)      $e
  Sub_list this(L_Pool_poly_line) $e
@@ -282,6 +288,23 @@ method CometGraphBuilder_PM_P_B207_basic Add_rel {id_m id_d} {
 }
 
 #_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic Add_node_type {id name} {
+ puts "$objName Add_node_type $id $name"
+ if {[info exists this(preso,$id)]} {
+   set preso $this(preso,$id)
+   #puts "In $objName : Adding an instance node created locally:\n  -   id : $id\n  - preso : $preso"
+   [$preso get_root] Vider_peres
+   $this(canvas) Ajouter_fils_au_debut [$preso get_root]
+  } else {
+          #puts "In $objName : Adding an instance node created externally:\n  -    e : $e"
+          set preso [this get_a_presentation_for_node TYPE $e]
+          $preso set_position_center 50 50
+          $preso Subscribe_to_Establish_rel $objName "$objName New_rel \$mother \$daughter"
+		  set this(preso,$id) $preso
+         }
+}
+
+#_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic Add_node_instance {id name} {
  if {[info exists this(preso,$id)]} {
    set preso $this(preso,$id)
@@ -311,11 +334,13 @@ method CometGraphBuilder_PM_P_B207_basic Add_a_presentation_for_node {mark node 
  puts "$objName Add_a_presentation_for_node $mark $node $x $y" 
  [$preso get_root] Vider_peres
  set this(instance_to_plug,$node) $preso
- puts "$objName prim_Add_node_instance {$node}"
  
  if {$mark == "LC"} {
+   puts "$objName prim_Add_node_instance $u_id {$node}"
    this prim_Add_node_instance $u_id $node
-  } else {this prim_Add_node_type $u_id $node}
+  } else {puts "$objName prim_Add_node_type $u_id {$node}"
+          this prim_Add_node_type $u_id $node
+         }
 }
 
 #_________________________________________________________________________________________________________
@@ -325,6 +350,8 @@ method CometGraphBuilder_PM_P_B207_basic get_a_presentation_for_node {mark node}
    set e [CPool get_a_comet CometGraphBuilder_PM_P_B207_basic___presentation_for_node]
    set rap_change [B_rappel [Interp_TCL]]
    $e Add_MetaData rap_change $rap_change
+   
+   $e Subscribe_to_Text_modified $objName "$objName Update_markers_of $e" UNIQUE
   }
  
  $this(canvas) Ajouter_fils_au_debut [$e get_root]
@@ -345,13 +372,26 @@ method CometGraphBuilder_PM_P_B207_basic release_a_presentation_for_node {e} {
  Add_list this(L_Pool_presentation_for_node) $e
  Sub_list this(L_presentation_for_node)      $e
 }
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic Update_markers_of {preso} {
+ puts -nonewline "$objName Update_markers_of $preso ... "
+ set u_id [$preso Val_MetaData u_id]
+ this prim_set_marks_for $u_id [[$preso get_b_txt_marks] TEXTE]
+ puts "DONE"
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic set_marks_for {id L_marks} {
+ set preso $this(preso,$id)
+ if {[$preso get_marks] != $L_marks} {
+   $preso set_marks $L_marks
+  }
+}
+
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-
-
-
-
 
 
 
@@ -365,9 +405,10 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node constructor {na
  set this(represented_element) ""
  
 # B207 scenegraph
- set this(root)     [B_noeud]
- set this(poly_txt) [B_polygone]
- set this(b_txt)    [B_texte 20 ""]
+ set this(root)        [B_noeud]
+ set this(poly_txt)    [B_polygone]
+ set this(b_txt)       [B_texte 20 ""]
+ set this(b_txt_marks) [B_texte 20 ""]
  
  set this(poly_for_mothers)   [B_polygone]
  set this(poly_for_daughters) [B_polygone]
@@ -377,8 +418,13 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node constructor {na
 						 -Ajouter_fils_au_debut $this(poly_txt) \
 						 -Position_des_fils_changeable 0
  
- B_configure $this(poly_txt) -Ajouter_fils_au_debut $this(b_txt)
- B_configure $this(b_txt)    -Gerer_contacts        0 -Couleur_texte 0 0 0 1
+ B_configure $this(poly_txt)    -Ajouter_fils_au_debut $this(b_txt) \
+                                -Ajouter_fils_au_debut $this(b_txt_marks)
+ B_configure $this(b_txt)       -Gerer_contacts        0 -Couleur_texte 0 0 0 1
+ B_configure $this(b_txt_marks) -Gerer_contacts        0 -Couleur_texte 0 0 0 1
+ set this(rap_char_entered) [B_rappel [Interp_TCL] "$objName Text_modified"]
+ $this(b_txt_marks) abonner_a_caractere_tape [$this(rap_char_entered) Rappel]
+ 
 
  set contour [ProcRect -15 0 15 30]
    B_configure $this(poly_for_mothers)   -Ajouter_contour $contour
@@ -393,7 +439,7 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node constructor {na
                                        -Ajouter_MetaData_T CometGraphBuilder_PM_P_B207_basic $objName
 
 # Model of contact
- B_contact ctc_$objName "$this(root) 0" -add "$this(poly_txt) 1"
+ B_contact ctc_$objName "$this(root) 0" -add "$this(poly_txt) 1" -add "$this(b_txt_marks) 1"
 
 # Callbacks for pointers events 
  set this(rap_press_on_mothers)   [B_rappel [Interp_TCL]]; $this(rap_press_on_mothers)   Texte "$objName Press_on_mothers   $this(rap_press_on_mothers)  "
@@ -420,21 +466,19 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node dispose {} {
 }
 
 #_________________________________________________________________________________________________________
-Generate_accessors CometGraphBuilder_PM_P_B207_basic___presentation_for_node [list represented_element root poly_for_daughters poly_for_mothers poly_txt b_txt rap_create_rel rap_press_on_mothers rap_press_on_daughters]
+Generate_accessors CometGraphBuilder_PM_P_B207_basic___presentation_for_node [list represented_element root poly_for_daughters poly_for_mothers poly_txt b_txt_marks b_txt rap_create_rel rap_press_on_mothers rap_press_on_daughters]
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node get_B_contact {} {return ctc_$objName}
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_represented_element   {element} {
- #puts "$objName set_represented_element $element"
-
  set this(represented_element) $element
  
  if {[catch {$this(b_txt) TEXTE [$element get_name]} err]} {
    $this(b_txt) TEXTE $element
-   $this(b_txt) Gerer_contacts 1
-   $this(b_txt) Editable 1
+   $this(b_txt_marks) Gerer_contacts 1
+   $this(b_txt_marks) Editable 1
   }
   
  this Update_presentation
@@ -442,15 +486,30 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_represented
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node Update_presentation {} {
-   $this(b_txt) Optimiser_dimensions; $this(b_txt) Calculer_boites
-   set box [$this(b_txt) Boite_noeud]
-   set w [$box Tx]
-   set h [$box Ty]
-   $this(b_txt) Origine [expr -[$box BG_X] - $w/2.0] \
-                        [expr -[$box BG_Y] - $h/2.0]
- set contour [ProcOvale 0 0 [expr 1.2 * $w / 2.0] [expr 1.2 * $h / 2.0] 60]
-   $this(poly_txt) Ajouter_contour $contour
+ set W 0; set H 0
+ foreach n [list $this(b_txt) $this(b_txt_marks)] {
+   $n Optimiser_dimensions; $n Calculer_boites
+   set box [$n Boite_noeud]
+   set w [$box Tx]; if {$W < $w} {set W $w}
+   set h [$box Ty]; set H [expr $H + $h]
+   $n Px [expr -[$box BG_X] - $w/2.0]
+  }
+  
+ set y 0
+ foreach n [list $this(b_txt) $this(b_txt_marks)] {
+   set box [$n Boite_noeud]; 
+   $n Py [expr $H/2.0 - $y - [$box BG_Y] - [$box Ty]]
+   set y [expr $y + [$box Ty]]
+  }
+  
+ #set contour [ProcOvale 0 0 [expr 1.2 * $W / 2.0] [expr 1.2 * $H / 2.0] 60]
+ set contour [ProcRect [expr -8 - $W / 2.0] [expr -8 - $H / 2.0] [expr 8 + $W / 2.0] [expr 8 + $H / 2.0]]
+   B_configure $this(poly_txt) -Vider \
+                               -Ajouter_contour $contour
  Detruire $contour
+ 
+ $this(poly_for_mothers)   Py [expr  $H/2.0 + 0]
+ $this(poly_for_daughters) Py [expr -$H/2.0 - 30]
 }
 
 #_________________________________________________________________________________________________________
@@ -535,8 +594,27 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node Create_rel     
 }
 
 #_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node get_marks { } {
+ return [$this(b_txt_marks) TEXTE]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_marks {L} {
+ $this(b_txt_marks) TEXTE $L
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node get_text {} {
+ return [$this(b_txt) TEXTE]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node Text_modified {} {
+ this Update_presentation
+}
+
+#_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node Establish_rel {mother daughter} {
- puts "$objName Establish_rel $mother -> $daughter"
 }
 
 #_________________________________________________________________________________________________________
@@ -549,5 +627,5 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_position_ce
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-Manage_CallbackList CometGraphBuilder_PM_P_B207_basic___presentation_for_node [list Establish_rel] end
+Manage_CallbackList CometGraphBuilder_PM_P_B207_basic___presentation_for_node [list Establish_rel Text_modified] end
 
