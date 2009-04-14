@@ -22,3 +22,5 @@ method CometToolBox_GDD dispose {} {this inherited}
 Methodes_set_LC CometToolBox_GDD [P_L_methodes_set_CometToolBox_GDD] {$this(FC)} {$this(L_LM)}
 Methodes_get_LC CometToolBox_GDD [P_L_methodes_get_CometToolBox_GDD] {$this(FC)}
 
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList CometToolBox_GDD [list Update_nodes] end

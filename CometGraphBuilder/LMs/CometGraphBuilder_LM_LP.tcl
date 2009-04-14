@@ -18,7 +18,9 @@ Methodes_get_LC CometGraphBuilder_LM_LP [P_L_methodes_get_CometGraphBuilder] {$t
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_set_CometGraphBuilder_COMET_RE {} {return [list {set_handle_root {id}} {set_handle_daughters {id}} \
                                                                   {Add_node_type {id name}} {Add_node_instance {id name}} \
-																  {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_n id_d}}]}
+																  {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_n id_d}} \
+																  {set_marks_for {id L_marks}} \
+															]}
 Generate_LM_setters CometGraphBuilder_LM_LP [P_L_methodes_set_CometGraphBuilder_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
