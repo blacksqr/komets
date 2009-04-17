@@ -521,8 +521,6 @@ method PhysicalHTML_root Is_update {clientversion} {
  set vclient ""
  set space 0
  
- puts $this(socket_serveur) "plop"
- 
  # Chaine séparer par un espace => "idclient vclient" => "10 20"
  for { set i 0 } { $i < $long } { incr i 1 } {
 	set resultat [string index $clientversion $i]
