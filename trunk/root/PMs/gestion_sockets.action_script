@@ -1,0 +1,39 @@
+package
+{
+	import flash.events.*;
+	import flash.net.*;
+	
+	public class SimpleClient
+	{
+		public var socket:Socket;
+		public var etat:String;
+		
+		public function SimpleClient(serv:String,port:int)
+		{
+			socket = new Socket();
+			etat="connecte";
+			socket.addEventListener(Event.CONNECT,lire); // Enregistre un objet écouteur afin que celui-ci soit averti d’un événement.
+			socket.addEventListener(Event.ENTER_FRAME, ecrire);
+			try{
+			socket.connect(serv,port);
+			}catch(ex:Error){
+				trace("Une erreur s'est produite !");
+			}
+		}
+		
+		public function lire():String {
+			var msg:String;
+			if (socket.bytesAvailable)		// Nombre d'octets de données disponibles en lecture dans la mémoire tampon d’entrée
+				msg=socket.readUTFBytes(socket.bytesAvailable);
+			else
+				msg=" ";
+			return msg;
+		}
+		
+		public function ecrire(msg:String):void {
+			//socket.writeInt(msg.length);
+			socket.writeUTFBytes(msg);
+		}
+	}
+}
+
