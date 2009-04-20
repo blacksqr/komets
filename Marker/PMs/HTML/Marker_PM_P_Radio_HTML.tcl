@@ -9,6 +9,7 @@ inherit Marker_PM_P_Radio_HTML Marker_PM_P_HTML
 method Marker_PM_P_Radio_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Marker_simple_CUI_RadioBt_HTML
+
  eval "$objName configure $args"
  return $objName
 }
@@ -25,13 +26,19 @@ method Marker_PM_P_Radio_HTML maj_choices {} {}
 method Marker_PM_P_Radio_HTML set_mark {v} {
   set root [this get_L_roots] 
 
- if {$v} {
-   set cmd "\$('#$objName').attr('checked', 'checked')"
-  } else {set cmd "\$('#$objName').removeAttr('checked');"}
+ if {![info exists this(old_mark)]} {set this(old_mark) [this get_mark]}
+ 
+ if {$v != $this(old_mark)} {
+   if {$v} {
+     set cmd "\$('#$objName').attr('checked', 'checked')"
+    } else {set cmd "\$('#$objName').removeAttr('checked');"}
   
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-   $root Concat_update $cmd
- }
+   if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+     $root Concat_update $cmd
+    }
+	
+   set this(old_mark) $v
+  } 
 }
 
 #___________________________________________________________________________________________________________________________________________
