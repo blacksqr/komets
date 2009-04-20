@@ -228,7 +228,8 @@ method PhysicalHTML_root Read_from_PHP {chan} {
     foreach e $this(clients) {if {[string equal $e $chan]} {} else {lappend nc $e}}
     set this(clients) $nc
     puts "$objName : Déconnection de $chan, reçut [string length $this(msg)] octets"
-    return} else {append this(msg) [read $chan]
+    return}
+  else {append this(msg) [read $chan]
 				  if {$this(msg_attended_length) == -1} {
 					set pos [string first " " $this(msg)]
 				    set this(msg_attended_length) [string range $this(msg) 0 [expr $pos - 1]]
@@ -245,7 +246,7 @@ method PhysicalHTML_root Read_from_PHP {chan} {
 					close $chan
 				    #puts "Done!"; 
 				   }
-				 }
+		}
   return
   
   
