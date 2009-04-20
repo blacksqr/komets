@@ -32,10 +32,10 @@ method PhysicalHTML_root constructor {name descr args} {
   set this(marker) 0
   
   # ________Envoi de changement avec le serveur le php________#
-  set this(flag_send) 1
+  set this(update_send) 0
   set this(version_server) 0
   set this(version_client) {}
-  set this(num_cmd) 0  
+  set this(update_cmd) ""
   # ___________________________________________________________#
   
  eval "$objName configure $args"
@@ -349,7 +349,15 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
           $r Render_all rep
           this set_next_root {}
          }
- puts $chan $rep
+		 
+ # envoi de la page complete ou juste d'un update partiel
+ if {$this(update_send) == 0} {
+	puts $chan $rep
+ } else {
+	puts -nonewline $chan $this(update_cmd) 
+	set this(update_send) 0
+	set this(update_cmd) ""
+ }
  set dt [expr [clock clicks -millisecond] - $t0];
 
  #puts "Generated in $dt ms."
@@ -401,6 +409,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
  #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
  append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
+ append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
  append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
    #puts "  this Render_daughters rep"
    this Render_daughters rep "$dec  "
@@ -471,62 +480,65 @@ method PhysicalHTML_root Apply_style {} {
 
 method PhysicalHTML_root Concat_update {cmd} {
  # suppression dans le concat toute les versions qui sont obsoléte
- this Concat_update_supp {}
- 
- # modification du flag et +1 pour la nouvelle version
- # if {$this(flag_send) == 1} { 
-    # set this(flag_send) 0
-	 incr this(version_server) 1
-	 set this(num_cmd) 0
- # }
+ this Concat_update_supp
+
+ # +1 pour la nouvelle version
+ incr this(version_server) 1
  
  # enregistrement de la commande avec sa version
- set this(concat_send($this(version_server),$this(num_cmd))) $cmd
- incr this(num_cmd) 1
+ set this(concat_send,$this(version_server)) $cmd
+ #puts $this(concat_send,$this(version_server))
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Concat_update_supp {} {
  set mini [this get_vclient_min] 
  
- foreach {vconcat numcmd cmd} [array get this(concat_send)] {
-	if($vconcat < $mini) {
-		unset this(concat_send($vconcat,$numcmd))
-	} else {
-		break
-	}
+ if {$mini != -1} {
+	 foreach {vconcat cmd} [array get this concat_send,*] {
+		if($vconcat < $mini) {
+			unset this(concat_send,$vconcat)
+		} else {
+			break
+		}
+	 }
  }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root get_vclient_min {} {
  # renvoi la version la plus petite de tous les clients
- set mini 0
- set i 0
- foreach p [array names this(version_client)] {
-	if($this(version_client($p)) < $mini || $i == 0) {
-		set mini $this(version_client($p))		
-	}
-	incr i 1
+ set mini -1
+ if {[array size this(version_client)]} {
+	 set i 0
+	 foreach p [array names this version_client] {
+		if($this(version_client,$p) < $mini || $i == 0) {
+			set mini $this(version_client,$p)		
+		}
+		incr i 1
+	 }
  }
  return $mini
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Is_update {clientversion} {
- set rep ""
+ set this(update_send) 1
+ set this(update_cmd) ""
  
  # Découpage de la chaine reçu pour connaitre  id du client et sa version | rangement dans un tableau de clients
  set long [string length $clientversion]
- set idclient ""
+ set ipclient ""
  set vclient ""
  set space 0
  
- # Chaine séparer par un espace => "idclient vclient" => "10 20"
+ #puts $clientversion
+
+ # Chaine séparer par un espace => "ipclient vclient" => "192.168.0.10 20"
  for { set i 0 } { $i < $long } { incr i 1 } {
 	set resultat [string index $clientversion $i]
 	if {$resultat != " " && $space == 0} {
-		append idclient $resultat
+		append ipclient $resultat
 	} elseif {$resultat != " " && $space == 1} {
 		append vclient $resultat
 	} else { 
@@ -535,23 +547,25 @@ method PhysicalHTML_root Is_update {clientversion} {
 	unset resultat
  }
  
+ #puts $ipclient
+ #puts $vclient
+ #puts $this(version_server)
+ #puts [array names this(concat_send)]
+ 
  # J'enregistre la version du client dans le tableau
- set this(version_client($idclient)) $vclient
+ set this(version_client,$ipclient) $vclient
 
  # Vérif si la version du client et la même que celle du serveur
  # Si diff => Appliquer toutes les modifs depuis la version du client jusqu'à celle du serveur
- if {$vclient != $this(version_server)} {	 
-	for {set ver [expr [ vclient]+1]} {$ver <= $this(version_server)} {incr ver 1} {
-		set boolfin 0
-		set num 0
-		while {!$boolfin} {
-			if {[info exists this(concat_send($ver,$num))]} {
-				append rep $this(concat_send($ver,$num)) "\n"
-				incr num 1
-			} else {
-				set boolfin 1
-			}
-		}	
+ if {$vclient != $this(version_server)} {
+	for {set ver [expr $vclient+1]} {$ver <= $this(version_server)} {incr ver 1} {
+		append this(update_cmd) $this(concat_send,$ver) "\n"
 	}
+	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
  }
+ 
+ #puts $this(update_cmd)
+ 
+ # J'enregistre la version du serveur dans le client
+ set this(version_client,$ipclient) $this(version_server)
 }
