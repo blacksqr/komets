@@ -24,7 +24,7 @@ method Marker_PM_P_Radio_HTML maj_choices {} {}
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_Radio_HTML set_mark {v} {
   set root [this get_L_roots] 
- 
+
  if {$v} {
    set cmd "\$('#$objName').attr('checked', 'checked')"
   } else {set cmd "\$('#$objName').removeAttr('checked');"}
