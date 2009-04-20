@@ -4,7 +4,7 @@ inherit Marker_PM_P_TK_RadioBt PM_TK
 method Marker_PM_P_TK_RadioBt constructor {name descr args} {
  set this(var_name) "${objName}_var_rb"
  this inherited $name $descr
-   this set_GDD_id Marker_simple_RadioBt_TK
+   this set_GDD_id Marker_simple_RadioBt_TK   
  eval "$objName configure $args"
 }
 #___________________________________________________________________________________________________________________________________________

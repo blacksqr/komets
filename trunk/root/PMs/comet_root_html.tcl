@@ -228,8 +228,8 @@ method PhysicalHTML_root Read_from_PHP {chan} {
     foreach e $this(clients) {if {[string equal $e $chan]} {} else {lappend nc $e}}
     set this(clients) $nc
     puts "$objName : Déconnection de $chan, reçut [string length $this(msg)] octets"
-    return}
-  else {append this(msg) [read $chan]
+    return
+  } else {append this(msg) [read $chan]
 				  if {$this(msg_attended_length) == -1} {
 					set pos [string first " " $this(msg)]
 				    set this(msg_attended_length) [string range $this(msg) 0 [expr $pos - 1]]
@@ -564,7 +564,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
  }
  
- #puts $this(update_cmd)
+ puts $this(update_cmd)
  
  # J'enregistre la version du serveur dans le client
  set this(version_client,$ipclient) $this(version_server)
