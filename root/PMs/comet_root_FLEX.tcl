@@ -48,25 +48,29 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  append strm { import SimpleClient; } "\n"
  append strm { public var client:SimpleClient;} "\n"
  append strm { public var msg:String;} "\n"
+ #append strm " zoneText.text = \"IP = $class(local_IP)\";"
  append strm " public function connexion():void {\n"
  append strm " 		if ((client==null)||(client.etat=\"deconnecte\")) { \n"
- append strm "	    	client = new SimpleClient(\" $class(local_IP) \", 12000); \n"
- append strm "	    	boutonConnexion.label=\"connexion effectué...\";} \n"
+ append strm "	    	client = new SimpleClient(\"$class(local_IP)\",12000); \n"
+ append strm "	    	boutonConnexion.label=\"connexion effectué...\";\n"
+ append strm "			zoneText.text=\"IP = $class(local_IP) \";} \n"
  append strm {	    else } "\n"
- append strm "	    	boutonConnexion.label=\"déjà connecté\"; } \n"
+ append strm "	    	boutonConnexion.label=\"déjà connecté\";} \n"
  append strm " public function envoyer():void { \n"
- append strm "    	client.ecrire(zoneText.text); \n"
- append strm "   	zoneText.text=null;} \n"
- append strm " public function recevoir():String{ \n"
+ append strm "	    boutonEnvoyer.label=\"envoi...\"; \n"
+ append strm "		client.ecrire(zoneText.text); \n"
+ append strm "		zoneText.text=null;} \n"
+ append strm " public function recevoir():void{ \n"
+ append strm "	    boutonRecevoir.label=\"lecture...\"; \n"
  append strm {    	msg=client.lire();} "\n"
- append strm { 		zoneText.text=msg;} "\n"
- append strm " return msg;} \n"
+ append strm "		if (msg!=null) { "
+ append strm " 			zoneText.text=msg;}} \n"
  append strm { ]]>} "\n"
  append strm { </mx:Script>} "\n"
- append strm { <mx:TextArea id="zoneText" x="455" y="194" width="145" height="23"/>} "\n"
- append strm { <mx:Button id="boutonConnexion" x="455" y="164" label="Connexion client" width="145" height="22" click="connexion()"/>} "\n\n\n"
- append strm { <mx:Button id="boutonEnvoyer" x="455" y="164" label="envoyer" width="145" height="22" click="envoyer()"/>} "\n\n\n"
- append strm { <mx:Button id="boutonRecevoir" x="455" y="164" label="recevoir" width="145" height="22" click="recevoir()"/>} "\n\n\n"
+ append strm { <mx:TextArea id="zoneText" x="100" y="100" width="145" height="23"/>} "\n"
+ append strm { <mx:Button id="boutonConnexion" x="200" y="200" label="Connexion client" width="155" height="22" click="connexion()"/>} "\n"
+ append strm { <mx:Button id="boutonEnvoyer" x="300" y="300" label="envoyer" width="135" height="22" click="envoyer()"/>} "\n"
+ append strm { <mx:Button id="boutonRecevoir" x="400" y="400" label="recevoir" width="135" height="22" click="recevoir()"/>} "\n\n"
     this Render_daughters strm "$dec  "
 
  append strm {</mx:Application>} "\n"
@@ -76,37 +80,19 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PhysicalFLEX_root Global_page {chan ad num} {
+method Comet_root_PM_P_FLEX Global_page {chan ad num} {
+ fconfigure $chan -encoding utf-8
  puts "Demande de renseignement global de $ad;$num sur $chan"
- fconfigure $chan -blocking 0
- if {![this get_direct_connection]} 
- {
-   fileevent $chan readable "$objName Send_global_info $chan"
-  } 
-  else {if {[this get_One_root_per_IP]} {
-            set new_root "Root_for_[string map [list . _] $ad]"
-			if {![gmlObject info exists object $new_root]} {
-			    CometRoot $new_root "Root for IP $ad" "Generated in $objName"
-			    PhysicalFLEX_root ${new_root}_PM_P_FLEX "FLEX Root for IP $ad" "Generated in $objName"
-				${new_root}_LM_LP configure -Add_PM ${new_root}_PM_P_FLEX -set_PM_active ${new_root}_PM_P_FLEX
-			  foreach cmd [this get_L_cmd_to_eval_when_plug_under_new_roots] {
-			    set obj_LC $new_root
-				set obj_PM ${new_root}_PM_P_FLEX 
-				eval $cmd
-			   }
-			 }
-			this set_next_root ${new_root}_PM_P_FLEX
-			this New_connexion $chan $ad $num
-           } 
-		else {puts "$objName New_connexion $chan $ad $num"
-		           this New_connexion $chan $ad $num}
-        }
- }
+ puts $chan "Message bien reçut dans $objName Global_page"
+ close $chan
+ puts "  End"
+}
+ 
 #___________________________________________________________________________________________________________________________________________
-method PhysicalFLEX_root get_server_port {} {return $this(server_port)}
+method Comet_root_PM_P_FLEX get_server_port {} {return $this(server_port)}
 
 #___________________________________________________________________________________________________________________________________________
-method PhysicalFLEX_root set_server_port {port} {
+method Comet_root_PM_P_FLEX set_server_port {port} {
  if {[string length $this(s)]} {close $this(s)}
  set cmd "set this(s) \[socket -server \"$objName New_connexion\" $port\]"
  if {[catch $cmd res]} {
@@ -123,7 +109,7 @@ method PhysicalFLEX_root set_server_port {port} {
  set this(server_port) $port
 }
 #___________________________________________________________________________________________________________________________________________
-method PhysicalFLEX_root New_connexion {chan ad num} {
+method Comet_root_PM_P_FLEX New_connexion {chan ad num} {
  fconfigure $chan -blocking 0
    set this(msg) ""
    set this(msg_attended_length) -1
@@ -131,7 +117,7 @@ method PhysicalFLEX_root New_connexion {chan ad num} {
  lappend this(clients) $chan
 }
 #___________________________________________________________________________________________________________________________________________
-method PhysicalFLEX_root Read_from_FLEX {chan} {
+method Comet_root_PM_P_FLEX Read_from_FLEX {chan} {
  append this(msg) [read $chan]
  
  if {[string first " " $this(msg)] > 0} {
