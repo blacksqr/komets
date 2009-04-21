@@ -22,16 +22,21 @@ package
 		}
 		
 		public function lire():String {
+			var taille:String;
 			var msg:String;
 			if (socket.bytesAvailable)		// Nombre d'octets de données disponibles en lecture dans la mémoire tampon d’entrée
+				taille=socket.readUTFBytes(socket.bytesAvailable);
 				msg=socket.readUTFBytes(socket.bytesAvailable);
+				if (taille!=String (msg.length)) {
+					msg="erreur";
+				}
 			else
-				msg=" ";
+				msg="rien";
 			return msg;
 		}
 		
 		public function ecrire(msg:String):void {
-			//socket.writeInt(msg.length);
+			socket.writeUTFBytes(String (msg.length));
 			socket.writeUTFBytes(msg);
 		}
 	}
