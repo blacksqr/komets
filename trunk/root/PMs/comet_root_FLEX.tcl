@@ -41,25 +41,32 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
 
  append strm {<?xml version="1.0" encoding="utf-8"?>} "\n"
  append strm {<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" cornerRadius="0" alpha="1.0" 
- backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#1BA01B, #C2E6E5]" color="#22B21B" borderColor="#202FC1">}
- //set f [open "[Comet_files_root]Comets/root/PMs/gestion_sockets.action_script" r]; append strm [read $f]; close $f
- 
- append strm { <mx:Script>}
- append strm { <![CDATA[}
- #append strm { import SimpleServeur;}
- append strm { public var client:SimpleClient;}
- append strm { public function connexion():void \{}
- append strm { 		if ((client==null)||(client.etat="deconnecte")) \{}
- append strm {	    	client = new SimpleClient("} $class(local_IP) {", );}
- append strm {	    	iden=iden+1;}
- append strm {	    	monBouton.label="connexion effectué...";\}\}}
- append strm { public function envoyer():void \{}
- append strm {    	var msg:String = "bonjour";}
- append strm {    	client.ecrire(msg);}
- append strm {   	msg=null;\}}
- append strm { ]]>}
- append strm { </mx:Script>}
-
+ backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#1BA01B, #C2E6E5]" color="#22B21B" borderColor="#202FC1">} "\n"
+ append strm { <mx:Script>} "\n"
+ append strm { <![CDATA[ } "\n"
+ #set f [open "[Comet_files_root]Comets/root/PMs/gestion_sockets.action_script" r]; append strm [read $f]; close $f
+ append strm { import SimpleClient; } "\n"
+ append strm { public var client:SimpleClient;} "\n"
+ append strm { public var msg:String;} "\n"
+ append strm " public function connexion():void {\n"
+ append strm " 		if ((client==null)||(client.etat=\"deconnecte\")) { \n"
+ append strm "	    	client = new SimpleClient(\" $class(local_IP) \", 12000); \n"
+ append strm "	    	boutonConnexion.label=\"connexion effectué...\";} \n"
+ append strm {	    else } "\n"
+ append strm "	    	boutonConnexion.label=\"déjà connecté\"; } \n"
+ append strm " public function envoyer():void { \n"
+ append strm "    	client.ecrire(zoneText.text); \n"
+ append strm "   	zoneText.text=null;} \n"
+ append strm " public function recevoir():String{ \n"
+ append strm {    	msg=client.lire();} "\n"
+ append strm { 		zoneText.text=msg;} "\n"
+ append strm " return msg;} \n"
+ append strm { ]]>} "\n"
+ append strm { </mx:Script>} "\n"
+ append strm { <mx:TextArea id="zoneText" x="455" y="194" width="145" height="23"/>} "\n"
+ append strm { <mx:Button id="boutonConnexion" x="455" y="164" label="Connexion client" width="145" height="22" click="connexion()"/>} "\n\n\n"
+ append strm { <mx:Button id="boutonEnvoyer" x="455" y="164" label="envoyer" width="145" height="22" click="envoyer()"/>} "\n\n\n"
+ append strm { <mx:Button id="boutonRecevoir" x="455" y="164" label="recevoir" width="145" height="22" click="recevoir()"/>} "\n\n\n"
     this Render_daughters strm "$dec  "
 
  append strm {</mx:Application>} "\n"
@@ -134,7 +141,7 @@ method PhysicalFLEX_root Read_from_FLEX {chan} {
   }
   
  if {$this(msg_attended_length)  > 0 && [string length $this(msg)] >= $this(msg_attended_length)} {
-   puts "Il faut exécuter la message FLEX suivant:\n$this(msg)"
+   puts "Il faut exécuter le message FLEX suivant:\n$this(msg)"
   }
 }
 
