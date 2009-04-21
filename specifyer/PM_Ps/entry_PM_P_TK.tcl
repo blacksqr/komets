@@ -15,6 +15,9 @@ method Specifyer_PM_P_entry_TK constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+Generate_PM_setters Specifyer_PM_P_entry_TK [P_L_methodes_set_specifyer_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_entry_TK dispose {} {this inherited}
 
 #___________________________________________________________________________________________________________________________________________
@@ -25,7 +28,7 @@ method Specifyer_PM_P_entry_TK get_or_create_prims {root} {
   }
  this set_root_for_daughters $root
  this set_text [[this get_Common_FC] get_text]
- $this(tk_entry) configure -validate key -validatecommand "after 5 \"[$objName get_LC] set_text \\\[$objName get_text\\\]\"; return 1"
+ $this(tk_entry) configure -validate key -validatecommand "after 5 \"$objName prim_set_text \\\[$objName get_text\\\]\"; return 1"
  
  this Show $this(show)
  

@@ -24,11 +24,14 @@ method Specifyer_PM_P_text_TK get_or_create_prims {root} {
  this set_root_for_daughters $root
  this set_text [[this get_Common_FC] get_text]
  bind $this(tk_text) <KeyRelease> "$objName set_is_being_set 1;\n\
-                                   \[$objName get_LC\] set_text \[$objName get_text\]\n\
+                                   $objName prim_set_text \[$objName get_text\]\n\
                                    $objName set_is_being_set 0"
 
  return [this set_prim_handle $this(tk_text)]
 }
+
+#___________________________________________________________________________________________________________________________________________
+Generate_PM_setters Specifyer_PM_P_text_TK [P_L_methodes_set_specifyer_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_text_TK get_is_being_set { } {return $this(is_being_set)}

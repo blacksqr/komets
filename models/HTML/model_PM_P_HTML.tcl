@@ -30,6 +30,15 @@ method PM_HTML constructor {name descr args} {
 
 Generate_List_accessor PM_HTML L_tags L_tags
 Generate_accessors     PM_HTML AJAX_id_for_daughters
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Encode_param_for_JS {txt} {
+ set    rep "\""
+ append rep [string map [list {"} {\"} "\n" {\n}] $txt]
+ append rep "\""
+ return $rep
+}
+
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Reconnect {PMD} {
  set pos [lsearch $this(L_daughters) $PMD]
