@@ -86,7 +86,7 @@ method CometGraphBuilder_CFC set_marks_for {id L_marks} {
 method CometGraphBuilder_CFC get_graph_description {{root {}}} {
  set str "[$this(node_name,$this(handle_daughters)) get_name] "
  if {$this(handle_root) != ""} {
-   set rep [$this(node_name,$this(handle_root)) Serialize str]
+   set rep [$this(node_name,$this(handle_root)) Serialize str $root]
    puts $rep
   }
  return $str
@@ -96,7 +96,7 @@ method CometGraphBuilder_CFC get_graph_description {{root {}}} {
 proc P_L_methodes_get_CometGraphBuilder {} {return [list {get_handle_root { }} {get_handle_daughters { }} \
                                                          {get_a_local_unique_id {}} \
 														 {get_marks_for {id}} \
-														 {get_graph_description {{root {}}}} \
+														 {get_graph_description {{{root {}}}}} \
 														 {Has_for_descendant {id_m id_d}} \
 												   ]}
 proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {set_handle_daughters {v}} \
@@ -140,7 +140,7 @@ method CometGraphBuilder_CFC___NODE Has_for_descendant {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometGraphBuilder_CFC___NODE Serialize {str_name {root {}}} {
+method CometGraphBuilder_CFC___NODE Serialize {str_name root} {
  #puts "$objName Serialize"
  upvar $str_name str
  
@@ -170,7 +170,7 @@ method CometGraphBuilder_CFC___NODE Serialize {str_name {root {}}} {
    # serialize the daughters, if any
    foreach d $this(daughters) {
      append str { ,}; 
-	 append rep [$d Serialize str]
+	 append rep [$d Serialize str $root]
     }
  append str {)}
  
