@@ -34,6 +34,7 @@ Methodes_get_LC LogicalSpecifyer $L_methodes_get_Specifyer {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_set_specifyer_COMET_RE {} {return [list {set_text {{v ""}}}]}
+Generate_LM_setters LogicalSpecifyer [P_L_methodes_set_specifyer_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
 method LogicalSpecifyer set_PM_active {PM} {

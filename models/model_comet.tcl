@@ -128,7 +128,7 @@ proc Methodes_get_LC {classe L_methodes o_reference} {
                                append cmd "\} \{"
                                  #// Default comportment is to call equivalent funcion for each Logical Model
                                  append cmd {return [} $o_reference { } $methode_name { }
-                                   foreach param $params {append cmd {$} [lindex $param 0] " "}
+                                   foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] " "}
                                  append cmd {]}
                                append cmd "\}"
                                eval $cmd
