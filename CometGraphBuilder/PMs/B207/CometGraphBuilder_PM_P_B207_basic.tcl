@@ -197,21 +197,25 @@ method CometGraphBuilder_PM_P_B207_basic Add_a_node {n_zone infos} {
 method CometGraphBuilder_PM_P_B207_basic Update_display_IN_OUT {} {
  if {$this(IN) != ""} {
    set m_root $this(poly_IN)
-   set d_root [$this(IN) get_root]
+   set d_root [$this(IN) get_root]; set d $this(IN)
    set m_root_X [$m_root Px]; set m_root_Y [$m_root Py]
    set d_root_X [$d_root Px]; set d_root_Y [$d_root Py]
-   set contour [ProcTabDouble "[expr $m_root_X + 1] $m_root_Y $m_root_X $m_root_Y $d_root_X [expr $d_root_Y + 31] $d_root_X [expr $d_root_Y + 30]"]
+     set box [[$d get_poly_for_mothers] Boite_noeud_et_fils_glob]
+     set d_root_Y [expr [$d_root Py] + [$box Cy]]
+   set contour [ProcTabDouble "[expr $m_root_X + 1] $m_root_Y $m_root_X $m_root_Y $d_root_X [expr $d_root_Y + 1] $d_root_X [expr $d_root_Y + 0]"]
      $this(rel,IN) Vider
 	 $this(rel,IN) Ajouter_contour $contour
    Detruire $contour
   }
 
  if {$this(OUT) != ""} {
-   set m_root [$this(OUT) get_root]
+   set m_root [$this(OUT) get_root]; set m $this(OUT)
    set d_root $this(poly_OUT)
    set m_root_X [$m_root Px]; set m_root_Y [$m_root Py]
+     set box [[$m get_poly_for_daughters] Boite_noeud_et_fils_glob]
+     set m_root_Y [expr [$m_root Py] + [$box Cy]]
    set d_root_X [$d_root Px]; set d_root_Y [$d_root Py]
-   set contour [ProcTabDouble "[expr $m_root_X + 1] [expr $m_root_Y-30] $m_root_X [expr $m_root_Y - 30] $d_root_X [expr $d_root_Y + 1] $d_root_X $d_root_Y"]
+   set contour [ProcTabDouble "[expr $m_root_X + 1] [expr $m_root_Y-0] $m_root_X [expr $m_root_Y - 0] $d_root_X [expr $d_root_Y + 1] $d_root_X $d_root_Y"]
      $this(rel,OUT) Vider
 	 $this(rel,OUT) Ajouter_contour $contour
    Detruire $contour
@@ -358,6 +362,8 @@ method CometGraphBuilder_PM_P_B207_basic get_a_presentation_for_node {mark node}
 
  $e Add_MetaData CometGraphBuilder_PM_P_B207_basic::Is_a $mark
  $e set_represented_element $node
+ if {$mark == "TYPE"} {set b 1} else {set b 0}
+ $e set_marks_editable $b
  
  Sub_list this(L_Pool_presentation_for_node) $e
  Add_list this(L_presentation_for_node)      $e
@@ -375,10 +381,10 @@ method CometGraphBuilder_PM_P_B207_basic release_a_presentation_for_node {e} {
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic Update_markers_of {preso} {
- puts -nonewline "$objName Update_markers_of $preso ... "
+ #puts -nonewline "$objName Update_markers_of $preso ... "
  set u_id [$preso Val_MetaData u_id]
  this prim_set_marks_for $u_id [[$preso get_b_txt_marks] TEXTE]
- puts "DONE"
+ #puts "DONE"
 }
 
 #_________________________________________________________________________________________________________
@@ -477,11 +483,15 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_represented
  
  if {[catch {$this(b_txt) TEXTE [$element get_name]} err]} {
    $this(b_txt) TEXTE $element
-   $this(b_txt_marks) Gerer_contacts 1
-   $this(b_txt_marks) Editable 1
   }
-  
+    
  this Update_presentation
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_marks_editable {v} {
+ $this(b_txt_marks) Gerer_contacts 1
+ $this(b_txt_marks) Editable       1
 }
 
 #_________________________________________________________________________________________________________

@@ -83,9 +83,12 @@ method CometGraphBuilder_CFC set_marks_for {id L_marks} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometGraphBuilder_CFC get_graph_description {} {
+method CometGraphBuilder_CFC get_graph_description {{root {}}} {
  set str "[$this(node_name,$this(handle_daughters)) get_name] "
- if {$this(handle_root) != ""} {$this(node_name,$this(handle_root)) Serialize str}
+ if {$this(handle_root) != ""} {
+   set rep [$this(node_name,$this(handle_root)) Serialize str]
+   puts $rep
+  }
  return $str
 }
 
@@ -93,7 +96,7 @@ method CometGraphBuilder_CFC get_graph_description {} {
 proc P_L_methodes_get_CometGraphBuilder {} {return [list {get_handle_root { }} {get_handle_daughters { }} \
                                                          {get_a_local_unique_id {}} \
 														 {get_marks_for {id}} \
-														 {get_graph_description {}} \
+														 {get_graph_description {{root {}}}} \
 														 {Has_for_descendant {id_m id_d}} \
 												   ]}
 proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {set_handle_daughters {v}} \
@@ -137,11 +140,28 @@ method CometGraphBuilder_CFC___NODE Has_for_descendant {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometGraphBuilder_CFC___NODE Serialize {str_name} {
- puts "$objName Serialize"
+method CometGraphBuilder_CFC___NODE Serialize {str_name {root {}}} {
+ #puts "$objName Serialize"
  upvar $str_name str
  
- append str $this(name) {(}
+ set is_a_comet 0
+ if {[gmlObject info exists object $this(name)]} {
+   if {[lsearch [gmlObject info classes $this(name)] Comet_element] >= 0} {set is_a_comet 1}
+  }
+  
+ set rep ""
+ if {$is_a_comet} {
+   set L_classes [lindex [gmlObject info classes [$this(name) get_LC]] 0]
+   set L_classes [concat $L_classes [$this(name) get_style_class]]
+   set obj_marks [join $L_classes .]
+   append rep "set $this(name)" { [CSS++ $obj "}  
+     
+   append rep {"]} ";\n"
+   append str {$} $this(name) {\(}
+  } else {append str $this(name) {(}}
+  
+   
+  
    # serialize the markers, if any
    if {[llength $this(marks)] > 0} {
      append str {-Add_style_class "} $this(marks) {"}
@@ -149,8 +169,11 @@ method CometGraphBuilder_CFC___NODE Serialize {str_name} {
 	
    # serialize the daughters, if any
    foreach d $this(daughters) {
-     append str { ,}; $d Serialize str
+     append str { ,}; 
+	 append rep [$d Serialize str]
     }
  append str {)}
+ 
+ return $rep
 }
 
