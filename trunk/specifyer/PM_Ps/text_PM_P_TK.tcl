@@ -16,6 +16,9 @@ method Specifyer_PM_P_text_TK constructor {name descr args} {
 method Specifyer_PM_P_text_TK dispose {} {this inherited}
 
 #___________________________________________________________________________________________________________________________________________
+Generate_PM_setters Specifyer_PM_P_text_TK [P_L_methodes_set_specifyer_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_text_TK get_or_create_prims {root} {
  set this(tk_text) "$root.tk_${objName}_text"
  if {[winfo exists $this(tk_text)]} {} else {
@@ -29,6 +32,7 @@ method Specifyer_PM_P_text_TK get_or_create_prims {root} {
 
  return [this set_prim_handle $this(tk_text)]
 }
+
 
 #___________________________________________________________________________________________________________________________________________
 Generate_PM_setters Specifyer_PM_P_text_TK [P_L_methodes_set_specifyer_COMET_RE]
