@@ -30,7 +30,7 @@ method Marker_PM_P_Radio_HTML set_mark {v} {
  
  if {$v != $this(old_mark)} {
    if {$v} {
-     set cmd "\$('#$objName').attr('checked', 'checked')"
+     set cmd "\$('#$objName').attr('checked', 'checked');"
     } else {set cmd "\$('#$objName').removeAttr('checked');"}
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {

@@ -20,6 +20,25 @@ method Marker_PM_P_CheckBox_HTML dispose {} {this inherited}
 method Marker_PM_P_CheckBox_HTML maj_choices {} {}
 
 #___________________________________________________________________________________________________________________________________________
+method Marker_PM_P_CheckBox_HTML set_mark {v} {
+  set root [this get_L_roots] 
+
+ if {![info exists this(old_mark)]} {set this(old_mark) [this get_mark]}
+ 
+ if {$v != $this(old_mark)} {
+   if {$v} {
+     set cmd "\$('#$objName').attr('checked', 'checked');"
+    } else {set cmd "\$('#$objName').removeAttr('checked');"}
+  
+   if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+     $root Concat_update $cmd
+    }
+	
+   set this(old_mark) $v
+  } 
+}
+
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_CheckBox_HTML Render_prim {strm_name {dec {}}} {

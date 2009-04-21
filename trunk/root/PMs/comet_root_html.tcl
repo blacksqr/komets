@@ -200,6 +200,7 @@ method PhysicalHTML_root New_connexion {chan ad num} {
    set this(msg) ""
    set this(msg_attended_length) -1
  fileevent $chan readable "$objName Read_from_PHP $chan"
+ fconfigure $chan -encoding utf-8
  #puts "$objName : Connection de la part de $ad;$num sur $chan"
  lappend this(clients) $chan
 }
@@ -234,34 +235,26 @@ method PhysicalHTML_root Read_from_PHP {chan} {
 					set pos [string first " " $this(msg)]
 				    set this(msg_attended_length) [string range $this(msg) 0 [expr $pos - 1]]
 					set this(msg)                 [string range $this(msg) [expr $pos + 1] end]
+					#puts " Premier paquet :\n  lg : $this(msg_attended_length)\n  txt : $this(msg)"
 				   }
 	              set recept [string length $this(msg)]
-				  #puts " Chargement intermédiaire : $recept octets / $this(msg_attended_length)"
+				  #puts "  -   % : $recept / $this(msg_attended_length)"
 				  if {$recept >= $this(msg_attended_length)} {
+				    set original_msg $this(msg)
 					if {[catch {$objName Analyse_message $chan this(msg)} err]} {
 					  #
 					  #set rep ""; this Render_all rep
-	                  puts $chan "<html><body>ERROR in COMETs:<br>$err</body></html>"
-					 } 
+					  set err_txt "ERROR in COMETs:<br/>message was :<br/>$original_msg<br/>ERROR was<br/>$err"
+	                  puts $chan $err_txt
+					  puts $err_txt
+					 }
+					set this(msg_attended_length) -1
+					set this(msg)                 ""
 					close $chan
 				    #puts "Done!"; 
 				   }
 		}
   return
-  
-  
-  set txt [read $chan]
-    set prev $txt
-    if {[catch {$objName Analyse_message $chan txt} err]} {
-	  set rep ""; this Render_all rep
-	  puts $chan $rep
-	  puts $prev
-	  puts "________ERROR in analysing message from browser :  err : $err"
-	 } else {puts "  Reçut [string length $prev] octets"}
-  close $chan
-  set nc [list]
-  foreach e $this(clients) {if {[string equal $e $chan]} {} else {lappend nc $e}}
-  set this(clients) $nc
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -405,6 +398,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
 # append rep "  " {<body onMouseUp="javascript:testClick2()">} "\n"
 
  append rep "  " {<body>}	"\n"
+ append rep "  " "  " {<p id="p_debug"></p>}
  append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
  #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
  #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
@@ -487,7 +481,6 @@ method PhysicalHTML_root Concat_update {cmd} {
  
  # enregistrement de la commande avec sa version
  set this(concat_send,$this(version_server)) $cmd
- #puts $this(concat_send,$this(version_server))
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -547,11 +540,6 @@ method PhysicalHTML_root Is_update {clientversion} {
 	unset resultat
  }
  
- #puts $ipclient
- #puts $vclient
- #puts $this(version_server)
- #puts [array names this(concat_send)]
- 
  # J'enregistre la version du client dans le tableau
  set this(version_client,$ipclient) $vclient
 
@@ -564,7 +552,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
  }
  
- puts $this(update_cmd)
+ #puts "Is_Update:\n  - V client : $vclient\n  - V server : $this(version_server)\n  -    cmd : $this(update_cmd)"
  
  # J'enregistre la version du serveur dans le client
  set this(version_client,$ipclient) $this(version_server)
