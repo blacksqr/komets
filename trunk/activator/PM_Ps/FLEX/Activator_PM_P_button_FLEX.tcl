@@ -37,7 +37,6 @@ method Activator_PM_P_button_FLEX Render {strm_name {dec {}}} {
  append strm $dec "<mx:Script>\n"
  append strm $dec "  <!\[CDATA\[\n"
  append strm $dec "  private function buttonClickHandler_${objName}():void{\n"
- append strm $dec "    ${objName}.label=\"Hello World of Zero!\";\n"
  append strm $dec "   }\n"
  append strm $dec {  ]]>} "\n"
  append strm $dec {</mx:Script>} "\n"

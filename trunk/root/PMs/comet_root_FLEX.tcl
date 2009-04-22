@@ -25,12 +25,15 @@ method Comet_root_PM_P_FLEX constructor {name descr args} {
       set this(port) 12000
       set class(next_port) 12001
       set class(L_server_ports) [list "12000 $objName"]
-      set this(socket_server) [socket -server "$objName Global_page" $this(port)]
+      set this(socket_server) [socket -server "$objName New_connection" $this(port)]
 	  fconfigure $this(socket_server) -buffersize 1024
     }
  eval "$objName configure $args"
  return $objName
 }
+
+#___________________________________________________________________________________________________________________________________________
+Generate_accessors Comet_root_PM_P_FLEX [list socket_server port]
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -53,24 +56,16 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  append strm " 		if ((client==null)||(client.etat=\"deconnecte\")) { \n"
  append strm "	    	client = new SimpleClient(\"$class(local_IP)\",12000); \n"
  append strm "	    	boutonConnexion.label=\"connexion effectué...\";\n"
- append strm "			zoneText.text=\"IP = $class(local_IP) \";} \n"
- append strm {	    else } "\n"
- append strm "	    	boutonConnexion.label=\"déjà connecté\";} \n"
- append strm " public function envoyer():void { \n"
- append strm "	    boutonEnvoyer.label=\"envoi...\"; \n"
- append strm "		client.ecrire(zoneText.text); \n"
- append strm "		zoneText.text=null;} \n"
- append strm " public function recevoir():void{ \n"
- append strm "	    boutonRecevoir.label=\"lecture...\"; \n"
- append strm {    	msg=client.lire();} "\n"
- append strm "		if (msg!=null) { "
- append strm " 			zoneText.text=msg;}} \n"
+ append strm "		} \n"
+ append strm "	    else  \n"
+ append strm "	    	boutonConnexion.label=\"déjà connecté\";\n"
+ append strm " } \n"
+ append strm " public function FLEX_to_TCL(str_obj:String, str_mtd:String, str_val:String):void {\n" 
+ append strm {   client.ecrire(String (str_obj.length)+ " " + str_obj + " " + String (str_mtd.length)+ " " + str_mtd + " " + String (str_val.length)+ " " + str_val + "|");} "\n"
+ append strm "  }\n"
  append strm { ]]>} "\n"
  append strm { </mx:Script>} "\n"
- append strm { <mx:TextArea id="zoneText" x="100" y="100" width="145" height="23"/>} "\n"
- append strm { <mx:Button id="boutonConnexion" x="200" y="200" label="Connexion client" width="155" height="22" click="connexion()"/>} "\n"
- append strm { <mx:Button id="boutonEnvoyer" x="300" y="300" label="envoyer" width="135" height="22" click="envoyer()"/>} "\n"
- append strm { <mx:Button id="boutonRecevoir" x="400" y="400" label="recevoir" width="135" height="22" click="recevoir()"/>} "\n\n"
+ append strm { <mx:Button id="boutonConnexion" label="Connexion client" width="155" height="22" click="connexion()"/>} "\n"
     this Render_daughters strm "$dec  "
 
  append strm {</mx:Application>} "\n"
@@ -78,64 +73,87 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  set f [open "${objName}.mxml" w]; fconfigure $f -encoding utf-8; puts $f $strm; close $f
  #exec "mxmlc ${objName}.mxml"
 }
-
-#___________________________________________________________________________________________________________________________________________
-method Comet_root_PM_P_FLEX Global_page {chan ad num} {
- fconfigure $chan -encoding utf-8
- puts "Demande de renseignement global de $ad;$num sur $chan"
- puts $chan "Message bien reçut dans $objName Global_page"
- close $chan
- puts "  End"
-}
  
 #___________________________________________________________________________________________________________________________________________
-method Comet_root_PM_P_FLEX get_server_port {} {return $this(server_port)}
-
-#___________________________________________________________________________________________________________________________________________
-method Comet_root_PM_P_FLEX set_server_port {port} {
- if {[string length $this(s)]} {close $this(s)}
- set cmd "set this(s) \[socket -server \"$objName New_connexion\" $port\]"
- if {[catch $cmd res]} {
-   puts "Echec de création de socket serveur sur $objName au port $port\n$res"
-   set this(s) {}
-   return
-  }
-
- set pos [lsearch $class(L_server_ports) "$this(server_port) $objName"]
- if {$pos>=0} {
-   lset class(L_server_ports) $pos "$port $objName"
-  } else {lappend class(L_server_ports) "$port $objName"}
-
- set this(server_port) $port
-}
-#___________________________________________________________________________________________________________________________________________
-method Comet_root_PM_P_FLEX New_connexion {chan ad num} {
+method Comet_root_PM_P_FLEX New_connection {chan ad num} {
+ puts "$objName New_connection $chan $ad $num"
  fconfigure $chan -blocking 0
+ fconfigure $chan -encoding utf-8
    set this(msg) ""
    set this(msg_attended_length) -1
  fileevent $chan readable "$objName Read_from_FLEX $chan"
  lappend this(clients) $chan
+ puts "fin New_connection appel à Read_from_FLEX"
 }
 #___________________________________________________________________________________________________________________________________________
 method Comet_root_PM_P_FLEX Read_from_FLEX {chan} {
  append this(msg) [read $chan]
- 
- if {[string first " " $this(msg)] > 0} {
+ #permet de sauter la taille indiquée en début de 
+ if {$this(msg_attended_length) == -1 && [string first " " $this(msg)] > 0} {
    set this(msg_attended_length) [lindex $this(msg) 0]
    set deb [expr [string length $this(msg_attended_length)] + 1]
    set this(msg) [string range $this(msg) $deb end]
   }
-  
- if {$this(msg_attended_length)  > 0 && [string length $this(msg)] >= $this(msg_attended_length)} {
+ 
+ puts "Received [string length $this(msg)] / $this(msg_attended_length)"
+ puts "  msg : $this(msg)"
+ 
+ if {$this(msg_attended_length) > 0 && [string length $this(msg)] >= $this(msg_attended_length)} {
    puts "Il faut exécuter le message FLEX suivant:\n$this(msg)"
+   set length [string length $this(msg)]
+   while { $length == [string length $this(msg)] \
+         &&[this Analyse_message this(msg)]} {set length [string length $this(msg)]
+		                                     }
+   set this(msg_attended_length) -1
+   set this(msg)                 ""
   }
+  
+ if {[eof $chan]} {puts "Socket $chan closed by client!"; close $chan}
 }
 
+#_ne sers à rien____________________________________________________________________________________________________________________________
+method Comet_root_PM_P_FLEX pipo {} {
+ set this(msg_attended_length) -1
+ set this(msg)                 ""
+}
 
-
-
-
-
-
+#___________________________________________________________________________________________________________________________________________
+method Comet_root_PM_P_FLEX Analyse_message {str_name} {
+ set still_to_be_done 0
+ # simplifie l'accès à la variable de Analyse_message
+ upvar $str_name str
+ 
+ set str_length [string length $str]
+ set pos        0
+ while {$pos < $str_length} {
+   if {[string index $str $pos] == "|"} {
+     set str [string range $str [expr $pos+1] end]
+	 # ce que j'ai modifié
+	 puts "- msg avant : $str"
+	 set taille_msg [string length $str]
+	 puts "- taille du message : $taille_msg"
+	 set debut [expr [string length taille_msg] + 1]
+	 puts "- taille de la taille du message : $debut"
+	 set str [string range str $debut end]
+	 puts "- msg après : $str"
+   
+	 # fin modif.
+	 set still_to_be_done 1
+	 break
+    }
+   foreach e [list var mtd val] {
+     set pos_space [string first " " $str $pos]
+     set size [string range $str $pos [expr $pos_space-1]]
+     set pos [expr $pos_space+1]
+	 set $e [string range $str $pos [expr $pos+$size-1]]
+	 set pos [expr $pos+$size+1]
+    }
+   if {[catch {$var $mtd $val} err]} {
+     puts "Error d'évaluation de la commande:\n  - var $var\n  - mtd : $mtd\n  - val : $val"
+    }
+  }
+  
+ return $still_to_be_done
+}
 
 
