@@ -49,7 +49,7 @@ method Marker_PM_P_Radio_HTML Render_prim {strm_name {dec {}}} {
  append rep $dec <input [this Style_class] { type="radio" onClick="javascript:addOutput(this)" name="} [this get_HTML_var] {" value="} [this get_HTML_val] {"}
    if {[this get_mark]} {append rep { checked="checked"}}
  append rep { />}
-   this Render_daughters rep ""
+   #this Render_daughters rep ""
 }
 
 

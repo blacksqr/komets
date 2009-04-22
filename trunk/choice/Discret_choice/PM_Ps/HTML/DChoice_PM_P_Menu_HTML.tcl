@@ -14,9 +14,28 @@ method DChoice_PM_P_Menu_HTML constructor {name descr args} {
 method DChoice_PM_P_Menu_HTML maj_choices {} {}
 
 #___________________________________________________________________________________________________________________________________________
+method DChoice_PM_P_Menu_HTML set_currents {v} {
+  set root [this get_L_roots] 
+
+ if {![info exists this(old_currents)]} {set this(old_currents) [this get_currents]}
+ 
+ if {$v != $this(old_currents)} {
+   if {$v} {
+     set cmd "\$('#$objName').attr('selected', 'selected');"
+    } else {set cmd "\$('#$objName').removeAttr('selected');"}
+  
+   if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+     $root Concat_update $cmd
+    }
+	
+   set this(old_currents) $v
+  } 
+}
+
+#___________________________________________________________________________________________________________________________________________
 method DChoice_PM_P_Menu_HTML Render {strm_name {dec {}}} {
  upvar $strm_name rep
- append rep $dec "<select [this Style_class] "
+ append rep $dec "<select [this Style_class] " onchange="javascript:addOutput(this)" " " 
    if {[this get_nb_max_choices] > 1} {append rep {multiple="multiple" }}
    append rep {name="} ${objName}__XXX__prim_set_currents {">} "\n"
    this Render_daughters rep "$dec  "
