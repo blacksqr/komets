@@ -25,7 +25,7 @@ method DChoice_PM_P_Menu_HTML set_currents {v} {
     } else {set cmd "\$('#$objName').removeAttr('selected');"}
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     $root Concat_update $cmd
+     $root Concat_update $objName $cmd
     }
 	
    set this(old_currents) $v

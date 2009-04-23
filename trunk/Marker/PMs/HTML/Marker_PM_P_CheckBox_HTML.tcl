@@ -31,7 +31,7 @@ method Marker_PM_P_CheckBox_HTML set_mark {v} {
     } else {set cmd "\$('#$objName').removeAttr('checked');"}
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     $root Concat_update $cmd
+     $root Concat_update $objName $cmd
     }
 	
    set this(old_mark) $v
