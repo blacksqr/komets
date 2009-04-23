@@ -36,7 +36,7 @@ method Specifyer_PM_P_Entry_HTML set_text {v} {
  set cmd "\$('#$objName').val($param);"
 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $cmd
+	$root Concat_update $objName $cmd
  }
 }
 

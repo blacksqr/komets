@@ -179,23 +179,25 @@ method PM_HTML Add_daughter {e {index -1}} {
  set rep [this inherited $e $index]
    this Do_in_root "Add_L_PM_to_add $objName"
  return $rep
- 
- 
- set pos       [lsearch [this get_daughters] $e]
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML Add_daughter_JS {} { 
+ set pos       [lsearch [this get_daughters] $objName]
  set tailletot [llength [this get_daughters]]
  
- set strm {}; $e Render strm
+ set objNameMother [lindex [this get_mothers] 0]
+ 
+ set strm {}; $objName Render strm
  set strm [this Encode_param_for_JS $strm]
  
  if { $tailletot-1 > $pos} {
 	set objAfter [lindex [this get_daughters] [expr $pos+1]]
 	set cmd "\$($strm).insertBefore('#$objAfter');"
  } else {
-	set cmd "\$($strm).appendTo('#$objName');"
+	set cmd "\$($strm).appendTo('#$objNameMother');"
  }
- puts $cmd
- this Send_cmd $cmd 
- 
+ return $cmd
 }
 
 #_________________________________________________________________________________________________________
@@ -203,10 +205,10 @@ method PM_HTML Sub_daughter {e} {
  set rep [this inherited $e]
    this Do_in_root "Add_L_PM_to_sub $objName"
  return $rep
- 
- 
- 
- set cmd "\$('#$e').remove();"
- this Send_cmd $cmd 
+}
 
+#_________________________________________________________________________________________________________
+method PM_HTML Sub_daughter_JS {} {
+ set cmd "\$('#$objName').remove();"
+ return $cmd
 }

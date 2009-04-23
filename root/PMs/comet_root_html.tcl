@@ -36,6 +36,10 @@ method PhysicalHTML_root constructor {name descr args} {
   set this(version_server) 0
   set this(version_client) {}
   set this(update_cmd) ""
+  set this(L_PM_to_sub) [list]
+  set this(L_PM_to_add) [list]
+  set this(L_PM_really_add) [list]
+  set this(L_PM_really_sub) [list]
   # ___________________________________________________________#
   
  eval "$objName configure $args"
@@ -48,6 +52,25 @@ Methodes_set_LC PhysicalHTML_root [L_methodes_set_CometRoot] {} {}
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP]
 Generate_List_accessor PhysicalHTML_root L_cmd_to_eval_when_plug_under_new_roots L_cmd_to_eval_when_plug_under_new_roots
+
+#___________________________________________________________________________________________________________________________________________
+Generate_List_accessor PhysicalHTML_root L_PM_to_sub L_PM_to_sub
+Generate_List_accessor PhysicalHTML_root L_PM_to_add L_PM_to_add
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Add_L_PM_to_sub {L_PM} {
+ incr this(version_server)
+ lappend this(L_PM_to_sub) [list $this(version_server) $L_PM]
+ set this(concat_send,$this(version_server)) [list $L_PM ""]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Add_L_PM_to_add {L_PM} {
+ incr this(version_server)
+ lappend this(L_PM_to_add) [list $this(version_server) $L_PM]
+ set this(concat_send,$this(version_server)) [list $L_PM ""]
+}
+
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root CB_plug_under_new_roots {r} {}
 
@@ -346,6 +369,8 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
  # envoi de la page complete ou juste d'un update partiel
  if {$this(update_send) == 0} {
 	puts $chan $rep
+	set this(L_PM_to_add) [list]
+	set this(L_PM_to_sub) [list]
  } else {
 	puts -nonewline $chan $this(update_cmd) 
 	set this(update_send) 0
@@ -471,16 +496,15 @@ method PhysicalHTML_root Apply_style {} {
 #______________________________ Automatic Dynamic update via AJAX __________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-
-method PhysicalHTML_root Concat_update {cmd} {
+method PhysicalHTML_root Concat_update {objN cmd} {
  # suppression dans le concat toute les versions qui sont obsoléte
  this Concat_update_supp
 
  # +1 pour la nouvelle version
- incr this(version_server) 1
+ incr this(version_server)
  
  # enregistrement de la commande avec sa version
- set this(concat_send,$this(version_server)) $cmd
+ set this(concat_send,$this(version_server)) [list $objN $cmd]
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -489,12 +513,25 @@ method PhysicalHTML_root Concat_update_supp {} {
  
  if {$mini != -1} {
 	 foreach {vconcat cmd} [array get this concat_send,*] {
-		if($vconcat < $mini) {
+		if($vconcat <= $mini) {
 			unset this(concat_send,$vconcat)
-		} else {
-			break
 		}
 	 }
+	 
+  # Update the list of elements to sub
+  set nL [list ]; 
+    foreach e [this get_L_PM_to_sub] {
+	  if {[lindex $e 0] > $mini} {lappend nL $e}
+	 }
+  this set_L_PM_to_sub $nL
+
+  # Update the list of elements to add
+  set nL [list ]; 
+    foreach e [this get_L_PM_to_add] {
+	  if {[lindex $e 0] > $mini} {lappend nL $e}
+	 }
+  this set_L_PM_to_add $nL
+
  }
 }
 
@@ -512,6 +549,103 @@ method PhysicalHTML_root get_vclient_min {} {
 	 }
  }
  return $mini
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Verif_L_add_exist_version {vencours} {
+ set pos [lsearch [this get_L_PM_to_add] $vencours]
+ 
+ return [expr $pos >= 0]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Verif_L_sub_exist_version {vencours} {
+ set pos [lsearch [this get_L_PM_to_sub] $vencours]
+ 
+ return [expr $pos >= 0]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
+ set L       [CSS++ $objName "#$obj <--< *"]
+ set Linter  [list]
+ set Linter2 [list]
+ 
+ foreach e $L {
+	foreach p [this get_L_PM_to_add] {
+		if {[lindex $p 0] > $vclient && $e == [lindex $p 1]} { lappend Linter [list [lindex $p 1]] }
+	}
+	
+	foreach p [this get_L_PM_to_add] {
+		if {[lindex $p 0] > $vclient && $e == [lindex $p 1]} { lappend Linter2 [list [lindex $p 1]] }
+	}
+ }
+
+ if {[expr [llength Linter] > 0] || [expr [llength Linter2] > 0]} {
+	return 1
+ } else { return 0 }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
+ set L       [CSS++ $objName "#$obj <--< *"]
+ set Linter  [list]
+ set Linter2 [list]
+ 
+ foreach e $L {
+	if {[lsearch this(L_PM_really_add) $e ]} { lappend Linter $e }
+
+	if {[lsearch this(L_PM_really_sub) $e ]} { lappend Linter2 $e }
+ }
+
+ if {[expr [llength Linter] > 0] || [expr [llength Linter2] > 0]} {
+	return 1
+ } else { return 0 }
+}
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Clear_L_PM_really_sub_add {obj} {
+ set daughts [$obj get_daughters]
+ foreach e $daughts {
+	[this Sub_Element this(L_PM_really_add) $e]
+	[this Sub_Element this(L_PM_really_sub) $e]
+ }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name {dec {}}} {
+ upvar $strm_name strm
+ set this(L_PM_really_sub) [list]
+ set this(L_PM_really_add) [list]
+ 
+ for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} { 
+ 
+ ###### ATTENTION VERIF VERSION DANS Verif_obj_parents_in_L_add_sub
+ 
+	set objN [lindex $this(concat_send,$ver) 0]
+	set cmd [lindex $this(concat_send,$ver) 1] 
+ 
+	if {![this Verif_obj_parents_in_L_add_sub $vclient $objN] && $cmd != ""} {
+		append strm $dec $cmd
+	} elseif {![this Verif_obj_parents_in_L_really_add_sub $objN] && $cmd == ""} {
+		this Clear_L_PM_really_sub_add $objN
+		
+		if {[this Verif_L_add_exist_version $ver]} {
+			lappend this(L_PM_really_add) $objN
+		} elseif {[this Verif_L_sub_exist_version $ver]} {
+			lappend this(L_PM_really_sub) $objN
+		}
+	}
+ }
+ 
+ foreach e $this(L_PM_really_sub) {
+	append strm $dec [$e Sub_daughter_JS]
+ } 
+ 
+ foreach e $this(L_PM_really_add) {
+	append strm $dec [$e Add_daughters_JS]
+ }
+ set this(L_PM_really_sub) [list]
+ set this(L_PM_really_add) [list]
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -546,9 +680,12 @@ method PhysicalHTML_root Is_update {clientversion} {
  # Vérif si la version du client et la même que celle du serveur
  # Si diff => Appliquer toutes les modifs depuis la version du client jusqu'à celle du serveur
  if {$vclient != $this(version_server)} {
-	for {set ver [expr $vclient+1]} {$ver <= $this(version_server)} {incr ver 1} {
-		append this(update_cmd) $this(concat_send,$ver) "\n"
-	}
+	# for {set ver [expr $vclient+1]} {$ver <= $this(version_server)} {incr ver 1} {
+		# append this(update_cmd) $this(concat_send,$ver) "\n"
+	  # }
+	# this Udpate_PM_to_add_sub $vclient $this(version_server) this(update_cmd)
+	
+	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
  }
  
