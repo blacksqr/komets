@@ -170,14 +170,14 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
      foreach C "[lindex $L_res_Comets 0] [lindex $L_res_Comets 1]" {$C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps}
 	 
    set root [CSS++ [$PM get_L_roots] "((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\ <--<!> */"]
-   puts "  - root : $root"
+   #puts "  - root : $root"
    $PM_encaps set_L_nested_handle_LM $root
    if {[string equal $handle_for_daughters ""]} {
      set handle_for_daughters [$PM get_LM]
 	} else {set handle_for_daughters [CSS++ $root "$handle_for_daughters"]
 	       }
    $PM_encaps set_L_nested_daughters_LM [CSS++ cr "#${handle_for_daughters}->_LM_LP"]
-   puts "$PM_encaps L_nested_daughters_LM is {[$PM_encaps get_L_nested_daughters_LM]}"
+   #puts "$PM_encaps L_nested_daughters_LM is {[$PM_encaps get_L_nested_daughters_LM]}"
  #$PM Substitute_by $PM_encaps
 		set nesting_element [$PM_encaps get_nesting_element]
 		if {![string equal $nesting_element ""]} {$nesting_element Update}
@@ -197,12 +197,12 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
           $PM_encaps set_L_nested_daughters_PM [CSS++ cr "#$PM_encaps ~ ($L)"]
          }
  #$PM_encaps set_daughters $L_daugthers
- puts "___________________________________\n$PM_encaps set_daughters {$L_daugthers}___________________________________\n"
+ #puts "___________________________________\n$PM_encaps set_daughters {$L_daugthers}___________________________________\n"
  foreach d $L_daugthers {
-   puts "$PM_encaps Add_daughter $d"
+   #puts "$PM_encaps Add_daughter $d"
    $PM_encaps Add_daughter $d
   }
- puts "___________________________________"
+ #puts "___________________________________"
  return $PM_encaps
 }
 

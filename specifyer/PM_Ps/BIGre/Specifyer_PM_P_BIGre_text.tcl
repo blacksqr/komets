@@ -12,7 +12,7 @@ method Specifyer_PM_P_BIGre_text constructor {name descr args} {
    [this get_prim_handle] abonner_a_caractere_tape [$this(rap_car) Rappel]
    set root [this get_prim_handle] 
      $root Calculer_boites
-     puts "$objName size:\n  - L : [$root Largeur]\n  - H [$root Hauteur]"
+     #puts "$objName size:\n  - L : [$root Largeur]\n  - H [$root Hauteur]"
 
  eval "$objName configure $args"
  return $objName

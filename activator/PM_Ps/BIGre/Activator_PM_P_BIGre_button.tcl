@@ -32,7 +32,7 @@ Generate_PM_setters Activator_PM_P_BIGre_button [list {activate {{type {}}}}]
 
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_BIGre_button Trigger_prim_activate {} {
- puts "$objName Trigger_prim_activate"
+ #puts "$objName Trigger_prim_activate"
  set cmd ""
  foreach {var val} [this get_Params] {append cmd " " $var " $val"}
  this prim_activate $cmd

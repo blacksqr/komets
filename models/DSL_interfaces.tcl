@@ -85,30 +85,30 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
    if {![gmlObject info exists object $name]} {
      lappend L_comets_created $name
      eval $txt
-	} else {eval "$name configure $argu"; puts "___$name set_daughters_R {}"; $name set_daughters_R {}}
+	} else {eval "$name configure $argu"; $name set_daughters_R {}}
 # Est ce un nom de variable ?
   } else {if {[gmlObject info exists object $type]} {
             set name $type
-            puts "$type est un objet."
+            #puts "$type est un objet."
 			# Est ce le nom d'un noeud du GDD ?							 
             if {$type == "GDD_Node" || [lsearch [gmlObject info classes $type] GDD_Node] >= 0} {
-			  puts "In $objName : Reference to a GDD node : $type"
+			  #puts "In $objName : Reference to a GDD node : $type"
 			  # Retrouver le LC correspondant dans le GDD
 			  $this(dsl_gdd) QUERY "?n : $type : NODE()->REL(type~=GDD_inheritance && type!=GDD_restriction)*->\$n()"
               set gdd_rep       [lindex [$this(dsl_gdd) get_Result] 0] 
-			  puts "gdd_rep = $gdd_rep"
+			  #puts "gdd_rep = $gdd_rep"
 			  set gdd_task_node [lindex [lindex $gdd_rep 1] 0]
 			  if {$gdd_task_node == ""} {set gdd_task_node $type}
-			  puts "gdd_task_node = $gdd_task_node"
+			  #puts "gdd_task_node = $gdd_task_node"
 			  # Identifier son usine
 			  if {[] == ""} {
 			    $this(dsl_gdd) QUERY "?n : $gdd_task_node : NODE()->REL(type~=GDD_inheritance)*->\$n()->REL(type==GDD_restriction)->NODE(name==IS_root)"
 				set gdd_rep          [lindex [$this(dsl_gdd) get_Result] 0] 
 				set root_restriction [lindex [lindex $gdd_rep 1] 0]
 				set factory          [lindex [$root_restriction get_L_factories] 0]
-				puts "factory = $factory"
+				#puts "factory = $factory"
 			   } else {set factory [lindex [$gdd_task_node get_L_factories] 0]
-			           puts "factory = $factory"
+			           #puts "factory = $factory"
 			          }
 			  # Trouver toutes les implementations de $type et les donner comme usines de l'instance
 			  set name $factory
@@ -116,20 +116,20 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 			  eval $txt
 			  lappend L_comets_created $name
 			  # Ajouter les usines correspondants aux autres implémentations de la même tâche
-			  puts "Reste à ajouter les bonnes usines pour $type rendu dans $name"
+			  #puts "Reste à ajouter les bonnes usines pour $type rendu dans $name"
 			  # Add right factories
 			  set req_gdd_direct_implem "?n : $type : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
 			  set req_gdd_all_implem    "?n : $gdd_task_node : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
-			  puts $req_gdd_direct_implem
+			  #puts $req_gdd_direct_implem
 			  $this(dsl_gdd) QUERY $req_gdd_direct_implem; set res_gdd [$this(dsl_gdd) get_Result]
-				puts "  res_gdd : {$res_gdd}"
+				#puts "  res_gdd : {$res_gdd}"
 				set L_nodes_implem [lindex [lindex $res_gdd 0] 1]
 			  # Add other factories
-			  puts $req_gdd_all_implem
+			  #puts $req_gdd_all_implem
 			  $this(dsl_gdd) QUERY $req_gdd_all_implem; set res_gdd [$this(dsl_gdd) get_Result]
-				puts "  res_gdd : {$res_gdd}"
+				#puts "  res_gdd : {$res_gdd}"
 			    Add_list L_nodes_implem [lindex [lindex $res_gdd 0] 1]
-				puts "${name}_LM_LP Update_factories $L_nodes_implem"
+				#puts "${name}_LM_LP Update_factories $L_nodes_implem"
 			    ${name}_LM_LP Update_factories $L_nodes_implem
 			 }
            } else {global $type
@@ -138,7 +138,6 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
                     } else {if {[gmlObject info exists class $type]} {
 		                     # C'est un nom de classe, est ce un élément de COMET ?
                              if {$type == "Logical_consistency" || [lsearch [gmlObject info classes $type] Logical_consistency] >= 0} {
-							   puts ""
 							   set txt "set name \[CPool get_a_comet $type $argu\]"
 							   eval $txt
 							   lappend L_comets_created $name
@@ -189,7 +188,7 @@ method DSL_interface_interpretor Interp_DSL {str_name} {
 
  set reco {^[ \n]*([a-z|A-Z|\||0-9|_]*)[ \n]*=[ \n]*(.*)$}
  if {[regexp $reco $str oki v_name str]} {
-   puts "$this(dec)v_name : $v_name"
+   #puts "$this(dec)v_name : $v_name"
    return [list $v_name [this Interp_DSL_Comet str]]
   }
 # puts "$this(dec)v_name : NULL"

@@ -37,7 +37,7 @@ Generate_PM_setters Specifyer_PM_P_B207_color_base [P_L_methodes_set_specifyer_C
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_B207_color_base Update_color {args} {
- puts "$objName Update_color $args"
+ #puts "$objName Update_color $args"
  if {[llength $args] == 4} {
    set r [lindex $args 0]
    set v [lindex $args 1]
@@ -48,12 +48,12 @@ method Specifyer_PM_P_B207_color_base Update_color {args} {
 		  set b [expr 0x[string range $args 5 6] / 255.0]
 		  set a 1
          }
- puts "$objName prim_set_text \"$r $v $b $a\""
+ #puts "$objName prim_set_text \"$r $v $b $a\""
  this prim_set_text "$r $v $b $a"
 }
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_B207_color_base set_text {v} {
- puts "$objName Specifyer_PM_P_B207_color_base::set_text $v"
+ #puts "$objName Specifyer_PM_P_B207_color_base::set_text $v"
  if {[catch "$this(poly_fond) Couleur $v" err]} {puts "ERROR in $objName Specifyer_PM_P_B207_color_base::set_text $v\n$err\n____________________"}
 }

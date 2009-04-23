@@ -58,7 +58,7 @@ method Activator_PM_P_BIGre_polygon Shape {L_pt} {
 	 default {lappend L $pt}
     }
   }
- puts $cmd
+ #puts $cmd
  eval $cmd
  
 # set contour [ProcTabDouble $L_pt]

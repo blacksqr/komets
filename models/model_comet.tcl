@@ -296,7 +296,7 @@ proc Manage_consistency_between {L_ObjOp_getOp_set_v} {
 
 #_________________________________________________________________________________________________________
 proc Eval_in_context {L_var_val args} {
- puts "L_var_val = {$L_var_val}"
+ #puts "L_var_val = {$L_var_val}"
  foreach {var val} $L_var_val {set $var $val}
  eval [subst $args]
 }
@@ -1387,7 +1387,6 @@ proc Read_string_as_css++ {str} {
  set L [split $str "\n"]
  set i 0; set length [llength $L]
  while {$i < $length} {
-   puts $i
    set line [lindex $L $i]
    if {[regexp "^(.*) *\{ *$" $line reco sel]} {
      set rule ""
@@ -1408,7 +1407,7 @@ proc Read_string_as_css++ {str} {
 #_________________________________________________________________________________________________________
 proc Apply_style_on {C GDD_op_file CSS_file} {
  set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
- set f [open $CSS_file    r]; set CSS    [read $f]; close $f
+ set CSS    [Read_file_as_css++ $CSS_file]
  Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C
 }
 

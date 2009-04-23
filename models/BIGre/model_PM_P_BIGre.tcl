@@ -83,7 +83,7 @@ method PM_BIGre get_rap_all_pointers_Leave {} {return $this(rap_on_leave)}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre On_one_pointer_Enter {cmd} {
- puts "$objName On_one_pointer_Enter {$cmd}"
+ #puts "$objName On_one_pointer_Enter {$cmd}"
  if {![info exists this(rap_on_enter)]} {
    set this(rap_on_enter) [B_rappel [Interp_TCL]]
    [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_enter) Rappel] [ALX_pointeur_apparition]
@@ -111,7 +111,7 @@ method PM_BIGre Is_the_pointer_disappearing {rap} {
  if {[string equal [$ptr Val_MetaData "alx_simulateur_pointeurs::Retirer_pointeur"] 1]} {
    set L_applied [$ptr Val_MetaData "alx_simulateur_pointeurs::Retirer_pointeur::Applied_to"]
    if {[lsearch $L_applied "${objName}::Is_the_pointer_disappearing"] == -1} {
-     puts "$objName Is_the_pointer_disappearing : YES !!!"
+     #puts "$objName Is_the_pointer_disappearing : YES !!!"
      eval [$this(rap_on_leave) Texte]
 	 lappend L_applied "${objName}::Is_the_pointer_disappearing"
 	 $ptr Add_MetaData "alx_simulateur_pointeurs::Retirer_pointeur::Applied_to" $L_applied
@@ -225,7 +225,7 @@ method PM_BIGre Redirect_key_events_to_LM {LM {LM_root {}}} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Fit_PM_pointed_by_CSS {args} {
- puts "$objName Fit_PM_pointed_by_CSS {$args}"
+ #puts "$objName Fit_PM_pointed_by_CSS {$args}"
  if {[llength $args] == 1} {set args [lindex $args 0]}
  set PM [CSS++ $objName $args]
  this Fit $PM
@@ -233,13 +233,13 @@ method PM_BIGre Fit_PM_pointed_by_CSS {args} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Fit {PM} {
- puts "$objName Fit {$PM}"
+ #puts "$objName Fit {$PM}"
  set prim_PM [$PM get_prim_handle]; set box_PM [$prim_PM Boite_noeud_et_fils]
  set p [this get_prim_handle];      set box    [$p       Boite_noeud_et_fils]
  $p Origine   [$prim_PM Origine]
  $p Rotation  [$prim_PM Rotation]
  $p Etirement [expr [$box_PM Tx]/[$box Tx]] [expr [$box_PM Ty]/[$box Ty]]
- puts "End Fit"
+ #puts "End Fit"
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -250,7 +250,7 @@ method PM_BIGre Stretch {ex ey} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Raise {args} {
- puts "$objName Raise {$args}"
+ #puts "$objName Raise {$args}"
  if {$args == "low"} {set mtd Ajouter_fils} else {set mtd Ajouter_fils_au_debut}
  set L {}
  set p [this get_prim_handle]
@@ -273,7 +273,7 @@ method PM_BIGre Redirect_key_events_to_PM {PM} {
  set    cmd "set prim \[$PM get_prim_handle\];\n"
  append cmd {set evt [B_sim_couche Evt_courant];} "\n"
  append cmd {set ptr [$evt Ptr]; set pt [$ptr P_Point];} "\n"
- append cmd {set res ""; catch "B_sim_sds Prendre_evennements_lies_a $pt [$prim Liant]" res; puts "res : $res";}
+ append cmd {set res ""; catch "B_sim_sds Prendre_evennements_lies_a $pt [$prim Liant]" res; }
 
  $this(rap_redirect_key) Texte $cmd
  [this get_prim_handle] desabonner_de_detection_pointeur [$this(rap_redirect_key) Rappel]
@@ -582,7 +582,7 @@ proc C_B_LOAD_DATA {c var cmd} {
 
 #___________________________________________________________________________________________________________________________________________
 proc C_Substitute_PM_with_type {PM GDD_type} {
- puts "C_Substitute_PM_with_type $PM $GDD_type"
+ #puts "C_Substitute_PM_with_type $PM $GDD_type"
  if {[catch "$PM Update_factories $GDD_type" res]} {puts "ERROR IN \"C_Substitute_PM_with_type $PM $GDD_type\"\n  $res"}
 }
 
