@@ -664,6 +664,8 @@ method Comet_element set_mothers   {v} {
  foreach m $L {$m Sub_daughter $objName}
  foreach m $v {$m Add_daughter $objName}
 }
+
+#_________________________________________________________________________________________________________
 method Comet_element set_daughters {v} {
  set L [this get_daughters]
  foreach d $L {this Sub_daughter $d}
@@ -1399,6 +1401,15 @@ proc Read_string_as_css++ {str} {
    incr i
   }
  return $L_rep
+}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+proc Apply_style_on {C GDD_op_file CSS_file} {
+ set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
+ set f [open $CSS_file    r]; set CSS    [read $f]; close $f
+ Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C
 }
 
 #_________________________________________________________________________________________________________

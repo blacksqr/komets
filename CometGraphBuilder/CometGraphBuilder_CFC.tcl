@@ -140,6 +140,44 @@ method CometGraphBuilder_CFC___NODE Has_for_descendant {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometGraphBuilder_CFC___NODE get_path_to_ancestor_from {n root rep_name} {
+ #puts "get_path_to_ancestor_from $n $root"
+ upvar $rep_name rep
+ 
+ set nb 0
+ if {$n == $root} {
+   #set rep {}
+  } else {set m [$n get_mothers]
+          if {$m != ""} {
+            set m [lindex $m 0]
+			set nb [this get_path_to_ancestor_from $m $root rep]
+            if { [lsearch [$m get_out_daughters] $n] == -1} {
+			  if {$m != $root} {
+                set L_classes [lindex [gmlObject info classes [$m get_LC]] 0]
+                set L_classes [concat $L_classes [$m get_style_class]]
+                set obj_marks [join $L_classes .]
+			   } else {set obj_marks {$obj}}
+			  append rep $obj_marks "\\("
+			  incr nb
+			 }
+           } else {set m [lindex [$n get_nesting_element] 0]
+		           if {$m != ""} {
+				     set m [$m get_LC]
+                     if {$m != $root} {
+					   set L_classes [lindex [gmlObject info classes [$m get_LC]] 0]
+                       set L_classes [concat $L_classes [$m get_style_class]]
+                       set obj_marks [join $L_classes .]
+					  } else {set obj_marks {$obj}}
+			           append rep $obj_marks "\\("
+			           incr nb
+				    }
+		          }
+		 }
+		 
+ return $nb
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC___NODE Serialize {str_name root} {
  #puts "$objName Serialize"
  upvar $str_name str
@@ -151,14 +189,21 @@ method CometGraphBuilder_CFC___NODE Serialize {str_name root} {
   
  set rep ""
  if {$is_a_comet} {
+   #puts "$this(name) is a comet"
    set L_classes [lindex [gmlObject info classes [$this(name) get_LC]] 0]
    set L_classes [concat $L_classes [$this(name) get_style_class]]
    set obj_marks [join $L_classes .]
-   append rep "set $this(name)" { [CSS++ $obj "}  
-     
+   append rep "set C_$this(name)" { [CSS++ $obj "}  
+     set nb_close_parenthesis [this get_path_to_ancestor_from $this(name) $root rep]
+	 append rep $obj_marks
+	 for {set i 0} {$i < $nb_close_parenthesis} {incr i} {append rep ")"}
+#	 puts "Nb close parenthesis $nb_close_parenthesis"
    append rep {"]} ";\n"
-   append str {$} $this(name) {\(}
-  } else {append str $this(name) {(}}
+   append str {$} C_$this(name) {\(}
+  } else {
+          #puts "$this(name) is not a comet"
+          append str $this(name) {(}
+		 }
   
    
   

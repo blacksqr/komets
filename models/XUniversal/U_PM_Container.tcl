@@ -64,7 +64,7 @@ method PM_U_Container Add_mother    {m {index -1}} {
   # Let's find a nested PM among handles to connect to $m
    set L [join [this get_L_nested_daughters_LM] ", "]
    this set_L_nested_daughters_PM [CSS++ $objName "#$objName ~ ($L)"]
-  #puts "_____________ $objName set_L_nested_daughters_PM {[this get_L_nested_daughters_PM]}"
+   puts "_______________\n  $objName set_L_nested_daughters_PM {[this get_L_nested_daughters_PM]}\n__________________________"
    this set_mode_plug Full
    if {![string equal $this(L_nested_handle_LM) ""]} {
      set LC [$this(L_nested_handle_LM) get_LC]
