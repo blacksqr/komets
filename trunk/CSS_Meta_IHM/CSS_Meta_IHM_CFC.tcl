@@ -133,7 +133,7 @@ method CSS_Meta_IHM_CFC Apply_set_of_rules_to {Element L_names} {
   # Apply the styles rules to roots of $Element
   # Modify set of rules for the root
    #this Update_style_to_with $root $fct $sel $L_rep
-   Update_style [$root get_DSL_GDD_QUERY] [$root get_DSL_CSSpp] $fct $L_rules
+   Update_style [$root get_DSL_GDD_QUERY] [$root get_DSL_CSSpp] $fct $L_rules $root
   }
  #puts "_______________ Functions _______________\n$L_fct\n______________________________________"
  $root set_style $L_RULES
