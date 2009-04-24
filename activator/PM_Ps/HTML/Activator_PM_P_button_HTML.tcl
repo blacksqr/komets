@@ -44,7 +44,8 @@ method Activator_PM_P_button_HTML Trigger_prim_activate {args} {
 method Activator_PM_P_button_HTML activate {args} {
  set root    [this get_L_roots] 
  set methode "val"
- set cmd   "\$('#$objName').val('OK');"
+ set cmd    "\$('#${objName}_button').removeAttr('disabled');\n"
+ append cmd "\$('#${objName}_button_img').attr('style','position:absolute; visibility:hidden;');"
 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
@@ -58,7 +59,10 @@ Manage_CallbackList Activator_PM_P_button_HTML Trigger_prim_activate begin
 method Activator_PM_P_button_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
- append strm $dec <input [this Style_class] { type="button" value="} [this get_text] {" name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:addOutput(this,true)" />} "\n"
-  this Render_daughters strm "$dec  "
+ append strm $dec <span [this Style_class]> "\n"
+	append strm $dec <img { src="src_img/load.gif" id="} ${objName}_button_img {" style="position:absolute; visibility:hidden;" />} "\n"
+	append strm $dec <input { id="} ${objName}_button {" type="button" value="} [this get_text] {" name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:$('#} $objName {_button').attr('disabled','disabled');$('#} $objName {_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />} "\n"
+	this Render_daughters strm "$dec  "
+ append strm $dec </span> "\n"
 }
 
