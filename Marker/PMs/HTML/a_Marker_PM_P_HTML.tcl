@@ -39,7 +39,7 @@ method Marker_PM_P_HTML prim_set_mark {v} {
 method Marker_PM_P_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
- append strm $dec "<span id=\"$objName\">"
+ append strm $dec "<span [this Style_class]>"
  if {[string equal ${objName}__XXX__prim_set_mark [this get_HTML_var]]} {
    append strm $dec {<input type="hidden" name="} ${objName}__XXX__init_next_val {"    value="}  {" />} "\n"
      this Render_prim strm "$dec  "

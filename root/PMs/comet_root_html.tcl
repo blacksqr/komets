@@ -176,7 +176,7 @@ method PhysicalHTML_root Send_global_info {chan} {
 
 
  puts $chan $rep
- puts $rep
+ #puts $rep
 # flush $chan
  close $chan
 }
@@ -337,10 +337,10 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
      if {[string length $v] == 0} {
        set    msg {}
        append msg $comet { } $m " \{\}"
-       if {[catch {eval $msg} res]} {puts $res}
+       if {[catch {eval $msg} res]} {puts "ERROR:\n$res"}
       } else {set    msg {}
               append msg $comet { } $m " \$v"
-              if {[catch {eval $msg} res]} {puts $res}
+              if {[catch {eval $msg} res]} {puts "ERROR2:\n$res"}
              }
     } else {
         if {[string length $c] > 1} {lappend L_post_cmd "$c \{$v\}"}
@@ -354,20 +354,23 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
   }
 
  #puts "Time to render..."
- set rep {}
- if {[string equal [this get_next_root] {}]} {
-   this set_marker [clock clicks]
-   this Render_all rep
-  } else {set r [this get_next_root]
-          puts "CSS++ $r \"#${r}->PMs\[soft_type==PHP_HTML\]\""
-          set r [CSS++ $r "#${r}->PMs\[soft_type==PHP_HTML\]"]
-          $r set_marker [clock clicks]
-          $r Render_all rep
-          this set_next_root {}
-         }
+ # set rep {}
+ # if {[string equal [this get_next_root] {}]} {
+   # this set_marker [clock clicks]
+   # this Render_all rep
+  # } else {set r [this get_next_root]
+          # puts "CSS++ $r \"#${r}->PMs\[soft_type==PHP_HTML\]\""
+          # set r [CSS++ $r "#${r}->PMs\[soft_type==PHP_HTML\]"]
+          # $r set_marker [clock clicks]
+          # $r Render_all rep
+          # this set_next_root {}
+         # }
 		 
  # envoi de la page complete ou juste d'un update partiel
  if {$this(update_send) == 0} {
+	set rep {}
+	  this set_marker [clock clicks]
+	  this Render_all rep
 	puts $chan $rep
 	set this(L_PM_to_add) [list]
 	set this(L_PM_to_sub) [list]
@@ -496,7 +499,7 @@ method PhysicalHTML_root Apply_style {} {
 #______________________________ Automatic Dynamic update via AJAX __________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root Concat_update {objN cmd} {
+method PhysicalHTML_root Concat_update {objN methode cmd} {
  # suppression dans le concat toute les versions qui sont obsoléte
  this Concat_update_supp
 
@@ -504,7 +507,9 @@ method PhysicalHTML_root Concat_update {objN cmd} {
  incr this(version_server)
  
  # enregistrement de la commande avec sa version
- set this(concat_send,$this(version_server)) [list $objN $cmd]
+ set this(concat_send,$this(version_server)) [list $objN $methode $cmd]
+ 
+ return ""
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -553,99 +558,148 @@ method PhysicalHTML_root get_vclient_min {} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_L_add_exist_version {vencours} {
- set pos [lsearch [this get_L_PM_to_add] $vencours]
- 
- return [expr $pos >= 0]
+ set trouve 0 
+ foreach e [this get_L_PM_to_add] {
+	if {[lindex $e 0] == $vencours} { set trouve 1; break }
+ } 
+ return $trouve
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_L_sub_exist_version {vencours} {
- set pos [lsearch [this get_L_PM_to_sub] $vencours]
- 
- return [expr $pos >= 0]
+ set trouve 0 
+ foreach e [this get_L_PM_to_sub] {
+	if {[lindex $e 0] == $vencours} { set trouve 1; break }
+ } 
+ return $trouve
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
- set L       [CSS++ $objName "#$obj <--< *"]
- set Linter  [list]
- set Linter2 [list]
+ if {[info exists $obj]} {
+   set L [CSS++ $objName "#$obj, #$obj <--< *"]
+  } else {set L [list $obj]}
+  
+ set trouve 0
+ #puts "verif if     =>    Verif_obj_parents_in_L_add_sub   => $obj"
  
  foreach e $L {
-	foreach p [this get_L_PM_to_add] {
-		if {[lindex $p 0] > $vclient && $e == [lindex $p 1]} { lappend Linter [list [lindex $p 1]] }
-	}
+	#puts "    ->   $e"	
+	set pos [lsearch [this get_L_PM_to_add] $e ]
+	if {$pos > -1 && [lindex [lindex [this get_L_PM_to_add] $pos] 0] > $vclient} { set trouve 1; break }
 	
-	foreach p [this get_L_PM_to_add] {
-		if {[lindex $p 0] > $vclient && $e == [lindex $p 1]} { lappend Linter2 [list [lindex $p 1]] }
-	}
+	set pos [lsearch [this get_L_PM_to_sub] $e ]
+	if {$pos > -1 && [lindex [lindex [this get_L_PM_to_sub] $pos] 0] > $vclient} { set trouve 1; break }
  }
 
- if {[expr [llength Linter] > 0] || [expr [llength Linter2] > 0]} {
-	return 1
- } else { return 0 }
+ return $trouve
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
- set L       [CSS++ $objName "#$obj <--< *"]
- set Linter  [list]
- set Linter2 [list]
+ if {[info exists $obj]} {
+   set L [CSS++ $objName "#$obj, #$obj <--< *"]
+  } else {set L [list $obj]}
  
+ set trouve 0
  foreach e $L {
-	if {[lsearch this(L_PM_really_add) $e ]} { lappend Linter $e }
-
-	if {[lsearch this(L_PM_really_sub) $e ]} { lappend Linter2 $e }
+	if {[lsearch $this(L_PM_really_add) $e ] > -1} { set trouve 1; break }
+	if {[lsearch $this(L_PM_really_sub) $e ] > -1} { set trouve 1; break }
  }
 
- if {[expr [llength Linter] > 0] || [expr [llength Linter2] > 0]} {
-	return 1
- } else { return 0 }
+ return $trouve
 }
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Clear_L_PM_really_sub_add {obj} {
- set daughts [$obj get_daughters]
+ if {[info exists $obj]} {
+   set daughts [CSS++ $obj "#$obj *"]
+  } else {set daughts [list $obj]}
+  
  foreach e $daughts {
-	[this Sub_Element this(L_PM_really_add) $e]
-	[this Sub_Element this(L_PM_really_sub) $e]
+	set pos [lsearch $this(L_PM_really_add) $e]
+	if {$pos!=-1} {
+		set this(L_PM_really_add) [lreplace $this(L_PM_really_add) $pos $pos]
+	}
+	
+	set pos [lsearch $this(L_PM_really_sub) $e]
+	if {$pos!=-1} {
+		set this(L_PM_really_sub) [lreplace $this(L_PM_really_sub) $pos $pos]
+	}
  }
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name {dec {}}} {
+method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  upvar $strm_name strm
  set this(L_PM_really_sub) [list]
  set this(L_PM_really_add) [list]
+ set listcmd               [list]
  
  for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} { 
  
- ###### ATTENTION VERIF VERSION DANS Verif_obj_parents_in_L_add_sub
- 
 	set objN [lindex $this(concat_send,$ver) 0]
-	set cmd [lindex $this(concat_send,$ver) 1] 
- 
+	set met  [lindex $this(concat_send,$ver) 1]
+	set cmd  [lindex $this(concat_send,$ver) 2] 
+	#puts "version        :   $ver    $cmd"
+	
 	if {![this Verif_obj_parents_in_L_add_sub $vclient $objN] && $cmd != ""} {
-		append strm $dec $cmd
-	} elseif {![this Verif_obj_parents_in_L_really_add_sub $objN] && $cmd == ""} {
+	# [lindex [lindex [this get_L_PM_to_add] $pos] 0]
+		if {[lsearch $listcmd "$objN $met"] == -1} {
+			lappend listcmd "$objN $met"
+			append strm $cmd "\n"
+			#puts "je suis dans le if        :   $strm"
+		}		
+	} elseif {![this Verif_obj_parents_in_L_really_add_sub $objN]} {
 		this Clear_L_PM_really_sub_add $objN
+		#puts "je suis dans le elseif    :    $objN "
 		
 		if {[this Verif_L_add_exist_version $ver]} {
 			lappend this(L_PM_really_add) $objN
+			#puts "       - L_PM_really_add     :    $objN " 
 		} elseif {[this Verif_L_sub_exist_version $ver]} {
 			lappend this(L_PM_really_sub) $objN
+			#puts "       - dans L_PM_really_sub    :    $objN "
 		}
-	}
+	} 
  }
  
  foreach e $this(L_PM_really_sub) {
-	append strm $dec [$e Sub_daughter_JS]
+	append strm [this Sub_JS $e] "\n"
+	#puts "Ma boucle L_PM_really_sub    :   $strm" 
  } 
  
  foreach e $this(L_PM_really_add) {
-	append strm $dec [$e Add_daughters_JS]
+	append strm [this Sub_JS $e] "\n"
+	append strm [this Add_JS $e] "\n"
+	#puts "Ma boucle L_PM_really_add    :   $strm"
  }
  set this(L_PM_really_sub) [list]
  set this(L_PM_really_add) [list]
+}
+
+#_________________________________________________________________________________________________________
+method PhysicalHTML_root Add_JS {e} { 
+ set objNameMother [lindex [$e get_mothers] 0]
+
+ set pos       [lsearch [$objNameMother get_daughters] $e]
+ set tailletot [llength [$objNameMother get_daughters]]
+  
+ set strm {}; $e Render strm
+ set strm [$e Encode_param_for_JS $strm]
+ 
+ if { $tailletot-1 > $pos} {
+	set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
+	set cmd "\$($strm).insertBefore('#$objAfter');"
+  } else {
+	      set cmd "\$($strm).appendTo('#$objNameMother');"
+         }
+ return $cmd
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Sub_JS {e} {
+ set cmd "\$('#$e').remove();"
+ return $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -666,13 +720,13 @@ method PhysicalHTML_root Is_update {clientversion} {
 	set resultat [string index $clientversion $i]
 	if {$resultat != " " && $space == 0} {
 		append ipclient $resultat
-	} elseif {$resultat != " " && $space == 1} {
-		append vclient $resultat
-	} else { 
-		incr space 1
-	}
+	 } elseif {$resultat != " " && $space == 1} {
+		        append vclient $resultat
+	           } else { 
+		               incr space 1
+	                  }
 	unset resultat
- }
+   }
  
  # J'enregistre la version du client dans le tableau
  set this(version_client,$ipclient) $vclient
@@ -680,13 +734,10 @@ method PhysicalHTML_root Is_update {clientversion} {
  # Vérif si la version du client et la même que celle du serveur
  # Si diff => Appliquer toutes les modifs depuis la version du client jusqu'à celle du serveur
  if {$vclient != $this(version_server)} {
-	# for {set ver [expr $vclient+1]} {$ver <= $this(version_server)} {incr ver 1} {
-		# append this(update_cmd) $this(concat_send,$ver) "\n"
-	  # }
-	# this Udpate_PM_to_add_sub $vclient $this(version_server) this(update_cmd)
-	
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
+	
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
+	puts $this(update_cmd)
  }
  
  #puts "Is_Update:\n  - V client : $vclient\n  - V server : $this(version_server)\n  -    cmd : $this(update_cmd)"
