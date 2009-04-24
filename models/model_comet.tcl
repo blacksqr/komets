@@ -1405,15 +1405,15 @@ proc Read_string_as_css++ {str} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-proc Apply_style_on {C GDD_op_file CSS_file} {
+proc Apply_style_on {C L_mapping GDD_op_file CSS_file} {
  set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
  set CSS    [Read_file_as_css++ $CSS_file]
- Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C
+ Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C $L_mapping
 }
 
 #_________________________________________________________________________________________________________
-proc Update_style {dsl_q dsl_css str_fct str_style {current ""} {L_rep ""}} {
- #puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current : $current"
+proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep ""}} {
+ puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
 # Process all the functions to give a list <fct_name, expr>
  set letter {[a-zA-Z0-9_\$"{}]}
  set space  "\[ \n\]"
@@ -1437,7 +1437,12 @@ proc Update_style {dsl_q dsl_css str_fct str_style {current ""} {L_rep ""}} {
 	        set root  [lindex $r 1];
 	        set L_ops [split [lindex $r 2] "\;"]
 	       }
-   set sel_svg [string map [list {$current} $current] [lindex $r 0]]
+   
+   # Mapping of variables names
+   set L_ops          [string map $L_mapping      $L_ops]
+   set L_real_mapping [concat     $L_mapping      [list {$current} $current]]
+   set sel_svg        [string map $L_real_mapping [lindex $r 0]]
+   
    if {$do_css} {
 	 set L_rep [CSS++ $root $sel_svg]
 	}
