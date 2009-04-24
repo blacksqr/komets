@@ -29,16 +29,17 @@ Generate_PM_setters Specifyer_PM_P_ZoneEntry_HTML [P_L_methodes_set_specifyer_CO
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_ZoneEntry_HTML set_text {v} {
- if {$this(prim_text) != $v} {
+ if {$this(prim_text) != $v} { 
    #puts "$objName set_text $v"
  
-   set root [this get_L_roots] 
+   set root [this get_L_roots]
+   set methode "selected"   
 
    set param [this Encode_param_for_JS $v]
    set cmd "\$('#$objName').val($param);"
 
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	 $root Concat_update $objName $cmd
+	 $root Concat_update $objName $methode $cmd
     }
  }
 }

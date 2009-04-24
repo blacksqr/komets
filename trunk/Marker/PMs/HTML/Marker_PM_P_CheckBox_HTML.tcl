@@ -22,16 +22,17 @@ method Marker_PM_P_CheckBox_HTML maj_choices {} {}
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_CheckBox_HTML set_mark {v} {
   set root [this get_L_roots] 
+  set methode "checked"
 
  if {![info exists this(old_mark)]} {set this(old_mark) [this get_mark]}
  
  if {$v != $this(old_mark)} {
    if {$v} {
-     set cmd "\$('#$objName').attr('checked', 'checked');"
-    } else {set cmd "\$('#$objName').removeAttr('checked');"}
+     set cmd "\$('#${objName}_input').attr('checked', 'checked');"
+    } else {set cmd "\$('#${objName}_input').removeAttr('checked');"}
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     $root Concat_update $objName $cmd
+     $root Concat_update $objName $methode $cmd
     }
 	
    set this(old_mark) $v
@@ -43,7 +44,7 @@ method Marker_PM_P_CheckBox_HTML set_mark {v} {
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_CheckBox_HTML Render_prim {strm_name {dec {}}} {
  upvar $strm_name rep
- append rep $dec <input [this Style_class] { type="checkbox" onchange="javascript:addOutput(this)" name="} [this get_HTML_var] {" value="} [this get_HTML_val] {"}
+ append rep $dec "<input id=\"${objName}_input\"" { type="checkbox" onchange="javascript:addOutput(this)" name="} [this get_HTML_var] {" value="} [this get_HTML_val] {"}
    if {[this get_mark]} {append rep { checked="checked"}}
  append rep { />}
    #this Render_daughters rep ""

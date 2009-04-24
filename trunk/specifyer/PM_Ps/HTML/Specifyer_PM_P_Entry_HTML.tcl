@@ -30,13 +30,14 @@ Generate_PM_setters Specifyer_PM_P_Entry_HTML [P_L_methodes_set_specifyer_COMET_
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_Entry_HTML set_text {v} {
- set root [this get_L_roots] 
+ set root    [this get_L_roots] 
+ set methode "val"
 
  set param [this Encode_param_for_JS $v]
- set cmd "\$('#$objName').val($param);"
+ set cmd   "\$('#$objName').val($param);"
 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $cmd
+	$root Concat_update $objName $methode $cmd
  }
 }
 
@@ -44,6 +45,18 @@ method Specifyer_PM_P_Entry_HTML set_text {v} {
 method Specifyer_PM_P_Entry_HTML MY_set_text {str} {
  set this(prim_text) $str
  this prim_set_text $str
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Specifyer_PM_P_Entry_HTML set_text_password {} {
+ set root    [this get_L_roots] 
+ set methode "type"
+
+ set cmd   "\$('#$objName').attr('style', 'width:200px;');"
+
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
 }
 
 #___________________________________________________________________________________________________________________________________________

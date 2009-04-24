@@ -15,7 +15,8 @@ method DChoice_PM_P_Menu_HTML maj_choices {} {}
 
 #___________________________________________________________________________________________________________________________________________
 method DChoice_PM_P_Menu_HTML set_currents {v} {
-  set root [this get_L_roots] 
+ set root [this get_L_roots] 
+ set methode "selected"
 
  if {![info exists this(old_currents)]} {set this(old_currents) [this get_currents]}
  
@@ -25,7 +26,7 @@ method DChoice_PM_P_Menu_HTML set_currents {v} {
     } else {set cmd "\$('#$objName').removeAttr('selected');"}
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     $root Concat_update $objName $cmd
+     $root Concat_update $objName $methode $cmd
     }
 	
    set this(old_currents) $v
