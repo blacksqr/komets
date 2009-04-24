@@ -9,7 +9,7 @@ inherit Comet_root_PM_P_FLEX PM_FLEX
 method Comet_root_PM_P_FLEX constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Comet_root_PM_P_FLEX
-   
+ 
    if {![info exists class(local_IP)]} {
      set class(local_IP) [regexp -inline {\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}} [exec ipconfig] ]
     }
@@ -76,14 +76,16 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  
 #___________________________________________________________________________________________________________________________________________
 method Comet_root_PM_P_FLEX New_connection {chan ad num} {
- puts "$objName New_connection $chan $ad $num"
+ puts "$objName New_connection $chan $ad $num" 
  fconfigure $chan -blocking 0
  fconfigure $chan -encoding utf-8
+ # attention cela exige qu'il n'y ait qu'un seul client, sinon il faut créer un array
+  set this(chan_for_client) $chan
+  
    set this(msg) ""
    set this(msg_attended_length) -1
  fileevent $chan readable "$objName Read_from_FLEX $chan"
  lappend this(clients) $chan
- puts "fin New_connection appel à Read_from_FLEX"
 }
 #___________________________________________________________________________________________________________________________________________
 method Comet_root_PM_P_FLEX Read_from_FLEX {chan} {
@@ -99,7 +101,6 @@ method Comet_root_PM_P_FLEX Read_from_FLEX {chan} {
  puts "  msg : $this(msg)"
  
  if {$this(msg_attended_length) > 0 && [string length $this(msg)] >= $this(msg_attended_length)} {
-   puts "Il faut exécuter le message FLEX suivant:\n$this(msg)"
    set length [string length $this(msg)]
    while { $length == [string length $this(msg)] \
          &&[this Analyse_message this(msg)]} {set length [string length $this(msg)]
@@ -128,14 +129,10 @@ method Comet_root_PM_P_FLEX Analyse_message {str_name} {
  while {$pos < $str_length} {
    if {[string index $str $pos] == "|"} {
      set str [string range $str [expr $pos+1] end]
-	 # ce que j'ai modifié
-	 puts "- msg avant : $str"
+	 # il faut sauter la taille précédant les messages concaténés
 	 set taille_msg [string length $str]
-	 puts "- taille du message : $taille_msg"
 	 set debut [expr [string length taille_msg] + 1]
-	 puts "- taille de la taille du message : $debut"
 	 set str [string range str $debut end]
-	 puts "- msg après : $str"
    
 	 # fin modif.
 	 set still_to_be_done 1
@@ -149,11 +146,37 @@ method Comet_root_PM_P_FLEX Analyse_message {str_name} {
 	 set pos [expr $pos+$size+1]
     }
    if {[catch {$var $mtd $val} err]} {
-     puts "Error d'évaluation de la commande:\n  - var $var\n  - mtd : $mtd\n  - val : $val"
+     puts "Error d'évaluation de la commande:\n  - var $var\n  - mtd $mtd\n  - val $val"
     }
   }
   
  return $still_to_be_done
 }
+#___________________________________________________________________________________________________________________________________________
+method Comet_root_PM_P_FLEX send_to_FLEX {obj} {
+
+ puts " msg \"[string length $obj] $obj;|\" envoyé sur le channel $this(chan_for_client)"
+ puts -nonewline $this(chan_for_client) "[expr [string length $obj]+1] $obj;|"
+ flush $this(chan_for_client)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
