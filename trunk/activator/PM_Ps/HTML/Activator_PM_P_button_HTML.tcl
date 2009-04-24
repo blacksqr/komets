@@ -26,8 +26,10 @@ method Activator_PM_P_button_HTML dispose {} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC Activator_PM_P_button_HTML $L_methodes_set_Activator {$this(FC)} {}
+Methodes_set_LC Activator_PM_P_button_HTML $L_methodes_set_Activator {}          {}
 Methodes_get_LC Activator_PM_P_button_HTML $L_methodes_get_Activator {$this(FC)}
+
+#___________________________________________________________________________________________________________________________________________
 Generate_PM_setters Activator_PM_P_button_HTML [list {activate {{type {}}}}]
   Manage_CallbackList Activator_PM_P_button_HTML prim_activate begin
 
