@@ -26,6 +26,17 @@ method Image_PM_P_HTML get_img_file_name {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Image_PM_P_HTML load_img {v} {
+ set root    [this get_L_roots] 
+ set methode "attr"
+ set cmd     "\$('#$objName').attr('src','$v');\n"
+
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Image_PM_P_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
