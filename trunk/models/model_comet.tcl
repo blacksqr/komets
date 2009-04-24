@@ -152,13 +152,13 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
                               append cmd "\} \{"
                                 if {[string equal $o_reference {}]} {} else {
                                   append cmd $o_reference { } $methode_name { }
-                                    foreach param $params {append cmd {$} [lindex $param 0] " "}
+                                    foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] " "}
                                   append cmd ";\n"
                                  }
-                                #// Default comportment is to call equivalent funcion for each Logical Model
+                                #// Default comportment is to call equivalent function for each element of the list attrib_L
                                 if {[llength $attrib_L]} {
                                   append cmd {foreach LM } $attrib_L { } "\{" {$LM } $methode_name { }
-                                    foreach param $params {append cmd {$} [lindex $param 0] { }}
+                                    foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] { }}
                                   append cmd "\}"
                                  }
                               append cmd "\}"

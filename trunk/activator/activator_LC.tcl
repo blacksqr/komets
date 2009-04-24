@@ -27,9 +27,7 @@ Methodes_get_LC CometActivator $L_methodes_get_Activator {$this(FC)}
 
 
 #___________________________________________________________________________________________________________________________________________
-method CometActivator activate {{type {}}} {
- foreach  {var val} $type {set $var $val}
-}
+Inject_code CometActivator activate {foreach  {var val} $type {set $var $val}} {}
 
 #___________________________________________________________________________________________________________________________________________
 Manage_CallbackList CometActivator activate end

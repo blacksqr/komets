@@ -41,13 +41,24 @@ method Activator_PM_P_button_HTML Trigger_prim_activate {args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Activator_PM_P_button_HTML activate {args} {
+ set root    [this get_L_roots] 
+ set methode "val"
+ set cmd   "\$('#$objName').val('OK');"
+
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
+}
+
+#___________________________________________________________________________________________________________________________________________
 Manage_CallbackList Activator_PM_P_button_HTML Trigger_prim_activate begin
 
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_button_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
- append strm $dec <input [this Style_class] { type="button" value="} [this get_text] {" name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:addOutput(this)" />} "\n"
+ append strm $dec <input [this Style_class] { type="button" value="} [this get_text] {" name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:addOutput(this,true)" />} "\n"
   this Render_daughters strm "$dec  "
 }
 
