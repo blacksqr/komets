@@ -29,7 +29,7 @@ method LogicalSpecifyer constructor {name descr args} {
 
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC LogicalSpecifyer $L_methodes_set_Specifyer {$this(FC)} {$this(L_actives_PM)}
+Methodes_set_LC LogicalSpecifyer $L_methodes_set_Specifyer {}         {$this(L_actives_PM)}
 Methodes_get_LC LogicalSpecifyer $L_methodes_get_Specifyer {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
