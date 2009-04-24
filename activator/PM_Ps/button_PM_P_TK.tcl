@@ -27,40 +27,12 @@ Generate_PM_setters Activator_PM_P_button_TK [list {activate {{type {}}}}]
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_button_TK Trigger_prim_activate {} {
  set cmd ""
- foreach {var val} [array get this PARAMS,*] {append cmd " " [string range $var 7 end] " $val"}
+ foreach {var val} [this get_Params] {append cmd " " $var " $val"}
  this prim_activate $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
 Manage_CallbackList Activator_PM_P_button_TK Trigger_prim_activate begin
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_TK Add_Params {L_var_val} {
- foreach {var val} $L_var_val {
-   set this(PARAMS,$var) $val
-  }
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_TK Sub_Params {L_var_val} {
- foreach {var val} $L_var_val {
-   unset this(PARAMS,$var)
-  }
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_TK Has_Params {L_var} {
- foreach {var val} [array get this PARAMS,*] {
-   set var [string range $var 7 end]
-   foreach v $L_var {if {$v == $var} {return 1}}
-  }
- return 0
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_TK Val_Param {v} {
- return $this(PARAMS,$v)
-}
 
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_button_TK get_or_create_prims {root} {
@@ -88,7 +60,3 @@ method Activator_PM_P_button_TK get_text {} {
   }
  return [eval [this get_Common_FC] get_text]
 }
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_button_TK activate {} {}
-

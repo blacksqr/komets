@@ -23,6 +23,18 @@ Methodes_set_LC CometTexte_PM_P_HTML $L_methodes_set_Text {} {}
 Methodes_get_LC CometTexte_PM_P_HTML $L_methodes_get_Text {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
+method CometTexte_PM_P_HTML set_text {v} {
+ set root    [this get_L_roots] 
+ set methode "replaceWith"
+
+ set param [this Encode_param_for_JS $v]
+ set cmd   "\$('#$objName').html($param);"
+
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
+}
+#___________________________________________________________________________________________________________________________________________
 method CometTexte_PM_P_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  append strm $dec <span [this Style_class] > [this get_text] </span>

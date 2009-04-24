@@ -33,7 +33,7 @@ method Specifyer_PM_P_ZoneEntry_HTML set_text {v} {
    #puts "$objName set_text $v"
  
    set root [this get_L_roots]
-   set methode "selected"   
+   set methode "val"   
 
    set param [this Encode_param_for_JS $v]
    set cmd "\$('#$objName').val($param);"
