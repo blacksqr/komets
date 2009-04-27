@@ -2,3 +2,6 @@ CometSqueletton GraphBuilder [list handle_root handle_daughters] [list {Add_node
 
 
 CometSqueletton ToolBox_GDD [list gdd_port] [list {Select_node {n}}] [list LP] [list {set_gdd_port {v}} {Select_node {n}} ]
+
+
+CometSqueletton CUI_Editor [list edited_comet style_file] [list Apply_style] [list LP] [list]
