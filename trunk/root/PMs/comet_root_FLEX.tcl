@@ -39,7 +39,7 @@ Generate_accessors Comet_root_PM_P_FLEX [list socket_server port]
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
+method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  upvar $strm_name strm
 
  append strm {<?xml version="1.0" encoding="utf-8"?>} "\n"
@@ -54,7 +54,7 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  #append strm " zoneText.text = \"IP = $class(local_IP)\";"
  append strm " public function connexion():void {\n"
  append strm " 		if ((client==null)||(client.etat=\"deconnecte\")) { \n"
- append strm "	    	client = new SimpleClient(\"$class(local_IP)\",12000); \n"
+ append strm "	    	client = new SimpleClient(\"$class(local_IP)\",12000,Application.application); \n"
  append strm "	    	boutonConnexion.label=\"connexion effectué...\";\n"
  append strm "		} \n"
  append strm "	    else  \n"
@@ -63,10 +63,13 @@ method Comet_root_PM_P_FLEX Render {strm_name {dec {}}} {
  append strm " public function FLEX_to_TCL(str_obj:String, str_mtd:String, str_val:String):void {\n" 
  append strm {   client.ecrire(String (str_obj.length)+ " " + str_obj + " " + String (str_mtd.length)+ " " + str_mtd + " " + String (str_val.length)+ " " + str_val + "|");} "\n"
  append strm "  }\n"
+   this set_prim_handle        "Application.application"
+   this set_root_for_daughters "Application.application"
+   this Render_daughters strm "$dec  "
  append strm { ]]>} "\n"
  append strm { </mx:Script>} "\n"
  append strm { <mx:Button id="boutonConnexion" label="Connexion client" width="155" height="22" click="connexion()"/>} "\n"
-    this Render_daughters strm "$dec  "
+    
 
  append strm {</mx:Application>} "\n"
  
