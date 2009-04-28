@@ -28,17 +28,20 @@ method Specifyer_PM_P_textarea_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
  set this(flex_text) [this get_text]
- 
- append strm $dec "<mx:Script>\n"
- append strm $dec "  <!\[CDATA\[\n"
+
  append strm $dec "  private function Text_entered_${objName}():void{ \n"
  append strm $dec "  	FLEX_to_TCL(\"$objName\", \"prim_set_text\", ${objName}.text); \n"
  append strm $dec "  } \n"
- append strm $dec "  ]]> \n"
- append strm $dec "</mx:Script> \n"
+ append strm "var $objName : TextArea = new TextArea();\n"
+ append strm "$objName.addEventListener(TextEvent.TEXT_INPUT,Text_entered_${objName}());"
+ append strm "$objName.text=[this get_text];"
+ #append strm $dec "<mx:TextArea id=\"$objName\" keyUp=\"Text_entered_${objName}()\" text=\"[this get_text]\"/>\n"
+
+ this set_prim_handle        $objName
+ this set_root_for_daughters $objName
+ this Render_daughters strm "$dec  "
  
- append strm $dec "<mx:TextArea id=\"$objName\" keyUp=\"Text_entered_${objName}()\" text=\"[this get_text]\"/>\n"
-  this Render_daughters strm "$dec  "
+ return [this get_prim_handle]
 }
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_textarea_FLEX set_text {t} {
