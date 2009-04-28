@@ -52,22 +52,35 @@ method PM_FLEX Adequacy {context {force_eval_ctx 0}} {return -1}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_FLEX Render_daughters {strm_name {dec {}}} {
+ set L [list]
+ 
  upvar $strm_name strm
  foreach elmt [this get_daughters] {
    $elmt Render_all strm $dec
+   lappend L [$elmt get_prim_handle]
   }
+ 
+ set root [this get_root_for_daughters]
+ if {$root != ""} {
+   append strm $dec "for(i=0; i<${root}.numChildren; i++) {${root}.removeChildAt(0);}\n"
+   foreach e $L {
+     append strm $dec "  ${root}.addChild($e);\n"
+	}
+  }
+  
+ return $L
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_FLEX Render_all {strm_name {dec {}}} {
  upvar $strm_name strm
- this Render strm $dec
+ return [this Render strm $dec]
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
- this Render_daughters strm $dec
+ return [this Render_daughters strm $dec]
 }
 
 #_________________________________________________________________________________________________________
