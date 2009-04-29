@@ -62,9 +62,10 @@ method PM_FLEX Render_daughters {strm_name {dec {}}} {
  
  set root [this get_root_for_daughters]
  if {$root != ""} {
-   append strm $dec "for(i=0; i<${root}.numChildren; i++) {${root}.removeChildAt(0);}\n"
+   append strm "\t" " while(${root}.numChildren > 0) \n"
+   append strm "\t" "  {${root}.removeChildAt(0);} \n"
    foreach e $L {
-     append strm $dec "  ${root}.addChild($e);\n"
+     append strm "\t" " ${root}.addChild($e); \n"
 	}
   }
   
