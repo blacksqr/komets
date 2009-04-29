@@ -693,6 +693,10 @@ method PhysicalHTML_root Add_JS {e} {
   } else {
 	      set cmd "\$($strm).appendTo('#$objNameMother');"
          }
+
+ set this(marker) [clock clicks]
+ $e Render_JS cmd $this(marker)
+ 
  return $cmd
 }
 
