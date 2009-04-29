@@ -159,10 +159,17 @@ method PM_U_Container Add_daughter {m {index -1}} {
 			 set rep [this inherited $m $index]
 			 if {$debug} {puts "  CASE 2, rep $rep"}
            } else {set rep 1
-				   foreach PM $this(L_nested_daughters_PM) {
-                     set rep [expr $rep && [$PM Add_daughter $m $index]]
-                     [$PM get_LM] Connect_PM_descendants $PM [$m get_LM]
-                    }
+		           if {$index == -1} {set i end} else {set i $index}
+		           set handle_daughter [lindex $this(L_nested_daughters_PM) $i]
+				   if {$handle_daughter == ""} {set handle_daughter [lindex $this(L_nested_daughters_PM) end]}
+				   if {$handle_daughter != ""} {
+				     $handle_daughter Add_daughter $m $index
+					 [$handle_daughter get_LM] Connect_PM_descendants $handle_daughter [$m get_LM]
+				    }
+				   #foreach PM $this(L_nested_daughters_PM) {
+                   #  set rep [expr $rep && [$PM Add_daughter $m $index]]
+                   #  [$PM get_LM] Connect_PM_descendants $PM [$m get_LM]
+                   # }
 				   if {$debug} {puts "  CASE 3, rep $rep"}
                   }
          }
