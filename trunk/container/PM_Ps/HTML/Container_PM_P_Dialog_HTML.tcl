@@ -14,7 +14,7 @@ method Container_PM_P_Dialog_HTML Render_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
 
  append strm $dec "\$(function() {" "\n"
- append strm $dec "	\$(\"#$objName\").dialog(); " 
+ append strm $dec "	\$(\"#$objName\").dialog(); "  "\n"
  append strm $dec "});" "\n"
 
  this set_mark $mark
