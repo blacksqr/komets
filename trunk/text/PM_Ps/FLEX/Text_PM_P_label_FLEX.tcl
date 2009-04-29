@@ -20,9 +20,27 @@ Methodes_set_LC CometTexte_PM_P_FLEX $L_methodes_set_Text {}          {}
 Methodes_get_LC CometTexte_PM_P_FLEX $L_methodes_get_Text {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
+Generate_PM_setters CometTexte_PM_P_FLEX [P_L_methodes_set_specifyer_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
 method CometTexte_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
+ 
+ append strm $dec " var $objName:Label = new Label(); \n"
+ append strm $dec " $objName.text=\"[this get_text]\"; \n"
+ append strm $dec " Dyna_context.$objName = $objName;\n"
 
- append strm $dec "<mx:Label text=\"toto\"/>\n"
-  this Render_daughters strm "$dec  "
+ this set_prim_handle        $objName
+ this set_root_for_daughters $objName
+ this Render_daughters strm "$dec "
+ 
+ return [this get_prim_handle]
+}
+#___________________________________________________________________________________________________________________________________________
+method CometTexte_PM_P_FLEX set_text {t} {
+ puts "coucou"
+    set root [this get_L_roots]
+    if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
+	   $root send_to_FLEX "${objName}.text=\"$t\""
+    }
 }
