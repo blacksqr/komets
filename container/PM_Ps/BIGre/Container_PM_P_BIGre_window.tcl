@@ -26,6 +26,12 @@ method Container_PM_P_BIGre_window constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Container_PM_P_BIGre_window Resize {x y} {
+ $this(primitives_handle) Dimension_corp $x $y
+ $this(primitives_handle) Mettre_a_jour
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_window Add_mother {m {index -1}} {
  $this(primitives_handle) Titre [[this get_LC] get_name]
  return [this inherited $m $index]

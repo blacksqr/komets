@@ -370,6 +370,10 @@ method Comet_element constructor {name descr args} {
  if {[info exist class(DSL_CSSpp)    ]} {} else {set class(DSL_CSSpp)     {}}
  if {[info exist class(DSL_ECA)      ]} {} else {set class(DSL_ECA)       {}}
 
+ set this(default_op_gdd_file)    [Comet_files_root]Common_GDD_requests.css++
+ set this(default_css_style_file) ""
+ set this(default_css_style_still_applied) 0
+ 
 #______________________________________
  eval "$objName configure $args"
  return $objName
@@ -418,8 +422,13 @@ method Comet_element Basic_Sub_daughter {d} {
 method Comet_element Basic_Sub_mother   {m} {Sub_list this(L_mothers) $m}
 
 #_________________________________________________________________________________________________________
-Generate_accessors Comet_element [list GDD_id nesting_element Semantic_API_get Semantic_API_set]
+Generate_accessors Comet_element [list default_css_style_still_applied default_css_style_file default_op_gdd_file GDD_id nesting_element Semantic_API_get Semantic_API_set]
 
+#_________________________________________________________________________________________________________
+method Comet_element Apply_default_style {} {
+ Apply_style_on $objName [list] [this get_default_op_gdd_file] [this get_default_css_style_file]
+ set this(default_css_style_still_applied) 1
+}
 
 #_________________________________________________________________________________________________________
 method Comet_element get_ancestors {} {
@@ -1377,8 +1386,10 @@ method Logical_model dispose {} {
 #__________________________________________________ Styles________________________________________________
 #_________________________________________________________________________________________________________
 proc Read_file_as_css++ {f_name} {
- set f [open $f_name]; set str [read $f]; close $f
- return [Read_string_as_css++ $str] 
+ if {[file exists $f_name]} {
+   set f [open $f_name]; set str [read $f]; close $f
+   return [Read_string_as_css++ $str] 
+  } else {return ""}
 }
 
 #_________________________________________________________________________________________________________
@@ -1405,10 +1416,14 @@ proc Read_string_as_css++ {str} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-proc Apply_style_on {C L_mapping GDD_op_file CSS_file} {
- set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
+proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
+ if {[file exists $GDD_op_file]} {
+   set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
+  } else {set GDD_op ""}
  set CSS    [Read_file_as_css++ $CSS_file]
- Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C $L_mapping
+ foreach C $L_C {
+   Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C $L_mapping
+  }
 }
 
 #_________________________________________________________________________________________________________

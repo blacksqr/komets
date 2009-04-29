@@ -2,25 +2,29 @@
 #_________________________________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit CometSWL_PM_P_U_basic PM_U_Container
+inherit CometCUI_Editor_PM_P_U_basic PM_U_Container
 #___________________________________________________________________________________________________________________________________________
-method CometSWL_PM_P_U_basic constructor {name descr args} {
+method CometCUI_Editor_PM_P_U_basic constructor {name descr args} {
  this inherited $name $descr
    this set_nb_max_mothers   1
-   this set_GDD_id CometSWL_PM_P_U_basic
+   this set_GDD_id GDD_CometCUI_Editor_PM_P_U_basic
+
+   this set_default_op_gdd_file    [Comet_files_root]Common_GDD_requests.css++
+   this set_default_css_style_file [Comet_files_root]Styles/CUI_Editor/CUI_Editor_basic.css++
+   
  eval "$objName configure $args"
  return $objName
 }
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometSWL_PM_P_U_basic [P_L_methodes_set_CometSWL] {} {}
-Methodes_get_LC CometSWL_PM_P_U_basic [P_L_methodes_get_CometSWL] {$this(FC)}
+Methodes_set_LC CometCUI_Editor_PM_P_U_basic [P_L_methodes_set_CometCUI_Editor] {} {}
+Methodes_get_LC CometCUI_Editor_PM_P_U_basic [P_L_methodes_get_CometCUI_Editor] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_PM_setters CometSWL_PM_P_U_basic [P_L_methodes_set_CometSWL_COMET_RE]
+Generate_PM_setters CometCUI_Editor_PM_P_U_basic [P_L_methodes_set_CometCUI_Editor_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-method CometSWL_PM_P_U_basic set_LM {LM} {
+method CometCUI_Editor_PM_P_U_basic set_LM {LM} {
  set rep [this inherited $LM]
  set this(cont)           "${objName}_cont"
  set this(cont_daughters) "${objName}_cont_daughters"
@@ -30,9 +34,8 @@ method CometSWL_PM_P_U_basic set_LM {LM} {
 
    CometContainer $this(cont)           "Container of player's presentation $objName"         {} -Add_style_class "CONTAINER INTERNAL_ROOT ROOT root"
    CometContainer $this(cont_daughters) "Container of player's presentation $objName"         {} -Add_style_class "CONTAINER DAUGHTERS"
-     $this(cont) Add_daughters_R "[[this get_LC] get_inter_SWL] $this(cont_daughters)"
+     $this(cont) Add_daughters_R "[[this get_LC] get_top_interleaving] $this(cont_daughters)"
 	 set this(reconnect_LM) 1
   }
  return $rep
 }
-
