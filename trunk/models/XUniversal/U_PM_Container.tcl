@@ -70,6 +70,8 @@ method PM_U_Container Add_mother    {m {index -1}} {
      set LC [$this(L_nested_handle_LM) get_LC]
 	 if {![string equal $LC ""]} {this Register_nested_element_from $LC}
     }
+	
+   this Apply_default_style
   } else {this set_daughters {}; this set_mode_plug Empty; puts "$objName Add_mother $m => GROS ECHEC"}
 
  

@@ -35,18 +35,34 @@ method PhysicalContainer_TK_window constructor {name descr args} {
  eval "$objName configure $args"
  return $objName
 }
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalContainer_TK_window dispose {} {
+ set w $root.tk_${objName}_win
+ if {[winfo exists $w]} {destroy $w}
+ 
+ this inherited
+}
+
 #___________________________________________________________________________________________________________________________________________
 method PhysicalContainer_TK_window get_context {} {}
+
 #___________________________________________________________________________________________________________________________________________
 method PhysicalContainer_TK_window get_or_create_prims {root} {
 # Define the handle
  set w $root.tk_${objName}_win
- if {[winfo exists $w]} {
-  } else {toplevel $w}
+ if {![winfo exists $w]} {toplevel $w}
  wm title $w [[this get_LC] get_name]
  this set_root_for_daughters $w
 
-
  return [this set_prim_handle $w]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalContainer_TK_window Resize {x y} {
+ set w $root.tk_${objName}_win
+ if {[winfo exists $w]} {
+   wm geometry $w "${x}x${y}"
+  }
 }
 

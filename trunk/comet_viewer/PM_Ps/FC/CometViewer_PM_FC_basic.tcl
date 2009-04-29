@@ -26,8 +26,17 @@ method CometViewer_PM_FC_basic set_go_inside_level     {e} {this Update_dot}
 method CometViewer_PM_FC_basic set_go_out_daughters    {e} {this Update_dot}
 
 #_________________________________________________________________________________________________________
+method CometViewer_PM_FC_basic set_element_and_level   {v} {
+ this Update_dot
+}
+
+
+#_________________________________________________________________________________________________________
 method CometViewer_PM_FC_basic Update_dot {} {
- this prim_set_dot_description [this Generate_dot_from [this get_represented_element] [this get_go_inside_level] [this get_go_out_daughters]]
+ if {[this get_represented_element] != ""} {
+   this prim_set_dot_description [this Generate_dot_from [this get_represented_element] [this get_go_inside_level] [this get_go_out_daughters]]
+  } else {this prim_set_dot_description "digraph G {}\n"
+         }
 }
 
 #_________________________________________________________________________________________________________
