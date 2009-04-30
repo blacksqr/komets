@@ -43,12 +43,13 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  upvar $strm_name strm
 
  append strm {<?xml version="1.0" encoding="utf-8"?>} "\n"
- append strm { <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" cornerRadius="0" alpha="1.0" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#EF0808, #F6E8E8]" color="#22B21B" borderColor="#202FC1" width="300" height="400">} "\n"
+ append strm { <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" layout="vertical" cornerRadius="0" alpha="1.0" backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#EF0808, #F6E8E8]" color="#22B21B" borderColor="#202FC1">} "\n"
  append strm "\t" { <mx:Script>} "\n"
  append strm "\t" { <![CDATA[ } "\n"
  append strm "\t" { import SimpleClient; } "\n"
  append strm "\t" { import mx.controls.*; } "\n"
  append strm "\t" { import mx.events.FlexEvent; } "\n"
+ append strm "\t" { import pandora.flex.containers.Window; } "\n"
  append strm "\t" { public var client:SimpleClient;} "\n"
  append strm "\t" { public var msg:String;} "\n"
  
