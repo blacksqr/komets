@@ -46,7 +46,7 @@ method Container_PM_P_HideShow_HTML set_title {v} {
  set root         [this get_L_roots]
  set this(marker) [clock clicks]
  set methode      "title"
- set cmd          "\$(\"#${objName}_title\").html(\"" [this get_title] "\");"
+ set cmd          "\$(\"#${objName}_title\").html(\"[this get_title]\");"
  
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
@@ -60,9 +60,8 @@ method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
  append strm $dec "\$(function() {" "\n" 
 
  ### jquery pour tous les containers
- if {[this get_header_place] == "left"} { set ouvert "w"; set ferme "e"
-	} elseif {[this get_header_place] == "right"} { set ouvert "e"; set ferme "w"
-			 } else { set ouvert "n"; set ferme "s" }
+ if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"
+	} else { set ouvert "n"; set ferme "s" }
  
 
  
@@ -88,8 +87,10 @@ method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
 				append strm $dec "		var options = {};"
 				append strm $dec "		options = {direction : \"" [this get_header_place] "\"};"
 				
-				if {[this get_header_place] == "left"} { set ouvert "w"; set ferme "e"
-				   } else { set ouvert "e"; set ferme "w" }
+				# if {[this get_header_place] == "left"} { set ouvert "w"; set ferme "e"
+				   # } else { set ouvert "e"; set ferme "w" }
+				 set ouvert "w"
+				 set ferme "e"
 				   
 				append strm $dec "		\$(\"#${objName}_icon\").click(function() {" "\n"
 				append strm $dec "         if(\$(this).hasClass(\"ui-icon-circle-arrow-" $ouvert "\")) { \$(this).attr(\"class\",\"ui-icon ui-icon-circle-arrow-" $ferme "\"); \$(\"#${objName}_content\").hide(\"slide\",options); save = \$(\"#${objName}\").width(); \$(\"#${objName}\").effect(\"size\",{to: {width: (\$(\"#${objName}_header\").width()+12)}},500);   }" "\n"
@@ -100,7 +101,6 @@ method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
 					 append strm $dec "     \$(\"#${objName}_header\").attr({style : \"float:left;\"});" "\n"
 				     append strm $dec "     \$(\"#${objName}_content\").attr({style : \"float:left;\"});" "\n"
 				   } else {
-							append strm $dec "     \$(\"#${objName}\").attr({style : \"float:right;\"});" "\n"
 				            append strm $dec "     \$(\"#${objName}_header\").attr({style : \"float:right;\"});" "\n"
 				            append strm $dec "     \$(\"#${objName}_content\").attr({style : \"float:left;\"});" "\n"
 						  }

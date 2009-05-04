@@ -1,8 +1,15 @@
+#$current(TOP.PM_HTML) {
+ FCT_set_html_style : float left border "1px solid #dddddd" width 100% padding 3px margin-right 6px;
+}
+
 #$current(MENU.PM_HTML) {
  GDD_fct : Implem(Container_Maskable_CUI);
- FCT_set_html_style : float left color red;
+ FCT_set_html_style : float left;
+ FCT_set_title : Menu;
+ FCT_set_header_place : right;
+ FCT_Eval : [$obj get_LC] Subscribe_to_Add_daughter_R default_style "Apply_style_on \[CSS++ $objName \"#$objName \$m\"\] \[list\] {[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++} {[Comet_files_root]Comets/CSS_STYLESHEETS/Interleaving/Interleaving_U_menu.css++} ";
 }
 
 #$current(CONTENT.PM_HTML) {
- 
+ FCT_set_html_style : float left margin-left 6px padding 3px;
 }
