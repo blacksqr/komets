@@ -34,9 +34,9 @@ method Interleaving_PM_P_U set_current_view {LC} {
 method Interleaving_PM_P_U set_LM {LM} {
  set rep [this inherited $LM]
  
-   set this(top_container)       [CPool get_a_comet CometContainer]
-     set this(menu_container)    [CPool get_a_comet CometContainer]
-     set this(content_container) [CPool get_a_comet CometContainer]
+   set this(top_container)       [CPool get_a_comet CometContainer -Add_style_class "TOP"]
+     set this(menu_container)    [CPool get_a_comet CometContainer -Add_style_class "MENU"]
+     set this(content_container) [CPool get_a_comet CometContainer -Add_style_class "CONTENT"]
 	 $this(top_container) Add_daughters_R [list $this(menu_container) $this(content_container)]
 	 
 

@@ -1,0 +1,3 @@
+#$current(MENU.PM_HTML) {
+ FCT_HTML_STYLE : "float left color red";
+}
