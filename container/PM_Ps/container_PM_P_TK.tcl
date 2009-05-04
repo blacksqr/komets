@@ -38,7 +38,7 @@ method PhysicalContainer_TK_window constructor {name descr args} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalContainer_TK_window dispose {} {
- set w $root.tk_${objName}_win
+ set w [this get_prim_handle]
  if {[winfo exists $w]} {destroy $w}
  
  this inherited

@@ -9,8 +9,8 @@ method CometCUI_Editor_PM_P_U_basic constructor {name descr args} {
    this set_nb_max_mothers   1
    this set_GDD_id GDD_CometCUI_Editor_PM_P_U_basic
 
-   this set_default_op_gdd_file    [Comet_files_root]Common_GDD_requests.css++
-   this set_default_css_style_file [Comet_files_root]Styles/CUI_Editor/CUI_Editor_basic.css++
+   this set_default_op_gdd_file    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
+   this set_default_css_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/CUI_Editor/CUI_Editor_basic.css++
    
  eval "$objName configure $args"
  return $objName

@@ -1,0 +1,1 @@
+Implem : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-$n();
