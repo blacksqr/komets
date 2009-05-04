@@ -12,7 +12,7 @@ method PM_HTML constructor {name descr args} {
 
  set this(L_tags)        {}
  set this(embeded_style) {}
- set this(html_style)    [list]
+ set this(html_style)    {}
 
  this set_cmd_placement      ""
  this set_prim_handle        ""
@@ -142,7 +142,12 @@ method PM_HTML Add_prim_mother   {c Lprims {index -1}} {this inherited $c $Lprim
 #_________________________________________________________________________________________________________
 method PM_HTML Style_class {} {
  set c [this get_style_class]
- return " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" "
+ set    rep " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" style=\""
+ foreach {var val} [this get_html_style] {
+	append rep $var ": " $val ";"
+  }  
+ append rep "\" "
+ return $rep
 }
 
 #_________________________________________________________________________________________________________
@@ -196,14 +201,49 @@ method PM_HTML Add_daughter {e {index -1}} {
 
 #_________________________________________________________________________________________________________
 method PM_HTML set_html_style {lstyles} {
- set cmd  "\$(\"#${objName}\").css({"
- foreach {var val} $lstyles {
-	append cmd $var ":" $val ";"
- }
- append cmd "});"
- 
+ set Lsub [list ]
+ foreach {var val} [this get_html_style] {
+   lappend Lsub $var
+  }
+ this sub_html_style $Lsub
+ this add_html_style $lstyles 
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML get_html_style {} {
+ set L [list]
+ foreach {var val} [array get this html_style,*] {lappend L [string range $var 11 end] $val; puts "[string range $var 11 end]   :   $val" }
+ return $L
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML add_html_style {L_var_val} {
+ foreach {var val} $L_var_val {
+   set this(html_style,$var) $val
+  }
+ this Send_updated_style
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML sub_html_style {L_vars} {
+ foreach var $L_vars {
+	unset this(html_style,$var)
+  }
+ this Send_updated_style
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML Send_updated_style {} {
  set root [this get_L_roots] 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-    $root Concat_update $objName "htmlstyle" $cmd
- } 
+   set    cmd  "\$(\"#${objName}\").removeAttr(\"style\");\n"
+   append cmd  "\$(\"#${objName}\").css({"
+   foreach {var val} [this get_html_style] {
+	 append cmd $var ": \"" $val "\","
+	}
+   # set cmd [string range $cmd 0 end-1]	
+   append cmd "});" "\n"
+ 
+   $root Concat_update $objName "htmlstyle" $cmd
+  } 
 }
