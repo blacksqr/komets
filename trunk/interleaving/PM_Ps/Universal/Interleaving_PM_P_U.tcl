@@ -9,7 +9,7 @@ method Interleaving_PM_P_U constructor {name descr args} {
    this set_GDD_id GDD_Interleaving_PM_P_U
 
    this set_default_op_gdd_file    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
-   this set_default_css_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/Interleaving/Common_GDD_requests.css++
+   this set_default_css_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/Interleaving/Interleaving_U.css++
 
    set this(current_view) ""
    
