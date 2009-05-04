@@ -1,0 +1,29 @@
+#$current(TOP.INTERLEAVING[soft_type ~= BIGre]) {
+  GDD_fct     : Implem(Interleaving_CUI_Menu);
+  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 1 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$obj CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
+}
+
+#$current(TOP.INTERLEAVING(CORE[soft_type ~= BIGre])) {
+  GDD_fct     : Implem(Interleaving_CUI_Menu);
+  FCT_Eval    : $obj Add_L_menu_and_associated_comets [list "Mode EDITION_MODE"]
+            --- [$obj get_B207_local_menu] Origine 0 400;
+}
+
+#cr->PMs.PM_BIGre swl(TOP.INTERLEAVING[soft_type ~= BIGre](EDITION_MODE > *))  {
+  FCT_set_method_placement: Line_v;
+}
+
+#$current(GRAPH.VIEWER) {
+  FCT_Eval : set LC [$obj get_LC]
+         --- U_encapsulator_PM  $obj  "CometContainer(set_name \"CUI Editor of [$LC get_name]\", \$obj() )";
+}
+
+#$current(CometCUI_Editor.CONTAINER.FUI, GRAPH.VIEWER(>CometContainer)) {
+  GDD_fct     : Implem(Container_CUI_window);
+  FCT_Resize  : 640 480;
+}
+
+#$current(GRAPH.BUILDER) {
+  FCT_Show_elements : 0 *;
+}
+

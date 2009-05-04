@@ -304,6 +304,8 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
      return
     }
 
+	if {![regexp "^($this(lettre)*) +(.*)" $str reco proj str]} {set proj ""}
+	
     if {[regexp "^$this(sep)*>-->$this(sep)*(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
     if {[regexp "^$this(sep)*<--<$this(sep)*(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
     if {[string equal [string index $str 0] !]} {set str [string range $str 1 end]
@@ -325,7 +327,6 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
                                                 if {[string equal [string index $str 0] >]} {
                                                   set cmd_daughter get_COMET_id
                                                   set str "* ${tilde}>$str"
-                                                  #puts "We have got a FILTER :\n  rep : \{$rep\}\n  str : $str"
                                                  }
                                                } else {set rec 1}
 #   puts "DSL_DEF($root) :\n  |rec : $rec\n  |str : $str"
@@ -340,6 +341,10 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
 	  
    set L_indesirables {}
    foreach nr $rep {
+     switch $proj {
+	   _LM_LP {set nr [$nr get_LC]}
+	   LC     {set nr [$nr get_LC]_LM_LP}
+	  }
      if {$nested} {
 	   set r [$nr get_handle_composing_comet]
 	   if {$r == ""} {continue}

@@ -1,0 +1,121 @@
+#$current(cont_op_planets)  {
+  FCT_Eval : C_B_configure  $obj  -Origine 80 91 ;
+  FCT_set_method_placement: Line_v;
+}
+
+#$current(cont_op_ships)  {
+  FCT_Eval : C_B_configure  $obj  -Origine 0 200 ;
+  FCT_set_method_placement: Line_v;
+}
+
+#$current(cont_op_players)  {
+  FCT_Eval : C_B_configure  $obj  -Origine 0  250 ;
+  FCT_set_method_placement: Line_v;
+}
+
+#$current(CONT.PLAYERS)  {
+  GDD_fct     : Implem(Container_CUI_Scrollable);
+  FCT_Resize  : 342 400;
+}
+
+#$current(op_players, cont_players, CONT.OP.SPACE)  {
+  FCT_set_method_placement: Line_v;
+}
+
+#$current(CometSWL_Player(>*), CometSWL_Player(CORE(>*)))  {
+  FCT_set_method_placement: Line_h;
+}
+
+#$current(>* >>!CometSWL_Player/>> (CONT.OP.SHIP, ACT.SUB.PLANET, ACT.SUB.PLAYER))   {
+  FCT_Show_elements : 0 *;
+}
+
+#$current(CONT.OP_EDITION)  {
+  FCT_Eval : U_encapsulator_PM $obj "\$obj(, CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometActivator(-set_name DESTROY -Add_style_class {ACT SUB DESTROY PLANET SHIP SWL_DESTROY} -set_text DESTROY -Subscribe_to_activate SWL {Eval_in_context \$type SWL_Destroy \\\$element}))" CONT_FOR_DAUGHTERS;
+}
+
+#$current(CONT.OP_EDITION(CometActivator.SWL_DESTROY))  {
+  GDD_fct   : Implem(CT_Activator_CUI_skinnable);
+  FCT_Shape : rect 0 0 50 50 plus oval 50 50 20 20 60;
+  FCT_Color : 1 0 0 1;
+  FCT_Eval  : set node [$obj get_polygon]
+          --- set PM_sub_planet [CSS++ cr "#$obj <--< swl(ACT.SUB.PLANET)"]
+		  --- set PM_sub_ship   [CSS++ cr "#$obj <--< swl(ACT.SUB.SHIP)"]
+          --- Drop_zones SWL_Destroy_Planet [list [list $node "SWL_Is_a {CometSWL_Planet} \$n" "SWL_Destroy_dropped_element $PM_sub_planet planet" "$obj Color 1 1 0 1" "$obj Color 1 0 0 1"]]
+		  --- Drop_zones SWL_Destroy_Ship   [list [list $node "SWL_Is_a {CometSWL_Ship}   \$n" "SWL_Destroy_dropped_element $PM_sub_ship   ship  " "$obj Color 1 0 1 1" "$obj Color 1 0 0 1"]];
+}
+
+#$current(CONT.OP_EDITION(CORE))  {
+  FCT_Panel_mode       : 1;
+  FCT_Redim_background : 0 0 342 768;
+  FCT_background_color : 0.3 0.4 0.5 1;
+}
+
+#$current(ACT.ADD.PLANET)  {
+  GDD_fct                                : Implem(CT_Activator_CUI_skinnable);
+  FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "$obj Add_Params \"ray 80 planet \[CPool get_a_comet CometSWL_Planet]\"" UNIQUE ;
+  FCT_Shape                              : oval 0 0 80 80 60;
+  FCT_Eval : set panel [CSS++ $obj "#$obj <--< swl(CONT.OP_EDITION(CORE))"]
+         --- Drag_nodes [$obj get_prim_handle] 1 "$panel Toggle_extension" "$panel Toggle_extension";
+}
+
+#$current(inter_SWL)  {
+  GDD_fct     : Implem(Interleaving_CUI_Menu);
+  FCT_Eval    : set LC_new_space  [CSS++ cr "#$obj->LC NEW.SPACE" ]
+            --- set LC_load_space [CSS++ cr "#$obj->LC LOAD.SPACE"]
+			--- set LC_save_space [CSS++ cr "#$obj->LC SAVE.SPACE"]
+			--- set PM_swl        [CSS++ cr "#$obj <--< swl"]
+            --- U_encapsulator_PM $obj "\$obj(, CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), $LC_new_space\(), $LC_load_space\(), $LC_save_space\(), CometChoice(-set_name GAME_MODE -Add_style_class SWL_MODE_CHOICE -set_nb_min_choices 1 -Subscribe_to_set_currents SWL {SWL_mode_is $PM_swl \$lc}, \"Edition\", \"Game\"))" CONT_FOR_DAUGHTERS;
+}
+
+#$current(inter_SWL(SWL_MODE_CHOICE > *))  {
+ FCT_set_method_placement: Line_v;
+}
+
+#$current(inter_SWL(CORE))  {
+  FCT_Eval    : set LC_new_space  [CSS++ cr "#$obj->LC NEW.SPACE" ]
+            --- set LC_load_space [CSS++ cr "#$obj->LC LOAD.SPACE"]
+			--- set LC_save_space [CSS++ cr "#$obj->LC SAVE.SPACE"]
+			--- $obj Add_L_menu_and_associated_comets [list "File {>>!CONT.EDITION />> ($LC_new_space, $LC_load_space, $LC_save_space)}" "Mode SWL_MODE_CHOICE"]
+            --- [$obj get_B207_local_menu] Origine 0 725;
+}
+
+#$current(CONT.EDITION CONT.SPACE)  {
+  FCT_Eval             : U_encapsulator_PM $obj "CometContainer(-set_name BACKGROUND -Add_style_class BACKGROUND_STAR, \$obj())";
+}
+
+#$current(CONT.EDITION CONT.SPACE(BACKGROUND_STAR))  {
+  FCT_background_color : 0 0 0 1;
+  FCT_Redim_background : 0 0 1024 768;
+  FCT_Eval             : Clipping [$obj get_poly_background];
+}
+
+#$current(CONT.EDITION CONT.SPACE(CORE))  {
+  FCT_background_color : 0 0 0 1;
+  FCT_Redim_background : -999999999 -999999999 999999999 999999999;
+  FCT_Origine          : 0 0;
+  FCT_Eval             : set cont_poly [$obj get_poly_background] 
+                     --- Drop_zones SWL_ship   [list [list $cont_poly "SWL_Is_a {ACT ADD SHIP}   \$n" SWL_Drop_ship   "$obj background_color 0 1 0 1" "$obj background_color 0 0 0 1"]]
+                     --- Drop_zones SWL_planet [list [list $cont_poly "SWL_Is_a {ACT ADD PLANET} \$n" SWL_Drop_planet "$obj background_color 0 1 1 1" "$obj background_color 0 0 0 1"]]
+					 --- set poly_background [$obj get_poly_background]
+					 --- Contact_model $poly_background [expr [Capa_T] + [Capa_R] + [Capa_E]]
+					 --- set b_ctc [$poly_background Val_MetaData B_contact]
+					 --- $b_ctc pt_rot_actif 0;
+  FCT_Raise            : low;
+}
+
+#$current(ACT.NEW.SPACE, ACT.LOAD.SPACE, ACT.SAVE.SPACE)  {
+  FCT_Show_elements : 0 *;
+}
+
+#$current {
+  FCT_Eval : set    cmd {}
+         --- append cmd {set PM [CSS++ cr "#${C}->PMs\[soft_type == BIGre\] \\<--< } $obj {/"] --- }
+         --- append cmd "Apply_style_on \$PM \[list \] {Common_GDD_requests.css++} {SWL_partial_style_player_B207_V1.css++}"
+		 --- [$obj get_real_LC] Subscribe_to_Add_a_player alex $cmd UNIQUE ;
+}
+
+#$current(add.player)  {
+  FCT_Subscribe_to_Trigger_prim_activate : alex "$obj Add_Params \"player \[CPool get_a_comet CometSWL_Player]\""    UNIQUE;
+}
+
