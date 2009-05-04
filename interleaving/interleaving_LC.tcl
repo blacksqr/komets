@@ -7,9 +7,9 @@ inherit CometInterleaving Logical_consistency
 method CometInterleaving constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Interleaving
- set this(LM_FC) "${objName}_LM_FC";
-   Logical_model $this(LM_FC) $this(LM_FC) "The logical functionnal core of $objName"; this Add_LM $this(LM_FC);
-   this Add_LM $this(LM_FC)
+# set this(LM_FC) "${objName}_LM_FC";
+#   Logical_model $this(LM_FC) $this(LM_FC) "The logical functionnal core of $objName"; this Add_LM $this(LM_FC);
+#   this Add_LM $this(LM_FC)
  set this(LM_LP) "${objName}_LM_LP";
    LogicalInterleaving $this(LM_LP) $this(LM_LP) "The logical presentation of $objName"; this Add_LM $this(LM_LP);
    this Add_LM $this(LM_LP)
@@ -53,6 +53,14 @@ method CometInterleaving maj_txt_daughters {Lf} {
 }
 
 
+#__________________________________________________
+proc P_L_methodes_get_CometInterleaving {} {return [list ]}
+proc P_L_methodes_set_CometInterleaving {} {return [list {maj_interleaved_daughters {}} ]}
+
+#__________________________________________________
+Methodes_set_LC CometInterleaving [P_L_methodes_set_CometInterleaving] {}  {$this(L_LM)}
+Methodes_get_LC CometInterleaving [P_L_methodes_get_CometInterleaving] {}
+
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________ Définition of Logical Model of présentation____________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -90,6 +98,11 @@ method LogicalInterleaving constructor {name descr args} {
  eval "$objName configure $args"
  return $objName
 }
+
+#__________________________________________________
+Methodes_set_LC LogicalInterleaving [P_L_methodes_set_CometInterleaving] {}  {$this(L_actives_PM)}
+Methodes_get_LC LogicalInterleaving [P_L_methodes_get_CometInterleaving] {}
+
 #___________________________________________________________________________________________________________________________________________
 method LogicalInterleaving Add_daughter    {m {index -1}} {
 global debug
@@ -175,7 +188,14 @@ method LogicalInterleaving EE_State_SomePM {proposer} {
 #___________________________________________________________________________________________________________________________________________
 method LogicalInterleaving maj_interleaved_daughters {} {
  foreach PM [this get_L_actives_PM] {
-   $PM maj_interleaved_daughters
+   if {[catch "$PM maj_interleaved_daughters" err]} {
+     puts "\n\n_____________________________________"
+	 puts "                 ERROR"
+	 puts "  in $objName maj_interleaved_daughters"
+	 puts "  doing $PM maj_interleaved_daughters"
+	 puts "  error is : $err"
+	 puts "_____________________________________\n"
+    }
   }
 }
 
@@ -190,6 +210,7 @@ method Interleaving_PM_P_TK_frame constructor {name descr args} {
  eval "$objName configure $args"
  return $objName
 }
-#___________________________________________________________________________________________________________________________________________
-method PhysicalContainer_TK_frame maj_interleaved_daughters {} {}
 
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_TK_frame [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_TK_frame [P_L_methodes_get_CometInterleaving] {}

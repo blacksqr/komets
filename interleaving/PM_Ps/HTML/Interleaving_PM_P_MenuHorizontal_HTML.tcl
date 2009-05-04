@@ -12,6 +12,10 @@ method Interleaving_PM_P_MenuHorizontal_HTML constructor {name descr args} {
  eval "$objName configure $args"
 }
 
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_MenuHorizontal_HTML [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_MenuHorizontal_HTML [P_L_methodes_get_CometInterleaving] {}
+
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML get_mark {}  {return $class(mark)}
 method Interleaving_PM_P_MenuHorizontal_HTML set_mark {m} {set class(mark) $m}
@@ -76,9 +80,6 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
 
  append strm $dec {</div>} "\n"
 }
-
-#___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_MenuHorizontal_HTML maj_interleaved_daughters {} {}
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}}} {

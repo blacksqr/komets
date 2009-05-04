@@ -48,9 +48,9 @@ append strm $dec {</DIV> } "\n"
 append strm $dec { <TABLE BORDER=1 CELLPADDING=1 CELLSPACING=2><TR ><TD><div id="montexte"></div></TD></TR> } "\n"
 }
 
-#___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_MenuFlotant_HTML maj_interleaved_daughters {} {} 
-
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_MenuFlotant_HTML [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_MenuFlotant_HTML [P_L_methodes_get_CometInterleaving] {}
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuFlotant_HTML Render_daughters {strm_name {dec {}}} {

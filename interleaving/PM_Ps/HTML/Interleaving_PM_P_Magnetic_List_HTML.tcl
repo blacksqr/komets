@@ -34,6 +34,10 @@ method Interleaving_PM_P_Magnetic_List_HTML Render {strm_name {dec {}}} {
  append strm $dec "</ul>\n"
 }
 
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_Magnetic_List_HTML [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_Magnetic_List_HTML [P_L_methodes_get_CometInterleaving] {}
+
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_Magnetic_List_HTML maj_interleaved_daughters {L} {
  puts "$objName maj_interleaved_daughters $L"

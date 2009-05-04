@@ -39,3 +39,13 @@ method CometCUI_Editor_PM_P_U_basic set_LM {LM} {
   }
  return $rep
 }
+
+#___________________________________________________________________________________________________________________________________________
+method CometCUI_Editor_PM_P_U_basic CUI_mode_is {LC} {
+ set PM_CUI [CSS++ $objName "#$objName CometCUI_Editor.CUI"]; $PM_CUI Show_elements 0 *
+ set PM_FUI [CSS++ $objName "#$objName CometCUI_Editor.FUI"]; $PM_FUI Show_elements 0 *
+ foreach C $LC {
+   if {[$C get_name] == "CUI"} {$PM_CUI Show_elements 1 *}
+   if {[$C get_name] == "FUI"} {$PM_FUI Show_elements 1 *}
+  }
+}

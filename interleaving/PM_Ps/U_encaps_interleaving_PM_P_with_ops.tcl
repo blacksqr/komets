@@ -27,6 +27,7 @@ method U_encaps_interleaving_PM_P_with_op constructor {name descr core_tmp args}
 method U_encaps_interleaving_PM_P_with_op get_LC_Act_add  {} {return $this(LC_Act_add)}
 method U_encaps_interleaving_PM_P_with_op get_LC_Spec_add {} {return $this(LC_Spec_add)}
 
-#___________________________________________________________________________________________________________________________________________
-method U_encaps_interleaving_PM_P_with_op maj_interleaved_daughters {} {}
+#__________________________________________________
+Methodes_set_LC U_encaps_interleaving_PM_P_with_op [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC U_encaps_interleaving_PM_P_with_op [P_L_methodes_get_CometInterleaving] {}
 
