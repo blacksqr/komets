@@ -12,6 +12,7 @@ method PM_HTML constructor {name descr args} {
 
  set this(L_tags)        {}
  set this(embeded_style) {}
+ set this(html_style)    [list]
 
  this set_cmd_placement      ""
  this set_prim_handle        ""
@@ -194,8 +195,15 @@ method PM_HTML Add_daughter {e {index -1}} {
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML Sub_daughter {e} {
- set rep [this inherited $e]
-   this Do_in_root "Add_L_PM_to_sub $e"
- return $rep
+method PM_HTML set_html_style {lstyles} {
+ set cmd  "\$(\"#${objName}\").css({"
+ foreach {var val} $lstyles {
+	append cmd $var ":" $val ";"
+ }
+ append cmd "});"
+ 
+ set root [this get_L_roots] 
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+    $root Concat_update $objName "htmlstyle" $cmd
+ } 
 }
