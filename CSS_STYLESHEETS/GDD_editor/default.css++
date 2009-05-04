@@ -1,0 +1,4 @@
+#$current->_LM_LP(>*->PMs.PM_TK) {
+  FCT_set_cmd_placement :  pack $p -expand 1 -fill both -side left;
+  FCT_Reconnect: ;
+}

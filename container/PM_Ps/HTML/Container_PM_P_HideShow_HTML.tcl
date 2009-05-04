@@ -7,7 +7,7 @@ method Container_PM_P_HideShow_HTML constructor {name descr args} {
  this inherited $name $descr
  set this(header_place) "top"
  set this(title)        "&nbsp;"
-   this set_GDD_id Container_CUI_frame_HTML
+   this set_GDD_id Container_Maskable_HTML
  eval "$objName configure $args"
  return $objName
 }

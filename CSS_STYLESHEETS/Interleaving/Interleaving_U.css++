@@ -1,3 +1,8 @@
 #$current(MENU.PM_HTML) {
- FCT_HTML_STYLE : "float left color red";
+ GDD_fct : Implem(Container_Maskable_CUI);
+ FCT_set_html_style : float left color red;
+}
+
+#$current(CONTENT.PM_HTML) {
+ 
 }
