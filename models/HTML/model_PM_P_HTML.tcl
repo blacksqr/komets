@@ -61,9 +61,21 @@ method PM_HTML Show_elements_prims {b L_prims} {
 	}
    if {!$found} {append this(embeded_style) $r "\n"}
   }
+  
+ set cmd ""
+
  if {$b == 0} {
-   foreach p $L_prims {append this(embeded_style) "#$p {display: none;}\n"}
-  }
+   foreach p $L_prims {
+						append this(embeded_style) "#$p { display :none; }"
+						append cmd "\$(\"#$p\").css({ display : \"none\" });\n"
+                      }
+  } else {foreach p $L_prims {
+								append cmd "\$(\"#$p\").css({ display : \"block\" });\n"
+							 }
+         }
+ set root [this get_L_roots]
+ puts $cmd
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} { $root Concat_update $L_prims "hideshow$L_prims" $cmd }
 }
 
 #___________________________________________________________________________________________________________________________________________

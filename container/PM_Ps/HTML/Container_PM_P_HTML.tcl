@@ -6,6 +6,11 @@ inherit Container_PM_P_HTML PM_HTML
 method Container_PM_P_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Container_CUI_frame_HTML
+
+   this set_root_for_daughters $objName
+   this set_prim_handle        $objName
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT FRAME" \
+                                      ]
  eval "$objName configure $args"
  return $objName
 }
