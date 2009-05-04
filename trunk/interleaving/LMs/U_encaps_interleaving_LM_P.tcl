@@ -12,3 +12,7 @@ method U_LM_encaps_interleaving_LM_P constructor {name descr LM_core L_PM L_acti
  eval "$objName configure $args"
  return $objName
 }
+
+#__________________________________________________
+Methodes_set_LC U_LM_encaps_interleaving_LM_P [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC U_LM_encaps_interleaving_LM_P [P_L_methodes_get_CometInterleaving] {}

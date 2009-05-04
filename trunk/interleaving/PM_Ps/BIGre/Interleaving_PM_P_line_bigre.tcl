@@ -27,5 +27,6 @@ method CometInterleaving_PM_P_line_BIGre constructor {name descr args} {
  return $objName
 }
 
-#___________________________________________________________________________________________________________________________________________
-method CometInterleaving_PM_P_line_BIGre maj_interleaved_daughters {} {} 
+#__________________________________________________
+Methodes_set_LC CometInterleaving_PM_P_line_BIGre [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC CometInterleaving_PM_P_line_BIGre [P_L_methodes_get_CometInterleaving] {}

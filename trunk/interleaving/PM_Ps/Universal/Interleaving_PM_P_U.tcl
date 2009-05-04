@@ -17,6 +17,10 @@ method Interleaving_PM_P_U constructor {name descr args} {
  return $objName
 }
 
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_U [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_U [P_L_methodes_get_CometInterleaving] {}
+
 #_________________________________________________________________________________________________________________________________
 Generate_accessors Interleaving_PM_P_U [list current_view]
 

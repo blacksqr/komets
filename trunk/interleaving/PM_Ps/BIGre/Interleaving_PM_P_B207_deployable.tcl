@@ -35,8 +35,9 @@ method Interleaving_PM_P_B207_deployable constructor {name descr args} {
  return $objName
 }
 
-#___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_B207_deployable maj_interleaved_daughters {} {}
+#__________________________________________________
+Methodes_set_LC Interleaving_PM_P_B207_deployable [P_L_methodes_set_CometInterleaving] {}  {}
+Methodes_get_LC Interleaving_PM_P_B207_deployable [P_L_methodes_get_CometInterleaving] {}
 
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors Interleaving_PM_P_B207_deployable [list mode_deploy index_of_current]
