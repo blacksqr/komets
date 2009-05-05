@@ -61,7 +61,7 @@ method Activator_PM_P_hyperlink_HTML Render {strm_name {dec {}}} {
 
  append strm $dec <span [this Style_class]> "\n"
 	append strm $dec <img { src="src_img/load.gif" id="} ${objName}_hyperlink_img {" style="position:absolute; visibility:hidden;" />} "\n"
-	append strm $dec <a href="#" { id="} ${objName}_hyperlink {"  name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:$('#} $objName {_button').attr('disabled','disabled');$('#} $objName {_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)">} [this get_text] {</a>} "\n"
+	append strm $dec <a { href="#} ${objName}_hyperlink {" id="} ${objName}_hyperlink {"  name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:$('#} $objName {_button').attr('disabled','disabled');$('#} $objName {_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)">} [this get_text] {</a>} "\n"
 	this Render_daughters strm "$dec  "
  append strm $dec </span> "\n"
 }
