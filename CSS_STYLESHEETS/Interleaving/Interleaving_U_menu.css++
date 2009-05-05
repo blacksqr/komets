@@ -1,0 +1,5 @@
+#$current {
+  FCT_Eval : puts "____ Stylisation de $obj dans la cadre d'un entrelacement à double container";
+  GDD_fct : Implem(CT_Activator_AUI_basic_CUI_hyperlink_HTML);
+  FCT_set_html_style : display block;
+}
