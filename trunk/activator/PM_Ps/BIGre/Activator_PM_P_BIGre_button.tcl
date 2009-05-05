@@ -51,7 +51,15 @@ method Activator_PM_P_BIGre_button get_or_create_prims {root} {
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_BIGre_button set_text {{t {}}} {
  $this(inner_txt) TEXTE $t
- [this get_prim_handle] Mettre_a_jour
+ $this(inner_txt) Optimiser_dimensions
+ 
+ set box [$this(inner_txt) Boite_noeud_et_fils]
+ $this(inner_txt) Origine [expr -[$box BG_X]] [expr -[$box BG_Y]]
+
+ set B207_bt [this get_prim_handle]
+   $B207_bt Longueur [$box Tx]
+   $B207_bt Hauteur  [$box Ty]
+ $B207_bt Mettre_a_jour
 }
 
 #___________________________________________________________________________________________________________________________________________

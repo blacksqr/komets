@@ -60,7 +60,7 @@ method PhysicalContainer_TK_window get_or_create_prims {root} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalContainer_TK_window Resize {x y} {
- set w $root.tk_${objName}_win
+ set w [this get_prim_handle]
  if {[winfo exists $w]} {
    wm geometry $w "${x}x${y}"
   }

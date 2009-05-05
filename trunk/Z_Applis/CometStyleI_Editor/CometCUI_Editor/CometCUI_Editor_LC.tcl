@@ -48,6 +48,23 @@ method CometCUI_Editor get_comet_viewer        {} {return $this(CV)}
 method CometCUI_Editor get_comet_graph_builder {} {return $this(CGB)}
 
 #___________________________________________________________________________________________________________________________________________
+method CometCUI_Editor Enlight_with_CSS {CSS} {
+ set PM_FUI  [CSS++ $objName "#$this(filter)->PMs [this get_edited_comet]"]
+ set new_CSS [string map [list {$current} $PM_FUI] $CSS]
+ set L [CSS++ $objName $new_CSS]
+ this Enlight $L
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometCUI_Editor Enlight {L} {
+ $this(CV) Enlight $L
+ set root [this get_L_roots] 
+ if {[catch {$root Stop_Enlight; $root Enlight $L} err]} {
+   puts "ERROR in \"$objName Enlight_with_CSS {$CSS}\"\n  - err : $err"
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {set_edited_comet {v}} 

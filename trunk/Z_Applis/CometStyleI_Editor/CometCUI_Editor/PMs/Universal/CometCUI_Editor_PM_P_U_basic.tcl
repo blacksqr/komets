@@ -41,6 +41,11 @@ method CometCUI_Editor_PM_P_U_basic set_LM {LM} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometCUI_Editor_PM_P_U_basic Update_CUI {} {
+ [this get_LC] Apply_style
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometCUI_Editor_PM_P_U_basic CUI_mode_is {LC} {
  puts "$objName CUI_mode_is {$LC}"
  set PM_CUI [CSS++ $objName "#$objName\(GRAPH.CUI)"    ]; $PM_CUI Show_elements 0 *
