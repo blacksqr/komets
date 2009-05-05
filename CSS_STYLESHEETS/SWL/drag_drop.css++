@@ -88,10 +88,11 @@
   FCT_background_color : 0 0 0 1;
   FCT_Redim_background : 0 0 1024 768;
   FCT_Eval             : Clipping [$obj get_poly_background];
+  FCT_Raise            : low;
 }
 
 #$current(CONT.EDITION CONT.SPACE(CORE))  {
-  FCT_background_color : 0 0 0 1;
+  FCT_background_color : 0 0 1 1;
   FCT_Redim_background : -999999999 -999999999 999999999 999999999;
   FCT_Origine          : 0 0;
   FCT_Eval             : set cont_poly [$obj get_poly_background] 
