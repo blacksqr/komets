@@ -9,7 +9,7 @@
             --- [$obj get_B207_local_menu] Origine 0 400;
 }
 
-#cr->PMs.PM_BIGre swl(TOP.INTERLEAVING[soft_type ~= BIGre](EDITION_MODE > *))  {
+#$current(TOP.INTERLEAVING[soft_type ~= BIGre](EDITION_MODE > *))  {
   FCT_set_method_placement: Line_v;
 }
 
@@ -18,7 +18,7 @@
          --- U_encapsulator_PM  $obj  "CometContainer(set_name \"CUI Editor of [$LC get_name]\", \$obj() )";
 }
 
-#$current(CometContainer \->_LM_LP > FUI/, GRAPH.VIEWER(>CometContainer)) {
+#$current(CometContainer \->_LM_LP > CONTAINER.FUI/, GRAPH.VIEWER(>CometContainer)) {
   GDD_fct     : Implem(Container_CUI_window);
   FCT_Resize  : 640 480;
 }

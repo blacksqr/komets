@@ -1,0 +1,5 @@
+cr set_daughters_R [CometCUI_Editor CUI_editor n d]
+  CUI_editor set_edited_comet swl
+  CUI_editor set_ptf_of_CUI Ptf_BIGre
+  CUI_editor set_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/SWL/drag_drop.css++
+  

@@ -1428,7 +1428,7 @@ proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
 
 #_________________________________________________________________________________________________________
 proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep ""}} {
- puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
+ #puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
 # Process all the functions to give a list <fct_name, expr>
  set letter {[a-zA-Z0-9_\$"{}]}
  set space  "\[ \n\]"

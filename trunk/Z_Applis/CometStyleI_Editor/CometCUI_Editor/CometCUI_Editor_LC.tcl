@@ -10,9 +10,10 @@ method CometCUI_Editor constructor {name descr args} {
    set this(CV)      [CPool get_a_comet CometViewer       -set_name "Comet viewer"                -Add_style_class "COMET GRAPH VIEWER CUI"]
    set this(CGB)     [CPool get_a_comet CometGraphBuilder -set_name "CometGraph Builder"          -Add_style_class "COMET GRAPH BUILDER"]
    set this(cont)    [CPool get_a_comet CometContainer    -set_name "Container of the FUI"        -Add_style_class "CONTAINER FUI"]
+   set this(filter)  [CPool get_a_comet CometContainer    -set_name "Filter of the FUI"           -Add_style_class "FILTER FUI"]
 	 
  $this(top_inter) Add_daughters_R [list $this(CV) $this(CGB) $this(cont)]
-
+ $this(cont) Add_daughters_R $this(filter)
 # set up actions
  
 # set up internal graph
@@ -52,20 +53,20 @@ method CometCUI_Editor get_comet_graph_builder {} {return $this(CGB)}
 # Inject code for {set_edited_comet {v}} 
 Inject_code CometCUI_Editor set_edited_comet \
             { if {[this get_edited_comet] != ""} {
-			    if {[catch "$this(cont) Sub_daughter_R [this get_edited_comet]" err]} {puts "ERROR in $objName set_edited_comet $v:\n$err"}
+			    if {[catch "$this(filter) Sub_daughter_R [this get_edited_comet]" err]} {puts "ERROR in $objName set_edited_comet $v:\n$err"}
                }
 			  [this get_Common_FC] set_edited_comet $v
-			  C_GDD $this(cont)_LM_LP "Implem" Container
+			  C_GDD $this(filter)_LM_LP "Implem" Container
 			  set ptf [this get_ptf_of_CUI]
-			  $this(cont)_LM_LP set_PM_factories [$this(cont)_LM_LP get_L_compatible_factories_with_ptf $ptf]
-			  set L_PMs [$this(cont)_LM_LP get_L_PM]
+			  $this(filter)_LM_LP set_PM_factories [$this(filter)_LM_LP get_L_compatible_factories_with_ptf $ptf]
+			  set L_PMs [$this(filter)_LM_LP get_L_PM]
 			  foreach PM $L_PMs {
 			    if {![${PM}_cou_ptf Accept_for_daughter $ptf]} {
 				  $PM dispose
 				 }
 			   }
-			  $this(top_inter) Sub_daughter_R $this(cont); $this(top_inter) Add_daughter_R $this(cont); 
-		      $this(cont) Add_daughter_R $v
+			  $this(cont)   Sub_daughter_R $this(filter); $this(cont) Add_daughter_R $this(filter); 
+		      $this(filter) Add_daughter_R $v
 			  this Apply_style
 			} \
 			{}
@@ -89,10 +90,10 @@ Inject_code CometCUI_Editor set_style_file \
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {Apply_style {}}
 Inject_code CometCUI_Editor Apply_style \
-			{ Apply_style_on [CSS++ $this(cont) "#$this(cont)->PMs [this get_edited_comet]"] [this get_L_mapping] [this get_gdd_op_file] [this get_style_file]
-			  set L_PMs [CSS++ $this(cont) "#$this(cont)->PMs [this get_edited_comet]"]
+			{ Apply_style_on [CSS++ $this(filter) "#$this(filter)->PMs [this get_edited_comet]"] [this get_L_mapping] [this get_gdd_op_file] [this get_style_file]
+			  set L_PMs [CSS++ $this(filter) "#$this(filter)->PMs [this get_edited_comet]"]
 			  set PM [lindex $L_PMs 0]
-			  puts "CSS++ $this(cont) {#$this(cont)->PMs [this get_edited_comet]} : $L_PMs"
+			  puts "CSS++ $this(filter) {#$this(filter)->PMs [this get_edited_comet]} : $L_PMs"
 			  if {$PM != ""} {
 			    $this(CV) set_element_and_level "$PM 10"
 			   } else {$this(CV) set_represented_element ""}

@@ -25,3 +25,6 @@ method Container_PM_P_ALX_TXT Analyse {str_name} {
 
  this inherited str
 }
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_ALX_TXT Resize {x y} {}

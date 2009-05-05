@@ -33,3 +33,6 @@ method Container_PM_P_FLEX_window Render {strm_name {dec {}}} {
 
  return [this get_prim_handle]
 }
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_FLEX_window Resize {x y} {}
