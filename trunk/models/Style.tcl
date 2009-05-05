@@ -304,7 +304,7 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
      return
     }
 
-	if {![regexp "^($this(lettre)*) +(.*)" $str reco proj str]} {set proj ""}
+	if {![regexp "^->($this(lettre)*) +(.*)" $str reco proj str]} {set proj ""}
 	
     if {[regexp "^$this(sep)*>-->$this(sep)*(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
     if {[regexp "^$this(sep)*<--<$this(sep)*(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
@@ -341,38 +341,44 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
 	  
    set L_indesirables {}
    foreach nr $rep {
+     set original_nr $nr
      switch $proj {
-	   _LM_LP {set nr [$nr get_LC]}
-	   LC     {set nr [$nr get_LC]_LM_LP}
+	   _LM_LP  {set Lnr [$nr get_LC]_LM_LP}
+	   LC      {set Lnr [$nr get_LC]}
+	   PMs     {set Lnr [[$nr get_LC]_LM_LP get_L_actives_PM]}
+	   default {set Lnr $nr}
 	  }
-     if {$nested} {
-	   set r [$nr get_handle_composing_comet]
-	   if {$r == ""} {continue}
-	  } else {set r $nr}
-     foreach c [$r $cmd_daughter] {
-       set str_tmp $str
-       set rep_tq {}
-	   #puts "FILTER found : \n  cmd_daughter : $cmd_daughter\n  * str_tmp : \"$str_tmp\" \n  * set rep_tq {}; set str_tmp {$str}; $objName DSL_SELECTOR str_tmp rep_tq $c $rec"
-       this DSL_SELECTOR str_tmp rep_tq $c $rec
-       #puts "  * rep_tq : \{$rep_tq\}"
-       set lg [string length $rep_tq]
-       if {$lg>0} {
-         if {$not==1} {lappend L_indesirables $nr}
-         Add_element n_rep $nr
-        }
-      }
-	}
-      # <DEBUG 2009 02 02>
-	    set this(cmd_daughter) $old_cmd_daughters
-	  # </DEBUG 2009 02 02>
+     foreach nr $Lnr {
+			 if {$nested} {
+			   set r [$nr get_handle_composing_comet]
+			   if {$r == ""} {continue}
+			  } else {set r $nr}
+			 foreach c [$r $cmd_daughter] {
+			   set str_tmp $str
+			   set rep_tq {}
+			   #puts "FILTER found : \n  cmd_daughter : $cmd_daughter\n  * str_tmp : \"$str_tmp\" \n  * set rep_tq {}; set str_tmp {$str}; $objName DSL_SELECTOR str_tmp rep_tq $c $rec"
+			   this DSL_SELECTOR str_tmp rep_tq $c $rec
+			   #puts "  * rep_tq : \{$rep_tq\}"
+			   set lg [string length $rep_tq]
+			   if {$lg>0} {
+				 if {$not==1} {Add_element L_indesirables $original_nr}
+				 Add_element n_rep $original_nr
+				}
+			  }
+			
+			  # <DEBUG 2009 02 02>
+				set this(cmd_daughter) $old_cmd_daughters
+			  # </DEBUG 2009 02 02>
 
-   if {$not==1} {set n_rep $rep
-                 Sub_list n_rep $L_indesirables
-                }
-     #DEBUG set str $str_rep
-     this DSL_SELECTOR str rep_tq $root $rec
-	 set rep $n_rep
-   regexp "^$this(sep)*\\\)*$this(sep)*/(.*)$" $str reco str
+		   if {$not==1} {set n_rep $rep
+						 Sub_list n_rep $L_indesirables
+						}
+			 #DEBUG set str $str_rep
+			 this DSL_SELECTOR str rep_tq $root $rec
+			 set rep $n_rep
+		   regexp "^$this(sep)*\\\)*$this(sep)*/(.*)$" $str reco str
+        }
+	  }
   }
 # puts "DSL_CLASS : \{$rep\}"
 }

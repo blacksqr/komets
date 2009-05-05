@@ -46,7 +46,6 @@ method Specifyer_PM_P_entry_TK set_text {{t {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_entry_TK get_text {} {
  if {[winfo exists $this(tk_entry)]} {
-   puts "get_text de PM_entry appellé : $this(tk_entry)"
    return [$this(tk_entry) get]
   }
  return [eval [this get_Common_FC] get_text]
