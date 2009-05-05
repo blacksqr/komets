@@ -111,7 +111,7 @@
 #$current {
   FCT_Eval : set    cmd {}
          --- append cmd {set PM [CSS++ cr "#${C}->PMs\[soft_type == BIGre\] \\<--< } $obj {/"] --- }
-         --- append cmd "Apply_style_on \$PM \[list \] {Common_GDD_requests.css++} {SWL_partial_style_player_B207_V1.css++}"
+         --- append cmd "Apply_style_on \$PM \[list \] {[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++} {[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_player_B207_V1.css++}"
 		 --- [$obj get_real_LC] Subscribe_to_Add_a_player alex $cmd UNIQUE ;
 }
 

@@ -1,0 +1,42 @@
+#$current(SPECIFYER.COLOR) {
+  GDD_fct : Implem(Specifyer_Color_CUI_basic_system);
+}
+
+#$current {
+  FCT_Eval : set swl_PM [CSS++ $obj "#$obj <--< CometSWL"]
+         --- set LC [$obj get_LC]
+		 --- set LC_sub_player [CSS++ cr "#${swl_PM}(sub.player->LC)"]
+		 --- set LC_add_ship   [CSS++ cr "#${swl_PM}(add.ship->LC)"]
+		 --- set PM_encaps     [U_encapsulator_PM $obj "CometContainer(-set_name Container, $LC_sub_player\(), \$obj, ${LC_add_ship}())"]
+		 --- set PM_sub        [CSS++ cr "#${PM_encaps}(sub.player)"]
+		 ---   $PM_sub Add_Params "player $LC"
+		 --- set PM_add_V [CSS++ $obj "#${PM_encaps}($LC_add_ship)"]
+		 ---   $PM_add_V Subscribe_to_Trigger_prim_activate __FOREACH_PM__alex "$PM_add_V Add_Params \"player $LC ship \[CPool get_a_comet CometSWL_Ship]\""    UNIQUE
+         --- set cmd_color_update "\[CSS++ cr {#${PM_encaps}(ACT.ADD.SHIP)}\] Color \[$LC get_player_color\]"
+         --- $obj Subscribe_to_set_player_color __FOREACH_PM__SWL_Encaps_player_V1 $cmd_color_update   
+		 --- puts "Now obj = $PM_encaps" ;
+}
+
+#$current(>*), #$current(CORE(>*)) {
+  FCT_set_method_placement: Line_h;
+}
+
+#$current(ACT.SUB.PLAYER) {
+  GDD_fct   : Implem(CT_Activator_CUI_skinnable);
+  FCT_Shape : 5 0 16 11 27 0 32 5 21 16 32 27 27 32 16 21 5 32 0 27 11 16 0 5;
+  FCT_Color : 1 0 0 1;
+  FCT_Eval  : set n [$obj get_prim_handle] ---
+              set p [$obj get_polygon]     ---
+              make_a_B_bouton_perso_from $n "$p Couleur 1 1 0 1" "$p Couleur 1 0 0 1" "$p Couleur 1 0.5 0.5 1" "$p Couleur 1 1 0 1" "$obj Trigger_prim_activate" ;
+}
+
+#$current(ACT.ADD.SHIP) {
+  GDD_fct  : Implem(CT_Activator_CUI_skinnable);
+  FCT_Eval : set panel [CSS++ $obj "#$obj <--< swl(CONT.OP_EDITION(CORE))"]
+         --- Drag_nodes [$obj get_prim_handle] 1 "$panel Toggle_extension" "$panel Toggle_extension";
+}
+
+#$current {
+  FCT_set_player_color : 1 1 0 1;
+}
+
