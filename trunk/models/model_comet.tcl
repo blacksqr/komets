@@ -1454,9 +1454,10 @@ proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep
 	       }
    
    # Mapping of variables names
-   set L_ops          [string map $L_mapping      $L_ops]
+#   set L_ops          [string map $L_mapping      $L_ops]
    set L_real_mapping [concat     $L_mapping      [list {$current} $current]]
    set sel_svg        [string map $L_real_mapping [lindex $r 0]]
+   set L_ops          [string map $L_real_mapping $L_ops]
    
    if {$do_css} {
 	 set L_rep [CSS++ $root $sel_svg]

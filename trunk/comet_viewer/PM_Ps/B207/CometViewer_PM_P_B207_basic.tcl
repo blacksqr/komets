@@ -113,7 +113,8 @@ method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
    set this(tk_str) [string range $this(tk_str) [string first {$c} $this(tk_str)] end]
    $this(B_canvas) Vider
    if {[catch $this(tk_str) err]} {
-     puts "______________________________________________________________________\nERROR in CometViewer_PM_P_B207_basic::${objName}\n______________________________________________________________________\n$err"
+     puts "!!!!"
+	 puts "______________________________________________________________________\nERROR in CometViewer_PM_P_B207_basic::${objName}\n______________________________________________________________________\n$err\nProgram was\n$this(tk_str)"
     } else {$this(B_canvas) Gestion_ctc
             $this(B_canvas) Link_contacts_and_co
             $this(B_canvas) Maj_MetaData_Markers CometPM
