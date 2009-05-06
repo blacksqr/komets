@@ -33,8 +33,9 @@ method choice_LM_P constructor {name descr args} {
                                                               {DChoice_PM_P_interleaving_markers_HTML Ptf_HTML} \
                                                               {DChoice_PM_P_Menu_HTML Ptf_HTML}                 \
                                                               {DChoice_PM_P_interleaving_markers_TK Ptf_TK}     \
- 															  {U_choice_PM_P Ptf_ALL} 							\
 															  {DChoice_PM_P_Menu_FLEX Ptf_FLEX} 				\
+ 															  {U_choice_PM_P Ptf_ALL} 							\
+
                                                         ] $objName]
 
  set this(init_ok) 1

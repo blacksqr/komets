@@ -35,9 +35,7 @@ method Marker_PM_P_CheckBox_FLEX set_mark {v} {
    if {$v} {
      set cmd "${objName}.selected=true;"
     } else {set cmd "${objName}.selected=false;"}
-  foreach r $root {
-	puts "$r \t"
-  }
+
     if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
      $root send_to_FLEX $cmd
     }
