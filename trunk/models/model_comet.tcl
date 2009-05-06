@@ -1,6 +1,20 @@
 set DEFINE_MODEL_COMET 1 
 
 #_________________________________________________________________________________________________________
+proc Trace {C m} {
+ set cmd    "method $C $m {[gmlObject info arglist $C $m]} {\n"
+ append cmd "puts \"\$objName $m "
+   foreach a [gmlObject info arglist $C $m] {
+     append cmd {$} [lindex $a 0] " "
+    }
+ append cmd "\"\n"
+ append cmd [gmlObject info body $C $m]
+ append cmd "}"
+ 
+ eval $cmd
+}
+
+#_________________________________________________________________________________________________________
   proc CSS++ {root args} {
     set cmd {};
     foreach a $args {append cmd $a { }}
@@ -2522,7 +2536,10 @@ method Physical_model get_context {} {return {}}
 #_________________________________________________________________________________________________________
 method Physical_model get_LM {}   {return $this(LM)}
 method Physical_model set_LM {LM} {set this(LM) $LM; 
-                                   if {[string length $LM] > 0} {set this(names_obj) [list $objName [this get_LM] [this get_LC]]}
+                                   if {$LM != ""} {
+								     set this(names_obj) [list $objName [this get_LM] [this get_LC]]
+									 this set_Common_FC [$LM get_Common_FC]
+									}
                                    return $LM}
 #_________________________________________________________________________________________________________
 method Physical_model get_LC {}   {return [$this(LM) get_LC]}
