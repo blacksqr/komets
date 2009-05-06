@@ -23,7 +23,18 @@
   FCT_Resize  : 640 480;
 }
 
+#$current(CONTAINER.FUI, GRAPH.VIEWER(>CometContainer)) {
+  GDD_fct     : Implem(Container_CUI_window);
+  FCT_Resize  : 640 480;
+}
+
 #$current(GRAPH.BUILDER) {
   FCT_Show_elements : 0 *;
 }
 
+#$current(INTERNAL_ROOT) {
+  GDD_fct     : Implem(Container_CUI_window);
+  FCT_Resize  : 800 600;
+  FCT_Eval    : set PM_menu [CSS++ $obj "#$obj TOP.INTERLEAVING(CORE)"]
+            --- $obj Layout "[$PM_menu get_B207_local_menu] top-left"
+}

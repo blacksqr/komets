@@ -12,6 +12,9 @@ method CometViewer_PM_P_B207_basic constructor {name descr args} {
  set this(animation_time) 600
  set this(tkdot_port) 10010
  set this(B_canvas)   ${objName}_BC; BIGre_canvas $this(B_canvas)
+ set this(mark_for_dot) 0
+ 
+ set this(setting_dot_description) 0
 
  this set_prim_handle        [$this(B_canvas) get_root]
  this set_root_for_daughters [$this(B_canvas) get_root]
@@ -88,10 +91,29 @@ method CometViewer_PM_P_B207_basic get_nodes_representing {e} {
 }
 
 #_________________________________________________________________________________________________________
+method CometViewer_PM_P_B207_basic get_new_mark_for_dor {} {
+ incr this(mark_for_dot)
+ return $this(mark_for_dot)
+}
+
+#_________________________________________________________________________________________________________
+method CometViewer_PM_P_B207_basic Update_dot_description {m} {
+ if {$this(mark_for_dot) == $m} {
+   if {$this(setting_dot_description)} {
+     after 1000 "$objName Update_dot_description $m"
+    } else {this $this(local_dot_description)}
+  }
+}
+
+#_________________________________________________________________________________________________________
 method CometViewer_PM_P_B207_basic set_dot_description {v} {
  set this(tk_str) ""
- 
+ if {$this(setting_dot_description)} {
+   set this(local_dot_description) $v
+   after 1000 "$objName Update_dot_description [this get_new_mark]"
+  }
  if {[catch {
+   set this(setting_dot_description) 1
    set s [socket 127.0.0.1 $this(tkdot_port)]
    fconfigure $s -blocking 0 
    fileevent  $s readable [list $objName Read_tk_data_from $s]
@@ -99,11 +121,21 @@ method CometViewer_PM_P_B207_basic set_dot_description {v} {
    puts $s $v
    flush $s
   } err]} {puts "Error in $objName :: set_dot_description\n  - err : $err"
+           set this(setting_dot_description) 0
           }
 }
 
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
+ if {[catch "$objName catched_Read_tk_data_from $s" err]} {
+   puts "Error in $objName Read_tk_data_from $s\n  -err : $err"
+   catch "close $s"
+   set this(setting_dot_description) 0
+  }
+}
+
+#_________________________________________________________________________________________________________
+method CometViewer_PM_P_B207_basic catched_Read_tk_data_from {s} {
  append this(tk_str) [read $s]
  #puts "__________\nReceived__________\n$s"
  if {[eof $s]} {
@@ -124,6 +156,7 @@ method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
 			   }
 			 }
            }
+   set this(setting_dot_description) 0
    close $s
   }
 }
