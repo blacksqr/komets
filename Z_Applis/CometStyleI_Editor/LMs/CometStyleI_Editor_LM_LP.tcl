@@ -4,7 +4,7 @@ inherit CometStyleI_Editor_LM_LP Logical_presentation
 method CometStyleI_Editor_LM_LP constructor {name descr args} {
  this inherited $name $descr
 # Adding some physical presentations 
- this Add_PM_factories [Generate_factories_for_PM_type [list \
+ this Add_PM_factories [Generate_factories_for_PM_type [list {CometStyle_editor_PM_P_U_basic Ptf_ALL} \
                                                        ] $objName]
 
  eval "$objName configure $args"
