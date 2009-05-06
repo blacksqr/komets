@@ -75,7 +75,7 @@ method PM_HTML Show_elements_prims {b L_prims} {
 							 }
          }
  set root [this get_L_roots]
- puts $cmd
+ #puts $cmd
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} { $root Concat_update $L_prims "hideshow$L_prims" $cmd }
 }
 
@@ -212,7 +212,7 @@ method PM_HTML set_html_style {lstyles} {
 #_________________________________________________________________________________________________________
 method PM_HTML get_html_style {} {
  set L [list]
- foreach {var val} [array get this html_style,*] {lappend L [string range $var 11 end] $val; puts "[string range $var 11 end]   :   $val" }
+ foreach {var val} [array get this html_style,*] {lappend L [string range $var 11 end] $val; }
  return $L
 }
 
