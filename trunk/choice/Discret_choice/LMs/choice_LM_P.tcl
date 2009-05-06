@@ -33,7 +33,8 @@ method choice_LM_P constructor {name descr args} {
                                                               {DChoice_PM_P_interleaving_markers_HTML Ptf_HTML} \
                                                               {DChoice_PM_P_Menu_HTML Ptf_HTML}                 \
                                                               {DChoice_PM_P_interleaving_markers_TK Ptf_TK}     \
- 															  {U_choice_PM_P Ptf_ALL} \
+ 															  {U_choice_PM_P Ptf_ALL} 							\
+															  {DChoice_PM_P_Menu_FLEX Ptf_FLEX} 				\
                                                         ] $objName]
 
  set this(init_ok) 1
@@ -46,7 +47,7 @@ method choice_LM_P constructor {name descr args} {
  return $objName
 }
 #______________________________________________________ Adding the choices functions _______________________________________________________
-Methodes_set_LC choice_LM_P $L_methodes_set_choices {$this(FC)} {$this(L_actives_PM)}
+Methodes_set_LC choice_LM_P $L_methodes_set_choices {}          {$this(L_actives_PM)}
 Methodes_get_LC choice_LM_P $L_methodes_get_choices {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________

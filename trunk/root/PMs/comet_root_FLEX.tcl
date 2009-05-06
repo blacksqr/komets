@@ -50,13 +50,14 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  append strm "\t" { import mx.controls.*; } "\n"
  append strm "\t" { import mx.events.FlexEvent; } "\n"
  append strm "\t" { import pandora.flex.containers.Window; } "\n"
+ append strm "\t" { import mx.core.UIComponent;} "\n"
  append strm "\t" { public var client:SimpleClient;} "\n"
  append strm "\t" { public var msg:String;} "\n"
  
    this set_prim_handle        "Application.application"
    this set_root_for_daughters "Application.application"
- append strm "\t" "public function init():void {\n"
- append strm "\t" "  var Dyna_context:Class_Dyna_context = new Class_Dyna_context();\n" 
+ append strm "\t" " public function init():void {\n"
+ append strm "\t" " var Dyna_context:Class_Dyna_context = new Class_Dyna_context();\n" 
  append strm "\t" " function connexion():void {\n"
  append strm "\t" " 	if ((client==null)||(client.etat=\"deconnecte\")) { \n"
  append strm "\t" "		client = new SimpleClient(\"$class(local_IP)\", 12000, Dyna_context); \n"
@@ -69,7 +70,7 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  append strm "\t" { 	client.ecrire(String (str_obj.length)+ " " + str_obj + " " + String (str_mtd.length)+ " " + str_mtd + " " + String (str_val.length)+ " " + str_val + "|");} "\n"
  append strm "\t" " }\n"
    this Render_daughters strm "\t $dec "
- append strm "\t" "\nconnexion();\n}\n"
+ append strm "\t" "\n\t connexion();\n}\n"
  append strm "\t" { ]]>} "\n"
  append strm "\t" { </mx:Script>} "\n"
  #append strm "\t" { <mx:Button id="boutonConnexion" label="Connexion client" width="155" height="22" click="connexion()"/>} "\n"
@@ -160,8 +161,8 @@ method Comet_root_PM_P_FLEX Analyse_message {str_name} {
 #___________________________________________________________________________________________________________________________________________
 method Comet_root_PM_P_FLEX send_to_FLEX {obj} {
 
- puts " msg \"[string length $obj] $obj;|\" envoyé sur le channel $this(chan_for_client)"
- puts -nonewline $this(chan_for_client) "[expr [string length $obj]+1] $obj;|"
+ puts " msg \"[string length $obj] $obj|\" envoyé sur le channel $this(chan_for_client)"
+ puts -nonewline $this(chan_for_client) "[expr [string length $obj]+1] $obj|"
  flush $this(chan_for_client)
 
 }

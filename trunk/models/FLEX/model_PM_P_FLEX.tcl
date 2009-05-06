@@ -6,7 +6,8 @@ inherit PM_FLEX Physical_model
 #___________________________________________________________________________________________________________________________________________
 method PM_FLEX constructor {name descr args} {
  this inherited $name $descr
- 
+ set class(mark) 0
+	
  set this(root) ""
  set ptf [$this(cou) get_ptf]
  $ptf maj Ptf_FLEX
@@ -15,6 +16,10 @@ method PM_FLEX constructor {name descr args} {
  this set_prim_handle        ""
  this set_root_for_daughters ""
 }
+
+#___________________________________________________________________________________________________________________________________________
+method PM_FLEX get_mark {}  {return $class(mark)}
+method PM_FLEX set_mark {m} {set class(mark) $m}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_FLEX Reconnect {PMD} {

@@ -41,6 +41,6 @@ method CometTexte_PM_P_FLEX set_text {t} {
  puts "coucou"
     set root [this get_L_roots]
     if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
-	   $root send_to_FLEX "${objName}.text=\"$t\""
+	   $root send_to_FLEX "${objName}.text=\"$t\";"
     }
 }
