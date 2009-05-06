@@ -41,7 +41,7 @@ method Activator_PM_P_button_FLEX Render {strm_name {dec {}}} {
  append strm $dec " var $objName:Button = new Button(); \n"
  append strm $dec " $objName.addEventListener(MouseEvent.CLICK,buttonClickHandler_${objName}); \n"
  append strm $dec " ${objName}.label =\"[this get_text]\"; \n"
- append strm $dec " Dyna_context.$objName = $objName;\n"
+ append strm $dec " Dyna_context.$objName = $objName; \n"
  #append strm $dec "<mx:Button id=\"$objName\" label=\"[this get_text]\" click=\"buttonClickHandler_${objName}()\"/>\n"
 
  this set_prim_handle        $objName

@@ -51,7 +51,7 @@ method Specifyer_PM_P_textarea_FLEX set_text {t} {
     #envoi un message au serveur FLEX
     set root [this get_L_roots]
     if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
-	   $root send_to_FLEX "${objName}.text=\"$t\""
+	   $root send_to_FLEX "${objName}.text=\"$t\";"
     }
  #celui-ci transmet le message au client SWF
  }

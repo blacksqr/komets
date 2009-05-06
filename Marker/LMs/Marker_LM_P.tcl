@@ -27,6 +27,8 @@ method LogicalMarker constructor {name descr args} {
                                                              {Marker_PM_P_Radio_HTML Ptf_HTML}    \
                                                              {Marker_PM_P_CheckBox_HTML Ptf_HTML} \
 															 {Marker_PM_P_B207_surrounding Ptf_BIGre} \
+															 {Marker_PM_P_RadioBouton_FLEX Ptf_FLEX} \
+															 {Marker_PM_P_CheckBox_FLEX Ptf_FLEX} \
                                                        ] $objName]
 # set node_name "${comet_name}_PM_P_HTML_CheckBox"
 #   Marker_PM_P_CheckBox_HTML   $node_name "HTML CheckBox"   {NO MORE TO SAY}
@@ -48,7 +50,7 @@ method LogicalMarker constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC LogicalMarker [L_methodes_set_Marker] {$this(FC)} {$this(L_actives_PM)}
+Methodes_set_LC LogicalMarker [L_methodes_set_Marker] {}          {$this(L_actives_PM)}
 Methodes_get_LC LogicalMarker [L_methodes_get_Marker] {$this(FC)}
 Generate_LM_setters LogicalMarker [L_methodes_CometRE_Marker]
 

@@ -28,7 +28,6 @@ method Marker_PM_P_CheckBox_FLEX maj_choices {} {}
 #___________________________________________________________________________________________________________________________________________
 method Marker_PM_P_CheckBox_FLEX set_mark {v} {
   set root [this get_L_roots] 
-  set methode "checked"
 
  if {![info exists this(old_mark)]} {set this(old_mark) [this get_mark]}
  
@@ -36,9 +35,11 @@ method Marker_PM_P_CheckBox_FLEX set_mark {v} {
    if {$v} {
      set cmd "${objName}.selected=true;"
     } else {set cmd "${objName}.selected=false;"}
-  
-   if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     $root Concat_update $objName $methode $cmd
+  foreach r $root {
+	puts "$r \t"
+  }
+    if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
+     $root send_to_FLEX $cmd
     }
    set this(old_mark) $v
   }
@@ -52,15 +53,16 @@ method Marker_PM_P_CheckBox_FLEX Render {strm_name {dec {}}} {
  
   set this(checkBox_mark) [this get_mark]
 
- append rep $dec " var $objName:CheckBox = new CheckBox(); \n"
- append rep $dec " $objName.addEventListener(MouseEvent.CLICK,checkBoxMark_${objName}); \n"
  append rep $dec " function checkBoxMark_${objName}(${objName}_event:MouseEvent):void{  \n"
  append rep $dec " 		if($objName.selected) { \n"
  append rep $dec "			FLEX_to_TCL(\"$objName\", \"prim_set_mark\", \"1\") } \n"
  append rep $dec " 		else {  \n"
  append rep $dec "			FLEX_to_TCL(\"$objName\", \"prim_set_mark\", \"0\") } \n"
  append rep $dec " } \n"
- 
+ append rep $dec " var $objName:CheckBox = new CheckBox(); \n"
+ append rep $dec " $objName.addEventListener(MouseEvent.CLICK,checkBoxMark_${objName}); \n"
+ append rep $dec " Dyna_context.$objName = $objName; \n"
+  
  this set_prim_handle        $objName
  this set_root_for_daughters $objName
  this Render_daughters strm "$dec "
