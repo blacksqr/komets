@@ -26,7 +26,7 @@ method CometChoice constructor {name descr args} {
 method CometChoice dispose {} {this inherited}
 
 #_______________________________________________________ Adding the choices functions _______________________________________________
-Methodes_set_LC CometChoice $L_methodes_set_choices {$this(FC)} {$this(L_LM)}
+Methodes_set_LC CometChoice $L_methodes_set_choices {} 			{$this(L_LM)}
 Methodes_get_LC CometChoice $L_methodes_get_choices {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
