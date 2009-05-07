@@ -30,3 +30,5 @@ method CometInterleaving_PM_P_line_BIGre constructor {name descr args} {
 #__________________________________________________
 Methodes_set_LC CometInterleaving_PM_P_line_BIGre [P_L_methodes_set_CometInterleaving] {}  {}
 Methodes_get_LC CometInterleaving_PM_P_line_BIGre [P_L_methodes_get_CometInterleaving] {}
+
+

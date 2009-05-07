@@ -42,6 +42,9 @@ method CometStyleI_Editor_CFC Release_unique_id_for_style_file {id} {
 method CometStyleI_Editor_CFC Apply_styles {} {}
 
 #___________________________________________________________________________________________________________________________________________
+method CometStyleI_Editor_CFC set_ptf_for_id {id ptf} {}
+
+#___________________________________________________________________________________________________________________________________________
 method CometStyleI_Editor_CFC Add_a_new_version {id} {}
 
 #___________________________________________________________________________________________________________________________________________
@@ -54,7 +57,8 @@ proc P_L_methodes_get_CometStyleI_Editor {} {return [list {get_edited_comet {}} 
                                                           {get_style_file_for_id {id}} {Exists_style_file_for_id {id}} \
 													]}
 proc P_L_methodes_set_CometStyleI_Editor {} {return [list {set_edited_comet {v}} \
-                                                          {set_style_file_for_id {id file_name}} \
+                                                          {set_ptf_for_id {id ptf}} \
+														  {set_style_file_for_id {id file_name}} \
                                                           {set_L_versions {L}} {Add_L_versions {L}} {Sub_L_versions {L}} \
 														  {Apply_styles { }} \
 														  {Add_a_new_version {id}} {Sub_version_id {id}} \

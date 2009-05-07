@@ -32,8 +32,7 @@ method CSS_Meta_IHM_PM_P_U_1 Select_elements {L} {
  #puts "$objName Select_elements {$L}"
  if {[gmlObject info exists object $this(interleaving)]} {
    if {[$this(txt_sel) get_text] != $L} {
-     puts "  OK"
-	 $this(txt_sel)  set_text $L
+     $this(txt_sel)  set_text $L
 	 set txt "#"; append txt [lindex $L 0]; foreach e [lrange $L 1 end] {append $txt ", #" $e}
 	 $this(spec_sel) set_text $txt
     }
@@ -146,7 +145,7 @@ method CSS_Meta_IHM_PM_P_U_1 Delete_rules {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_U_1 Load_styles {f_name} {
- puts "$objName Load_styles $f_name"
+ #puts "$objName Load_styles $f_name"
  this Update_rules_presentations
 }
 
@@ -173,7 +172,7 @@ method CSS_Meta_IHM_PM_P_U_1 Save_rules_to_files {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_U_1 Select_rules {L_r_names} {
- puts "$objName Select_rules {$L_r_names}"
+ #puts "$objName Select_rules {$L_r_names}"
  set Lc {}
  foreach r_names $L_r_names {
    foreach c [$this(cc_set) get_out_daughters] {
@@ -186,7 +185,7 @@ method CSS_Meta_IHM_PM_P_U_1 Select_rules {L_r_names} {
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_U_1 Update_rules_presentations {} {
- puts "$objName Update_rules_presentations"
+ #puts "$objName Update_rules_presentations"
  set pos 0
  set L_comet_daughters [$this(cc_set) get_out_daughters]
  foreach r [this get_L_set_of_rules] {
@@ -225,7 +224,7 @@ method CSS_Meta_IHM_PM_P_U_1 Delete_rules_named {L_names} {
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_U_1 Apply_rules {} {
- puts "$objName Apply_rules"
+ #puts "$objName Apply_rules"
  set L {}
  foreach r [$this(cc_set) get_currents] {
    lappend L [$r get_name]

@@ -1,0 +1,21 @@
+#$current(TOP.INTERLEAVING[soft_type ~= BIGre]) {
+  FCT_Eval : [$obj get_root_for_daughters] Position_des_fils_changeable 1;
+}
+
+#$current(TASK.GRAPH.VIEWER[soft_type ~= BIGre]) {
+  FCT_Eval : set LC [$obj get_LC]
+         --- puts "______<$obj TASK.GRAPH.VIEWER>"
+		 --- U_encapsulator_PM  $obj "CometContainer(set_name \"CUI Editor of [$LC get_name]\", \$obj() )"
+		 --- puts "______</$obj TASK.GRAPH.VIEWER>";
+}
+
+#$current(TASK.GRAPH.VIEWER(>CometContainer[soft_type ~= BIGre])) {
+  GDD_fct     : Implem(Container_CUI_window);
+  FCT_Resize  : 640 480;
+}
+
+#$current(META[soft_type ~= BIGre]) {
+  GDD_fct : Implem(CT_CSS_Meta_IHM_CUI_toolglass);
+  FCT_set_mode_GDD_active : 0;
+  FCT_Raise : top;
+}

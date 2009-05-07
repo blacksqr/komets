@@ -8,6 +8,10 @@
   FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF)}" "Display EDITION_MODE"]
             --- [$obj get_B207_local_menu] Origine 0 400;
 }
+			
+#$current(TOP.INTERLEAVING(CONT_FOR_DAUGHTERS)) {
+  FCT_Eval    : [$obj get_root_for_daughters] Position_des_fils_changeable 1;
+}
 
 #$current(TOP.INTERLEAVING[soft_type ~= BIGre]((CHOICE.PTF > *), (EDITION_MODE > *)))  {
   FCT_set_method_placement: Line_v;

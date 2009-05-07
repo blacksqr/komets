@@ -28,14 +28,14 @@ method CometStyle_editor_PM_P_U_basic set_LM {LM} {
  set rep [this inherited $LM]
  set this(cont)           "${objName}_cont"
  set this(cont_daughters) "${objName}_cont_daughters"
- if {$rep && ![gmlObject info exists object $this(cont)]} {
+ if {![gmlObject info exists object $this(cont)]} {
    this set_L_nested_handle_LM    $this(cont)_LM_LP
    this set_L_nested_daughters_LM $this(cont_daughters)_LM_LP
 
    CometContainer $this(cont)           "Container of player's presentation $objName"         {} -Add_style_class "CONTAINER INTERNAL_ROOT ROOT root"
    CometContainer $this(cont_daughters) "Container of player's presentation $objName"         {} -Add_style_class "CONTAINER DAUGHTERS"
      set LC [this get_LC]
-	 $this(cont) Add_daughters_R [list [$LC get_top_inter] $this(cont_daughters)]
+	 $this(cont) Add_daughters_R [list [$LC get_cont_root] $this(cont_daughters)]
 	 set this(reconnect_LM) 1
   }
   

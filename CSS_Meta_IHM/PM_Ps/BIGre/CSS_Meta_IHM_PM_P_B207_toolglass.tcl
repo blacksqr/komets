@@ -207,16 +207,7 @@ method CSS_Meta_IHM_PM_P_B207_toolglass GDD_call_now {infos_origine infos} {
    puts "$objName has still selected :\n{[this get_selected_elements]}"
    set PM [$noeud Val CometPM]
    if {$PM != ""} {
-	 set L_PM_CSS [CSS++ cr "#$PM->PMs, #$PM->LC"]
-	 set L  [Liste_Intersection [this get_selected_elements] $L_PM_CSS]
-	 if {[llength $L] > 0} {
-	   Sub_list L $PM
-	   Sub_list L $L_PM_CSS
-	   Sub_list L [$PM get_LC]
-	  } else {Add_list L $PM
-	         }
-	 puts "$objName prim_Select_elements {$L}"
-     this prim_Select_elements $L
+     this prim_Select_elements $PM
     }
    return
   }

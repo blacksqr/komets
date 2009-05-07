@@ -707,6 +707,21 @@ method Comet_element get_rec_L_nesting_element {} {
 }
 
 #_________________________________________________________________________________________________________
+method Comet_element get_toplevel_nesting_PM {} {
+ set PM_rep ""
+ set rep [this get_nesting_element]
+ if {$rep != ""} {
+	 if {[lsearch [gmlObject info classes $rep] Physical_model] >= 0} {
+	   set PM_rep [$rep get_toplevel_nesting_PM]
+	  }
+  }
+  
+ if {$PM_rep == "" && [lsearch [gmlObject info classes $objName] Physical_model] >= 0} {set PM_rep $objName}
+ 
+ return $PM_rep
+}
+
+#_________________________________________________________________________________________________________
 method Comet_element get_out_daughters { } {
  set L_rep {}
  set L_h_d [this get_handle_comet_daughters]
