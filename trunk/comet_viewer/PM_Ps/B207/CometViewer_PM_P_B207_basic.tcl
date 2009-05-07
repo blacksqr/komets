@@ -91,7 +91,7 @@ method CometViewer_PM_P_B207_basic get_nodes_representing {e} {
 }
 
 #_________________________________________________________________________________________________________
-method CometViewer_PM_P_B207_basic get_new_mark_for_dor {} {
+method CometViewer_PM_P_B207_basic get_new_mark_for_dot {} {
  incr this(mark_for_dot)
  return $this(mark_for_dot)
 }
@@ -101,7 +101,7 @@ method CometViewer_PM_P_B207_basic Update_dot_description {m} {
  if {$this(mark_for_dot) == $m} {
    if {$this(setting_dot_description)} {
      after 1000 "$objName Update_dot_description $m"
-    } else {this $this(local_dot_description)}
+    } else {this set_dot_description $this(local_dot_description)}
   }
 }
 
@@ -110,19 +110,20 @@ method CometViewer_PM_P_B207_basic set_dot_description {v} {
  set this(tk_str) ""
  if {$this(setting_dot_description)} {
    set this(local_dot_description) $v
-   after 1000 "$objName Update_dot_description [this get_new_mark]"
-  }
- if {[catch {
-   set this(setting_dot_description) 1
-   set s [socket 127.0.0.1 $this(tkdot_port)]
-   fconfigure $s -blocking 0 
-   fileevent  $s readable [list $objName Read_tk_data_from $s]
- 
-   puts $s $v
-   flush $s
-  } err]} {puts "Error in $objName :: set_dot_description\n  - err : $err"
-           set this(setting_dot_description) 0
-          }
+   after 1000 "$objName Update_dot_description [this get_new_mark_for_dot]"
+  } else {
+			 if {[catch {
+			   set this(setting_dot_description) 1
+			   set s [socket 127.0.0.1 $this(tkdot_port)]
+			   fconfigure $s -blocking 0 
+			   fileevent  $s readable [list $objName Read_tk_data_from $s]
+			 
+			   puts $s $v
+			   flush $s
+			  } err]} {puts "Error in $objName :: set_dot_description\n  - err : $err"
+					   set this(setting_dot_description) 0
+					  }
+         }
 }
 
 #_________________________________________________________________________________________________________

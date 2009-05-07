@@ -162,7 +162,10 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
  if {[regexp "^$this(sep)*\\\~(.*)\$" $str reco str]} {
    set this(cmd_daughter) get_$this(sens)
    set str2 " "; append str2 $str; set str $str2
-  } else {set this(cmd_daughter) get_out_$this(sens)}
+  } else {if {[string index $str 0] == " "} {
+            set this(cmd_daughter) get_out_$this(sens)
+		   }
+         }
  
  #puts "DSL_SELECTOR($root); str=\{$str\}; rec($recursive); sens($this(sens))"
  this DSL_CLASS str rep $root $recursive
@@ -182,7 +185,10 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
  if {[regexp "^$this(sep)*\\\~(.*)\$" $str reco str]} {
    set this(cmd_daughter) get_$this(sens)
    set str " $str"
-  } else {set this(cmd_daughter) get_out_$this(sens)}
+  } else {if {[string index $str 0] == " "} {
+            set this(cmd_daughter) get_out_$this(sens)
+           }
+		 }
 
 # Do we have a '>>' ?
  if {[regexp "^$this(sep)*>>$this(sep)*(.*)\$" $str reco str]} {

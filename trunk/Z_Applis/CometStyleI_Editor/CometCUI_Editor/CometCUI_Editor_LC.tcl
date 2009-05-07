@@ -57,10 +57,19 @@ method CometCUI_Editor Enlight_with_CSS {CSS} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometCUI_Editor Enlight {L} {
- $this(CV) Enlight $L
- set root [this get_L_roots] 
- if {[catch {$root Stop_Enlight; $root Enlight $L} err]} {
-   puts "ERROR in \"$objName Enlight_with_CSS {$CSS}\"\n  - err : $err"
+ set L_PMs [list]
+ foreach e $L {
+   if {[lsearch [gmlObject info classes $e] Physical_model] >= 0} {
+     lappend L_PMs $e
+    } else {set L_PMs [concat $L_PMs [CSS++ $e "#$e->PMs"]]}
+  }
+ $this(CV) Enlight $L_PMs
+ 
+ set root [CSS++ $objName "#$objName <--< CometRoot"] 
+ if {$root != ""} {
+	 if {[catch {$root Stop_Enlight; $root Enlight $L_PMs} err]} {
+	   puts "ERROR in \"$objName Enlight {$L_PMs}\"\n  - err : $err"
+	  }
   }
 }
 
@@ -83,7 +92,7 @@ Inject_code CometCUI_Editor set_edited_comet \
 				 }
 			   }
 			  $this(cont)   Sub_daughter_R $this(filter); $this(cont) Add_daughter_R $this(filter); 
-		      $this(filter) Add_daughter_R $v
+		      if {$v != ""} {$this(filter) Add_daughter_R $v}
 			  this Apply_style
 			} \
 			{}
