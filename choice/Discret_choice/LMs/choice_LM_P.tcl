@@ -71,6 +71,7 @@ method choice_LM_P Stop_making_marks_consistents {} {
 
 #___________________________________________________________________________________________________________________________________________
 method choice_LM_P set_currents {Lc} {
+puts "dans method choice_LM_P set_currents {Lc}  \n"
 global debug
  [this get_Common_FC] set_currents $Lc
  if {$debug} {puts "$objName set_currents $Lc"}
