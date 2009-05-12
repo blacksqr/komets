@@ -11,7 +11,7 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic constructor {name desc
    set this(t_ms)	    500
    set class(mark)      0
    set this(L_boutons)  [list go_to_bgn go_to_nxt go_to_prv go_to_end]
-   set this(dir)        {./Comets/Z_Applis/CamNote/SlideRemoteController/PM_Ps/P/HTML}
+   set this(dir)        [Comet_files_root]{./Comets/Z_Applis/CamNote/SlideRemoteController/PM_Ps/P/HTML}
    this read_style_from_file $this(dir)/Skins/skin1.xml
  eval "$objName configure $args"
  return $objName
@@ -45,25 +45,6 @@ Methodes_get_LC CometSlideRemoteController_PM_P_HTML_image_dynamic [L_methodes_g
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-
-#___________________________________________________________________________________________________________________________________________
-method CometSlideRemoteController_PM_P_HTML_image_dynamic Render_JS {strm_name mark {dec {}}} {
- upvar $strm_name strm
- if {$mark != [this get_mark]} {
-   append strm $dec {function RemotControl_cmd(telec, action) } "\{\n"
-   append strm $dec {  document.forms["root"].elements["pipo_button"].value =  telec + "__XXX__" + action ;} "\n"
-   append strm $dec {  document.root.submit();} "\n"
-   append strm $dec " \}\n"
-   append strm $dec "function show(id){\n"
-   append strm $dec "  if(document.getElementById){tabler = document.getElementById(id);tabler.style.display=\"inline\";}}\n"
-   append strm $dec "function hide(id){ \n"
-   append strm $dec "  if(document.getElementById){tabler = document.getElementById(id);tabler.style.display=\"none\";}}\n"
-  }
-
- this set_mark $mark
- this Render_daughters_JS strm $mark $dec
-}
-
 #___________________________________________________________________________________________________________________________________________
 method CometSlideRemoteController_PM_P_HTML_image_dynamic read_style_from_file {f_name} {
  set f [open $f_name]
@@ -95,13 +76,13 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic Render {strm_name {dec
  append strm $dec {  </div>} "\n"
 
  foreach bt $this(L_boutons) {
-	append strm $dec {  <img style="z-index:2; position:absolute; left:} $this($bt,x) {; top:} $this($bt,y) {;" id="} ${objName}_$bt {" src="} $this(dir)/Skins/$this($bt,img) {" onclick="javascript:RemotControl_cmd('} $objName {', 'prim_} $bt {')" onmouseout="hide('} ${objName}_txt_$bt {')" onmouseover="show('} ${objName}_txt_$bt {')" />} "\n"
+	append strm $dec {  <img style="z-index:2; position:absolute; left:} $this($bt,x) {; top:} $this($bt,y) {;" id="} ${objName}_$bt {" name="} ${objName}__XXX__prim_$bt {" src="} $this(dir)/Skins/$this($bt,img) {" onclick="javascript:addOutput(this,true);" onmouseout="hide('} ${objName}_txt_$bt {')" onmouseover="show('} ${objName}_txt_$bt {')" />} "\n"
   }
 
  append strm $dec {  <div style="position:absolute; top:} $this(go_to_slide,y) {; left:} $this(go_to_slide,x) {;" id="} $objName {_div_select">} "\n"
  append strm $dec {  <select id="} ${objName}_select {" name="} $objName {__XXX__prim_set_current" value="[this get_val]">} "\n$dec    "
  for {set i [this get_b_inf]} {$i <= [this get_b_sup]} {incr i [this get_step]} {
-    append strm "<option value=\"$i\" " {onmouseup="javascript:document.root.submit();"}
+    append strm "<option name=\"${objName}__XXX__prim_set_current\" value=\"$i\" " {onmouseup="javascript:addOutput(this,true);"}
 	  if {$i == [this get_val]} {append strm { selected="selected"}}
 	append strm ">$i</option>"
   }

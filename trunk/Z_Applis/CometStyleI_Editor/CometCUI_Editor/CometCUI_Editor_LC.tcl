@@ -104,6 +104,8 @@ Inject_code CometCUI_Editor set_ptf_of_CUI \
 			  this set_edited_comet [this get_edited_comet]
 			} \
 			{}
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList CometCUI_Editor set_ptf_of_CUI end
 
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {set_style_file {v}} 
