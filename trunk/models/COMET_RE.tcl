@@ -17,7 +17,7 @@ proc Generate_PM_setters {classe L_methodes} {
      append cmd { [this get_LM] } prim_$methode_name { $objName}
      foreach param $params {append cmd { $} [lindex $param 0]}
    append cmd "\n\}\n"
-   puts "Eval :\n$cmd";
+   #puts "Eval :\n$cmd";
    eval $cmd
   }
 }
@@ -42,7 +42,7 @@ proc Generate_LM_setters {classe L_methodes} {
      append cmd " set rep \[this Eval_COMET_RE $methode_name\]\n"
      append cmd " if {\[lindex \$rep 1\]} {$call; this set_COMET_RE_state $methode_name {}}\n"
    append cmd "\}\n"
-   puts "Eval :\n$cmd";
+   #puts "Eval :\n$cmd";
    eval $cmd
   }
 }
