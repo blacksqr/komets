@@ -50,8 +50,9 @@ method Activator_PM_P_BIGre_button get_or_create_prims {root} {
 
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_BIGre_button set_text {{t {}}} {
- $this(inner_txt) TEXTE $t
+ $this(inner_txt) TEXTE $t; $this(inner_txt) Calculer_boites
  $this(inner_txt) Optimiser_dimensions
+ $this(inner_txt) Calculer_boites
  
  set box [$this(inner_txt) Boite_noeud_et_fils]
  $this(inner_txt) Origine [expr -[$box BG_X]] [expr -[$box BG_Y]]

@@ -182,12 +182,10 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
 #       }
 #     }
 # Recursion with nesting ?
- set look_for_tild_again 0
- if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set look_for_tild_again 1; set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
- if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set look_for_tild_again 1; set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
- 
- if {$look_for_tild_again} {
-	 if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
+ if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+
+ if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
 	   set this(cmd_daughter) get_$this(sens)
 	   set str " $str"
 	   #puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
@@ -196,7 +194,6 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
 				#puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
 			   }
 			 }
-  }
   
   
 # Do we have a '>>' ?
@@ -260,7 +257,10 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
    foreach c [$r $this(cmd_daughter)] {
      set str_tmp $str
      set tmp     {}
-     this DSL_SELECTOR str_tmp tmp $c $rec
+	 #puts "plus loin avec DSL_SELECTOR:\"$str_tmp\""
+       set cmd_daughter_SVG $this(cmd_daughter)
+	   this DSL_SELECTOR str_tmp tmp $c $rec
+	   set this(cmd_daughter) $cmd_daughter_SVG
      if {[string length $tmp]>0} {set str_rep $str_tmp}
      set new_rep [Liste_Union $new_rep $tmp]
     }}
