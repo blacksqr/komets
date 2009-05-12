@@ -159,11 +159,14 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
  
  if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
  if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
- if {[regexp "^$this(sep)*\\\~(.*)\$" $str reco str]} {
+ #puts "DSL_SELECTOR on $root : \"$str\""
+ if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
    set this(cmd_daughter) get_$this(sens)
    set str2 " "; append str2 $str; set str $str2
+   #puts "  1 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
   } else {if {[string index $str 0] == " "} {
             set this(cmd_daughter) get_out_$this(sens)
+			#puts "  1 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
 		   }
          }
  
@@ -179,17 +182,23 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
 #       }
 #     }
 # Recursion with nesting ?
- if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
- if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+ set look_for_tild_again 0
+ if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set look_for_tild_again 1; set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set look_for_tild_again 1; set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
  
- if {[regexp "^$this(sep)*\\\~(.*)\$" $str reco str]} {
-   set this(cmd_daughter) get_$this(sens)
-   set str " $str"
-  } else {if {[string index $str 0] == " "} {
-            set this(cmd_daughter) get_out_$this(sens)
-           }
-		 }
-
+ if {$look_for_tild_again} {
+	 if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
+	   set this(cmd_daughter) get_$this(sens)
+	   set str " $str"
+	   #puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
+	  } else {if {[string index $str 0] == " "} {
+				set this(cmd_daughter) get_out_$this(sens)
+				#puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
+			   }
+			 }
+  }
+  
+  
 # Do we have a '>>' ?
  if {[regexp "^$this(sep)*>>$this(sep)*(.*)\$" $str reco str]} {
    set L_rep_>> {}

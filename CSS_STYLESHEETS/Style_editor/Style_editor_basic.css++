@@ -1,4 +1,4 @@
-#$current(TOP.INTERLEAVING[soft_type ~= BIGre]) {
+#$current(ROOT[soft_type ~= BIGre] , TOP.INTERLEAVING[soft_type ~= BIGre]) {
   FCT_Eval : [$obj get_root_for_daughters] Position_des_fils_changeable 1;
 }
 
@@ -19,3 +19,4 @@
   FCT_set_mode_GDD_active : 0;
   FCT_Raise : top;
 }
+
