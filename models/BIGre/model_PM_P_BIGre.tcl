@@ -78,6 +78,35 @@ method PM_BIGre set_method_placement {m} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_BIGre On_wheel_down {cmd} {
+ puts "$objName On_wheel_down {$cmd}"
+ if {![info exists this(rap_on_wheel_down)]} {
+   set this(rap_on_wheel_down) [B_rappel [Interp_TCL]]
+   [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_wheel_down) Rappel] [ALX_pointeur_enfonce]
+  }
+ $this(rap_on_wheel_down) Texte [list $objName Is_a_pointer_press $this(rap_on_wheel_down) 4 $cmd]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre On_wheel_up {cmd} {
+ puts "$objName On_wheel_up {$cmd}"
+ if {![info exists this(rap_on_wheel_up)]} {
+   set this(rap_on_wheel_up) [B_rappel [Interp_TCL]]
+   [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_wheel_up) Rappel] [ALX_pointeur_enfonce]
+  }
+ $this(rap_on_wheel_up) Texte [list $objName Is_a_pointer_press $this(rap_on_wheel_up) 8 $cmd]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre Is_a_pointer_press {rap appuie cmd} {
+ set infos [Void_vers_info [$rap Param]]
+ set ptr   [$infos Ptr]
+ if {[$ptr Appuie] & $appuie} {
+   eval $cmd
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_BIGre get_rap_one_pointer_Enter  {} {return $this(rap_on_enter)}
 method PM_BIGre get_rap_all_pointers_Leave {} {return $this(rap_on_leave)}
 
