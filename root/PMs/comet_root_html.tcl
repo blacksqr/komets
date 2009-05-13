@@ -265,11 +265,11 @@ method PhysicalHTML_root Read_from_PHP {chan} {
 				  if {$recept >= $this(msg_attended_length)} {
 				    set original_msg $this(msg)
 					if {[catch {$objName Analyse_message $chan this(msg)} err]} {
+					  puts $err					  
 					  #
 					  #set rep ""; this Render_all rep
 					  set err_txt "ERROR in COMETs:<br/>message was :<br/>$original_msg<br/>ERROR was<br/>$err"
 	                  puts $chan $err_txt
-					  puts $err_txt
 					 }
 					set this(msg_attended_length) -1
 					set this(msg)                 ""
@@ -303,6 +303,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
  set prev 0
  set t [string length $txt]
  while {$pos < $t-1} {
+ 
   # Variable
   set next [string first { } $txt $pos]; if {$next <= $pos} {puts "POST foireux, trop d'espaces..."; break}
      set t_var [string range $txt $pos [expr $next-1]]
@@ -576,7 +577,7 @@ method PhysicalHTML_root Verif_L_sub_exist_version {vencours} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
- if {[info exists $obj]} {
+ if {[gmlObject info exists object $obj]} {
    set L [CSS++ $objName "#$obj, #$obj <--< *"]
   } else {set L [list $obj]}
   
@@ -597,7 +598,7 @@ method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
- if {[info exists $obj]} {
+ if {[gmlObject info exists object $obj]} {
    set L [CSS++ $objName "#$obj, #$obj <--< *"]
   } else {set L [list $obj]}
  
@@ -611,7 +612,7 @@ method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
 }
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Clear_L_PM_really_sub_add {obj} {
- if {[info exists $obj]} {
+ if {[gmlObject info exists object $obj]} {
    set daughts [CSS++ $obj "#$obj *"]
   } else {set daughts [list $obj]}
   
@@ -635,7 +636,7 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  set this(L_PM_really_add) [list]
  set listcmd               [list]
  
- for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} { 
+ for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} {
  
 	set objN [lindex $this(concat_send,$ver) 0]
 	set met  [lindex $this(concat_send,$ver) 1]
@@ -678,25 +679,27 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
 }
 
 #_________________________________________________________________________________________________________
-method PhysicalHTML_root Add_JS {e} { 
- set objNameMother [lindex [$e get_mothers] 0]
+method PhysicalHTML_root Add_JS {e} {
+ if {[gmlObject info exists object $e]} {
+	 set objNameMother [lindex [$e get_mothers] 0]
 
- set pos       [lsearch [$objNameMother get_daughters] $e]
- set tailletot [llength [$objNameMother get_daughters]]
+	 set pos       [lsearch [$objNameMother get_daughters] $e]
+	 set tailletot [llength [$objNameMother get_daughters]]
+	  
+	 set strm {}; $e Render strm
+	 set strm [$e Encode_param_for_JS $strm]
+	 
+	 if { $tailletot-1 > $pos} {
+		set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
+		set cmd "\$($strm).insertBefore('#$objAfter');"
+	  } else {
+			  set cmd "\$($strm).appendTo('#$objNameMother');"
+			 }
+
+	 set this(marker) [clock clicks]
+	 $e Render_JS cmd $this(marker)
+  } else {set cmd [this Sub_JS $e]}
   
- set strm {}; $e Render strm
- set strm [$e Encode_param_for_JS $strm]
- 
- if { $tailletot-1 > $pos} {
-	set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
-	set cmd "\$($strm).insertBefore('#$objAfter');"
-  } else {
-	      set cmd "\$($strm).appendTo('#$objNameMother');"
-         }
-
- set this(marker) [clock clicks]
- $e Render_JS cmd $this(marker)
- 
  return $cmd
 }
 
