@@ -16,8 +16,8 @@ method CometCamNote_PM_U constructor {name descr args} {
 }
 #___________________________________________________________________________________________________________________________________________
 method CometCamNote_PM_U dispose {} {
- if {[string equal $this(internal_log) {}]} {
-   $this(internal_log) dispose
+ if {$this(internal_log) != ""} {
+   catch "$this(internal_log) dispose"
   }
  this inherited
 }
@@ -34,22 +34,24 @@ method CometCamNote_PM_U Sub_Examinator {n p id} {this maj_users}
 
 #___________________________________________________________________________________________________________________________________________
 method CometCamNote_PM_U maj_users {} {
- if {[string equal $this(internal_log) {}]} {} else {
+ if {$this(internal_log) != ""} {
    $this(internal_log) set_L_valid_id_pass [[this get_Common_FC] get_L_valid_id_pass]
   }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometCamNote_PM_U set_LM {LM} {
- if {[string equal [this get_LM] {}]} {
+ if {$LM != ""} {
    this inherited $LM
    set this(internal_log) ${objName}_C_log
    if {![gmlObject info exists object $this(internal_log)]} {
-     CometLog $this(internal_log) "Log to [this get_LC]" {}
+     set this(cont) [CPool get_a_comet CometContainer]
+	 CometLog $this(internal_log) "Log to [this get_LC]" {}
+	 $this(cont) Add_daughter_R $this(internal_log)
 	}
-   set L $this(internal_log)_LM_LP
+   set L $this(cont)_LM_LP
    this set_L_nested_handle_LM    $L
-   #this set_L_nested_daughters_LM $L
+   this set_L_nested_daughters_LM $L
   } else {this inherited $LM}
 }
 
@@ -65,25 +67,13 @@ method CometCamNote_PM_U Add_mother {m {index -1}} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometCamNote_PM_U Branch_to_user {u} {
- puts "$objName Branch_to_user \"$u\""
-
- if {0==1 && [Ptf_HTML Accept_for_daughter [this get_cou]_ptf]} {
-   set m_c_u [[this get_LC] get_root_for_user $u]
-   set r_HTML  [this get_L_roots]
-   set nr_HTML [[this get_DSL_CSSpp] Interprets "${m_c_u}->PMs.PM_HTML" $m_c_u]
-   $r_HTML set_next_root $nr_HTML
-   puts "$r_HTML set_next_root \"$nr_HTML\" ()=> [$r_HTML get_next_root]"
-  } else {this set_mode_plug Empty; this set_daughters {};
-          this set_L_nested_handle_LM    [[this get_Common_FC] get_user_comet_from_id $u]_LM_LP
-          this set_L_nested_daughters_LM {}
-          this set_handle_composing_comet {}
-          #this set_L_handle_composing_daughters {}
-          this set_composing_comets {}
-          #XXXthis set_L_nested_daughters_LM [[this get_Common_FC] get_user_comet_from_id $u]_LM_LP
-          #puts "  [this get_LM] Connect_PM_descendants $objName \{$this(L_nested_handle_LM)\}\n  daughters : \{[this get_daughters]\}"
-          [this get_LM] Connect_PM_descendants $objName $this(L_nested_handle_LM)
-		  this set_mode_plug Full
-         }
+ puts "______________$objName Branch_to_user \"$u\""
+ if {$u == ""} {return}
+ set CU [[this get_Common_FC] get_user_comet_from_id $u]
+ if {$CU == ""} {return}
+ puts "$this(cont) Add_daughters_R $CU"
+ $this(cont) Add_daughters_R $CU
+ puts "______________________________"
 
 if {![string equal [${objName}_cou_ptf get_soft_type] BIGre]} {return}
 # Cas d'un PM BIGre, appliquer des styles prédéfinis
