@@ -30,7 +30,6 @@ method DChoice_PM_P_Menu_FLEX set_currents {e} {
  puts "$cmd \n"
  if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
     $root send_to_FLEX $cmd
-	puts "message envoyé ! \n"
  }
 }
 #___________________________________________________________________________________________________________________________________________
@@ -49,7 +48,7 @@ method DChoice_PM_P_Menu_FLEX Render {strm_name {dec {}}} {
  append strm $dec " ${objName}.addEventListener(ListEvent.CHANGE,listValueChanged_${objName}); \n"
  append strm $dec " function listValueChanged_${objName}(${objName}_event:ListEvent):void{ \n"
  append strm $dec " 	var ${objName}_index:int = ${objName}.selectedIndex; \n"
- append strm $dec "		FLEX_to_TCL(\"$objName\", \"prim_set_currents\", \"${objName}_index\") } \n"
+ append strm $dec "		FLEX_to_TCL(\"$objName\", \"prim_set_currents_index\", String(${objName}_index)) } \n"
  append strm $dec " Dyna_context.$objName = $objName; \n"
  
  this set_prim_handle        $objName
@@ -57,12 +56,11 @@ method DChoice_PM_P_Menu_FLEX Render {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method DChoice_PM_P_Menu_FLEX prim_set_currents {c} {
-puts "method DChoice_PM_P_Menu_FLEX prim_set_currents \n"
- puts "$c \n"
- if {[string equal [this get_currents] $c]} {return}
+method DChoice_PM_P_Menu_FLEX prim_set_currents_index {i} {
+ puts "$objName prim_set_currents_index $i"
  # L'ERREUR VIENT D'ICI
- [this get_LM] set_currents $c
-
+ set LC [this get_LC]
+ set C [lindex [$LC get_out_daughters] $i]
+ if {$C != ""} {$LC set_currents $C}
 }
 

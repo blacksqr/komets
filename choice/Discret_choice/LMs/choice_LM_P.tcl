@@ -76,7 +76,9 @@ global debug
  [this get_Common_FC] set_currents $Lc
  if {$debug} {puts "$objName set_currents $Lc"}
  this Make_marks_consistents
+ # ICI la méthode set_currents pour le PM_FLEX bogue
  foreach PM $this(L_actives_PM) {$PM set_currents $Lc}
+
 }
 #___________________________________________________________________________________________________________________________________________
 method choice_LM_P set_PM_active {PM} {
