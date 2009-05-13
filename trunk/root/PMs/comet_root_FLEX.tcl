@@ -154,7 +154,7 @@ method Comet_root_PM_P_FLEX Analyse_message {str_name} {
 	 set pos [expr $pos+$size+1]
     }
    if {[catch {$var $mtd $val} err]} {
-     puts "Error d'évaluation de la commande:\n  - var $var\n  - mtd $mtd\n  - val $val"
+     puts "Error d'évaluation de la commande:\n  - var $var\n  - mtd $mtd\n  - val $val \n  - err : $err"
     }
   }
   
