@@ -9,6 +9,7 @@ inherit Specifyer_PM_P_Entry_HTML PM_HTML
 method Specifyer_PM_P_Entry_HTML constructor {name descr args} {
  this inherited $name $descr
    set this(show) 1
+   set this(prim_text) ""
  eval "$objName configure $args"
  return $objName
 }
@@ -22,7 +23,7 @@ method Specifyer_PM_P_Entry_HTML maj_choices {} {}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC Specifyer_PM_P_Entry_HTML $L_methodes_set_Specifyer {$this(FC)} {}
+Methodes_set_LC Specifyer_PM_P_Entry_HTML $L_methodes_set_Specifyer {} {}
 Methodes_get_LC Specifyer_PM_P_Entry_HTML $L_methodes_get_Specifyer {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
@@ -30,15 +31,17 @@ Generate_PM_setters Specifyer_PM_P_Entry_HTML [P_L_methodes_set_specifyer_COMET_
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_Entry_HTML set_text {v} {
- set root    [this get_L_roots] 
- set methode "val"
+ if {$this(prim_text) != $v} { 
+	 set root    [this get_L_roots] 
+	 set methode "val"
 
- set param [this Encode_param_for_JS $v]
- set cmd   "\$('#$objName').val($param);"
+	 set param [this Encode_param_for_JS $v]
+	 set cmd   "\$('#$objName').val($param);"
 
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
+	 if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+		$root Concat_update $objName $methode $cmd
+	 }
+  }
 }
 
 #___________________________________________________________________________________________________________________________________________
