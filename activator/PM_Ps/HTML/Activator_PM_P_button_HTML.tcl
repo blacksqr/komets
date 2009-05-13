@@ -60,7 +60,7 @@ method Activator_PM_P_button_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
  append strm $dec <span [this Style_class]> "\n"
-	append strm $dec <img { src="src_img/load.gif" id="} ${objName}_button_img {" style="position:absolute; visibility:hidden;" />} "\n"
+	append strm $dec <img { src="Comets/activator/PM_Ps/HTML/load.gif" id="} ${objName}_button_img {" style="position:absolute; visibility:hidden;" />} "\n"
 	append strm $dec <input { id="} ${objName}_button {" type="button" value="} [this get_text] {" name="} ${objName}__XXX__Trigger_prim_activate {" onclick="javascript:$('#} $objName {_button').attr('disabled','disabled');$('#} $objName {_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />} "\n"
 	this Render_daughters strm "$dec  "
  append strm $dec </span> "\n"
