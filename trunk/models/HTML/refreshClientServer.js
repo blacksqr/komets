@@ -17,7 +17,7 @@ $(document).ready(function() {
 		alert("Votre navigateur ne gère pas le java");
 	}
 
-	setInterval('refreshClientServer()',2000);		
+	setInterval('refreshClientServer()',10000);		
 });
 
 function addOutput(obj,forcing) {
@@ -35,6 +35,7 @@ function refreshClientServer() {
 	if(mutex == false) {
 		//$("#p_debug").append("INSIDE --- ");
 		mutex = true;
+		forcing_send = false;
 		var do_update = false;
 		
 		// On enregistre la version du client et de son ip
@@ -46,41 +47,50 @@ function refreshClientServer() {
 			url: "index.php",
 			data: outputVer,
 			success: function(msg){
-				if(msg) {					
+				if(msg) {
 					try { 
 						eval(msg);
 					}
 					catch(err) {
-						//alert(err);
+						alert(err);
 					}
 					do_update = true;
-				}
+					output = {};
+					i = 0;
+					mutex = false;
+				} else if(i >= 1) {output['Comet_port'] = $("#Comet_port").val();
+								   output[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
+						           $.ajax({
+										type: "POST",
+										url: "index.php",
+										data: output,
+										success : function(msg) {output = {};
+																 i = 0;
+																 if(msg) {try {eval(msg);
+																	          } catch(err) { alert(err);
+																						   }
+																		 }
+																 mutex = false;
+																},
+										error: function(msg) {mutex = false;
+										                      alert("Problème d'envoi des mises à jour client\n\n" + msg);
+															 }
+									});
+				                 }
 		    },
 			error: function(err){
-				alert("Problème de réception des mises à jour serveur\n\n"+err);				
+			    mutex = false;
+				alert("Problème de réception des mises à jour serveur\n\n"+err);
 			}
 		});
 		
 		// Envoi de la version client si la il n'y a pas eu de modification du coté serveur
-		if(do_update == false && i >= 1) {
-			output['Comet_port'] = $("#Comet_port").val();
-			
-			$.ajax({
-				type: "POST",
-				url: "index.php",
-				data: output,
-				error: function(msg){
-					alert("Problème d'envoi des mises à jour client\n\n"+err);
-				}
-			});			
-		}
 		
 		// Réinitialisation des paramètres (modification du client non pris en compte si il y a une mise à jour serveur)
-		output = {};
-		i = 0;
 		do_update = false;
-		mutex = false;	
-		if(forcing_send) { forcing_send = false; refreshClientServer(); }
-	}
+			
+		
+	} else {//if(forcing_send) { forcing_send = false; refreshClientServer(); }
+	       }
    //$("#p_debug").append("END<br/>");
 }

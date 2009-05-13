@@ -294,7 +294,7 @@ proc pipo_button {c} {
 method PhysicalHTML_root Analyse_message {chan txt_name} {
  upvar $txt_name txt
 
- #puts "  Annalyse : $txt"
+ puts "  Annalyse :\n$txt"
  set t [clock clicks -millisecond]; set t0 $t
  set L_post_cmd {}
  set L_cmd      {}
@@ -711,6 +711,8 @@ method PhysicalHTML_root Sub_JS {e} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Is_update {clientversion} {
+ puts "Is_update $clientversion"
+ 
  set this(update_send) 1
  set this(update_cmd) ""
  
