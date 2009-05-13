@@ -17,7 +17,7 @@ $(document).ready(function() {
 		alert("Votre navigateur ne gère pas le java");
 	}
 
-	setInterval('refreshClientServer()',10000);		
+	setInterval('refreshClientServer()',2000);		
 });
 
 function addOutput(obj,forcing) {
