@@ -38,10 +38,7 @@ method Activator_PM_P_hyperlink_HTML Trigger_prim_activate {args} {
  set cmd ""
  foreach {var val} [this get_Params] {append cmd " " $var " $val"}
  this prim_activate $cmd
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_hyperlink_HTML activate {args} {
+ 
  set root    [this get_L_roots] 
  set methode "val"
  set cmd    "\$('#${objName}_hyperlink').removeAttr('disabled');\n"
@@ -51,6 +48,9 @@ method Activator_PM_P_hyperlink_HTML activate {args} {
 	$root Concat_update $objName $methode $cmd
  }
 }
+
+#___________________________________________________________________________________________________________________________________________
+method Activator_PM_P_hyperlink_HTML activate {args} {}
 
 #___________________________________________________________________________________________________________________________________________
 Manage_CallbackList Activator_PM_P_hyperlink_HTML Trigger_prim_activate begin

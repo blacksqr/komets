@@ -193,6 +193,13 @@ method PM_HTML Do_in_root {cmd} {
 }
 
 #_________________________________________________________________________________________________________
+method PM_HTML Sub_daughter {e} {
+ set rep [this inherited $e]
+   this Do_in_root "Add_L_PM_to_sub $e"
+ return $rep
+}
+
+#_________________________________________________________________________________________________________
 method PM_HTML Add_daughter {e {index -1}} {
  set rep [this inherited $e $index]
    this Do_in_root "Add_L_PM_to_add $e"
