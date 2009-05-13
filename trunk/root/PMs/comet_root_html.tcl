@@ -87,10 +87,10 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/ajax.js\"></script>\n"
  append strm $dec {<script language="JavaScript" type="text/javascript" src="./src_js/dynamiclayout.js"></script>} "\n"
  
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/jquery/jquery-1.3.2.min.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/refreshClientServer.js\"></script>\n"
- append strm $dec "<link type=\"text/css\" href=\"./src_js/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-1.3.2.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
+ append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
  append strm $dec "<!--\n"
