@@ -76,7 +76,7 @@ function refreshClientServer() {
 										                      alert("Problème d'envoi des mises à jour client\n\n" + msg);
 															 }
 									});
-				                 }
+				                 } else {mutex = false;}
 		    },
 			error: function(err){
 			    mutex = false;
