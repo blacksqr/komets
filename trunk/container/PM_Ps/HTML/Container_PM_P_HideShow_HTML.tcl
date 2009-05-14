@@ -7,12 +7,13 @@ method Container_PM_P_HideShow_HTML constructor {name descr args} {
  this inherited $name $descr
  set this(header_place) "top"
  set this(title)        "&nbsp;"
+ set this(drag)         0
    this set_GDD_id Container_Maskable_HTML
  eval "$objName configure $args"
  return $objName
 }
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Container_PM_P_HideShow_HTML [list header_place title]
+Generate_accessors Container_PM_P_HideShow_HTML [list header_place title drag]
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HideShow_HTML set_header_place {hp} {
@@ -57,6 +58,20 @@ method Container_PM_P_HideShow_HTML set_title {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HideShow_HTML set_drag {v} {
+ set this(drag) $v
+ 
+ set root         [this get_L_roots]
+ set methode      "drag"
+ if {$v == 1} { set cmd          "\$(\"#${objName}\").draggable({handle : '#${objName}_header'});"
+ } else { set cmd          "\$(\"#${objName}\").draggable('destroy');" }
+ 
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
 
@@ -65,8 +80,6 @@ method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
  ### jquery pour tous les containers
  if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"
 	} else { set ouvert "n"; set ferme "s" }
- 
-
  
  append strm $dec "     \$(\"#${objName}\").addClass(\"ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\")" "\n"
  append strm $dec "	            .find(\"#${objName}_header\")" "\n"
