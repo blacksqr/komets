@@ -6,6 +6,7 @@ method DChoice_PM_P_Menu_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Choice_DropDown_HTML
    this set_nb_max_daughters 0
+   set this(old_currents) ""
  eval "$objName configure $args"
  return $objName
 }
@@ -20,10 +21,8 @@ method DChoice_PM_P_Menu_HTML set_currents {v} {
 
  if {![info exists this(old_currents)]} {set this(old_currents) [this get_currents]}
  
- if {$v != $this(old_currents)} {
-   if {$v} {
-     set cmd "\$('#$objName').attr('selected', 'selected');"
-    } else {set cmd "\$('#$objName').removeAttr('selected');"}
+ if {$v != $this(old_currents) && $v != ""} {
+   set cmd "\$('#$v').attr('selected', 'selected');"
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
      $root Concat_update $objName $methode $cmd
@@ -49,7 +48,7 @@ method DChoice_PM_P_Menu_HTML Render_daughters {strm_name {dec {}}} {
 
  set LC [this get_LC]
  foreach c [$LC get_daughters] {
-   append rep $dec {<option  value="} $c {"}
+   append rep $dec {<option  value="} $c {" id="} $c {"}
      if {[lsearch [this get_currents] $c] != -1} {append rep  { selected="selected" }}
    append rep {>} [$c get_name]
   append rep { </option>} "\n"
