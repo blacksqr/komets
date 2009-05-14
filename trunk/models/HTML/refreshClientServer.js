@@ -1,5 +1,7 @@
 var output = {};
 var outputVer = {};
+var outputForcingName = "";
+var outputForcingValue = "";
 var i = 0;	
 var mutex = false;
 var forcing_send = false;
@@ -26,6 +28,8 @@ function addOutput(obj,forcing) {
 	i++;
 	if(forcing) { 
 		forcing_send = forcing;
+		outputForcingName = obj.name;
+		outputForcingValue = obj.value;
 		refreshClientServer(); 
 	}
 }
@@ -35,8 +39,6 @@ function refreshClientServer() {
 	if(mutex == false) {
 		//$("#p_debug").append("INSIDE --- ");
 		mutex = true;
-		forcing_send = false;
-		var do_update = false;
 		
 		// On enregistre la version du client et de son ip
 		outputVer[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
@@ -54,12 +56,12 @@ function refreshClientServer() {
 					catch(err) {
 						alert(err);
 					}
-					do_update = true;
 					output = {};
 					i = 0;
 					mutex = false;
 				} else if(i >= 1) {output['Comet_port'] = $("#Comet_port").val();
 								   output[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
+								   if(forcing_send) {forcing_send = false;}
 						           $.ajax({
 										type: "POST",
 										url: "index.php",
@@ -71,25 +73,31 @@ function refreshClientServer() {
 																						   }
 																		 }
 																 mutex = false;
+																 if(forcing_send) {forcing_send = false;
+																				   output[outputForcingName] = outputForcingValue; 
+																				   outputForcingName = "";
+																				   outputForcingValue = "";
+																				   refreshClientServer();
+																				  }
 																},
 										error: function(msg) {mutex = false;
 										                      alert("Problème d'envoi des mises à jour client\n\n" + msg);
 															 }
 									});
-				                 } else {mutex = false;}
+				                 } else {mutex = false;
+										 if(forcing_send) {forcing_send = false;
+														   output[outputForcingName] = outputForcingValue;
+														   outputForcingName = "";
+														   outputForcingValue = "";
+														   refreshClientServer();
+														  }
+										}
 		    },
 			error: function(err){
 			    mutex = false;
 				alert("Problème de réception des mises à jour serveur\n\n"+err);
 			}
 		});
-		
-		// Envoi de la version client si la il n'y a pas eu de modification du coté serveur
-		
-		// Réinitialisation des paramètres (modification du client non pris en compte si il y a une mise à jour serveur)
-		do_update = false;
-			
-		
 	} else {//if(forcing_send) { forcing_send = false; refreshClientServer(); }
 	       }
    //$("#p_debug").append("END<br/>");

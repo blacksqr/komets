@@ -9,7 +9,7 @@ method ChoiceN_PM_P_menu_HTML constructor {name descr args} {
  eval "$objName configure $args"
 }
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC ChoiceN_PM_P_menu_HTML $L_methodes_set_choicesN {$this(FC)} {}
+Methodes_set_LC ChoiceN_PM_P_menu_HTML $L_methodes_set_choicesN {}         {}
 Methodes_get_LC ChoiceN_PM_P_menu_HTML $L_methodes_get_choicesN {$this(FC)}
 #___________________________________________________________________________________________________________________________________________
 method ChoiceN_PM_P_menu_HTML Render {strm_name {dec {}}} {
