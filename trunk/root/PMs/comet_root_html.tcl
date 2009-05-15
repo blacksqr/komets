@@ -77,15 +77,6 @@ method PhysicalHTML_root CB_plug_under_new_roots {r} {}
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/xml2dom_1.0.0.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/core.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/events.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/css.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/coordinates.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/drag.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/dragsort.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/ajax.js\"></script>\n"
- append strm $dec {<script language="JavaScript" type="text/javascript" src="./src_js/dynamiclayout.js"></script>} "\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-1.3.2.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
@@ -94,19 +85,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
- append strm $dec "<!--\n"
- append strm $dec "  FuncOL = new Array();\n"
- append strm $dec "  function StkFunc(Obj) \{\n"
- append strm $dec "    FuncOL\[FuncOL.length\] = Obj;\n"
- append strm $dec "  \}\n"
- append strm $dec "  window.onload = function() \{\n"
- append strm $dec "    for(i=0 ; i<FuncOL.length ; i++) \{\n"
- append strm $dec "      FuncOL\[i\]();\n"
- append strm $dec "    \}\n"
- append strm $dec "  \}\n"
- 
    this Render_daughters_JS strm $mark $dec
- append strm $dec "-->\n"
  append strm $dec "</script>\n"
 }
 #___________________________________________________________________________________________________________________________________________
