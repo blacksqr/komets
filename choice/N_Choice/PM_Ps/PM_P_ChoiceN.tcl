@@ -10,16 +10,11 @@ method PM_P_ChoiceN_TK constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 #______________________________________________________ Adding the choices functions _______________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method PM_P_ChoiceN_TK prim_set_val {v} {
-# puts "____$objName PM_P_ChoiceN_TK::prim_set_val $v"
- [this get_Common_FC] set_val $v
-# INSERT CALLBACKS HERE
- [this get_LC] set_val $v
-}
-Manage_CallbackList PM_P_ChoiceN_TK [list prim_set_val] INSERT
+Generate_PM_setters PM_P_ChoiceN_TK [P_L_methodes_PM_set_ChoiceN_COMET_RE]
+Manage_CallbackList PM_P_ChoiceN_TK [list prim_set_val] end
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC PM_P_ChoiceN_TK $L_methodes_set_choicesN {$this(FC)} {}
+Methodes_set_LC PM_P_ChoiceN_TK $L_methodes_set_choicesN {} {}
 Methodes_get_LC PM_P_ChoiceN_TK $L_methodes_get_choicesN {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
@@ -35,13 +30,8 @@ method PM_P_ChoiceN_HTML constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_P_ChoiceN_HTML prim_set_val {v} {
-# puts "____$objName PM_P_ChoiceN_HTML::prim_set_val $v"
- [this get_Common_FC] set_val $v
-# INSERT CALLBACKS HERE
- [this get_LC] set_val $v
-}
-Manage_CallbackList PM_P_ChoiceN_HTML [list prim_set_val] INSERT
+Generate_PM_setters PM_P_ChoiceN_HTML [P_L_methodes_PM_set_ChoiceN_COMET_RE]
+Manage_CallbackList PM_P_ChoiceN_HTML [list prim_set_val] end
 
 #___________________________________________________________________________________________________________________________________________
 #______________________________________________________ Adding the choices functions _______________________________________________________
@@ -62,12 +52,7 @@ method PM_P_ChoiceN_BIGre constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_P_ChoiceN_BIGre prim_set_val {v} {
- #puts "____$objName PM_P_ChoiceN_BIGre::prim_set_val $v"
- [this get_Common_FC] set_val $v
-# INSERT CALLBACKS HERE
- [this get_LC] set_val $v
-}
+Generate_PM_setters PM_P_ChoiceN_BIGre [P_L_methodes_PM_set_ChoiceN_COMET_RE]
 Manage_CallbackList PM_P_ChoiceN_BIGre [list prim_set_val] INSERT
 
 #___________________________________________________________________________________________________________________________________________
