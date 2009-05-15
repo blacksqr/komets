@@ -59,7 +59,7 @@ method CometSWL_Planet_PM_P_B207_basic dispose {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometSWL_Planet_PM_P_B207_basic [P_L_methodes_set_CometSWL_Planet] {} {$this(L_actives_PM)}
+Methodes_set_LC CometSWL_Planet_PM_P_B207_basic [P_L_methodes_set_CometSWL_Planet] {} {}
 Methodes_get_LC CometSWL_Planet_PM_P_B207_basic [P_L_methodes_get_CometSWL_Planet] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
