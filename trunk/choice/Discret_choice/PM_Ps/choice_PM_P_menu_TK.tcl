@@ -40,6 +40,10 @@ method PM_P_menu_TK get_or_create_prims {root} {
    $options_name configure -textvariable $this(var_txt_menu)
   }
 
+# defining primitives
+ this Add_MetaData PRIM_STYLE_CLASS [list $options_name "PARAM RESULT OUT IN"]
+
+
 # Bindings
 # set L [list $label_name $options_name]
  set L [list $options_name]
@@ -48,6 +52,7 @@ method PM_P_menu_TK get_or_create_prims {root} {
  
 # this set_currents [$common_FC get_currents]
  this maj_choices
+ 
 
  return [this set_prim_handle $L]
 }
