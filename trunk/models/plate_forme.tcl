@@ -4,6 +4,7 @@
 method PTF constructor {{hard_type *} {soft_type *} {OS_type *} {min_mem 0} {HCI_type gfx}} {
  set this(hard_type) $hard_type
  set this(soft_type) $soft_type
+ set this(daughter_soft_type) $soft_type
  set this(OS_type)   $OS_type
  set this(min_mem)   $min_mem
  set this(HCI_type)  $HCI_type
@@ -15,9 +16,10 @@ method PTF constructor {{hard_type *} {soft_type *} {OS_type *} {min_mem 0} {HCI
 method PTF maj {ptf} {
  this set_hard_type [$ptf get_hard_type]
  this set_soft_type [$ptf get_soft_type]
+ this set_daughter_soft_type [$ptf get_daughter_soft_type]
  this set_OS_type   [$ptf get_OS_type]
  this set_min_mem   [$ptf get_min_mem]
- this set_HCI_type  [$ptf get_HCI_type]
+ this set_HCI_type  [$ptf get_HCI_type] 
 }
 
 #_____________________________________________________________________________________________
@@ -35,6 +37,9 @@ method PTF set_OS_type {t} {set this(OS_type) $t}
 #_____________________________________________________________________________________________
 method PTF get_min_mem {}  {return $this(min_mem)}
 method PTF set_min_mem {t} {set this(min_mem) $t}
+#_____________________________________________________________________________________________
+method PTF get_daughter_soft_type {}  {return $this(daughter_soft_type)}
+method PTF set_daughter_soft_type {t} {set this(daughter_soft_type) $t}
 
 #_____________________________________________________________________________________________
 method PTF Accept_for_daughter {ptf} {
@@ -44,8 +49,8 @@ method PTF Accept_for_daughter {ptf} {
     ||[string equal *                [$ptf get_hard_type]] \
     ||[string equal $this(hard_type) *]} {} else {return 0}
  # Conditions on the software
- if { [string equal $this(soft_type) [$ptf get_soft_type]] \
-    ||[string equal $this(soft_type) *]} {} else {if {[string equal [$ptf get_soft_type] *]} {} else {return 0}}
+ if { [string equal $this(daughter_soft_type) [$ptf get_soft_type]] \
+    ||[string equal $this(daughter_soft_type) *]} {} else {if {[string equal [$ptf get_soft_type] *]} {} else {return 0}}
  if { [string equal $this(OS_type) [$ptf get_OS_type]] \
     ||[string equal $this(OS_type) *]}   {} else {if {[string equal [$ptf get_OS_type] *]}   {} else {return 0}}
 
@@ -61,14 +66,19 @@ if {[info exists PTF_defined]} {} else {
   PTF Ptf_BIGre   PC BIGre    WinXP 0 gfx
   PTF Ptf_ALX_TXT *  TCL_TK_ALX_TXT  *     0  vocal
   PTF Ptf_FLEX    *  FLEX     *     0 gfx
+  PTF Ptf_SVG     *  SVG      *     0 gfx
+  PTF Ptf_HTML_to_SVG     *  HTML      *     0 gfx  ; 
+    Ptf_HTML_to_SVG set_daughter_soft_type SVG
  } 
 
-set Tab_PTF(*)              Ptf_ALL
-set Tab_PTF(TCL_TK)         Ptf_TK
-set Tab_PTF(PHP_HTML)       Ptf_HTML
-set Tab_PTF(BIGre)          Ptf_BIGre
-set Tab_PTF(TCL_TK_ALX_TXT) Ptf_ALX_TXT
-set Tab_PTF(FLEX)           Ptf_FLEX
+set Tab_PTF(*)               Ptf_ALL
+set Tab_PTF(TCL_TK)          Ptf_TK
+set Tab_PTF(PHP_HTML)        Ptf_HTML
+set Tab_PTF(BIGre)           Ptf_BIGre
+set Tab_PTF(TCL_TK_ALX_TXT)  Ptf_ALX_TXT
+set Tab_PTF(FLEX)            Ptf_FLEX
+set Tab_PTF(SVG)             Ptf_SVG
+set Tab_PTF(HTML_to_SVG)     Ptf_HTML_to_SVG
 
 proc get_Tab_PTF {p} {
  global Tab_PTF
