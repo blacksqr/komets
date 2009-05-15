@@ -431,3 +431,8 @@
 .ui-sortable-placeholder { font-size: 11px; border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .portlet-left { float:left; }
 .portlet-right { float:right; }
+
+/* Carousel
+----------------------------------*/
+.carousel{float:left;display:inline-block;}
+.carousel-commande {float:left;display:inline-block;}

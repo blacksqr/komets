@@ -7,6 +7,10 @@ method DChoice_PM_P_Menu_HTML constructor {name descr args} {
    this set_GDD_id Choice_DropDown_HTML
    this set_nb_max_daughters 0
    set this(old_currents) ""
+
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT CHOICE IN OUT" \
+                                      ]
+
  eval "$objName configure $args"
  return $objName
 }

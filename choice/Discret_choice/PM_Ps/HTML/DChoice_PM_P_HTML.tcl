@@ -5,6 +5,10 @@ inherit PM_Choice_HTML PM_HTML
 #___________________________________________________________________________________________________________________________________________
 method PM_Choice_HTML constructor {name descr args} {
  this inherited $name $descr
+ 
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT CHOICE IN OUT" \
+                                      ]
+
  eval "$objName configure $args"
  return $objName
 }

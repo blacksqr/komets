@@ -24,6 +24,6 @@ method DChoice_PM_P_Text_HTML maj_choices {} {}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC DChoice_PM_P_Text_HTML $L_methodes_set_choices {$this(FC)} {}
+Methodes_set_LC DChoice_PM_P_Text_HTML $L_methodes_set_choices {} {}
 Methodes_get_LC DChoice_PM_P_Text_HTML $L_methodes_get_choices {$this(FC)}
 

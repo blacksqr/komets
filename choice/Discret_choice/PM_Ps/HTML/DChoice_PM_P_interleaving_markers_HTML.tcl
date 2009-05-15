@@ -9,6 +9,10 @@ inherit DChoice_PM_P_interleaving_markers_HTML PM_Choice_HTML
 method DChoice_PM_P_interleaving_markers_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Choice_InterleavedMarkers_HTML
+   
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT CHOICE IN OUT" \
+                                      ]
+
  eval "$objName configure $args"
  return $objName
 }

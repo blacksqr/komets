@@ -9,6 +9,10 @@ inherit CometTexte_PM_P_HTML PM_HTML
 method CometTexte_PM_P_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id TextDisplay_CUI_label_HTML
+   
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT TEXT OUT" \
+                                      ]
+   
  eval "$objName configure $args"
  return $objName
 }
@@ -39,5 +43,7 @@ method CometTexte_PM_P_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  append strm $dec <span [this Style_class] > [this get_text] </span>
  this Render_daughters strm "$dec "
+ 
+ 
 }
 
