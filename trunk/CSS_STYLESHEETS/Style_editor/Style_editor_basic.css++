@@ -14,6 +14,11 @@
   FCT_Resize  : 640 480;
 }
 
+#$current(GRAPH.VIEWER(CORE[soft_type ~= BIGre])) {
+  FCT_Eval : $obj On_wheel_down "$obj Etirement_interne \$infos 1.1 1.1 \$X \$Y"
+         --- $obj On_wheel_up   "set e [expr 1.0/1.1] --- $obj Etirement_interne \$infos \$e \$e \$X \$Y";
+}
+
 #$current(META[soft_type ~= BIGre]) {
   GDD_fct : Implem(CT_CSS_Meta_IHM_CUI_toolglass);
   FCT_set_mode_GDD_active : 0;

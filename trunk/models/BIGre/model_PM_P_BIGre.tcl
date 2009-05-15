@@ -21,6 +21,9 @@ method PM_BIGre constructor {name descr args} {
  this set_cmd_placement {}
  this set_nb_max_mothers 1
  
+ set this(L_Pool_B_point)            [list]
+ set this(L_Pool_Liste_alx_repere2D) [list]
+ 
  eval "$objName configure $args"
  return $objName
 }
@@ -43,6 +46,69 @@ method PM_BIGre Py {v} {[this get_prim_handle] Py $v}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Rotation {v} {[this get_prim_handle] Rotation $v}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre get_a_B_point {} {
+ if {[llength $this(L_Pool_B_point)] > 0} {
+   set rep [lindex $this(L_Pool_B_point) 0]
+   set this(L_Pool_B_point) [lrange $this(L_Pool_B_point) 1 end]
+  } else {set rep [B_point]
+         }
+		 
+ return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre release_a_B_point {pt} {
+ Add_list this(L_Pool_B_point) $pt
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre get_a_Liste_alx_repere2D {} {
+ if {[llength $this(L_Pool_Liste_alx_repere2D)] > 0} {
+   set rep [lindex $this(L_Pool_Liste_alx_repere2D) 0]
+   set this(L_Pool_Liste_alx_repere2D) [lrange $this(L_Pool_Liste_alx_repere2D) 1 end]
+  } else {set rep [Liste_alx_repere2D]
+         }
+		 
+ return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre release_a_Liste_alx_repere2D {r} {
+ Add_list this(L_Pool_Liste_alx_repere2D) $r
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre Etirer_de {ex {ey ""}} {
+ if {$ey == ""} {set ey $ex}
+ [this get_prim_handle] Etirer_de $ex $ey
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre Etirement_interne {{infos {}} ex ey cx cy} {
+ if {$infos != ""} {
+   set node       [Real_class [$infos NOEUD]]
+   set L_repere2D [this get_a_Liste_alx_repere2D] 
+   set L_rep_tmp  [this get_a_Liste_alx_repere2D] 
+   Lister_partie_noeud [$infos L_REPERES] \
+					   [this get_prim_handle] \
+					   $node \
+                       $L_rep_tmp
+   Ajouter_noeud_en_fin_de_liste_rep $L_rep_tmp $node
+   Lister_partie_index $L_rep_tmp 1 9999 $L_repere2D
+   set pt_tmp [this get_a_B_point]; $pt_tmp maj [$infos Point_au_contact]
+   Repere_transformation_inverse $pt_tmp $L_repere2D
+   set cx [$pt_tmp X]; set cy [$pt_tmp Y]
+   #puts "New click coords are <$cx ; $cy>"
+   
+   this release_a_Liste_alx_repere2D $L_repere2D
+   this release_a_Liste_alx_repere2D $L_rep_tmp
+   this release_a_B_point            $pt_tmp
+  }
+ [this get_prim_handle] Etirement_interne $ex $ey $cx $cy
+}
+#Trace PM_BIGre Etirement_interne
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Etirement {ex {ey ""}} {
@@ -101,8 +167,13 @@ method PM_BIGre On_wheel_up {cmd} {
 method PM_BIGre Is_a_pointer_press {rap appuie cmd} {
  set infos [Void_vers_info [$rap Param]]
  set ptr   [$infos Ptr]
+ set X     [$infos X_au_contact]
+ set Y     [$infos Y_au_contact]
+ 
  if {[$ptr Appuie] & $appuie} {
-   eval $cmd
+   if {[catch {eval $cmd} err]} {
+     puts "ERROR in $objName Is_a_pointer_press $rap $appuie {$cmd}:\n$err"
+    }
   }
 }
 

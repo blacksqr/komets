@@ -71,8 +71,8 @@ method CometCamNote_PM_U Branch_to_user {u} {
  if {$u == ""} {return}
  set CU [[this get_Common_FC] get_user_comet_from_id $u]
  if {$CU == ""} {return}
- puts "$this(cont) Add_daughters_R $CU"
- $this(cont) Add_daughters_R $CU
+ puts "$this(cont) set_daughters_R $CU"
+ $this(cont) set_daughters_R $CU
  puts "______________________________"
 
 if {![string equal [${objName}_cou_ptf get_soft_type] BIGre]} {return}
