@@ -28,12 +28,17 @@ method Comet_root_PM_P_FLEX constructor {name descr args} {
       set this(socket_server) [socket -server "$objName New_connection" $this(port)]
 	  fconfigure $this(socket_server) -buffersize 1024
     }
+	
+	
+ set this(L_chan_for_client) [list ]
+ 
  eval "$objName configure $args"
  return $objName
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Comet_root_PM_P_FLEX [list socket_server port]
+Generate_accessors     Comet_root_PM_P_FLEX [list socket_server port]
+Generate_List_accessor Comet_root_PM_P_FLEX L_chan_for_client L_chan_for_client
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -52,6 +57,8 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  append strm "\t" { import pandora.flex.containers.Window; } "\n"
  append strm "\t" { import mx.core.UIComponent;} "\n"
  append strm "\t" { import mx.events.ListEvent;} "\n"
+ append strm "\t" { import mx.events.NumericStepperEvent;} "\n"
+ append strm "\t" { import r1.deval.D;} "\n"
  
  append strm "\t" { public var client:SimpleClient;} "\n"
  append strm "\t" { public var msg:String;} "\n"
@@ -60,6 +67,9 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
    this set_root_for_daughters "Application.application"
  append strm "\t" " public function init():void {\n"
  append strm "\t" " var Dyna_context:Class_Dyna_context = new Class_Dyna_context();\n" 
+ append strm "\t" " Dyna_context.Dyna_context = Dyna_context;\n"
+ append strm "\t" " Dyna_context.Application  = Application;\n"
+ append strm "\t" " D.importClass(Label);\n"
  append strm "\t" " function connexion():void {\n"
  append strm "\t" " 	if ((client==null)||(client.etat=\"deconnecte\")) { \n"
  append strm "\t" "		client = new SimpleClient(\"$class(local_IP)\", 12000, Dyna_context); \n"
@@ -88,7 +98,7 @@ method Comet_root_PM_P_FLEX New_connection {chan ad num} {
  fconfigure $chan -blocking 0
  fconfigure $chan -encoding utf-8
  # attention cela exige qu'il n'y ait qu'un seul client, sinon il faut créer un array
-  set this(chan_for_client) $chan
+   this Add_L_chan_for_client $chan
   
    set this(msg) ""
    set this(msg_attended_length) -1
@@ -117,7 +127,10 @@ method Comet_root_PM_P_FLEX Read_from_FLEX {chan} {
    set this(msg)                 ""
   }
   
- if {[eof $chan]} {puts "Socket $chan closed by client!"; close $chan}
+ if {[eof $chan]} {puts "Socket $chan closed by client!"; 
+                   this Sub_L_chan_for_client $chan
+				   close $chan
+				  }
 }
 
 #_ne sers à rien____________________________________________________________________________________________________________________________
@@ -162,11 +175,12 @@ method Comet_root_PM_P_FLEX Analyse_message {str_name} {
 }
 #___________________________________________________________________________________________________________________________________________
 method Comet_root_PM_P_FLEX send_to_FLEX {obj} {
-
- puts " msg \"[string length $obj] $obj|\" envoyé sur le channel $this(chan_for_client)"
- puts -nonewline $this(chan_for_client) "[expr [string length $obj]+1] $obj|"
- flush $this(chan_for_client)
-
+ foreach chan [this get_L_chan_for_client] {
+   set obj [string map [list "\n" " "] $obj]
+   puts " msg \"[string length $obj] $obj|\" envoyé sur le channel $chan"
+   puts -nonewline $chan "[expr [string length $obj]+1] $obj|"
+   flush $chan
+  }
 }
 
 

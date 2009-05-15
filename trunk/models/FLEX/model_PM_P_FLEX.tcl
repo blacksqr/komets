@@ -97,6 +97,34 @@ method PM_FLEX Add_prim_daughter {c Lprims {index -1}} {this inherited $c $Lprim
 method PM_FLEX Add_prim_mother   {c Lprims {index -1}} {this inherited $c $Lprims $index; return 1}
 
 #_________________________________________________________________________________________________________
-method PM_HTML Do_prims_still_exist {} {return 1}
+method PM_FLEX Do_prims_still_exist {} {return 1}
 
+#_________________________________________________________________________________________________________
+method PM_FLEX Add_daughter {m {index -1}} {
+ puts "$objName Add_daughter $m"
+ puts "  set still_daughter [this Has_for_daughter $m]"
+ set still_daughter [this Has_for_daughter $m]
+ set rep [this inherited $m $index]
+ if {$still_daughter == -1} {
+   # Envoyer le code de création / branchement de $m dans les clients FLEX
+   set cmd ""; $m Render cmd
+   set root_for_daughters [this get_root_for_daughters]
+   set daughter_handle    [$m   get_prim_handle]
+   if {$index == -1} {set index [this get_nb_daughters]}
+   append cmd "${root_for_daughters}.addChildAt($daughter_handle, 0); "
+   
+   set root [this get_L_roots] 
+   puts "$cmd \n"
+   if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
+     $root send_to_FLEX $cmd
+    }
+  }
+ return $rep
+}
 
+#_________________________________________________________________________________________________________
+method PM_FLEX Sub_daughter {m} {
+ set rep [this inherited $m]
+   # Envoyer le code de destruction / débranchement de $m dans les clients FLEX
+ return $rep
+}

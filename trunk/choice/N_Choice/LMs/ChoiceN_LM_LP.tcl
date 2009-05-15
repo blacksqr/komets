@@ -29,6 +29,7 @@ method ChoiceN_LM_LP constructor {name descr args} {
                                                               {ChoiceN_PM_P_menu_HTML Ptf_HTML}         \
                                                               {ChoiceN_PM_P_Texte_HTML Ptf_HTML}        \
                                                               {CometChoiceN_PM_P_scale_BIGre Ptf_BIGre} \
+															  {DChoiceN_PM_P_Menu_FLEX Ptf_FLEX}        \
                                                         ] $objName]
  set this(init_pas_ok) 0
  
@@ -38,6 +39,10 @@ method ChoiceN_LM_LP constructor {name descr args} {
 #______________________________________________________ Adding the choices functions _______________________________________________________
 Methodes_set_LC ChoiceN_LM_LP $L_methodes_set_choicesN {} {$this(L_actives_PM)}
 Methodes_get_LC ChoiceN_LM_LP $L_methodes_get_choicesN {$this(FC)}
+
+#___________________________________________________________________________________________________________________________________________
+proc P_L_methodes_PM_set_ChoiceN_COMET_RE {} {return [list {set_val {v}}]}
+Generate_LM_setters ChoiceN_LM_LP [P_L_methodes_PM_set_ChoiceN_COMET_RE]
 
 #______________________________________________________ Adding the choices functions _______________________________________________________
 method ChoiceN_LM_LP set_PM_active {PM} {
