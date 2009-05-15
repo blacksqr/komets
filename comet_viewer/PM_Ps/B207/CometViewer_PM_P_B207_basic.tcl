@@ -156,8 +156,15 @@ method CometViewer_PM_P_B207_basic catched_Read_tk_data_from {s} {
 			    Drag_nodes $n 1 "" ""
 			   }
 			 }
+			this Graph_regenerated
            }
    set this(setting_dot_description) 0
    close $s
   }
 }
+
+#_________________________________________________________________________________________________________
+method CometViewer_PM_P_B207_basic Graph_regenerated {} {}
+
+#_________________________________________________________________________________________________________
+Manage_CallbackList CometViewer_PM_P_B207_basic Graph_regenerated end

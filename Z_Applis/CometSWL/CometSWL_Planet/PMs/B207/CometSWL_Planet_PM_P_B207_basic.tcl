@@ -45,7 +45,7 @@ method CometSWL_Planet_PM_P_B207_basic constructor {name descr args} {
  $this(poly_etirement) Difference $this(poly_translation)
  B_contact ${objName}_ctc "$this(root) 0" -add "$this(poly_translation) 1" -add "$this(poly_etirement) 10"
 
- this Add_MetaData PRIM_STYLE_CLASS [list $this(root) "PARAM RESULT OUT image IMAGE"]
+ this Add_MetaData PRIM_STYLE_CLASS [list $this(root) "PARAM RESULT IN OUT"]
  
  eval "$objName configure $args"
  return $objName
@@ -66,7 +66,7 @@ Methodes_get_LC CometSWL_Planet_PM_P_B207_basic [P_L_methodes_get_CometSWL_Plane
 Generate_PM_setters CometSWL_Planet_PM_P_B207_basic [P_L_methodes_set_CometSWL_Planet_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometSWL_Planet_PM_P_B207_basic [list poly_translation poly_etirement]
+Generate_accessors CometSWL_Planet_PM_P_B207_basic [list poly poly_translation poly_etirement]
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_B207_basic Update_datas {} {
@@ -81,6 +81,8 @@ method CometSWL_Planet_PM_P_B207_basic set_mode    {m}  {
  if {$m == "game"} {set v 0} else {set v 1}
  B_configure $this(n_edition) -Afficher_noeud $v \
                               -Gerer_contacts $v
+ B_configure $this(poly)  -Afficher_noeud [expr 1-$v] \
+                          -Gerer_contacts [expr 1-$v]
 }
 
 #___________________________________________________________________________________________________________________________________________
