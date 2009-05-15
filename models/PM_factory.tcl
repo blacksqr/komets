@@ -23,7 +23,8 @@ Generate_accessors PM_factory classes
 
 #_________________________________________________________________________________________________________
 method PM_factory Is_compatible_with_ptf {ptf} {
- return [$this(ptf) Accept_for_daughter $ptf]
+ #return [$this(ptf) Accept_for_daughter $ptf]
+ return [$ptf Accept_for_daughter $this(ptf)]
 }
 
 #_________________________________________________________________________________________________________

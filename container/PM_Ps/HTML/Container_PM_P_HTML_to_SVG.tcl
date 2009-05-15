@@ -16,10 +16,10 @@ method Container_PM_P_HTML_to_SVG constructor {name descr args} {
  return $objName
 }
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HTML Render {strm_name {dec {}}} {
+method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec <svg  [this Style_class] " xmlns=\"http://www.w3.org/2000/svg\">\n"
+ append strm $dec <svg  [this Style_class] " xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" >\n"
    this Render_daughters strm "$dec  "
  append strm $dec </svg> "\n"
 }
