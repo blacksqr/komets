@@ -1,0 +1,15 @@
+#$current(TOP.PM_HTML) {
+ FCT_set_html_style : float left background-color #DDDDDD padding 6px border "1px solid #BBBBBB";
+}
+
+#$current(CONTENT.PM_HTML) {
+ FCT_set_html_style : display block background-color #FFFFFF padding 6px border "1px solid #CCCCCC";
+}
+
+#$current(STEPTEXT.PM_HTML) {
+ FCT_set_html_style : padding-left 6px padding-right 6px;
+}
+
+#$current(COMMANDE.PM_HTML) {
+ FCT_set_html_style : display block padding-top 6px;
+}
