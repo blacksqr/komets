@@ -8,11 +8,13 @@ method CometCUI_Editor constructor {name descr args} {
 # set up internal COMET graph
  set this(top_inter) [CPool get_a_comet CometInterleaving -set_name "CUI editor top interleaving" -Add_style_class "TOP INTERLEAVING"]
    set this(CV)      [CPool get_a_comet CometViewer       -set_name "Comet viewer"                -Add_style_class "COMET GRAPH VIEWER CUI"]
-   set this(CGB)     [CPool get_a_comet CometGraphBuilder -set_name "CometGraph Builder"          -Add_style_class "COMET GRAPH BUILDER"]
+   #DEBUG set this(CGB)     [CPool get_a_comet CometGraphBuilder -set_name "CometGraph Builder"          -Add_style_class "COMET GRAPH BUILDER"]
    set this(cont)    [CPool get_a_comet CometContainer    -set_name "Container of the FUI"        -Add_style_class "CONTAINER FUI"]
    set this(filter)  [CPool get_a_comet CometContainer    -set_name "Filter of the FUI"           -Add_style_class "FILTER FUI"]
 	 
- $this(top_inter) Add_daughters_R [list $this(CV) $this(CGB) $this(cont)]
+ #DEBUG $this(top_inter) Add_daughters_R [list $this(CV) $this(CGB) $this(cont)]
+        $this(top_inter) Add_daughters_R [list $this(CV) $this(cont)]
+ 
  $this(cont) Add_daughters_R $this(filter)
 # set up actions
  
@@ -92,13 +94,13 @@ Inject_code CometCUI_Editor set_edited_comet \
 				 }
 			   }
 			  $this(cont)   Sub_daughter_R $this(filter); $this(cont) Add_daughter_R $this(filter); 
-		      if {$v != ""} {$this(filter) Add_daughter_R $v}
+		      if {$v != ""} {$this(filter) set_daughters_R $v}
 			  this Apply_style
 			} \
 			{}
 			
 #___________________________________________________________________________________________________________________________________________
-# Inject code for {set_style_file {v}} 
+# Inject code for {set_ptf_of_CUI {v}} 
 Inject_code CometCUI_Editor set_ptf_of_CUI \
 			{ [this get_Common_FC] set_ptf_of_CUI $v
 			  this set_edited_comet [this get_edited_comet]
@@ -123,8 +125,10 @@ Inject_code CometCUI_Editor Apply_style \
 			  set PM [lindex $L_PMs 0]
 			  puts "CSS++ $this(filter) {#$this(filter)->PMs [this get_edited_comet]} : $L_PMs"
 			  if {$PM != ""} {
-			    $this(CV) set_element_and_level "$PM 10"
-			   } else {$this(CV) set_represented_element ""}
+			    #DEBUG $this(CV) set_element_and_level "$PM 10"
+			   } else {
+			           #DEBUG $this(CV) set_represented_element ""
+					  }
 			} \
 			{}
 

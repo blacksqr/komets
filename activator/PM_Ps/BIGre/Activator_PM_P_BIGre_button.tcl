@@ -7,6 +7,7 @@ method Activator_PM_P_BIGre_button constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id CT_Activator_AUI_basic_CUI_button_B207
    set this(inner_txt) [B_texte 100 30 27 [fonte_Arial] [B_sim_sds]]; $this(inner_txt) Editable 0
+   this set_prim_handle $this(inner_txt)
    this set_prim_handle [B_bouton 100 30 [N_i_mere] [N_i_mere Noeud_scene] 1]
    [N_i_mere Noeud_scene] Retirer_fils [this get_prim_handle]
    [[this get_prim_handle] Noeud_fen] Ajouter_fils $this(inner_txt)
@@ -49,7 +50,7 @@ method Activator_PM_P_BIGre_button get_or_create_prims {root} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Activator_PM_P_BIGre_button set_text {{t {}}} {
+method Activator_PM_P_BIGre_button set_text {{t {}}} { 
  $this(inner_txt) TEXTE $t; $this(inner_txt) Calculer_boites
  $this(inner_txt) Optimiser_dimensions
  $this(inner_txt) Calculer_boites

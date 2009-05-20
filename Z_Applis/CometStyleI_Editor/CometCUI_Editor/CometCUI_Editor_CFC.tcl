@@ -5,7 +5,7 @@ method CometCUI_Editor_CFC constructor {} {
  set this(edited_comet) {}
  set this(style_file)   {}
  set this(gdd_op_file)  [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
- set this(ptf_of_CUI)   Ptf_TK
+ set this(ptf_of_CUI)   Ptf_BIGre
  set this(L_mapping)    [list]
 }
 #___________________________________________________________________________________________________________________________________________
