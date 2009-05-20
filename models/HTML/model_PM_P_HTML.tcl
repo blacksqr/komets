@@ -254,3 +254,35 @@ method PM_HTML Send_updated_style {} {
    $root Concat_update $objName "htmlstyle" $cmd
   } 
 }
+
+#_________________________________________________________________________________________________________
+method PM_HTML Add_JS {e} {
+ if {[gmlObject info exists object $e]} {
+	
+	 set objNameMother [lindex [$e get_mothers] 0]
+
+	 set pos       [lsearch [$objNameMother get_daughters] $e]
+	 set tailletot [llength [$objNameMother get_daughters]]
+	  
+	 set strm {}; $e Render strm
+	 set strm [$e Encode_param_for_JS $strm]
+	 
+	 if { $tailletot-1 > $pos} {
+		set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
+		set cmd "\$($strm).insertBefore('#$objAfter');"
+	  } else {
+			  set cmd "\$($strm).appendTo('#$objNameMother');"
+			 }
+
+	 set this(marker) [clock clicks]
+	 $e Render_JS cmd $this(marker)
+  } else {set cmd [[$e get_mothers] Sub_JS $e]}
+  
+ return $cmd
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Sub_JS {e} {
+ set cmd "\$('#$e').remove();"
+ return $cmd
+}

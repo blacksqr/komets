@@ -80,6 +80,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-1.3.2.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
  append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
@@ -644,13 +645,13 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  }
  
  foreach e $this(L_PM_really_sub) {
-	append strm [this Sub_JS $e] "\n"
+	append strm [[$e get_mothers] Sub_JS $e] "\n"
 	#puts "Ma boucle L_PM_really_sub    :   $strm" 
  } 
  
  foreach e $this(L_PM_really_add) {
-	append strm [this Sub_JS $e] "\n"
-	append strm [this Add_JS $e] "\n"
+	#append strm [$e Sub_JS] "\n"
+	append strm [[$e get_mothers] Add_JS $e] "\n"
 	#puts "Ma boucle L_PM_really_add    :   $strm"
  }
  set this(L_PM_really_sub) [list]
