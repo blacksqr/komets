@@ -25,7 +25,7 @@ method Container_PM_P_SVG_group Render {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_SVG_group  {} {
+method Container_PM_P_SVG_group PIPO {} {
  set root    [this get_L_roots] 
  set methode "addgroup"
 

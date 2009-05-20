@@ -2464,7 +2464,6 @@ method Physical_model Propagate_info_substitution_of {PM1 PM2} {
 #_________________________________________________________________________________________________________
 method Physical_model Substitute_by {PM} {
  #puts "$objName Physical_model::Substitute_by $PM"
- #puts "<${objName}::Physical_model::Substitute_by $PM>"
  if {[string equal $PM {}]} {return}
  set L_roots [this get_L_roots]
  set LM [this get_LM]
@@ -2479,27 +2478,33 @@ method Physical_model Substitute_by {PM} {
 		 set L_CB {}
 		 foreach CB [this $mtd] {
 		   if {[string equal -length 14 __FOREACH_PM__ [lindex $CB 0]]} {lappend L_CB $CB}
-		  }
-		 #puts "IN $objName Substitute_by $PM\n  $PM $mtd_set {$L_CB}"
+          }
 		 set L_CB [string map [list $objName $PM] $L_CB]
 		 $PM $mtd_set $L_CB
-		 #puts "  $PM $mtd = {[$PM $mtd]}"
 	    }
 	  }
     }
   }
-   #puts "<${objName}::Physical_model::Substitute_by::INHERITED>"
-   #puts "  <L_fils_before>[this get_daughters]</L_fils_before>"
-   this inherited $PM
-   #puts "  <L_fils_after>[$PM get_daughters]</L_fils_after>"
-   #puts "</${objName}::Physical_model::Substitute_by::INHERITED>"
- if {![string equal $LM ""]} {
+
+ # Can the new PM plugs the current daughters
+  set do_it_classically 1
+  if {[this get_nb_daughters] > 0} {
+    set fils [lindex [this get_out_daughters] 0]
+	if {![${PM}_cou_ptf Accept_for_daughter ${fils}_cou_ptf]} {
+	  set do_it_classically 0
+	 }
+   }
+  
+  if {$do_it_classically} {
+    this inherited $PM
+   } else {this set_daughters ""
+           this inherited $PM
+           $LM Connect_PM_descendants [list $PM] [$LM get_daughters]
+          }
+
+
+  if {![string equal $LM ""]} {
    $LM set_PM_inactive $objName
- 
-   #puts "<${objName}::Physical_model::Substitute_by::Connect_PM_descendants>"
-     #XXX $LM Connect_PM_descendants $PM {}
-     #puts "  <L_fils_after>[$PM get_daughters]</L_fils_after>"
-   #puts "</${objName}::Physical_model::Substitute_by::Connect_PM_descendants>"
   }
  $PM Propagate_info_substitution_of $objName $PM
  #puts "</${objName}::Physical_model::Substitute_by $PM>"
