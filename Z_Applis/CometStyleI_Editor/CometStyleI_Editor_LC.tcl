@@ -132,7 +132,8 @@ Inject_code CometStyleI_Editor set_style_file_for_id \
 Inject_code CometStyleI_Editor set_ptf_for_id \
             {set CUI_editor [CSS++ $objName "#$this(top_inter) CometCUI_Editor.ID_$id"]
 			 if {$CUI_editor != ""} {
-			   $CUI_editor set_ptf_of_CUI $ptf
+			   puts "$CUI_editor set_ptf_of_CUI $ptf"
+               $CUI_editor set_ptf_of_CUI $ptf
 			  }
 			} \
 			{}
