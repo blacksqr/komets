@@ -19,9 +19,9 @@ method Container_PM_P_SVG_group constructor {name descr args} {
 method Container_PM_P_SVG_group Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec <svg:g  [this Style_class] ">\n"
+ append strm $dec <g  [this Style_class] ">\n"
    this Render_daughters strm "$dec  "
- append strm $dec </svg:g> "\n"
+ append strm $dec </g> "\n"
 }
 
 #___________________________________________________________________________________________________________________________________________
