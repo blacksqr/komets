@@ -8,7 +8,6 @@ method Container_PM_P_HTML_to_SVG constructor {name descr args} {
    this set_GDD_id FUI_Container_PM_P_HTML_to_SVG
    [[this get_cou] get_ptf] maj Ptf_HTML_to_SVG
 
-   this Add_daughter_R $pipo
    this set_root_for_daughters $objName
    this set_prim_handle        $objName
    this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT FRAME" \
@@ -36,8 +35,6 @@ method Container_PM_P_HTML_to_SVG cont_svg {} {
  set methode "contsvg"
  set cmd     "\$('#$objName').svg();"
  append cmd  "\$('#${objName}_pipo').svg();"
- append cmd  "\$('#${objName} svg').attr({id : '${objName}_svg'});"
- append cmd  "\$('#${objName}_pipo svg').attr({id : '${objName}_pipo_svg'});"
 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
