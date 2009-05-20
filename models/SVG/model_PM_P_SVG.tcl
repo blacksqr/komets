@@ -10,24 +10,41 @@ method PM_SVG constructor {name descr args} {
 }
 
 #_________________________________________________________________________________________________________
+method PM_SVG get_HTML_to_SVG_bridge {} {
+ set m [this get_mothers]
+ if {$m != ""} {
+  return [$m get_HTML_to_SVG_bridge]
+ } else {return ""
+		}
+}
+
+#_________________________________________________________________________________________________________
 method PM_SVG Add_JS {e} {
- if {[gmlObject info exists object $e]} {
+ set cmd ""
+ set bridge [this get_HTML_to_SVG_bridge]
+ if {$bridge != ""} { 
+     set pipo_svg [$bridge get_pipo_svg]
+	 set strm ""; $e Render strm
+     set strm    [$e Encode_param_for_JS $strm]
+     append cmd  "var svg = \$('#$pipo_svg').svg('get');"
+     append cmd  "svg.add($strm);" 
+	 
 	 set pos       [lsearch [$objName get_daughters] $e]
 	 set tailletot [llength [$objName get_daughters]]
-	 set cmd       "var ref = \$(\"#${e}\").get(0);"
+	 set e_root    [$e get_prim_handle]
+	 append cmd    "var ref = \$(\"#$e_root\").get(0);"
 	 append cmd    "ref.parentNode.removeChild(ref);"
 
 	 if { $tailletot-1 > $pos} {
 		set objAfter [lindex [$objName get_daughters] [expr $pos+1]]
-		append cmd "\$('#$objName').get(0).insertBefore(ref,$('#$objAfter').get(0));"
-	  } else {
-			  append cmd "\$('#$objName').get(0).appendChild(ref);"
+		set objAfter [$objAfter get_prim_handle]
+		set root_for_daughters [this get_root_for_daughters]
+		append cmd "\$('#$root_for_daughters').get(0).insertBefore(ref, \$('#$objAfter').get(0));"
+	  } else {set root_for_daughters [this get_root_for_daughters]
+			  append cmd "\$('#$root_for_daughters').get(0).appendChild(ref);"
 			 }
 
-	 set this(marker) [clock clicks]
-	 $e Render_JS cmd $this(marker)
-  } else {set cmd [[$e get_mothers] Sub_JS $e]}
-  
+  }
  return $cmd
 }
 
@@ -36,3 +53,4 @@ method PM_SVG Sub_JS {e} {
  set cmd "\$('#$e').remove();"
  return $cmd
 }
+

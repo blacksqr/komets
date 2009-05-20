@@ -86,6 +86,9 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
    this Render_daughters_JS strm $mark $dec
+   append strm $dec "\$(function() {\n"
+     this Render_post_JS strm $dec
+   append strm $dec "  });"
  append strm $dec "</script>\n"
 }
 #___________________________________________________________________________________________________________________________________________
@@ -314,7 +317,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
    #DEBUG set v [string map [list {\"} {"}] $v]
 
    if {[regexp {^(.*)__XXX__(.*)$} $c reco comet m]} {
-     #puts "Eval of: \"$comet $m $v\""
+     puts "Eval of: \"$comet $m $v\""
      if {[string length $v] == 0} {
        set    msg {}
        append msg $comet { } $m " \{\}"
@@ -645,48 +648,20 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  }
  
  foreach e $this(L_PM_really_sub) {
-	append strm [[$e get_mothers] Sub_JS $e] "\n"
+	append strm [this Sub_JS $e] "\n"
 	#puts "Ma boucle L_PM_really_sub    :   $strm" 
  } 
  
  foreach e $this(L_PM_really_add) {
 	#append strm [$e Sub_JS] "\n"
-	append strm [[$e get_mothers] Add_JS $e] "\n"
+	if {[gmlObject info exists object $e]} {
+	  append strm [[$e get_mothers] Add_JS $e] "\n"
+	  $e Render_post_JS strm
+	 } else {append strm [this Sub_JS $e] "\n"}
 	#puts "Ma boucle L_PM_really_add    :   $strm"
  }
  set this(L_PM_really_sub) [list]
  set this(L_PM_really_add) [list]
-}
-
-#_________________________________________________________________________________________________________
-method PhysicalHTML_root Add_JS {e} {
- if {[gmlObject info exists object $e]} {
-	 set objNameMother [lindex [$e get_mothers] 0]
-
-	 set pos       [lsearch [$objNameMother get_daughters] $e]
-	 set tailletot [llength [$objNameMother get_daughters]]
-	  
-	 set strm {}; $e Render strm
-	 set strm [$e Encode_param_for_JS $strm]
-	 
-	 if { $tailletot-1 > $pos} {
-		set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
-		set cmd "\$($strm).insertBefore('#$objAfter');"
-	  } else {
-			  set cmd "\$($strm).appendTo('#$objNameMother');"
-			 }
-
-	 set this(marker) [clock clicks]
-	 $e Render_JS cmd $this(marker)
-  } else {set cmd [this Sub_JS $e]}
-  
- return $cmd
-}
-
-#___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root Sub_JS {e} {
- set cmd "\$('#$e').remove();"
- return $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
