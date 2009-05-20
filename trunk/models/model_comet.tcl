@@ -2343,7 +2343,7 @@ method Physical_model constructor {name descr args} {
  this set_propagate_prev_liste_cmd "this get_LM"
  this set_propagate_next_liste_cmd ""
 
- set this(L_img) [list]
+ #set this(L_img) [list]
 
  eval "$objName configure $args"
  return $objName
@@ -2534,10 +2534,10 @@ method Physical_model get_nesting_LC {} {
 method Physical_model Reconnect {PMD} {RECONNECT HAS TO BE SPECIFYED!!!!}
 
 #_________________________________________________________________________________________________________
-method Physical_model get_L_img { } {return $this(L_img)}
-method Physical_model set_L_img {L} {return [set this(L_img) $L]}
-method Physical_model add_L_img {L} {return [Add_list this(L_img) $L]}
-method Physical_model sub_L_img {L} {return [Sub_list this(L_img) $L]}
+#method Physical_model get_L_img { } {return $this(L_img)}
+#method Physical_model set_L_img {L} {return [set this(L_img) $L]}
+#method Physical_model add_L_img {L} {return [Add_list this(L_img) $L]}
+#method Physical_model sub_L_img {L} {return [Sub_list this(L_img) $L]}
 
 #_________________________________________________________________________________________________________
 method Physical_model get_Common_FC {}   {if {[string equal $this(LM) {}]} {return ""}

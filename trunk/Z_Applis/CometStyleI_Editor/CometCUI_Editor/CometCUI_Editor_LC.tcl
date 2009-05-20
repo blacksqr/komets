@@ -8,12 +8,11 @@ method CometCUI_Editor constructor {name descr args} {
 # set up internal COMET graph
  set this(top_inter) [CPool get_a_comet CometInterleaving -set_name "CUI editor top interleaving" -Add_style_class "TOP INTERLEAVING"]
    set this(CV)      [CPool get_a_comet CometViewer       -set_name "Comet viewer"                -Add_style_class "COMET GRAPH VIEWER CUI"]
-   #DEBUG set this(CGB)     [CPool get_a_comet CometGraphBuilder -set_name "CometGraph Builder"          -Add_style_class "COMET GRAPH BUILDER"]
+   set this(CGB)     [CPool get_a_comet CometGraphBuilder -set_name "CometGraph Builder"          -Add_style_class "COMET GRAPH BUILDER"]
    set this(cont)    [CPool get_a_comet CometContainer    -set_name "Container of the FUI"        -Add_style_class "CONTAINER FUI"]
    set this(filter)  [CPool get_a_comet CometContainer    -set_name "Filter of the FUI"           -Add_style_class "FILTER FUI"]
 	 
- #DEBUG $this(top_inter) Add_daughters_R [list $this(CV) $this(CGB) $this(cont)]
-        $this(top_inter) Add_daughters_R [list $this(CV) $this(cont)]
+ $this(top_inter) Add_daughters_R [list $this(CV) $this(CGB) $this(cont)]
  
  $this(cont) Add_daughters_R $this(filter)
 # set up actions
