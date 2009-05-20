@@ -85,8 +85,8 @@ Methodes_get_LC CometStyleI_Editor [P_L_methodes_get_CometStyleI_Editor] {$this(
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometStyleI_Editor Add_a_new_version \
             {set CUI_editor [CPool get_a_comet CometCUI_Editor -Add_style_class "ID_$id"]
-			 this set_ptf_for_id $id Ptf_TK
 			 $this(top_inter) Add_daughters_R $CUI_editor
+			 this set_ptf_for_id $id Ptf_TK
 			 $CUI_editor set_edited_comet [this get_edited_comet]
 			 $CUI_editor Subscribe_to_set_ptf_of_CUI $objName "$objName Update_CUI_editor_ptf $id $CUI_editor"
 			} \
@@ -130,11 +130,13 @@ Inject_code CometStyleI_Editor set_style_file_for_id \
 #___________________________________________________________________________________________________________________________________________
 # method CometStyleI_Editor set_ptf_for_id {id ptf}
 Inject_code CometStyleI_Editor set_ptf_for_id \
-            {set CUI_editor [CSS++ $objName "#$this(top_inter) CometCUI_Editor.ID_$id"]
+            {[this get_Common_FC] set_ptf_for_id $id $ptf
+             set CUI_editor [CSS++ $objName "#$this(top_inter) CometCUI_Editor.ID_$id"]
 			 if {$CUI_editor != ""} {
 			   puts "$CUI_editor set_ptf_of_CUI $ptf"
                $CUI_editor set_ptf_of_CUI $ptf
 			  }
 			} \
 			{}
-          
+
+Trace CometStyleI_Editor set_ptf_for_id

@@ -85,21 +85,29 @@ Inject_code CometCUI_Editor set_edited_comet \
 			  [this get_Common_FC] set_edited_comet $v
 			  C_GDD $this(filter)_LM_LP "Implem" Container
 			  set ptf [this get_ptf_of_CUI]
+              puts "  ptf = $ptf"
 			  $this(filter)_LM_LP set_PM_factories [$this(filter)_LM_LP get_L_compatible_factories_with_ptf $ptf]
+              puts "  this(filter)_LM_LP get_PM_factories = [$this(filter)_LM_LP get_PM_factories]"
 			  set L_PMs [$this(filter)_LM_LP get_L_PM]
+              puts "  this(filter)_LM_LP get_L_PM = {$L_PMs}"
 			  foreach PM $L_PMs {
+                puts "    considering PM $PM"
 			    if {![${PM}_cou_ptf Accept_for_daughter $ptf]} {
+                  puts "    $PM is not compatible with $ptf and therefore destroyed\n    $PM classe's are [gmlObject info classes $PM]"
 				  $PM dispose
-				 }
+				 } else {puts "    $PM is OK for the ptf $ptf.\n    $PM classe's are [gmlObject info classes $PM]"
+                        }
 			   }
+              puts "  this(filter)_LM_LP get_L_PM = [$this(filter)_LM_LP get_L_PM]"
 			  $this(cont)   Sub_daughter_R $this(filter); $this(cont) Add_daughter_R $this(filter); 
-		      if {$v != ""} {$this(filter) set_daughters_R $v}
-			  this Apply_style
+		      $this(filter) set_daughters_R $v
+              if {$v != ""} {this Apply_style
+                            }
 			} \
 			{}
-			
+Trace CometCUI_Editor set_edited_comet
 #___________________________________________________________________________________________________________________________________________
-# Inject code for {set_ptf_of_CUI {v}} 
+# Inject code for {set_ptf_of_CUI {v}}
 Inject_code CometCUI_Editor set_ptf_of_CUI \
 			{ [this get_Common_FC] set_ptf_of_CUI $v
 			  this set_edited_comet [this get_edited_comet]
@@ -124,9 +132,9 @@ Inject_code CometCUI_Editor Apply_style \
 			  set PM [lindex $L_PMs 0]
 			  puts "CSS++ $this(filter) {#$this(filter)->PMs [this get_edited_comet]} : $L_PMs"
 			  if {$PM != ""} {
-			    #DEBUG $this(CV) set_element_and_level "$PM 10"
+			    $this(CV) set_element_and_level "$PM 10"
 			   } else {
-			           #DEBUG $this(CV) set_represented_element ""
+			           $this(CV) set_represented_element ""
 					  }
 			} \
 			{}
