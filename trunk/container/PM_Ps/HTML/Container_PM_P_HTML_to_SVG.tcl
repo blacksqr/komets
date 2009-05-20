@@ -21,36 +21,29 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec "<div [this Style_class]>\n"
-	this Render_daughters strm "$dec  "	 
 	append strm $dec "<div style=\"display:none\" id=\"${objName}_pipo\">\n"
 	append strm $dec "</div>\n"
  append strm $dec "</div>\n"
  
- this cont_svg
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HTML_to_SVG cont_svg {} {
- set root    [this get_L_roots] 
- set methode "contsvg"
- set cmd     "\$('#$objName').svg();"
- append cmd  "\$('#${objName}_pipo').svg();"
+method Container_PM_P_HTML_to_SVG Render_post_JS {strm_name {dec {}}} {
+ upvar $strm_name strm
 
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
+ append strm $dec "\$('#$objName').svg();\n"
+ append strm $dec "\$('#${objName}_pipo').svg();\n"
+ 
+ append strm $dec "var svg = \$('#$objName').svg('get');\n"
+ set render_daughters ""; this Render_daughters render_daughters
+ append strm $dec "svg.add([this Encode_param_for_JS $render_daughters]);\n"
+ append strm $dec "svg.configure({height: '300'}, true);\n"
 }
 
-#___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HTML_to_SVG add_pipo_element {strsvg} {
- set root    [this get_L_roots] 
- set methode "addpipoelement"
- set strm    {}
- set strm    [$strsvg Encode_param_for_JS $strm]
- set cmd     "var svg = $('#${objName}_pipo').svg('get');"
- append cmd  "svg.add($strm);"
-
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
+#_________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG get_HTML_to_SVG_bridge {} {
+ return $objName
 }
+
+#_________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG get_pipo_svg {} {return ${objName}_pipo}

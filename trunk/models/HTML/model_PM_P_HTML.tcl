@@ -18,6 +18,9 @@ method PM_HTML constructor {name descr args} {
  this set_prim_handle        ""
  this set_root_for_daughters ""
  
+ this set_prim_handle        $objName
+ this set_root_for_daughters $objName
+  
  set this(AJAX_id_for_daughters) $objName
 
  set class(mark) 0
@@ -118,6 +121,20 @@ method PM_HTML Render_all {strm_name {dec {}}} {
 method PM_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  this Render_daughters strm $dec
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Render_post_JS {strm_name {dec {}}} {
+ upvar $strm_name strm
+ this Render_daughters_post_JS strm $dec
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Render_daughters_post_JS {strm_name {dec {}}} {
+ upvar $strm_name strm
+ foreach d [this get_daughters] {
+   $d Render_post_JS strm $dec
+  }
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -258,25 +275,25 @@ method PM_HTML Send_updated_style {} {
 #_________________________________________________________________________________________________________
 method PM_HTML Add_JS {e} {
  if {[gmlObject info exists object $e]} {
-	
-	 set objNameMother [lindex [$e get_mothers] 0]
+	 #set objNameMother [lindex [$e get_mothers] 0]
 
-	 set pos       [lsearch [$objNameMother get_daughters] $e]
-	 set tailletot [llength [$objNameMother get_daughters]]
+	 set pos       [lsearch [this get_daughters] $e]
+	 set tailletot [llength [this get_daughters]]
 	  
 	 set strm {}; $e Render strm
 	 set strm [$e Encode_param_for_JS $strm]
 	 
 	 if { $tailletot-1 > $pos} {
-		set objAfter [lindex [$objNameMother get_daughters] [expr $pos+1]]
+		set objAfter [lindex [this get_daughters] [expr $pos+1]]
+		set objAfter [$objAfter get_prim_handle]
 		set cmd "\$($strm).insertBefore('#$objAfter');"
-	  } else {
-			  set cmd "\$($strm).appendTo('#$objNameMother');"
+	  } else {set root_for_daughters [this get_root_for_daughters]
+			  set cmd "\$($strm).appendTo('#$root_for_daughters');"
 			 }
 
 	 set this(marker) [clock clicks]
 	 $e Render_JS cmd $this(marker)
-  } else {set cmd [[$e get_mothers] Sub_JS $e]}
+  } else {set cmd [this Sub_JS $e]}
   
  return $cmd
 }
@@ -286,3 +303,5 @@ method PM_HTML Sub_JS {e} {
  set cmd "\$('#$e').remove();"
  return $cmd
 }
+
+Trace PM_HTML Sub_JS

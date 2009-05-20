@@ -23,13 +23,3 @@ method Container_PM_P_SVG_group Render {strm_name {dec {}}} {
    this Render_daughters strm "$dec  "
  append strm $dec </g> "\n"
 }
-
-#___________________________________________________________________________________________________________________________________________
-method Container_PM_P_SVG_group PIPO {} {
- set root    [this get_L_roots] 
- set methode "addgroup"
-
- if {[lsearch [gmlObject info classes $root] Container_PM_P_HTML_to_SVG] != -1} {
-	$root add_pipo_element $objName $methode $cmd
- }
-}

@@ -54,7 +54,7 @@ method CometSWL_Planet_PM_P_SVG_basic set_density {v}  {}
 method CometSWL_Planet_PM_P_SVG_basic Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm "<svg:circle cx=\"[this get_X]\" cy=\"[this get_Y]\" r=\"40\" stroke=\"black\" stroke-width=\"1\" fill=\"red\" />\n"
+ append strm "<circle id=\"$objName\" cx=\"[this get_X]\" cy=\"[this get_Y]\" r=\"40\" stroke=\"black\" stroke-width=\"1\" fill=\"red\" />\n"
 
  this Render_daughters strm "$dec  "
 }
