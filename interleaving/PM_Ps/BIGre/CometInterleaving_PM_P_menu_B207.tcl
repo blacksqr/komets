@@ -129,7 +129,7 @@ method CometInterleaving_PM_P_menu_B207 Sub_L_menu_and_associated_comets {L_menu
 #___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207 Add_daughter {m {index -1}} {
  set rep [this inherited $m $index]
- puts "  rep = $rep"
+ #puts "  rep = $rep"
  if {$rep == 1} {
 	 set plugged 0
 	 
@@ -185,29 +185,29 @@ method CometInterleaving_PM_P_menu_B207 Update_menu_titles {} {
  set this(L_menu_and_associated_comets) $nL
  
 # Unplugg presentation that are now part of a menu
- puts "Unplugg presentation that are now part of a menu"
+ #puts "Unplugg presentation that are now part of a menu"
  set L_nodes ""
  foreach m $this(L_menu_and_associated_comets) {
-   puts "Do menu [lindex $m 0] with selector [lindex $m 1]"
+   #puts "Do menu [lindex $m 0] with selector [lindex $m 1]"
    set sel [lindex $m 1]
    set LC  [CSS++ $objName "#$objName $sel"]
    foreach C $LC {
-     puts "$this(B207_daughters) Retirer_fils [$C get_prim_handle]"
+     #puts "$this(B207_daughters) Retirer_fils [$C get_prim_handle]"
      $this(B207_daughters) Retirer_fils [$C get_prim_handle]
 	 Add_list L_nodes [$C get_prim_handle]
 	}
   }
 # Plug the presentations that are not part of a menu
- puts "Plug the presentations that are not part of a menu"
+ #puts "Plug the presentations that are not part of a menu"
  #set L [Lister_fils_de $this(B207_pipo_handle_daughters)]
  set L ""; foreach C [this get_out_daughters] {lappend L [$C get_prim_handle]}
- puts "      L : {$L}"
+ #puts "      L : {$L}"
  Sub_list L $L_nodes
- puts "  new L : {$L}"
+ #puts "  new L : {$L}"
  $this(B207_daughters) Vider_fils
  foreach n $L {
-   puts "$this(B207_daughters) Ajouter_fils_au_debut $n\n_________"
-   puts "  n à [$n Nb_Peres] peres"
+   #puts "$this(B207_daughters) Ajouter_fils_au_debut $n\n_________"
+   #puts "  n à [$n Nb_Peres] peres"
    $this(B207_daughters) Ajouter_fils_au_debut $n
   }
 }
@@ -225,7 +225,7 @@ method CometInterleaving_PM_P_menu_B207 Add_a_new_menu_entry {name} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207   Deploy_menu {menu} {
- puts "$objName Deploy_menu $menu"
+ #puts "$objName Deploy_menu $menu"
  set m_name [$menu get_name]
  set L_nodes ""
  foreach m $this(L_menu_and_associated_comets) {
@@ -252,7 +252,7 @@ method CometInterleaving_PM_P_menu_B207   Deploy_menu {menu} {
   }
 
 # Resize menu box and make the menu box appear
- puts "$menu Resize_poly_for_daughters $dx $dy"
+ #puts "$menu Resize_poly_for_daughters $dx $dy"
  $menu Resize_poly_for_daughters $dx $dy
  B_configure [$menu get_poly_for_daughters] -Origine 0 0 \
                                             -Afficher_noeud 1 \
@@ -262,7 +262,7 @@ method CometInterleaving_PM_P_menu_B207   Deploy_menu {menu} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207 UnDeploy_menu {menu} {
- puts "$objName UnDeploy_menu $menu"
+ #puts "$objName UnDeploy_menu $menu"
  B_Fire_Forget_after_simulations "B_configure [$menu get_poly_for_daughters] -Afficher_noeud 0 -Gerer_contacts 0"
 }
 
@@ -282,12 +282,12 @@ method CometInterleaving_PM_P_menu_B207 release_a_inner_menu {m} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Trace CometInterleaving_PM_P_menu_B207 Add_L_menu_and_associated_comets
-Trace CometInterleaving_PM_P_menu_B207 Sub_L_menu_and_associated_comets
-Trace CometInterleaving_PM_P_menu_B207 Add_daughter
-Trace CometInterleaving_PM_P_menu_B207 Sub_daughter
-Trace CometInterleaving_PM_P_menu_B207 Update_menu_titles
-Trace CometInterleaving_PM_P_menu_B207 Add_a_new_menu_entry
+#Trace CometInterleaving_PM_P_menu_B207 Add_L_menu_and_associated_comets
+#Trace CometInterleaving_PM_P_menu_B207 Sub_L_menu_and_associated_comets
+#Trace CometInterleaving_PM_P_menu_B207 Add_daughter
+#Trace CometInterleaving_PM_P_menu_B207 Sub_daughter
+#Trace CometInterleaving_PM_P_menu_B207 Update_menu_titles
+#Trace CometInterleaving_PM_P_menu_B207 Add_a_new_menu_entry
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
