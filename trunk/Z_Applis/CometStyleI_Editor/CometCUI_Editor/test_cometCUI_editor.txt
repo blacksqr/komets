@@ -1,5 +1,5 @@
-set CUI_editor [C_Pool get_a_comet CometCUI_Editor]
-$CUI_editor Ptf_BIGre
+set CUI_editor [CPool get_a_comet CometCUI_Editor]
+$CUI_editor set_ptf_of_CUI Ptf_BIGre
 cr set_daughters_R $CUI_editor 
   $CUI_editor set_edited_comet swl
-  
+  $CUI_editor set_style_file "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/drag_drop.css++"

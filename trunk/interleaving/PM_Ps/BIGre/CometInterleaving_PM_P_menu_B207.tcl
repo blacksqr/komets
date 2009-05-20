@@ -12,14 +12,12 @@ method CometInterleaving_PM_P_menu_B207 constructor {name descr args} {
  
 # L_menu_and_associated_comets contient une liste de triplet de la forme :
 #   <Nom du menu, liste de sélecteurs associées, noeud B207 racine de ce menu>
- set this(L_menu_and_associated_comets) {}
+ set this(L_menu_and_associated_comets) [list]
  
  set this(font_size)                    40
 
  set this(L_inner_menus) {}
  set this(id_menu)       0
-
- if {[string length [info proc B_noeud]] > 0} {} else {return $objName}
 
  set this(root) [B_noeud]
   set this(B207_local_menu)            [B_noeud] 
@@ -45,7 +43,7 @@ method CometInterleaving_PM_P_menu_B207 constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors CometInterleaving_PM_P_menu_B207 [list font_size L_menu_and_associated_comets B207_local_menu B207_daughters B207_pipo_handle_daughters]
 
-#__________________________________________________
+#___________________________________________________________________________________________________________________________________________
 Methodes_set_LC CometInterleaving_PM_P_menu_B207 [P_L_methodes_set_CometInterleaving] {}  {}
 Methodes_get_LC CometInterleaving_PM_P_menu_B207 [P_L_methodes_get_CometInterleaving] {}
 
@@ -131,24 +129,27 @@ method CometInterleaving_PM_P_menu_B207 Sub_L_menu_and_associated_comets {L_menu
 #___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207 Add_daughter {m {index -1}} {
  set rep [this inherited $m $index]
- set plugged 0
- 
- foreach menu_and_sel $this(L_menu_and_associated_comets) {
-   set menu_name   [lindex $menu_and_sel 0]
-   set L_selectors [lindex $menu_and_sel 1]
-   set L_PM [CSS++ $objName "#$objName $L_selectors"]
-   if {[lindex $L_PM $m] != -1} {
-     set plugged 1
-     # Add to the corresponding menu
-	 set menu_root [lindex $menu_and_sel 2]
-	 if {[catch "$menu_root Retirer_fils [$m get_prim_handle]" err]} {puts "ERROR in \"$objName Add_daughter $m $index\"\n  command $menu_root Retirer_fils \[$m get_prim_handle\]\n  err : $err"}
-	 if {[catch "$menu_root Ajouter_fils [$m get_prim_handle]" err]} {puts "ERROR in \"$objName Add_daughter $m $index\"\n  command $menu_root Ajouter_fils \[$m get_prim_handle\]\n  err : $err"}
-    }
-  }
-  
- if {!$plugged} {
-   if {[catch "$this(B207_daughters) Retirer_fils [$m get_prim_handle]" err]} {puts "ERROR in \"$objName Add_daughter $m $index\"\n  command $this(B207_daughters) Retirer_fils \[$m get_prim_handle\]\n  err : $err"}
-   if {[catch "$this(B207_daughters) Ajouter_fils [$m get_prim_handle]" err]} {puts "ERROR in \"$objName Add_daughter $m $index\"\n  command $this(B207_daughters) Ajouter_fils \[$m get_prim_handle\]\n  err : $err"}
+ puts "  rep = $rep"
+ if {$rep == 1} {
+	 set plugged 0
+	 
+	 foreach menu_and_sel $this(L_menu_and_associated_comets) {
+	   set menu_name   [lindex $menu_and_sel 0]
+	   set L_selectors [lindex $menu_and_sel 1]
+	   set L_PM [CSS++ $objName "#$objName $L_selectors"]
+	   if {[lindex $L_PM $m] != -1} {
+		 set plugged 1
+		 # Add to the corresponding menu
+		 set menu_root [lindex $menu_and_sel 2]
+		 if {[catch "$menu_root Retirer_fils [$m get_prim_handle]" err]} {puts "ERROR in 1 : \"$objName Add_daughter $m $index\"\n  command $menu_root Retirer_fils \[$m get_prim_handle\]\n  $m get_prim_handle = [$m get_prim_handle]\n  err : $err"}
+		 if {[catch "$menu_root Ajouter_fils [$m get_prim_handle]" err]} {puts "ERROR in 1 : \"$objName Add_daughter $m $index\"\n  command $menu_root Ajouter_fils \[$m get_prim_handle\]\n  $m get_prim_handle = [$m get_prim_handle]\n  err : $err"}
+		}
+	  }
+	  
+	 if {!$plugged} {
+	   if {[catch "$this(B207_daughters) Retirer_fils [$m get_prim_handle]" err]} {puts "ERROR in 2 : \"$objName Add_daughter $m $index\"\n  command $this(B207_daughters) Retirer_fils \[$m get_prim_handle\]\n  $m get_prim_handle = [$m get_prim_handle]\n  err : $err"}
+	   if {[catch "$this(B207_daughters) Ajouter_fils [$m get_prim_handle]" err]} {puts "ERROR in 2 : \"$objName Add_daughter $m $index\"\n  command $this(B207_daughters) Ajouter_fils \[$m get_prim_handle\]\n  $m get_prim_handle = [$m get_prim_handle]\n  err : $err"}
+	  }
   }
   
  return $rep
@@ -281,6 +282,16 @@ method CometInterleaving_PM_P_menu_B207 release_a_inner_menu {m} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
+Trace CometInterleaving_PM_P_menu_B207 Add_L_menu_and_associated_comets
+Trace CometInterleaving_PM_P_menu_B207 Sub_L_menu_and_associated_comets
+Trace CometInterleaving_PM_P_menu_B207 Add_daughter
+Trace CometInterleaving_PM_P_menu_B207 Sub_daughter
+Trace CometInterleaving_PM_P_menu_B207 Update_menu_titles
+Trace CometInterleaving_PM_P_menu_B207 Add_a_new_menu_entry
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207_inner_class_menu constructor {font_size name} {
  set this(switch_state) 0
  set this(switch_set)   [list UnDeploy Deploy]
@@ -312,8 +323,8 @@ method CometInterleaving_PM_P_menu_B207_inner_class_menu constructor {font_size 
 
 #___________________________________________________________________________________________________________________________________________
 method CometInterleaving_PM_P_menu_B207_inner_class_menu dispose {} {
- Detruire $this(poly_node)
- Detruire $this(txt_node)
+ #Detruire $this(poly_node)
+ #Detruire $this(txt_node)
  this inherited
 }
 
