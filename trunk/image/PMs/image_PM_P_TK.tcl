@@ -45,6 +45,7 @@ Methodes_get_LC Image_PM_P_TK [P_L_methodes_get_Image] {$this(FC)}
 #___________________________________________________________________________________________________________________________________________
 method Image_PM_P_TK load_img {f} {
  if {[winfo exists [this get_prim_handle]]} {
+   [this get_Common_FC] load_img $f
    set this(img_tk_name) "[this get_LM]_TK_img_ressource"
    if {[catch "image create photo $this(img_tk_name) -file {$f}" res]} {
      puts "Error while loading image in $objName :\n    $res"
