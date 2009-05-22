@@ -11,3 +11,13 @@ cr set_daughters_R [CometStyleI_Editor Style_editor "Style editor" d]
 	
 set pipo [B_noeud]
 set PM_graph [CSS++ cr "#cr->PMs ~ GRAPH.TASK(CORE)"]
+set graph_root [$PM_graph get_prim_handle]
+
+set rap [B_rappel [Interp_TCL] "puts coucou"]
+set PM_win [CSS++ cr "#cr->PMs.PM_BIGre ~ Container_PM_P_BIGre_window_by_texture \\>>!Container_PM_P_BIGre_window_by_texture/>> swl/"]
+set win_Droot [$PM_win get_root_for_daughters]
+
+set rap_coucou [B_rappel [Interp_TCL] "puts coucou"]
+$win_Droot abonner_a_LR_parcours [$win_Droot LR_Av_aff_fils] [$rap Rappel]
+
+
