@@ -24,5 +24,5 @@ method LogicalImage set_PM_active {PM} {
  this inherited $PM
  if {[string equal [this get_LC] {}]} {return}
  set f [this get_img_file_name]
- if {![string equal $f {}]} {$PM load_img $f}
+ if {$f != ""} {$PM load_img $f}
 }

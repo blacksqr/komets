@@ -24,9 +24,10 @@ method Image_PM_P_TK get_or_create_prims {root} {
           if {[string length $this(img_tk_name)] == 0} {
             set this(img_tk_name) "[this get_LM]_TK_img_ressource"
             set f [this get_img_file_name]
-            if {[string length $f] == 0} {
+            if {$f != ""} {
               image create photo $this(img_tk_name)
-             } else {this load_img $f}
+             }
+			this load_img $f
            }
           $img configure -image $this(img_tk_name)
 		  this Add_MetaData PRIM_STYLE_CLASS [list $img "PARAM RESULT OUT image IMAGE"]
