@@ -404,11 +404,11 @@ proc B207_Line_v {n {align left}} {
      #$nf Afficher_boites 1
      set boite_out [$nf Boite_noeud_et_fils_glob]
      set boite_in  [$nf Boite_noeud_et_fils]
-       $nf Py [expr $y - [$boite_in BG_Y]]
+       set v [expr $y - [$boite_in BG_Y]]; if { abs([$nf Py] - $v) > 0.0001 } {$nf Py $v}
 	   switch $align {
-	     left   {$nf Px [expr -[$boite_in BG_X]]}
-		 right  {$nf Px [expr -[$boite_in BG_X] - [$boite_in Tx]]}
-		 center {$nf Px [expr -[$boite_in Cx]]}
+	     left   {set v [expr -[$boite_in BG_X]]                 ; if { abs([$nf Px] - $v) > 0.0001 } {$nf Px $v} }
+		 right  {set v [expr -[$boite_in BG_X] - [$boite_in Tx]]; if { abs([$nf Px] - $v) > 0.0001 } {$nf Px $v} }
+		 center {set v [expr -[$boite_in Cx]]                   ; if { abs([$nf Px] - $v) > 0.0001 } {$nf Px $v} }
 	    }
      set y [expr $y + [$boite_out Ty]]
 	 $nf Calculer_boites
@@ -450,7 +450,10 @@ proc B207_Line_h {n} {
    set nf [$n Courant_dans_parcours_fils $it]
      set boite_out [$nf Boite_noeud_et_fils_glob]
      set boite_in  [$nf Boite_noeud_et_fils]
-     $nf Origine [expr $x - [$boite_in BG_X]] [expr - [$boite_in BG_Y]]
+     set px [expr $x - [$boite_in BG_X]] 
+	 set py [expr    - [$boite_in BG_Y]]
+	   if { abs([$nf Px] - $px) > 0.0001
+	      ||abs([$nf Py] - $py) > 0.0001 } {$nf Origine $px $py}
 	 $nf Calculer_boites
      set x [expr $x + [$boite_out Tx]]
    set it [$n Suivant_dans_parcours_fils $it]
@@ -473,11 +476,18 @@ method PM_BIGre Window_fit_daughters {} {
 
  $f Calculer_boites
    set bt [$f Boite_noeud_et_fils]
-   $f Origine [expr -[$bt BG_X]] [expr -[$bt BG_Y]]
- $n Dimension_corp [expr [$bt Tx]] [expr [$bt Ty]]
- $n Mettre_a_jour
- $n Gerer_bordure 0
- $n Rendu_ecran_direct 0
+    set px [expr -[$bt BG_X]] 
+	set py [expr -[$bt BG_Y]]
+	   if { abs([$f Px] - $px) > 0.0001
+	      ||abs([$f Py] - $py) > 0.0001 } {$f Origine $px $py}
+    set tx [expr [$bt Tx]]
+	set ty [expr [$bt Ty]]
+	   if { abs([$f Largeur] - $tx) > 0.0001
+	      ||abs([$f Hauteur] - $ty) > 0.0001 } {$n Dimension_corp $tx $ty
+                                                $n Mettre_a_jour
+										        $n Gerer_bordure 0
+										        $n Rendu_ecran_direct 0
+										       }
 }
 
 #___________________________________________________________________________________________________________________________________________
