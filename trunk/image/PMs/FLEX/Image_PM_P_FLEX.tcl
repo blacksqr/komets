@@ -43,7 +43,7 @@ method Image_PM_P_FLEX Render {strm_name {dec {}}} {
  append strm $dec " var $objName:Image = new Image(); \n"
  append strm $dec " $objName.width=200; \n"
  append strm $dec " $objName.height=200; \n"
- append strm $dec " $objName.source=\"C:/Documents and Settings/aad/Bureau/signature.jpg\"; \n"
+ append strm $dec " $objName.source=\"[this get_img_file_name]\"; \n"
  
  this set_prim_handle        $objName
  this set_root_for_daughters $objName
