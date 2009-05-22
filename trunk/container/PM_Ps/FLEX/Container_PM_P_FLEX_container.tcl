@@ -1,10 +1,10 @@
 #_________________________________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit Container_PM_P_FLEX_window PM_FLEX
+inherit Container_PM_P_FLEX_Vbox PM_FLEX
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_FLEX_window constructor {name descr args} {
+method Container_PM_P_FLEX_Vbox constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Container_CUI_frame_FLEX
 
@@ -13,12 +13,11 @@ method Container_PM_P_FLEX_window constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_FLEX_window Render {strm_name {dec {}}} {
+method Container_PM_P_FLEX_Vbox Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
  #set this(container_text) [this get_text]
- append strm $dec " var $objName:Window = new Window(); \n"
- append strm $dec " $objName.title=\"$objName\"; \n"
+ append strm $dec " var $objName:Vbox = new Vbox(); \n"
  append strm $dec " $objName.minHeight=20; \n"
  append strm $dec " $objName.minWidth=150; \n"
  append strm $dec " Dyna_context.$objName = $objName;\n"
@@ -31,4 +30,4 @@ method Container_PM_P_FLEX_window Render {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_FLEX_window Resize {x y} {}
+method Container_PM_P_FLEX_Vbox Resize {x y} {}

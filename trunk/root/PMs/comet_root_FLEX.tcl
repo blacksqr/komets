@@ -59,6 +59,8 @@ method Comet_root_PM_P_FLEX generate_FLEX_stub {strm_name {dec {}}} {
  append strm "\t" { import mx.events.ListEvent;} "\n"
  append strm "\t" { import mx.events.NumericStepperEvent;} "\n"
  append strm "\t" { import r1.deval.D;} "\n"
+ append strm "\t" { import r1.deval.D;} "\n"
+ append strm "\t" { import mx.containers.Box;} "\n"
  
  append strm "\t" { public var client:SimpleClient;} "\n"
  append strm "\t" { public var msg:String;} "\n"
