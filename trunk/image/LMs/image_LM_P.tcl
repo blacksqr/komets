@@ -24,10 +24,8 @@ method LogicalImage set_PM_active {PM} {
  set rep [this inherited $PM]
  if {[this get_LC] != ""} {
    set f [this get_img_file_name]
-   if {$f != ""} {puts "$PM load_img $f"; $PM load_img $f}
+   if {$f != ""} {$PM load_img $f}
   }
   
  return $rep
 }
-
-Trace LogicalImage set_PM_active
