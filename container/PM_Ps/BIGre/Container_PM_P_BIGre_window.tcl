@@ -35,6 +35,7 @@ Generate_accessors Container_PM_P_BIGre_window [list L_prim_layout]
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_window Win_layout {} {
  foreach {PM_prim layout} $this(L_prim_layout) {
+   $PM_prim Maj_boites_recursif; $PM_prim Afficher; $PM_prim Maj_boites_recursif;
    set box  [$PM_prim Boite_noeud_et_fils]
    set prim [this get_prim_handle]; set L [$prim Longueur_corp]; set H [$prim Hauteur_corp]
    switch $layout {

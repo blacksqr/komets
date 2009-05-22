@@ -10,7 +10,7 @@
 }
 
 #$current(TASK.GRAPH.VIEWER(>CometContainer[soft_type ~= BIGre])) {
-  GDD_fct     : Implem(Container_CUI_window);
+  GDD_fct     : Implem(Container_CUI_window_by_texture);
   FCT_Resize  : 640 480;
 }
 
