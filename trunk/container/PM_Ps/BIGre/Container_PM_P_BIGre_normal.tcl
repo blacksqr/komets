@@ -44,8 +44,8 @@ method Container_PM_P_BIGre_normal set_panel_button_side {v} {$this(panel) set_s
 method Container_PM_P_BIGre_normal Panel_mode {v} {
  if {$v} {
    if {![info exists this(panel)]} {
-     #set this(panel) ${objName}_B207_panel
-     #Panel $this(panel) [this get_prim_handle] $this(poly_background) [list $class(img_bt_right) $class(img_bt_left)]
+     set this(panel) ${objName}_B207_panel
+     Panel $this(panel) [this get_prim_handle] $this(poly_background) [list $class(img_bt_right) $class(img_bt_left)]
 	}
   }
 }

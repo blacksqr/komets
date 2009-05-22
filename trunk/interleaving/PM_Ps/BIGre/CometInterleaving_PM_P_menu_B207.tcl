@@ -14,9 +14,9 @@ method CometInterleaving_PM_P_menu_B207 constructor {name descr args} {
 #   <Nom du menu, liste de sélecteurs associées, noeud B207 racine de ce menu>
  set this(L_menu_and_associated_comets) [list]
  
- set this(font_size)                    40
+ set this(font_size) 40
 
- set this(L_inner_menus) {}
+ set this(L_inner_menus) [list]
  set this(id_menu)       0
 
  set this(root) [B_noeud]
@@ -31,10 +31,6 @@ method CometInterleaving_PM_P_menu_B207 constructor {name descr args} {
 
  this set_prim_handle        $this(root)
  this set_root_for_daughters $this(B207_pipo_handle_daughters)
-
-# set this(rap_placement) [B_rappel [Interp_TCL] "$objName Line_v"]
-#$this(rap_placement) Texte "$objName Line_v"
-#   $n abonner_a_LR_parcours [$n LR_Av_aff_fils] [$this(rap_placement) Rappel]
 
  eval "$objName configure $args"
  return $objName
