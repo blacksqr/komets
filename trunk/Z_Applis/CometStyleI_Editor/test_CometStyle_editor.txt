@@ -9,3 +9,5 @@ cr set_daughters_R [CometStyleI_Editor Style_editor "Style editor" d]
     Style_editor Add_a_new_version $id_2
 	Style_editor set_ptf_for_id $id_2 Ptf_BIGre
 	
+set pipo [B_noeud]
+set PM_graph [CSS++ cr "#cr->PMs ~ GRAPH.TASK(CORE)"]
