@@ -243,7 +243,7 @@ method CometInterleaving_PM_P_menu_B207   Deploy_menu {menu} {
  set dy 0; set dx 0
  foreach node $L_nodes {
    $node Origine 0 0
-   $node Calculer_boites
+   $node Maj_boites_recursif; $node Afficher; $node Maj_boites_recursif;
    set box_node [$node Boite_noeud_et_fils_glob]
    set dy [expr $dy - [$box_node Ty]]
    set tx [$box_node Tx]; if {$tx > $dx} {set dx $tx}

@@ -24,6 +24,6 @@ method CometImage constructor {name descr args} {
 method CometImage dispose {} {this inherited}
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometImage [P_L_methodes_set_Image] {} 			{$this(L_LM)}
+Methodes_set_LC CometImage [P_L_methodes_set_Image] {$this(FC)} {$this(L_LM)}
 Methodes_get_LC CometImage [P_L_methodes_get_Image] {$this(FC)}
 
