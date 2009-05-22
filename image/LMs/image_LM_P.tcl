@@ -21,8 +21,13 @@ Methodes_get_LC LogicalImage [P_L_methodes_get_Image] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
 method LogicalImage set_PM_active {PM} {
- this inherited $PM
- if {[string equal [this get_LC] {}]} {return}
- set f [this get_img_file_name]
- if {$f != ""} {$PM load_img $f}
+ set rep [this inherited $PM]
+ if {[this get_LC] != ""} {
+   set f [this get_img_file_name]
+   if {$f != ""} {puts "$PM load_img $f"; $PM load_img $f}
+  }
+  
+ return $rep
 }
+
+Trace LogicalImage set_PM_active
