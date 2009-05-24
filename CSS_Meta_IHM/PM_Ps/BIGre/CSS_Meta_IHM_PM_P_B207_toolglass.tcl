@@ -3,7 +3,8 @@ inherit CSS_Meta_IHM_PM_P_B207_toolglass PM_BIGre
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_B207_toolglass constructor {name descr args} {
  this inherited $name $descr
-   #this set_GDD_id N_controller_CUI_basic_gfx_luna_B207
+   this set_GDD_id FUI_CSS_Meta_IHM_PM_P_B207_toolglass
+   
  if {[string length [info proc B_noeud]] > 0} {} else {return $objName}
 
  set this(mode_GDD_active) 1
