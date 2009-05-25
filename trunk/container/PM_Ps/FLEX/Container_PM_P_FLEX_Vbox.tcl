@@ -18,9 +18,6 @@ method Container_PM_P_FLEX_Vbox Render {strm_name {dec {}}} {
 
  #set this(container_text) [this get_text]
  append strm $dec " var $objName:Box = new Box(); \n"
- append strm $dec " var $objName.borderColor=\"#E6DE64\"; \n"
- append strm $dec " $objName.minHeight=20; \n"
- append strm $dec " $objName.minWidth=150; \n"
  append strm $dec " Dyna_context.$objName = $objName;\n"
  
  this set_prim_handle        $objName
