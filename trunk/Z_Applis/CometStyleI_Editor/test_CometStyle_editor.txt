@@ -20,4 +20,8 @@ set win_Droot [$PM_win get_root_for_daughters]
 set rap_coucou [B_rappel [Interp_TCL] "puts coucou"]
 $win_Droot abonner_a_LR_parcours [$win_Droot LR_Av_aff_fils] [$rap Rappel]
 
+#______________________________________________________________________________________________________________
+set PM_win_graph [CSS++ cr "#cr->PMs.PM_BIGre CometStyleI_Editor(TASK.GRAPH(>Container_PM_P_BIGre_window_by_texture))"]
+set win_graph_Droot [$PM_win_graph get_root_for_daughters]
+$win_graph_Droot abonner_a_LR_parcours [$win_Droot LR_Av_aff_fils] [$rap Rappel]
 

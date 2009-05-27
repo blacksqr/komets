@@ -60,6 +60,7 @@ method Root_PM_P_BIGre release_a_highlighter {e} {
  set prim_PM [$e Val_MetaData ${objName}::prim_PM]
  set rap     [$e Val_MetaData B_rappel_from_$objName]
  $prim_PM desabonner_de_LR_parcours [$prim_PM LR_Ap_aff] [$rap Rappel]
+ $prim_PM A_changer 1
  
  Add_list this(L_pool_highlighters)    $e
  Sub_list this(L_actives_highlighters) $e
@@ -94,6 +95,7 @@ method Root_PM_P_BIGre prim_Enlight {L_PM} {
    set highlighter [this     get_a_highlighter]
    set rap         [$highlighter Val_MetaData B_rappel_from_$objName]
    set prim_PM     [$PM      get_prim_handle]
+   $prim_PM A_changer 1
    
      B_configure $highlighter -Ajouter_MetaData_T ${objName}::prim_PM $prim_PM
 	 $rap Texte "$objName Display_highlighter $prim_PM [$prim_PM Boite_noeud_et_fils] $highlighter"

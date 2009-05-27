@@ -1,21 +1,3 @@
-#$current(TOP.INTERLEAVING[soft_type ~= BIGre]) {
-  GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
-}
-
-#$current(TOP.INTERLEAVING(CORE[soft_type ~= BIGre])) {
-  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF)}" "Display EDITION_MODE" "{                                                                                                                                                                                                      } NOP"]
-            --- [$obj get_B207_local_menu] Origine 0 400;
-}
-			
-#$current(TOP.INTERLEAVING(CONT_FOR_DAUGHTERS[soft_type ~= BIGre])) {
-  FCT_Eval    : [$obj get_root_for_daughters] Position_des_fils_changeable 1;
-}
-
-#$current(TOP.INTERLEAVING[soft_type ~= BIGre]((CHOICE.PTF > *), (EDITION_MODE > *)))  {
-  FCT_set_method_placement: Line_v;
-}
-
 #$current(GRAPH.VIEWER) {
   FCT_Eval : set LC [$obj get_LC]
          --- U_encapsulator_PM  $obj  "CometContainer(set_name \"CUI Editor of [$LC get_name]\", \$obj() )";
@@ -30,18 +12,13 @@
   FCT_Show_elements : 0 *;
 }
 
-#$current(INTERNAL_ROOT[soft_type ~= BIGre]) {
-  GDD_fct     : Implem(Container_CUI_window_by_texture);
-  FCT_Resize  : 800 600;
-  FCT_Eval    : set PM_menu [CSS++ $obj "#$obj TOP.INTERLEAVING(CORE)"]
-            --- $obj Layout "[$PM_menu get_B207_local_menu] top-left"
-}
-
 #$current(GRAPH.VIEWER(CORE[soft_type ~= BIGre])) {
   FCT_Eval : $obj On_wheel_down "$obj Etirement_interne \$infos 1.1 1.1 \$X \$Y"
          --- $obj On_wheel_up   "set e [expr 1.0/1.1] --- $obj Etirement_interne \$infos \$e \$e \$X \$Y";
 }
 
 #$current(META.CSS) {
-  GDD_fct     : Implem(CT_CSS_Meta_IHM_CUI_toolglass);
+  GDD_fct                 : Implem(CT_CSS_Meta_IHM_CUI_toolglass);
+  FCT_Raise               : top;
+  FCT_set_mode_GDD_active : 0;
 }
