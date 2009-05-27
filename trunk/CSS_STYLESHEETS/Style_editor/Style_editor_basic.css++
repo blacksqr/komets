@@ -5,11 +5,8 @@
 
 #$current(GRAPH.VIEWER(>CometContainer)) {
   GDD_fct     : Implem(Container_CUI_window_by_texture);
-  FCT_Resize  : 400 300;
-}
-
-#$current(GRAPH.BUILDER) {
-  FCT_Show_elements : 0 *;
+  FCT_Resize  : 320 240;
+  FCT_Origine : 640 0;
 }
 
 #$current(GRAPH.VIEWER(CORE[soft_type ~= BIGre])) {

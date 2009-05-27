@@ -105,7 +105,7 @@ Inject_code CometCUI_Editor set_edited_comet \
                             }
 			} \
 			{}
-Trace CometCUI_Editor set_edited_comet
+
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {set_ptf_of_CUI {v}}
 Inject_code CometCUI_Editor set_ptf_of_CUI \
