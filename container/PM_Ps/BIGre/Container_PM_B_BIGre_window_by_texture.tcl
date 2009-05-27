@@ -53,7 +53,7 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
  set this(width)  640
  set this(height) 480
  this set_head_height 20
- this set_body_color  "0.3 0.3 0.3 1"
+ this set_body_color  "0.2 0.5 0.2 1"
  this set_head_color  "0.2 0.2 0.5 1"
  this set_redim_color "0.2 0.2 0.5 1"
  this Redim $this(width) $this(height)
@@ -89,9 +89,7 @@ method Container_PM_P_BIGre_window_by_texture Redim {width height {triggered_by_
  $this(head_up_down) Origine [expr $width - [$box_local BG_X] - [$box_local Tx]] [expr -[$box_local BG_Y]]
  
 # set up redim zone
- if {!$triggered_by_redim_zone} {
-   $this(redim) Origine $width 0
-  }
+ $this(redim) Origine $width 0
 
 # Deal with layout
  this Win_layout
@@ -151,8 +149,12 @@ method Container_PM_P_BIGre_window_by_texture Win_layout {} {
    set box  [$PM_prim Boite_noeud_et_fils]
    set L $this(width); set H $this(height)
    switch $layout {
-     top-left {$PM_prim Origine [expr -[$box BG_X]] [expr $H - [$box Ty] - [$box BG_Y]]}
+     top-left {set x [expr -[$box BG_X]] 
+			   set y [expr $H - [$box Ty] - [$box BG_Y]]
+			   $PM_prim Origine $x $y
+			  }
     }
   }
+  
 }
 
