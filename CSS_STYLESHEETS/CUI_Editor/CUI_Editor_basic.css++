@@ -1,6 +1,6 @@
 #$current(TOP.INTERLEAVING[soft_type ~= BIGre]) {
   GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
+  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, ChoiceFiles_CUI_standard_system(-Add_style_class {LOAD FILE STYLE} -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_style_file \$lc}), CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
 }
 
 #$current(TOP.INTERLEAVING[soft_type ~= BIGre](EDITION_MODE)) {
@@ -11,7 +11,7 @@
 
 #$current(TOP.INTERLEAVING(CORE[soft_type ~= BIGre])) {
   GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF)}" "Display EDITION_MODE" "{                                                                                                                                                                                                      } NOP"]
+  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)}" "Display EDITION_MODE" "{                                                                                                                                                                                                      } NOP"]
             --- [$obj get_B207_local_menu] Origine 0 400;
 }
 			
@@ -28,7 +28,7 @@
          --- U_encapsulator_PM  $obj  "CometContainer(set_name \"CUI Editor of [$LC get_name]\", \$obj() )";
 }
 
-#$current(CONTAINER.FUI, GRAPH.VIEWER(>CometContainer)) {
+#$current[soft_type ~= BIGre](CONTAINER.FUI, GRAPH.VIEWER(>CometContainer)) {
   GDD_fct     : Implem(Container_CUI_window_by_texture);
   FCT_Resize  : 400 300;
 }

@@ -24,7 +24,10 @@
 <node id="ChoiceFiles_CUI_standard_system_TK" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_TK">
 <factory id="Choice_file_PM_P_dialog_TK"></factory>
 </node>
-<relation id="GDD_implementation_ChoiceFiles_CUI_standard_system_ChoiceFiles_CUI_standard_system_TK" set_L_source_nodes="ChoiceFiles_CUI_standard_system_TK" set_L_dest_nodes="ChoiceFiles_CUI_standard_system" set_type="GDD_implementation"></relation>
+<node id="ChoiceFiles_CUI_standard_system_B207_with_TK" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_BIGre">
+<factory id="Choice_file_PM_P_dialog_B207_with_TK"></factory>
+</node>
+<relation id="GDD_implementation_ChoiceFiles_CUI_standard_system_ChoiceFiles_CUI_standard_system_TK" set_L_source_nodes="ChoiceFiles_CUI_standard_system_TK ChoiceFiles_CUI_standard_system_B207_with_TK" set_L_dest_nodes="ChoiceFiles_CUI_standard_system" set_type="GDD_implementation"></relation>
 <relation id="GDD_specialization_ChoiceFiles_CUI_ChoiceFiles_CUI_standard_system" set_L_source_nodes="ChoiceFiles_CUI_standard_system" set_L_dest_nodes="ChoiceFiles_CUI" set_type="GDD_specialization"></relation>
 <relation id="GDD_concretization_ChoiceFiles_AUI_ChoiceFiles_CUI" set_L_source_nodes="ChoiceFiles_CUI" set_L_dest_nodes="ChoiceFiles_AUI" set_type="GDD_concretization"></relation>
 <relation id="GDD_concretization_ChoiceFiles_ChoiceFiles_AUI" set_L_source_nodes="ChoiceFiles_AUI" set_L_dest_nodes="ChoiceFiles" set_type="GDD_concretization"></relation>
@@ -46,6 +49,8 @@
 <relation id="Choice_Restriction" set_L_source_nodes="ChoiceMonth SimpleChoice ChoiceFiles Choice_Color" set_L_dest_nodes="Choice" set_type="GDD_restriction"></relation>
 <node id="ChoiceAccumulator" set_type="GDD_C&amp;T" set_descriptions="Accumulator choice" set_ptf="*">
 </node>
+<relation id="ChoiceAccumulator_Choosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
+<relation id="ChoiceAccumulator_Unchoosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
 <node id="ChoiceInterleavedMarkers" set_type="GDD_C&amp;T" set_descriptions="Choice done by interleaved markers" set_ptf="*">
 </node>
 <node id="Marker" set_type="GDD_C&amp;T" set_descriptions="Marker" set_ptf="*">
@@ -250,8 +255,17 @@
 <relation id="InterleavingAUI_to_NoNav" set_L_source_nodes="Interleaving_AUI_NoNav" set_L_dest_nodes="Interleaving_AUI" set_type="GDD_specialization"></relation>
 <node id="Interleaving_AUI_Nav" set_type="GDD_AUI" set_descriptions="Interleaving with navigation" set_ptf="*">
 </node>
+<node id="Interleaving_AUI_Sequence" set_type="GDD_AUI" set_descriptions="Interleaving shwing subspace in sequence" set_ptf="*">
+</node>
+<node id="ComboMenu" set_type="GDD_CUI" set_descriptions="Combo menu" set_ptf="*">
+</node>
+<node id="ScrollListInterleaving" set_type="GDD_CUI" set_descriptions="Scroll list ListBox" set_ptf="*">
+</node>
+<node id="ScrollableMonospaceInterleaving" set_type="GDD_CUI" set_descriptions="Scrollable monospace ListBox" set_ptf="*">
+</node>
 <node id="Interleaving_AUI_MonoSPace" set_type="GDD_AUI" set_descriptions="Interleaving showing one subspace at a time" set_ptf="*">
 </node>
+<relation id="NoNav_to_MonoSpace" set_L_source_nodes="Interleaving_AUI_MonoSPace" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
 <node id="Interleaving_AUI_Menu" set_type="GDD_AUI" set_descriptions="" set_ptf="*">
 </node>
 <node id="Interleaving_CUI_Menu" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
@@ -262,20 +276,7 @@
 <relation id="GDD_implementation_Interleaving_CUI_Menu_Interleaving_FUI_Menu_B207" set_L_source_nodes="Interleaving_FUI_Menu_B207" set_L_dest_nodes="Interleaving_CUI_Menu" set_type="GDD_implementation"></relation>
 <relation id="GDD_concretization_Interleaving_AUI_Menu_Interleaving_CUI_Menu" set_L_source_nodes="Interleaving_CUI_Menu" set_L_dest_nodes="Interleaving_AUI_Menu" set_type="GDD_concretization"></relation>
 <relation id="GDD_specialization_Interleaving_AUI_MonoSPace_Interleaving_AUI_Menu" set_L_source_nodes="Interleaving_AUI_Menu" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_specialization"></relation>
-<node id="ScrollableMonospaceInterleaving" set_type="GDD_CUI" set_descriptions="Scrollable monospace ListBox" set_ptf="*">
-</node>
-<node id="ScrollListInterleaving" set_type="GDD_CUI" set_descriptions="Scroll list ListBox" set_ptf="*">
-</node>
-<node id="ComboMenu" set_type="GDD_CUI" set_descriptions="Combo menu" set_ptf="*">
-</node>
-<node id="Interleaving_AUI_Sequence" set_type="GDD_AUI" set_descriptions="Interleaving shwing subspace in sequence" set_ptf="*">
-</node>
-<relation id="NoNav_to_Sequence" set_L_source_nodes="Interleaving_AUI_Sequence" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
-<relation id="Sequence_to_CUI" set_L_source_nodes="ComboMenu ScrollListInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequence" set_type="GDD_concretization"></relation>
-<node id="Interleaving_AUI_Sequential" set_type="GDD_AUI" set_descriptions="Interleaving showing subspace sequentialy" set_ptf="*">
-</node>
-<relation id="NoNav_to_Sequential" set_L_source_nodes="Interleaving_AUI_Sequential" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
-<relation id="Sequential_to_CUI" set_L_source_nodes="ScrollListInterleaving ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequential" set_type="GDD_concretization"></relation>
+<relation id="MonoSpace_to_CUI" set_L_source_nodes="ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_concretization"></relation>
 <node id="ScrollableMonospaceInterleaving_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Interleaving_PM_P_MenuHorizontal_HTML"></factory>
 </node>
@@ -296,8 +297,12 @@
 </node>
 <relation id="GDD_implementation_ScrollableMonospaceInterleaving_Deployable_ScrollableMonospaceInterleaving_Deployable_B207" set_L_source_nodes="ScrollableMonospaceInterleaving_Deployable_B207" set_L_dest_nodes="ScrollableMonospaceInterleaving_Deployable" set_type="GDD_implementation"></relation>
 <relation id="GDD_specialization_ScrollableMonospaceInterleaving_ScrollableMonospaceInterleaving_menu" set_L_source_nodes="ScrollableMonospaceInterleaving_menu ScrollableMonospaceInterleaving_Deployable" set_L_dest_nodes="ScrollableMonospaceInterleaving" set_type="GDD_specialization"></relation>
-<relation id="MonoSpace_to_CUI" set_L_source_nodes="ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_concretization"></relation>
-<relation id="NoNav_to_MonoSpace" set_L_source_nodes="Interleaving_AUI_MonoSPace" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
+<node id="Interleaving_AUI_Sequential" set_type="GDD_AUI" set_descriptions="Interleaving showing subspace sequentialy" set_ptf="*">
+</node>
+<relation id="NoNav_to_Sequential" set_L_source_nodes="Interleaving_AUI_Sequential" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
+<relation id="Sequential_to_CUI" set_L_source_nodes="ScrollListInterleaving ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequential" set_type="GDD_concretization"></relation>
+<relation id="Sequence_to_CUI" set_L_source_nodes="ComboMenu ScrollListInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequence" set_type="GDD_concretization"></relation>
+<relation id="NoNav_to_Sequence" set_L_source_nodes="Interleaving_AUI_Sequence" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
 <relation id="InterleavingAUI_to_Nav" set_L_source_nodes="Interleaving_AUI_Nav" set_L_dest_nodes="Interleaving_AUI" set_type="GDD_specialization"></relation>
 <relation id="Interleaving_to_AUI" set_L_source_nodes="Interleaving_AUI" set_L_dest_nodes="Interleaving" set_type="GDD_concretization"></relation>
 <relation id="ChoiceInterleavedMarkers_Interleaving" set_L_source_nodes="ChoiceInterleavedMarkers" set_L_dest_nodes="Interleaving" set_type="GDD_encapsulation"></relation>
@@ -315,8 +320,6 @@
 </node>
 <relation id="ChoiceInterleavedMarkers_to_FUI" set_L_source_nodes="ChoiceInterleavingMarkersTK Choice_InterleavedMarkers_HTML ChoiceInterleavedMarkers_U ChoiceInterleavingMarkers_S207" set_L_dest_nodes="ChoiceInterleavedMarkers" set_type="GDD_implementation"></relation>
 <relation id="ChoiceSpecialization" set_L_source_nodes="ChoiceAccumulator ChoiceInterleavedMarkers" set_L_dest_nodes="Choice" set_type="GDD_specialization"></relation>
-<relation id="ChoiceAccumulator_Choosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
-<relation id="ChoiceAccumulator_Unchoosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
 <node id="ChoiceWithExtend" set_type="GDD_C&amp;T" set_descriptions="Choice among an extendable set" set_ptf="*">
 </node>
 <node id="Specifyer" set_type="GDD_C&amp;T" set_descriptions="Textual Specifyer" set_ptf="*">

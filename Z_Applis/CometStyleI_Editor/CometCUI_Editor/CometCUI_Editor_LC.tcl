@@ -123,6 +123,8 @@ Inject_code CometCUI_Editor set_style_file \
 			  this Apply_style
 			} \
 			{}
+			
+Manage_CallbackList CometCUI_Editor set_style_file end
 
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {Apply_style {}}

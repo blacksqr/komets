@@ -56,7 +56,7 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
  this set_body_color  "0.2 0.5 0.2 1"
  this set_head_color  "0.2 0.2 0.5 1"
  this set_redim_color "0.2 0.2 0.5 1"
- this Redim $this(width) $this(height)
+ this Resize $this(width) $this(height)
 
 # Finishing
  eval "$objName configure $args"
@@ -67,7 +67,7 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
 Generate_accessors Container_PM_P_BIGre_window_by_texture [list head_height body_color head_color redim_color]
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_BIGre_window_by_texture Redim {width height {triggered_by_redim_zone 0}} {
+method Container_PM_P_BIGre_window_by_texture Resize {width height {triggered_by_redim_zone 0}} {
  set this(width)  $width
  set this(height) $height
  
@@ -98,7 +98,7 @@ method Container_PM_P_BIGre_window_by_texture Redim {width height {triggered_by_
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_window_by_texture set_head_height {v} {
  set this(head_height) $v
- this Redim $this(width) $this(height)
+ this Resize $this(width) $this(height)
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -124,7 +124,7 @@ method Container_PM_P_BIGre_window_by_texture set_redim_color {v} {
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_window_by_texture redim_zone_has_moved {} {
  $this(root) Translation 0 [$this(redim) Py]
- this Redim [$this(redim) Px] [expr [$this(head) Py] - [$this(redim) Py]] 1
+ this Resize [$this(redim) Px] [expr [$this(head) Py] - [$this(redim) Py]] 1
 }
 
 #___________________________________________________________________________________________________________________________________________
