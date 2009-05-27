@@ -144,6 +144,16 @@ method PM_BIGre set_method_placement {m} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_BIGre On_click {cmd} {
+ puts "$objName On_click {$cmd}"
+ if {![info exists this(rap_on_click)]} {
+   set this(rap_on_click) [B_rappel [Interp_TCL]]
+   [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_click) Rappel] [ALX_pointeur_enfonce]
+  }
+ $this(rap_on_wheel_down) Texte [list $objName Is_a_pointer_press $this(rap_on_click) 1 $cmd]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_BIGre On_wheel_down {cmd} {
  puts "$objName On_wheel_down {$cmd}"
  if {![info exists this(rap_on_wheel_down)]} {
