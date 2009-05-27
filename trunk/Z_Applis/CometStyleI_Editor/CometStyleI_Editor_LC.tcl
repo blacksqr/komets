@@ -88,17 +88,11 @@ Inject_code CometStyleI_Editor Add_a_new_version \
 			 $this(top_inter) Add_daughters_R $CUI_editor
 			 this set_ptf_for_id $id Ptf_TK
 			 $CUI_editor set_edited_comet [this get_edited_comet]
-			 $CUI_editor Subscribe_to_set_ptf_of_CUI $objName "$objName Update_CUI_editor_ptf $id $CUI_editor"
+			 $CUI_editor Subscribe_to_set_ptf_of_CUI $objName "$objName set_ptf_for_id        $id \[$CUI_editor get_ptf_of_CUI\]"
+			 $CUI_editor Subscribe_to_set_style_file $objName "$objName set_style_file_for_id $id \[$CUI_editor get_style_file\]"
 			} \
 			{}
 
-#___________________________________________________________________________________________________________________________________________
-method CometStyleI_Editor Update_CUI_editor_ptf {id CUI_editor} {
- if {[this get_ptf_for_id $id] != [$CUI_editor get_ptf_of_CUI]} {
-   $CUI_editor set_ptf_of_CUI [this get_ptf_for_id $id]
-  }
-}
-			
 #___________________________________________________________________________________________________________________________________________
 # method CometStyleI_Editor Sub_version_id {id}
 Inject_code CometStyleI_Editor Sub_version_id \
@@ -122,19 +116,24 @@ Inject_code CometStyleI_Editor set_edited_comet \
 Inject_code CometStyleI_Editor set_style_file_for_id \
             {set CUI_editor [CSS++ $objName "#$this(top_inter) CometCUI_Editor.ID_$id"]
 			 if {$CUI_editor != ""} {
-			   $CUI_editor set_style_file $file_name
+			   if {[$CUI_editor get_style_file] != $file_name} {
+			     $CUI_editor set_style_file $file_name
+				}
 			  }
 			} \
 			{}
 			
+Trace CometStyleI_Editor set_style_file_for_id
+
 #___________________________________________________________________________________________________________________________________________
 # method CometStyleI_Editor set_ptf_for_id {id ptf}
 Inject_code CometStyleI_Editor set_ptf_for_id \
             {[this get_Common_FC] set_ptf_for_id $id $ptf
              set CUI_editor [CSS++ $objName "#$this(top_inter) CometCUI_Editor.ID_$id"]
 			 if {$CUI_editor != ""} {
-			   puts "$CUI_editor set_ptf_of_CUI $ptf"
-               $CUI_editor set_ptf_of_CUI $ptf
+			   if {[$CUI_editor get_ptf_of_CUI] != $ptf} {
+			     $CUI_editor set_ptf_of_CUI $ptf
+				}
 			  }
 			} \
 			{}
