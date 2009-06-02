@@ -4,8 +4,9 @@ inherit LogicalVideo Logical_presentation
 method LogicalVideo constructor {name descr args} {
  this inherited $name $descr
 
- this Add_PM_factories [Generate_factories_for_PM_type [list {Video_PM_P_BIGre Ptf_BIGre}  \
+ this Add_PM_factories [Generate_factories_for_PM_type [list {Video_PM_P_BIGre Ptf_BIGre} \
 															 {Video_PM_P_HTML  Ptf_HTML}  \
+															 {Video_PM_P_FLEX  Ptf_FLEX}  \
                                                        ] $objName]
 
  eval "$objName configure $args"
