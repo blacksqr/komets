@@ -20,7 +20,7 @@ method LogicalSpecifyer constructor {name descr args} {
                                                              {Specifyer_PM_P_ZoneEntry_HTML Ptf_HTML} \
                                                              {Specifyer_PM_P_BIGre_text Ptf_BIGre}    \
                                                              {TextArea_PM_P_ALX_TXT Ptf_ALX_TXT}      \
-															 {Specifyer_PM_P_textarea_FLEX Ptf_FLEX}  \
+															 {Specifyer_PM_P_textInput_FLEX Ptf_FLEX}  \
                                                        ] $objName]
 
  eval "$objName configure $args"

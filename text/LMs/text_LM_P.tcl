@@ -13,7 +13,7 @@ method LogicalText constructor {name descr args} {
 															 {Text_PM_P_zone_TK Ptf_TK}          \
                                                              {CometTexte_PM_P_HTML Ptf_HTML}     \
                                                              {CometText_PM_P_BIGre Ptf_BIGre}    \
-													         {CometTexte_PM_P_FLEX Ptf_FLEX}     \
+													         {CometText_PM_P_FLEX Ptf_FLEX}     \
 														] $objName]
  eval "$objName configure $args"
  return $objName
