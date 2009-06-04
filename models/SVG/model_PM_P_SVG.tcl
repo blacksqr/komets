@@ -54,3 +54,20 @@ method PM_SVG Sub_JS {e} {
  return $cmd
 }
 
+#___________________________________________________________________________________________________________________________________________
+method PM_SVG Draggable {} {
+ set cmd "\$('#$objName').draggable({drag : function(e){"
+ append cmd " if($(this).get(0) == 'SVGCircleElement' || $(this).get(0) == 'SVGEllipseElement') { \$(this).get(0).setAttribute('cx',e.pageX); \$(this).get(0).setAttribute('cy',e.pageY); }"
+ append cmd " else { \$(this).get(0).setAttribute('x',e.pageX); \$(this).get(0).setAttribute('y',e.pageY); }"
+ append cmd " addOutputSVG(${objName}__XXX__prim_set);"
+ append cmd "}});"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_SVG DragDrop_event {type x y} {
+ set cmd "\$('#$objName').${type}({drag : function(e){"
+ append cmd " if($(this).get(0) == 'SVGCircleElement' || $(this).get(0) == 'SVGEllipseElement') { \$(this).get(0).setAttribute('cx',e.pageX); \$(this).get(0).setAttribute('cy',e.pageY); }"
+ append cmd " else { \$(this).get(0).setAttribute('x',e.pageX); \$(this).get(0).setAttribute('y',e.pageY); }"
+ append cmd " addOutputSVG(${objName}__XXX__prim_set);"
+ append cmd "}});"
+}

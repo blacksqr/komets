@@ -34,6 +34,12 @@ function addOutput(obj,forcing) {
 	}
 }
 
+function addOutputSVG(proc, val) {
+	// Ajout dans la map output la modification faite sur le client html
+	output[proc] = val;
+	i++;
+}
+
 function refreshClientServer() {
 	//$("#p_debug").append("refreshClientServer --- ");
 	if(mutex == false) {
