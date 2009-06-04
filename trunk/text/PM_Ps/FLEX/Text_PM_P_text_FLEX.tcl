@@ -3,12 +3,12 @@
 #_______________________________________________ Définition of the presentations __________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit CometLabel_PM_P_FLEX PM_FLEX
+inherit CometText_PM_P_FLEX PM_FLEX
 
 #___________________________________________________________________________________________________________________________________________
-method CometLabel_PM_P_FLEX constructor {name descr args} {
+method CometText_PM_P_FLEX constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id CometLabel_PM_P_FLEX
+   this set_GDD_id CometText_PM_P_FLEX
  eval "$objName configure $args"
  return $objName
 }
@@ -16,17 +16,17 @@ method CometLabel_PM_P_FLEX constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometLabel_PM_P_FLEX $L_methodes_set_Text {}          {}
-Methodes_get_LC CometLabel_PM_P_FLEX $L_methodes_get_Text {$this(FC)}
+Methodes_set_LC CometText_PM_P_FLEX $L_methodes_set_Text {}          {}
+Methodes_get_LC CometText_PM_P_FLEX $L_methodes_get_Text {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_PM_setters CometLabel_PM_P_FLEX [P_L_methodes_set_specifyer_COMET_RE]
+Generate_PM_setters CometText_PM_P_FLEX [P_L_methodes_set_specifyer_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-method CometLabel_PM_P_FLEX Render {strm_name {dec {}}} {
+method CometText_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec " var $objName:Label = new Label(); \n"
+ append strm $dec " var $objName:Text = new Text(); \n"
  append strm $dec " $objName.text=\"[this get_text]\"; \n"
  append strm $dec " Dyna_context.$objName = $objName;\n"
 
@@ -37,7 +37,7 @@ method CometLabel_PM_P_FLEX Render {strm_name {dec {}}} {
  return [this get_prim_handle]
 }
 #___________________________________________________________________________________________________________________________________________
-method CometLabel_PM_P_FLEX set_text {t} {
+method CometText_PM_P_FLEX set_text {t} {
  puts "coucou"
     set root [this get_L_roots]
     if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {

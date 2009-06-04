@@ -81,7 +81,6 @@ method Video_PM_P_FLEX go_to_frame {nb} {
 method Video_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
  append strm $dec " var $objName:VideoDisplay = new VideoDisplay(); \n"
- append strm $dec " $objName.width=330;$objName.height=250;$objName.x=50;$objName.y=50; \n"
  append strm $dec " flash.system.Security.allowDomain(\"file:///C|/boot.flv\"); \n"
  append strm $dec " $objName.source=\"file:///C|/boot.flv\"; \n"
  append strm $dec " $objName.addEventListener(MouseEvent.CLICK,${objName}_play); \n" 
