@@ -677,8 +677,6 @@ method PhysicalHTML_root Is_update {clientversion} {
  set vclient ""
  set space 0
  
- #puts $clientversion
-
  # Chaine séparer par un espace => "ipclient vclient" => "192.168.0.10 20"
  for { set i 0 } { $i < $long } { incr i 1 } {
 	set resultat [string index $clientversion $i]
@@ -698,13 +696,12 @@ method PhysicalHTML_root Is_update {clientversion} {
  # Vérif si la version du client et la même que celle du serveur
  # Si diff => Appliquer toutes les modifs depuis la version du client jusqu'à celle du serveur
  if {$vclient != $this(version_server)} {
+	# j'envoie le numéro de version du serveur
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
-	
+	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
 	puts $this(update_cmd)
  }
- 
- #puts "Is_Update:\n  - V client : $vclient\n  - V server : $this(version_server)\n  -    cmd : $this(update_cmd)"
  
  # J'enregistre la version du serveur dans le client
  set this(version_client,$ipclient) $this(version_server)
