@@ -64,7 +64,7 @@ method Video_PM_P_FLEX Stop {} {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_FLEX go_to_time {t} {
  set root    [this get_L_roots] 
- # t doit être en seconde
+ t doit être en seconde
  set cmd     "$objName.playheadTime = $t;\n"
  
  if {[lsearch [gmlObject info classes $root] Comet_root_PM_P_FLEX] != -1} {
@@ -82,9 +82,16 @@ method Video_PM_P_FLEX Render {strm_name {dec {}}} {
  upvar $strm_name strm
  append strm $dec " var $objName:VideoDisplay = new VideoDisplay(); \n"
  append strm $dec " $objName.width=330;$objName.height=250;$objName.x=50;$objName.y=50; \n"
- append strm $dec " $objName.addEventListener(MouseEvent.CLICK,$objName_play); \n"
- append strm $dec " function ${objName}_play(${objName}_evt:MouseEvent):void { \n"
- append strm $dec "		FLEX_to_TCL(\"$objName\", \"prim_play\", \"\") } \n"
+ append strm $dec " flash.system.Security.allowDomain(\"file:///C|/boot.flv\"); \n"
+ append strm $dec " $objName.source=\"file:///C|/boot.flv\"; \n"
+ append strm $dec " $objName.addEventListener(MouseEvent.CLICK,${objName}_play); \n" 
+ append strm $dec " function ${objName}_play(${objName}_event:MouseEvent):void{ \n"
+ append strm $dec " 	if ($objName.playing) { \n"
+ append strm $dec " 		$objName.pause(); \n"
+ append strm $dec " 	} \n"
+ append strm $dec " 	else  \n"
+ append strm $dec " 		$objName.play(); \n"
+ append strm $dec " } \n"
  append strm $dec " Dyna_context.$objName = $objName; \n"
  
  this set_prim_handle        $objName

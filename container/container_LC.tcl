@@ -44,7 +44,6 @@ method LogicalContainer constructor {name descr args} {
                                                              {Container_PM_P_BIGre_window Ptf_BIGre}  \
                                                              {Container_PM_P_ALX_TXT Ptf_ALX_TXT}     \
 															 {Container_PM_P_FLEX_window Ptf_FLEX}    \
-															 {Container_PM_P_FLEX_Vbox Ptf_FLEX}      \
 
                                                        ] $objName]
 
