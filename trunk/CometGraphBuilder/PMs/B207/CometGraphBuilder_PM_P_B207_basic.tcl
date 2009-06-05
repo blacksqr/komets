@@ -309,6 +309,11 @@ method CometGraphBuilder_PM_P_B207_basic Add_node_type {id name} {
 }
 
 #_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic get_L_preso {} {
+ return [array get this preso,*]
+}
+
+#_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic Add_node_instance {id name} {
  if {[info exists this(preso,$id)]} {
    set preso $this(preso,$id)
@@ -335,15 +340,14 @@ method CometGraphBuilder_PM_P_B207_basic Add_a_presentation_for_node {mark node 
 
  set this(preso,$u_id) $preso
  
- puts "$objName Add_a_presentation_for_node $mark $node $x $y" 
+ #puts "$objName Add_a_presentation_for_node $mark $node $x $y" 
  [$preso get_root] Vider_peres
  set this(instance_to_plug,$node) $preso
  
  if {$mark == "LC"} {
-   puts "$objName prim_Add_node_instance $u_id {$node}"
+   #puts "$objName prim_Add_node_instance $u_id {$node}"
    this prim_Add_node_instance $u_id $node
-  } else {puts "$objName prim_Add_node_type $u_id {$node}"
-          this prim_Add_node_type $u_id $node
+  } else {this prim_Add_node_type $u_id $node
          }
 }
 
@@ -355,7 +359,8 @@ method CometGraphBuilder_PM_P_B207_basic get_a_presentation_for_node {mark node}
    set rap_change [B_rappel [Interp_TCL]]
    $e Add_MetaData rap_change $rap_change
    
-   $e Subscribe_to_Text_modified $objName "$objName Update_markers_of $e" UNIQUE
+   $e Subscribe_to_Text_modified $objName "$objName Update_markers_of  $e" UNIQUE
+   $e Subscribe_to_Has_moved     $objName "$objName Update_position_of $e" UNIQUE
   }
  
  $this(canvas) Ajouter_fils_au_debut [$e get_root]
@@ -377,6 +382,35 @@ method CometGraphBuilder_PM_P_B207_basic release_a_presentation_for_node {e} {
  
  Add_list this(L_Pool_presentation_for_node) $e
  Sub_list this(L_presentation_for_node)      $e
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic Update_position_of {preso} {
+ set id_element    [$preso Val_MetaData u_id]
+# puts "id_element : $id_element"
+ set element       [this get_node_with_id $id_element]
+# puts "element : $element"
+ foreach mother [$element get_mothers] {
+  # puts "in mother $mother"
+   # Resort the daughters into its list to take into account the x order
+   set L_daughters [$mother get_daughters]
+     set L_preso [list]
+	 foreach d $L_daughters {lappend L_preso $this(preso,[$d get_id])}
+	 # Sort
+	  set L_preso [lsort -command "$objName Compare_preso_x_order" $L_preso]
+	 # Redefine the list of daughters
+	 set L_daughters [list]
+	 foreach p $L_preso     {lappend L_daughters [this get_node_with_id [$p Val_MetaData u_id]]}
+   #puts "$mother set_daughters $L_daughters"
+   $mother set_daughters $L_daughters
+  }
+}
+
+#Trace CometGraphBuilder_PM_P_B207_basic Update_position_of
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic Compare_preso_x_order {p1 p2} {
+ return [expr int([$p1 get_X] - [$p2 get_X])]
 }
 
 #_________________________________________________________________________________________________________
@@ -446,6 +480,8 @@ method CometGraphBuilder_PM_P_B207_basic___presentation_for_node constructor {na
 
 # Model of contact
  B_contact ctc_$objName "$this(root) 0" -add "$this(poly_txt) 1" -add "$this(b_txt_marks) 1"
+   set this(rap_has_moved) [B_rappel [Interp_TCL] "$objName Has_moved"]
+   ctc_$objName abonner $this(rap_has_moved)
 
 # Callbacks for pointers events 
  set this(rap_press_on_mothers)   [B_rappel [Interp_TCL]]; $this(rap_press_on_mothers)   Texte "$objName Press_on_mothers   $this(rap_press_on_mothers)  "
@@ -476,6 +512,17 @@ Generate_accessors CometGraphBuilder_PM_P_B207_basic___presentation_for_node [li
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node get_B_contact {} {return ctc_$objName}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node get_X {} {
+ return [$this(root) Px]
+}
+
+#_________________________________________________________________________________________________________
+method CometGraphBuilder_PM_P_B207_basic___presentation_for_node Has_moved {} {}
+Manage_CallbackList CometGraphBuilder_PM_P_B207_basic___presentation_for_node \
+                    [list Has_moved] \
+					end
 
 #_________________________________________________________________________________________________________
 method CometGraphBuilder_PM_P_B207_basic___presentation_for_node set_represented_element   {element} {

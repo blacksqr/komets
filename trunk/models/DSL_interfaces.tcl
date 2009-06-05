@@ -101,7 +101,7 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 			  if {$gdd_task_node == ""} {set gdd_task_node $type}
 			  #puts "gdd_task_node = $gdd_task_node"
 			  # Identifier son usine
-			  if {[] == ""} {
+			  if {[$gdd_task_node get_L_factories] == ""} {
 			    $this(dsl_gdd) QUERY "?n : $gdd_task_node : NODE()->REL(type~=GDD_inheritance)*->\$n()->REL(type==GDD_restriction)->NODE(name==IS_root)"
 				set gdd_rep          [lindex [$this(dsl_gdd) get_Result] 0] 
 				set root_restriction [lindex [lindex $gdd_rep 1] 0]
@@ -176,6 +176,9 @@ method DSL_interface_interpretor Interprets {str {prefixe CG}} {
 # puts "\n________________________________\nArbre interprété : "
 # Afficher_arbre $L
 # puts "\n________________________________\n"
+ if {$this(dsl_gdd) == ""} {
+   puts "WARNING : The dsl interpretor is not specified : use \"$objName set_dsl_gdd ...\""
+  }
  return [this DSL L $prefixe]
 }
 

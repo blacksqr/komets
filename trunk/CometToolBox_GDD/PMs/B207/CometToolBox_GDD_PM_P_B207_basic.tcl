@@ -21,7 +21,7 @@ method CometToolBox_GDD_PM_P_B207_basic constructor {name descr args} {
 
 
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometToolBox_GDD_PM_P_B207_basic [P_L_methodes_set_CometToolBox_GDD] {} {$this(L_actives_PM)}
+Methodes_set_LC CometToolBox_GDD_PM_P_B207_basic [P_L_methodes_set_CometToolBox_GDD] {}          {}
 Methodes_get_LC CometToolBox_GDD_PM_P_B207_basic [P_L_methodes_get_CometToolBox_GDD] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
