@@ -26,15 +26,20 @@ method CometGraphBuilder_CFC get_a_unique_node_name {}   {
 #___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC Add_node_type     {id name}   {
  set node_name [this get_a_unique_node_name]
- CometGraphBuilder_CFC___NODE $node_name CLASS $name
+ CometGraphBuilder_CFC___NODE $node_name CLASS $name $id
  set this(id,$node_name) $id
  set this(node_name,$id) $node_name
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometGraphBuilder_CFC get_node_with_id {id} {
+ if {[info exists this(node_name,$id)]} {return $this(node_name,$id)} else {return ""}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC Add_node_instance {id name}   {
  set node_name [this get_a_unique_node_name]
- CometGraphBuilder_CFC___NODE $node_name INSTANCE $name
+ CometGraphBuilder_CFC___NODE $node_name INSTANCE $name $id
  set this(id,$node_name) $id
  set this(node_name,$id) $node_name
 }
@@ -98,6 +103,7 @@ proc P_L_methodes_get_CometGraphBuilder {} {return [list {get_handle_root { }} {
 														 {get_marks_for {id}} \
 														 {get_graph_description {{{root {}}}}} \
 														 {Has_for_descendant {id_m id_d}} \
+														 {get_node_with_id {id}} \
 												   ]}
 proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {set_handle_daughters {v}} \
                                                          {Add_node_type {id name}} {Add_node_instance {id name}} \
@@ -108,9 +114,11 @@ proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method CometGraphBuilder_CFC___NODE constructor {type name} {
- set this(type) $type
- set this(name) $name
+method CometGraphBuilder_CFC___NODE constructor {type name id} {
+ set this(id)        $id
+ set this(type)      $type
+ set this(name)      $name
+
  set this(marks)     [list]
  set this(daughters) [list]
  set this(mothers)   [list]
@@ -125,7 +133,7 @@ method CometGraphBuilder_CFC___NODE dispose {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors     CometGraphBuilder_CFC___NODE [list type name]
+Generate_accessors     CometGraphBuilder_CFC___NODE [list type name id]
 Generate_List_accessor CometGraphBuilder_CFC___NODE daughters daughters
 Generate_List_accessor CometGraphBuilder_CFC___NODE mothers   mothers
 Generate_List_accessor CometGraphBuilder_CFC___NODE marks     marks
