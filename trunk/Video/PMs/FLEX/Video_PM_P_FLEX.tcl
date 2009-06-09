@@ -83,6 +83,7 @@ method Video_PM_P_FLEX Render {strm_name {dec {}}} {
  append strm $dec " var $objName:VideoDisplay = new VideoDisplay(); \n"
  append strm $dec " flash.system.Security.allowDomain(\"file:///C|/boot.flv\"); \n"
  append strm $dec " $objName.source=\"file:///C|/boot.flv\"; \n"
+ append strm $dec " $objName.stop(); \n"
  append strm $dec " $objName.addEventListener(MouseEvent.CLICK,${objName}_play); \n" 
  append strm $dec " function ${objName}_play(${objName}_event:MouseEvent):void{ \n"
  append strm $dec " 	if ($objName.playing) { \n"
