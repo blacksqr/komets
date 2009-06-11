@@ -92,7 +92,7 @@
                      --- B_configure $poly_node -Mode_texture 1 -Mode_texture_fils 1 -Mode_texture2 1;
   FCT_Raise            : low;
 }
-
+ 
 #$current(CONT.EDITION CONT.SPACE(CORE))  {
   FCT_background_color : 0 0 1 1;
   FCT_Redim_background : -999999999 -999999999 999999999 999999999;
