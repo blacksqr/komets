@@ -1,4 +1,4 @@
-$current(CONT.SPACE) {
+#$current(CONT.SPACE) {
   GDD_fct : Implem(Container_CUI_bridge_HTML_to_SVG);
 }
 

@@ -1642,7 +1642,7 @@ method Logical_model Update_factories {L_nodes} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Update_factories {L_nodes} {
- #puts "$objName Update_factories \{$L_nodes\}"
+ puts "$objName Update_factories \{$L_nodes\}"
  # Retrieve factories from nodes list
  # Not all factories are convenient for this PM, we have to filtred
  set L_factories {}
@@ -1650,7 +1650,7 @@ method Physical_model Update_factories {L_nodes} {
    set ptf [$node get_ptf]
    if {[string equal $ptf *] || [string equal ${objName}_cou_ptf *]} {
      Add_list L_factories [$node get_L_factories]
-    } else {if {[$ptf Accept_for_daughter ${objName}_cou_ptf]} {Add_list L_factories [$node get_L_factories]}
+    } else {if {[${objName}_cou_ptf Accept_for_daughter $ptf]} {Add_list L_factories [$node get_L_factories]}
            }
   }
 
