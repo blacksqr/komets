@@ -59,6 +59,7 @@
          --- Drag_nodes [$obj get_prim_handle] 1 "$panel Toggle_extension" "$panel Toggle_extension";
 }
 
+
 #$current(inter_SWL)  {
   GDD_fct     : Implem(Interleaving_CUI_Menu);
   FCT_Eval    : set LC_new_space  [CSS++ cr "#$obj->LC NEW.SPACE" ]
