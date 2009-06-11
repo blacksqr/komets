@@ -67,7 +67,7 @@ if {[info exists PTF_defined]} {} else {
   PTF Ptf_ALX_TXT *  TCL_TK_ALX_TXT  *     0  vocal
   PTF Ptf_FLEX    *  FLEX     *     0 gfx
   PTF Ptf_SVG     *  SVG      *     0 gfx
-  PTF Ptf_HTML_to_SVG     *  HTML      *     0 gfx  ; 
+  PTF Ptf_HTML_to_SVG     *  PHP_HTML      *     0 gfx  ; 
     Ptf_HTML_to_SVG set_daughter_soft_type SVG
  } 
 
