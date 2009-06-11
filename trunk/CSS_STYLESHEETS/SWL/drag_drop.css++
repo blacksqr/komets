@@ -87,7 +87,8 @@
 #$current(CONT.EDITION CONT.SPACE(BACKGROUND_STAR))  {
   FCT_background_color : 0 0 0 1;
   FCT_Redim_background : 0 0 1024 768;
-  FCT_Eval             : Clipping [$obj get_poly_background];
+  FCT_Eval             : set poly_node [$obj get_poly_background]
+                     --- B_configure $poly_node -Mode_texture 1 -Mode_texture_fils 1 -Mode_texture2 1;
   FCT_Raise            : low;
 }
 
