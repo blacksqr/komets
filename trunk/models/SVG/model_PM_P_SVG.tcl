@@ -8,6 +8,9 @@ method PM_SVG constructor {name descr args} {
  this inherited $name $descr
  [[this get_cou] get_ptf] maj Ptf_SVG
  set this(drag_function) ""
+ set this(L_draggable) [list ]
+ 
+ set class(last_marker) ""
 }
 
 #_________________________________________________________________________________________________________
@@ -71,8 +74,6 @@ method PM_SVG Sub_JS {e} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_SVG SVG_Origine {coords} {
- set x [lindex $coords 0]
- set y [lindex $coords 1]
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -80,11 +81,77 @@ Manage_CallbackList PM_SVG SVG_Origine end
 Trace PM_SVG SVG_Origine
 
 #___________________________________________________________________________________________________________________________________________
-method PM_SVG Draggable {} {
- set cmd "\$('#$objName').draggable({drag : function(event, ui){"
- append cmd [this get_drag_function]
- append cmd " addOutputSVG(\"${objName}__XXX__SVG_Origine\", string(event.pageX) + ' ' + string(event.pageY));"
- append cmd "}});"
+method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
+ set cmd ""
+ foreach n $this(L_draggable) {
+	append cmd "\$('#$n').draggable('destroy');\n"
+ }
  
- this send_jquery_message "Draggable" $cmd 
+ set this(L_draggable) $L_drag_element 
+ foreach n $this(L_draggable) {
+ 	 append cmd "var ${n}_dx = 0;\n"
+	 append cmd "var ${n}_dy = 0;\n"
+	 append cmd "var ${n}_str_dCTM = '';\n"
+	 append cmd "\$('#$n').draggable({start : function(event, ui){\n"
+	   append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
+	   append cmd "   var coord = convert_coord_from_page_to_node(event.pageX,event.pageY,drag_obj.parentNode);\n"
+	   append cmd "   ${n}_dx = coord\['x'\];\n"
+	   append cmd "   ${n}_dy = coord\['y'\];\n"
+	   append cmd "   var ma_matrice = drag_obj.getCTM();\n"
+	   append cmd "   var dCTM = drag_obj.parentNode.getCTM().inverse().mMultiply(ma_matrice);\n"
+	   append cmd {   } ${n}_ {str_dCTM = "matrix("+dCTM.a+","+dCTM.b+","+dCTM.c+","+dCTM.d+","+dCTM.e+","+dCTM.f+")";} "\n"
+	   append cmd "   drag_obj.setAttribute(\"transform\", ${n}_str_dCTM);\n"
+	 append cmd "},drag : function(event, ui){\n"
+	   append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
+	   append cmd "   var coord = convert_coord_from_page_to_node(event.pageX,event.pageY,drag_obj.parentNode);\n"
+	   append cmd "   var tx = coord\['x'\] - ${n}_dx;\n"
+	   append cmd "   var ty = coord\['y'\] - ${n}_dy;\n"
+	   append cmd {   drag_obj.setAttribute("transform", } ${n}_ {str_dCTM + ' translate(' + tx + ', ' + ty +')');} "\n"
+	 append cmd "},stop : function(event, ui){\n"
+	   append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
+	   append cmd "   var ma_matrice = drag_obj.getCTM();\n"
+	   append cmd "   addOutput_proc_val(\"${objName}__XXX__SVG_Origine\", ma_matrice.e + ' ' + ma_matrice.f,true);\n"
+	 append cmd "}});\n"
+ }
+ 
+ if {$direct_mode == 1} {
+	this send_jquery_message "Draggable" $cmd 
+  }
+  
+ return $cmd
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_SVG Render_JS {strm_name marker {dec {}}} {
+ upvar $strm_name strm
+ 
+ if {![string equal $class(last_marker) $marker]} {
+   set class(last_marker) $marker
+   append strm "function convert_coord_from_page_to_node(x,y,node) {  						\
+				var coord = new Array();													\
+				coord\['x'\] = x;                         									\
+				coord\['y'\] = y;                      										\
+				var current_node = node;	                      							\
+																							\
+				while(current_node.nodeName != 'HTML' && current_node.nodeName != 'svg') {  \
+					current_node = current_node.parentNode;                      			\
+				}																			\
+					 																		\
+				if(current_node.nodeName == 'svg') {										\
+					coord\['x'\] -= current_node.offsetLeft;								\
+					coord\['y'\] -= current_node.offsetTop;									\
+					var ma_matrice = current_node.createSVGMatrix();						\
+						ma_matrice.e = coord\['x'\];										\
+						ma_matrice.f = coord\['y'\];										\
+					var matriceres = node.getCTM().inverse().mMultiply(ma_matrice);			\
+																							\
+					coord\['x'\] = matriceres.e;											\
+					coord\['y'\] = matriceres.f;											\
+				}																			\
+																							\
+				return coord;																\
+				} \n"
+  }
+  
+ this Render_daughters_JS strm $marker $dec
 }

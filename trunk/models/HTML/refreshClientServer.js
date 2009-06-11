@@ -1,9 +1,8 @@
-var output = {};
-var outputVer = {};
-var outputForcingName = "";
-var outputForcingValue = "";
+var output     = {};
+var output_tmp = {};
+var outputVer  = {};
 var i = 0;	
-var mutex = false;
+var mutex        = false;
 var forcing_send = false;
 
 $(document).ready(function() {
@@ -24,24 +23,19 @@ $(document).ready(function() {
 
 function addOutput(obj,forcing) {
 	// Ajout dans la map output la modification faite sur le client html
-	output[obj.name] = obj.value;
-	i++;
+	if(mutex) {output_tmp[obj.name] = obj.value;} else {output[obj.name] = obj.value; i++;}
+	
 	if(forcing) { 
 		forcing_send = forcing;
-		outputForcingName = obj.name;
-		outputForcingValue = obj.value;
 		refreshClientServer(); 
 	}
 }
 
 function addOutput_proc_val(proc, val, forcing) {
 	// Ajout dans la map output la modification faite sur le client html
-	output[proc] = val;
-	i++;
+	if(mutex) {output_tmp[proc] = val;} else {output[proc] = val; i++;}
 	if(forcing) { 
 		forcing_send = forcing;
-		outputForcingName = proc;
-		outputForcingValue = val;
 		refreshClientServer(); 
 	}
 }
@@ -78,7 +72,8 @@ function refreshClientServer() {
 										type: "POST",
 										url: "index.php",
 										data: output,
-										success : function(msg) {output = {};
+										success : function(msg) {output = output_tmp;
+										                         output_tmp = {};
 																 i = 0;
 																 if(msg) {try {eval(msg);
 																	          } catch(err) { alert(err);
@@ -86,9 +81,6 @@ function refreshClientServer() {
 																		 }
 																 mutex = false;
 																 if(forcing_send) {forcing_send = false;
-																				   output[outputForcingName] = outputForcingValue; 
-																				   outputForcingName = "";
-																				   outputForcingValue = "";
 																				   refreshClientServer();
 																				  }
 																},
@@ -98,9 +90,6 @@ function refreshClientServer() {
 									});
 				                 } else {mutex = false;
 										 if(forcing_send) {forcing_send = false;
-														   output[outputForcingName] = outputForcingValue;
-														   outputForcingName = "";
-														   outputForcingValue = "";
 														   refreshClientServer();
 														  }
 										}
@@ -110,7 +99,7 @@ function refreshClientServer() {
 				alert("Problème de réception des mises à jour serveur\n\n"+err);
 			}
 		});
-	} else {//if(forcing_send) { forcing_send = false; refreshClientServer(); }
+	} else {//if(forcing_send) { setTimeout('refreshClientServer()',1000);	 }
 	       }
    //$("#p_debug").append("END<br/>");
 }

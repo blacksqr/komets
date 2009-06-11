@@ -57,9 +57,12 @@ method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometSWL_Ship_PM_P_SVG_basic Render_post_JS {strm_name} {
+method CometSWL_Ship_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
  upvar $strm_name strm
  this inherited strm
+ 
+ this Render_daughters_post_JS strm $dec
+
  # draggable?
  # append strm "\$(this).get(0).setAttribute('cx',e.pageX);"
  # append strm "\$(this).get(0).setAttribute('cy',e.pageY);"
