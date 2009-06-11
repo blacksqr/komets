@@ -275,6 +275,9 @@ method PM_HTML Send_updated_style {} {
 #_________________________________________________________________________________________________________
 method PM_HTML Add_JS {e} {
  if {[gmlObject info exists object $e]} {
+     set marker [clock clicks]
+	 $e Render_JS      cmd $marker
+	 
 	 #set objNameMother [lindex [$e get_mothers] 0]
 
 	 set pos       [lsearch [this get_daughters] $e]
@@ -291,8 +294,9 @@ method PM_HTML Add_JS {e} {
 			  set cmd "\$($strm).appendTo('#$root_for_daughters');"
 			 }
 
-	 set this(marker) [clock clicks]
-	 $e Render_JS cmd $this(marker)
+	 
+	 
+	 $e Render_post_JS cmd 
   } else {set cmd [this Sub_JS $e]}
   
  return $cmd
@@ -314,4 +318,13 @@ method PM_HTML Draggable {} {
 method PM_HTML DragDrop_event {type x y} {
  set cmd "\$('#$objName').${type}();"
  append cmd ""
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML send_jquery_message {methode cmd} {
+ set root [this get_L_roots]
+ 
+ if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+	$root Concat_update $objName $methode $cmd
+ }
 }

@@ -7,6 +7,16 @@ inherit PM_SVG PM_HTML
 method PM_SVG constructor {name descr args} {
  this inherited $name $descr
  [[this get_cou] get_ptf] maj Ptf_SVG
+ set this(drag_function) ""
+}
+
+#_________________________________________________________________________________________________________
+Generate_accessors PM_SVG [list drag_function]
+
+#_________________________________________________________________________________________________________
+method PM_SVG set_drag_function {fct} {
+ set this(drag_function) $fct
+ this Draggable
 }
 
 #_________________________________________________________________________________________________________
@@ -23,6 +33,9 @@ method PM_SVG Add_JS {e} {
  set cmd ""
  set bridge [this get_HTML_to_SVG_bridge]
  if {$bridge != ""} { 
+     set marker [clock clicks]
+	 $e Render_JS      cmd $marker
+ 
      set pipo_svg [$bridge get_pipo_svg]
 	 set strm ""; $e Render strm
      set strm    [$e Encode_param_for_JS $strm]
@@ -44,6 +57,8 @@ method PM_SVG Add_JS {e} {
 			  append cmd "\$('#$root_for_daughters').get(0).appendChild(ref);"
 			 }
 
+   
+    $e Render_post_JS cmd 
   }
  return $cmd
 }
@@ -55,19 +70,21 @@ method PM_SVG Sub_JS {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_SVG Draggable {} {
- set cmd "\$('#$objName').draggable({drag : function(e){"
- append cmd " if($(this).get(0) == 'SVGCircleElement' || $(this).get(0) == 'SVGEllipseElement') { \$(this).get(0).setAttribute('cx',e.pageX); \$(this).get(0).setAttribute('cy',e.pageY); }"
- append cmd " else { \$(this).get(0).setAttribute('x',e.pageX); \$(this).get(0).setAttribute('y',e.pageY); }"
- append cmd " addOutputSVG(${objName}__XXX__prim_set);"
- append cmd "}});"
+method PM_SVG SVG_Origine {coords} {
+ set x [lindex $coords 0]
+ set y [lindex $coords 1]
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_SVG DragDrop_event {type x y} {
- set cmd "\$('#$objName').${type}({drag : function(e){"
- append cmd " if($(this).get(0) == 'SVGCircleElement' || $(this).get(0) == 'SVGEllipseElement') { \$(this).get(0).setAttribute('cx',e.pageX); \$(this).get(0).setAttribute('cy',e.pageY); }"
- append cmd " else { \$(this).get(0).setAttribute('x',e.pageX); \$(this).get(0).setAttribute('y',e.pageY); }"
- append cmd " addOutputSVG(${objName}__XXX__prim_set);"
+Manage_CallbackList PM_SVG SVG_Origine end
+Trace PM_SVG SVG_Origine
+
+#___________________________________________________________________________________________________________________________________________
+method PM_SVG Draggable {} {
+ set cmd "\$('#$objName').draggable({drag : function(event, ui){"
+ append cmd [this get_drag_function]
+ append cmd " addOutputSVG(\"${objName}__XXX__SVG_Origine\", string(event.pageX) + ' ' + string(event.pageY));"
  append cmd "}});"
+ 
+ this send_jquery_message "Draggable" $cmd 
 }
