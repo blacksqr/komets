@@ -34,10 +34,16 @@ function addOutput(obj,forcing) {
 	}
 }
 
-function addOutputSVG(proc, val) {
+function addOutput_proc_val(proc, val, forcing) {
 	// Ajout dans la map output la modification faite sur le client html
 	output[proc] = val;
 	i++;
+	if(forcing) { 
+		forcing_send = forcing;
+		outputForcingName = proc;
+		outputForcingValue = val;
+		refreshClientServer(); 
+	}
 }
 
 function refreshClientServer() {
