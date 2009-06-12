@@ -316,7 +316,11 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
    #regsub -all {\"} $v {"} v
    #DEBUG set v [string map [list {\"} {"}] $v]
 
-   if {[regexp {^(.*)__XXX__(.*)$} $c reco comet m]} {
+   set pos_XXX [string first __XXX__ $c]
+   
+   if {$pos_XXX >= 0} {
+	 set m     [string range $c [expr $pos_XXX + 7] end]
+	 set comet [string range $c 0 [expr $pos_XXX - 1]]
      #puts "Eval of: \"$comet $m $v\""
      if {[string length $v] == 0} {
        set    msg {}
@@ -365,7 +369,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
  }
  set dt [expr [clock clicks -millisecond] - $t0];
 
- #puts "Generated in $dt ms."
+ puts "Generated in $dt ms."
  flush $chan
 }
 
@@ -561,7 +565,8 @@ method PhysicalHTML_root Verif_L_sub_exist_version {vencours} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
  if {[gmlObject info exists object $obj]} {
-   set L [CSS++ $objName "#$obj, #$obj <--< *"]
+   #set L [CSS++ $objName "#$obj, #$obj <--< *"]
+   set L [list]; $obj get_L_ancestors L
   } else {set L [list $obj]}
   
  set trouve 0
@@ -596,7 +601,9 @@ method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Clear_L_PM_really_sub_add {obj} {
  if {[gmlObject info exists object $obj]} {
-   set daughts [CSS++ $obj "#$obj *"]
+   #set daughts [CSS++ $obj "#$obj *"]
+   set L [list]; $obj get_L_out_descendants L
+   set daughts [lrange $L 0 end-1]
   } else {set daughts [list $obj]}
   
  foreach e $daughts {
@@ -619,6 +626,9 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  set this(L_PM_really_add) [list]
  set listcmd               [list]
  
+ 
+ # XXX GROS PROBLEME car BCP de version sont générés lors d'un drag...
+ #     => Optimiser l'ajout de versions
  for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} {
  
 	set objN [lindex $this(concat_send,$ver) 0]
@@ -672,23 +682,10 @@ method PhysicalHTML_root Is_update {clientversion} {
  set this(update_cmd) ""
  
  # Découpage de la chaine reçu pour connaitre  id du client et sa version | rangement dans un tableau de clients
- set long [string length $clientversion]
- set ipclient ""
- set vclient ""
- set space 0
- 
  # Chaine séparer par un espace => "ipclient vclient" => "192.168.0.10 20"
- for { set i 0 } { $i < $long } { incr i 1 } {
-	set resultat [string index $clientversion $i]
-	if {$resultat != " " && $space == 0} {
-		append ipclient $resultat
-	 } elseif {$resultat != " " && $space == 1} {
-		        append vclient $resultat
-	           } else { 
-		               incr space 1
-	                  }
-	unset resultat
-   }
+ set pos [string first { } $clientversion]
+   set ipclient [string range $clientversion 0 [expr $pos - 1]]
+   set vclient  [string range $clientversion [expr $pos + 1] end]
  
  # J'enregistre la version du client dans le tableau
  set this(version_client,$ipclient) $vclient
@@ -700,7 +697,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
-	puts $this(update_cmd)
+	#puts $this(update_cmd)
  }
  
  # J'enregistre la version du serveur dans le client
