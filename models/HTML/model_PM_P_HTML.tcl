@@ -147,9 +147,7 @@ method PM_HTML Render_JS {strm_name mark {dec {}}} {
 method PM_HTML Render_daughters_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
  foreach PM [this get_daughters] {
-   puts "<$PM Render_JS>"
    $PM Render_JS strm $mark $dec
-   puts "</$PM Render_JS>"; flush stdout
   }
 }
 

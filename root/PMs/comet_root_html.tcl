@@ -317,7 +317,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
    #DEBUG set v [string map [list {\"} {"}] $v]
 
    if {[regexp {^(.*)__XXX__(.*)$} $c reco comet m]} {
-     puts "Eval of: \"$comet $m $v\""
+     #puts "Eval of: \"$comet $m $v\""
      if {[string length $v] == 0} {
        set    msg {}
        append msg $comet { } $m " \{\}"
