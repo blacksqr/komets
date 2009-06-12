@@ -12,9 +12,14 @@ method Container_PM_P_HTML_to_SVG constructor {name descr args} {
    this set_prim_handle        $objName
    this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT FRAME" \
                                       ]
+									  
+	set class(last_marker) ""
  eval "$objName configure $args"
  return $objName
 }
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG get_last_marker {} {return $class(last_marker)}
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
@@ -51,3 +56,53 @@ method Container_PM_P_HTML_to_SVG get_HTML_to_SVG_bridge {} {
 
 #_________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG get_pipo_svg {} {return ${objName}_pipo}
+
+#_________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG Add_JS {e} [gmlObject info body PM_SVG Add_JS]
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
+ upvar $strm_name strm
+ 
+ if {![string equal $class(last_marker) $marker]} {
+   puts "  class(last_marker) was equal to $class(last_marker)"
+   set class(last_marker) $marker
+   append strm "function convert_coord_from_page_to_node(x,y,node) {  						\n\
+				var coord = new Array();													\n\
+				coord\['x'\] = x;                         									\n\
+				coord\['y'\] = y;                      										\n\
+				var current_node = node;	                      							\n\
+																							\n\
+				while(current_node.nodeName != 'HTML' && current_node.nodeName != 'svg') {  \n\
+					current_node = current_node.parentNode;                      			\n\
+				}																			\n\
+					 																		\n\
+				if(current_node.nodeName == 'svg') {										\n\
+					coord\['x'\] -= current_node.offsetLeft;								\n\
+					coord\['y'\] -= current_node.offsetTop;									\n\
+					var ma_matrice = current_node.createSVGMatrix();						\n\
+						ma_matrice.e = coord\['x'\];										\n\
+						ma_matrice.f = coord\['y'\];										\n\
+					var matriceres = node.getCTM().inverse().mMultiply(ma_matrice);			\n\
+																							\n\
+					coord\['x'\] = matriceres.e;											\n\
+					coord\['y'\] = matriceres.f;											\n\
+				}																			\n\
+																							\n\
+				return coord;																\n\
+				} 																			\n\
+																							\n\
+				function set_svg_origine(id,x,y) {											\n\
+				  var node = document.getElementById(id);									\n\
+				  if(node != null) {														\n\
+				    var dCTM = node.getCTM();											\n\
+				    dCTM.e = x;															\n\
+				    dCTM.f = y;															\n\
+				    node.setAttribute('transform', 'matrix('+dCTM.a+','+dCTM.b+','+dCTM.c+','+dCTM.d+','+dCTM.e+','+dCTM.f+')'); \n\
+				   }																		\n\
+				 }																			\n\
+				"
+  }
+  
+ this Render_daughters_JS strm $marker $dec
+}

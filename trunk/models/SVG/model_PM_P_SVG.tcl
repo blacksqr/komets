@@ -9,8 +9,7 @@ method PM_SVG constructor {name descr args} {
  [[this get_cou] get_ptf] maj Ptf_SVG
  set this(drag_function) ""
  set this(L_draggable) [list ]
- 
- set class(last_marker) ""
+
 }
 
 #_________________________________________________________________________________________________________
@@ -36,28 +35,27 @@ method PM_SVG Add_JS {e} {
  set cmd ""
  set bridge [this get_HTML_to_SVG_bridge]
  if {$bridge != ""} { 
-     set marker [clock clicks]
-	 $e Render_JS      cmd $marker
+     $e Render_JS      cmd [$bridge get_last_marker]
  
      set pipo_svg [$bridge get_pipo_svg]
 	 set strm ""; $e Render strm
      set strm    [$e Encode_param_for_JS $strm]
-     append cmd  "var svg = \$('#$pipo_svg').svg('get');"
-     append cmd  "svg.add($strm);" 
+     append cmd  "var svg = \$('#$pipo_svg').svg('get');\n"
+     append cmd  "svg.add($strm);\n" 
 	 
 	 set pos       [lsearch [$objName get_daughters] $e]
 	 set tailletot [llength [$objName get_daughters]]
 	 set e_root    [$e get_prim_handle]
-	 append cmd    "var ref = \$(\"#$e_root\").get(0);"
-	 append cmd    "ref.parentNode.removeChild(ref);"
+	 append cmd    "var ref = \$(\"#$e_root\").get(0);\n"
+	 append cmd    "ref.parentNode.removeChild(ref);\n"
 
 	 if { $tailletot-1 > $pos} {
 		set objAfter [lindex [$objName get_daughters] [expr $pos+1]]
 		set objAfter [$objAfter get_prim_handle]
 		set root_for_daughters [this get_root_for_daughters]
-		append cmd "\$('#$root_for_daughters').get(0).insertBefore(ref, \$('#$objAfter').get(0));"
+		append cmd "\$('#$root_for_daughters').get(0).insertBefore(ref, \$('#$objAfter').get(0));\n"
 	  } else {set root_for_daughters [this get_root_for_daughters]
-			  append cmd "\$('#$root_for_daughters').get(0).appendChild(ref);"
+			  append cmd "\$('#$root_for_daughters').get(0).appendChild(ref);\n"
 			 }
 
    
@@ -66,9 +64,10 @@ method PM_SVG Add_JS {e} {
  return $cmd
 }
 
+Trace PM_SVG Add_JS
 #___________________________________________________________________________________________________________________________________________
 method PM_SVG Sub_JS {e} {
- set cmd "\$('#$e').remove();"
+ set cmd "\$('#$e').remove();\n"
  return $cmd
 }
 
@@ -78,10 +77,11 @@ method PM_SVG SVG_Origine {coords} {
 
 #___________________________________________________________________________________________________________________________________________
 Manage_CallbackList PM_SVG SVG_Origine end
-Trace PM_SVG SVG_Origine
 
 #___________________________________________________________________________________________________________________________________________
 method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
+ if {$direct_mode == 1  &&  $L_drag_element == $this(L_draggable)} {return ""}
+ 
  set cmd ""
  foreach n $this(L_draggable) {
 	append cmd "\$('#$n').draggable('destroy');\n"
@@ -121,37 +121,3 @@ method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
  return $cmd
 }
 
-#___________________________________________________________________________________________________________________________________________
-method PM_SVG Render_JS {strm_name marker {dec {}}} {
- upvar $strm_name strm
- 
- if {![string equal $class(last_marker) $marker]} {
-   set class(last_marker) $marker
-   append strm "function convert_coord_from_page_to_node(x,y,node) {  						\
-				var coord = new Array();													\
-				coord\['x'\] = x;                         									\
-				coord\['y'\] = y;                      										\
-				var current_node = node;	                      							\
-																							\
-				while(current_node.nodeName != 'HTML' && current_node.nodeName != 'svg') {  \
-					current_node = current_node.parentNode;                      			\
-				}																			\
-					 																		\
-				if(current_node.nodeName == 'svg') {										\
-					coord\['x'\] -= current_node.offsetLeft;								\
-					coord\['y'\] -= current_node.offsetTop;									\
-					var ma_matrice = current_node.createSVGMatrix();						\
-						ma_matrice.e = coord\['x'\];										\
-						ma_matrice.f = coord\['y'\];										\
-					var matriceres = node.getCTM().inverse().mMultiply(ma_matrice);			\
-																							\
-					coord\['x'\] = matriceres.e;											\
-					coord\['y'\] = matriceres.f;											\
-				}																			\
-																							\
-				return coord;																\
-				} \n"
-  }
-  
- this Render_daughters_JS strm $marker $dec
-}
