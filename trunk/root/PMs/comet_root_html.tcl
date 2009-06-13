@@ -491,22 +491,34 @@ method PhysicalHTML_root Concat_update {objN methode cmd} {
  # suppression dans le concat toute les versions qui sont obsoléte
  this Concat_update_supp
 
+ # Avant d'incrémenter la version, on vérifie que objN et method ne sont pas dans les nouvelles mises à jour.
  # +1 pour la nouvelle version
- incr this(version_server)
+ set v_current $this(version_server)
+ set vmax      [this get_vclient_max]
+ set trouve    0
  
+ while {$v_current > $vmax} {
+   if {[lrange $this(concat_send,$v_current) 0 1] == [list $objN $methode]} {set trouve 1;  break} else {incr v_current -1}
+  }
+ if {!$trouve} {incr this(version_server)
+                set  v_current $this(version_server)
+			   }
+  
  # enregistrement de la commande avec sa version
- set this(concat_send,$this(version_server)) [list $objN $methode $cmd]
+ set this(concat_send,$v_current) [list $objN $methode $cmd]
+ 
+ #set this(concat_send,$this(version_server)) [list $objN $methode $cmd]
  
  return ""
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Concat_update_supp {} {
- set mini [this get_vclient_min] 
+ set mini [this get_vclient_min];
  
  if {$mini != -1} {
 	 foreach {vconcat cmd} [array get this concat_send,*] {
-		if($vconcat <= $mini) {
+		if {$vconcat <= $mini} {
 			unset this(concat_send,$vconcat)
 		}
 	 }
@@ -529,13 +541,41 @@ method PhysicalHTML_root Concat_update_supp {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root get_vclient_max {} {
+ # renvoi la version la plus grande de tous les clients
+ set max -1
+
+	 foreach {i v} [array get this version_client,*] {
+	   if {$v > $max} {
+		 set max $v
+		}
+	  }
+
+ return $max
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root get_vclient_min {} {
+ # renvoi la version la plus grande de tous les clients
+ set min -1
+
+	 foreach {i v} [array get this version_client,*] {
+	   if {$min == -1 || $v < $min} {
+		 set min $v
+		}
+	  }
+
+ return $min
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root get_vclient_min___OLD___ {} {
  # renvoi la version la plus petite de tous les clients
  set mini -1
  if {[array size this(version_client)]} {
 	 set i 0
 	 foreach p [array names this version_client] {
-		if($this(version_client,$p) < $mini || $i == 0) {
+		if {$this(version_client,$p) < $mini || $i == 0} {
 			set mini $this(version_client,$p)		
 		}
 		incr i 1
