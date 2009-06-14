@@ -12,8 +12,9 @@ method Container_PM_P_HTML_to_SVG constructor {name descr args} {
    this set_prim_handle        $objName
    this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT FRAME" \
                                       ]
-									  
-	set class(last_marker) ""
+   set this(canevas_width) ""
+   set this(canevas_height) 400  
+	set class(last_marker) "100%"
  eval "$objName configure $args"
  return $objName
 }
@@ -35,16 +36,17 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
-
+ 
  append strm $dec "\$('#$objName').svg();\n"
  append strm $dec "\$('#${objName}_pipo').svg();\n"
  
  append strm $dec "var svg = \$('#$objName').svg('get');\n"
- set render_daughters "<g id=\"${objName}_root_group\">"
+ 
+ set render_daughters "<g id=\"${objName}_root_group\" transform=\"translate(0,[this get_canevas_height]) scale(1,-1)\">"
    this Render_daughters render_daughters
  append render_daughters "</g>"
  append strm $dec "svg.add([this Encode_param_for_JS $render_daughters]);\n"
- append strm $dec "svg.configure({height: '400'}, true);\n"
+ append strm $dec "svg.configure({height: '[this get_canevas_height]',width: '[this get_canevas_width]'}, false);"
  
  this Render_daughters_post_JS strm $dec
 }
@@ -59,6 +61,31 @@ method Container_PM_P_HTML_to_SVG get_pipo_svg {} {return ${objName}_pipo}
 
 #_________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG Add_JS {e} [gmlObject info body PM_SVG Add_JS]
+
+# _________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG set_canevas_width {v} {
+ set this(canevas_width) $v
+ set cmd "var svg = \$('#$objName').svg('get');"
+ append cmd "svg.configure({width: '$v'}, false);" 
+ 
+ this send_jquery_message "set_canevas_width" $cmd 
+}
+
+# _________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG get_canevas_width {} {return $this(canevas_width)}
+
+# _________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG set_canevas_height {v} {
+ set this(canevas_height) $v
+ set cmd "var svg = \$('#$objName').svg('get');"
+ append cmd "svg.configure({height: '$v'}, false);" 
+ append cmd "\$('#${objName}_root_group').get(0).setAttribute('transform','translate(0,$v) scale(1,-1)');"
+ 
+ this send_jquery_message "set_canevas_height" $cmd 
+}
+
+# _________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG get_canevas_height {} {return $this(canevas_height)}
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
@@ -95,9 +122,9 @@ method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
 				function set_svg_origine(id,x,y) {											\n\
 				  var node = document.getElementById(id);									\n\
 				  if(node != null) {														\n\
-				    var dCTM = node.getCTM();											\n\
-				    dCTM.e = x;															\n\
-				    dCTM.f = y;															\n\
+				    var dCTM = node.getCTM();												\n\
+				    dCTM.e = x;																\n\
+				    dCTM.f = y;																\n\
 				    node.setAttribute('transform', 'matrix('+dCTM.a+','+dCTM.b+','+dCTM.c+','+dCTM.d+','+dCTM.e+','+dCTM.f+')'); \n\
 				   }																		\n\
 				 }																			\n\

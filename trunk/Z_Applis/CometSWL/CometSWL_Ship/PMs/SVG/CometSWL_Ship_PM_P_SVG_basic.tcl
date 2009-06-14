@@ -14,6 +14,7 @@ method CometSWL_Ship_PM_P_SVG_basic constructor {name descr args} {
  
  set this(svg_x) ""
  set this(svg_y) ""
+ set this(mode) edition
  
  eval "$objName configure $args"
  return $objName
@@ -25,6 +26,9 @@ Methodes_get_LC CometSWL_Ship_PM_P_SVG_basic [P_L_methodes_get_CometSWL_Ship] {$
 
 #___________________________________________________________________________________________________________________________________________
 Generate_PM_setters CometSWL_Ship_PM_P_SVG_basic [P_L_methodes_set_CometSWL_Ship_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
+Generate_accessors CometSWL_Ship_PM_P_B207_basic [list mode]
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometSWL_Ship_PM_P_SVG_basic prim_set_X \
@@ -72,7 +76,16 @@ method CometSWL_Ship_PM_P_SVG_basic set_Y       {v}  {
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic Update_color {} {
- set color [$this(current_player) get_player_color]
+ set rgba [$this(current_player) get_player_color]
+ set r [format %.2x [expr int([lindex $rgba 0]*255)]]
+ set g [format %.2x [expr int([lindex $rgba 1]*255)]]
+ set b [format %.2x [expr int([lindex $rgba 2]*255)]]
+ set color [expr 0x$r$g${b}]
+	 puts "color : $color"
+	 
+ set cmd "\$('#${objName}_drag').get(0).setAttribute('fill','#$r$g$b');"
+ 
+ this send_jquery_message "Update_color" $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -90,8 +103,9 @@ method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
 method CometSWL_Ship_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
  upvar $strm_name strm
  this inherited strm
- 
- append strm [this Draggable ${objName} ${objName}_drag 0]
+ if {[this get_mode] == "edition"} {
+     append strm [this Draggable ${objName} ${objName}_drag 0]
+  }
  
  this Render_daughters_post_JS strm $dec
 }

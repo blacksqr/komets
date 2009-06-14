@@ -14,6 +14,7 @@ method CometSWL_Planet_PM_P_SVG_basic constructor {name descr args} {
  
  set this(svg_x) ""
  set this(svg_y) ""
+ set this(mode) edition
  
  eval "$objName configure $args"
  return $objName
@@ -25,6 +26,9 @@ Methodes_get_LC CometSWL_Planet_PM_P_SVG_basic [P_L_methodes_get_CometSWL_Planet
 
 #___________________________________________________________________________________________________________________________________________
 Generate_PM_setters CometSWL_Planet_PM_P_SVG_basic [P_L_methodes_set_CometSWL_Planet_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
+Generate_accessors CometSWL_Ship_PM_P_B207_basic [list mode]
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometSWL_Planet_PM_P_SVG_basic prim_set_X \
@@ -50,11 +54,6 @@ method CometSWL_Planet_PM_P_SVG_basic SVG_Origine {coords} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_SVG_basic Update_datas {} {}
-
-#___________________________________________________________________________________________________________________________________________
-method CometSWL_Planet_PM_P_SVG_basic set_mode    {m}  {
- if {$m == "game"} {set v 0} else {set v 1}
-}
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_SVG_basic set_X       {v}  {
@@ -97,9 +96,9 @@ method CometSWL_Planet_PM_P_SVG_basic Render {strm_name {dec {}}} {
 method CometSWL_Planet_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
  upvar $strm_name strm
  this inherited strm
- 
- append strm [this Draggable ${objName} ${objName}_drag 0]
- append strm "var lag = 0;																				\n\
+ if {[this get_mode] == "edition"} {
+   append strm [this Draggable ${objName} ${objName}_drag 0]
+   append strm "var lag = 0;																				\n\
 			\$('#${objName}_resize').draggable({start:function(event, ui){								\n\
 				var cx = this.getAttribute('cx');														\n\
 				var cy = this.getAttribute('cy');														\n\
@@ -121,6 +120,6 @@ method CometSWL_Planet_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
 			},stop : function(event, ui){																\n\
 				addOutput_proc_val('${objName}__XXX__prim_set_R', this.getAttribute('r'), true); 		\n\
 			}});"
-			
+  }			
  this Render_daughters_post_JS strm $dec
 }
