@@ -16,6 +16,8 @@ $(document).ready(function() {
 	}
 	catch(err) {
 		alert("Votre navigateur ne gère pas le java");
+		ip = '127.0.0.1';
+		$("#IP_client").val(ip);
 	}
 
 	setInterval('refreshClientServer()',2000);		

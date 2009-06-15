@@ -40,6 +40,8 @@ method PhysicalHTML_root constructor {name descr args} {
   set this(L_PM_to_add) [list]
   set this(L_PM_really_add) [list]
   set this(L_PM_really_sub) [list]
+  
+  set this(concat_send,0) ""
   # ___________________________________________________________#
   
  eval "$objName configure $args"
