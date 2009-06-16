@@ -14,7 +14,7 @@ method CometSWL_Planet_PM_P_SVG_basic constructor {name descr args} {
  
  set this(svg_x) ""
  set this(svg_y) ""
- set this(mode) edition
+ set this(mode) "edition"
  
  eval "$objName configure $args"
  return $objName
@@ -28,18 +28,20 @@ Methodes_get_LC CometSWL_Planet_PM_P_SVG_basic [P_L_methodes_get_CometSWL_Planet
 Generate_PM_setters CometSWL_Planet_PM_P_SVG_basic [P_L_methodes_set_CometSWL_Planet_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometSWL_Ship_PM_P_B207_basic [list mode]
+Generate_accessors CometSWL_Planet_PM_P_SVG_basic [list mode]
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometSWL_Planet_PM_P_SVG_basic prim_set_X \
   "set this(svg_x) \$v" \
   ""
-
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometSWL_Planet_PM_P_SVG_basic prim_set_Y \
   "set this(svg_y) \$v" \
   ""
-
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Ship_PM_P_SVG_basic set_mode    {m}  {
+ set this(mode) $m
+}
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_SVG_basic SVG_Origine {coords} {
@@ -52,6 +54,13 @@ method CometSWL_Planet_PM_P_SVG_basic SVG_Origine {coords} {
  this inherited $coords
 }
 
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Planet_PM_P_SVG_basic Substitute_by {PM} {
+ this inherited $PM
+ if {[catch "$PM set_mode [this get_mode]" err]} {
+   puts "Error in \"$objName Substitute_by $PM :\n  -  exp : May be due to the non implementation of a set_mode method in $PM\n  -err : $err\""
+  }
+}
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_SVG_basic Update_datas {} {}
 
