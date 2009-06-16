@@ -50,14 +50,17 @@ method CometSWL_Missile_PM_P_SVG_basic SVG_Origine {coords} {
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Missile_PM_P_SVG_basic set_X       {v}  {
  if {$v != $this(svg_x)} {
-   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cx',$v)});" 
+   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cx',$v)}); \$('#$objName').each(function(i) {this.setAttribute('cy',[this get_Y])});" 
   }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Missile_PM_P_SVG_basic set_Y       {v}  {
  if {$v != $this(svg_y)} {
-   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cy',$v)});"
+   # set cmd "$('#$objName').each(function(i) {"
+   # append cmd "var "
+   # append cmd "this.setAttribute('cy',$v)}"
+   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cy',$v)}); \$('#$objName').each(function(i) {this.setAttribute('cx',[this get_X])});"
   }
 }
 
@@ -65,7 +68,7 @@ method CometSWL_Missile_PM_P_SVG_basic set_Y       {v}  {
 method CometSWL_Missile_PM_P_SVG_basic Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm "<circle id=\"${objName}\" cx=\"[this get_X]\" cy=\"[this get_Y]\" r=\"5\" fill=\"yellow\" stroke=\"black\" stroke-width=\"3\" />\n"
+ append strm "<circle id=\"${objName}\" cx=\"[this get_X]\" cy=\"[this get_Y]\" r=\"5\" fill=\"white\" stroke=\"black\" stroke-width=\"1\" />\n"
  
  this Render_daughters strm "$dec  "
 }

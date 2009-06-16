@@ -107,7 +107,7 @@ method CometSWL_Planet_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
  this inherited strm
  if {[this get_mode] == "edition"} {
    append strm [this Draggable ${objName} ${objName}_drag 0]
-   append strm "var lag = 0;																				\n\
+   append strm "var ${objName}_lag = 0;																				\n\
 			\$('#${objName}_resize').draggable({start:function(event, ui){								\n\
 				var cx = this.getAttribute('cx');														\n\
 				var cy = this.getAttribute('cy');														\n\
@@ -115,7 +115,7 @@ method CometSWL_Planet_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
 				var nbre1 = (cx - coord\['x'\]);														\n\
 				var nbre2 = (cy - coord\['y'\]);														\n\
 				var d_middle_arrow = (Math.sqrt((nbre1*nbre1) + (nbre2*nbre2)));						\n\
-				lag = (this.getAttribute('r') - d_middle_arrow) / this.getAttribute('r');				\n\
+				${objName}_lag = (this.getAttribute('r') - d_middle_arrow) / this.getAttribute('r');				\n\
 			},drag:function(event, ui){																	\n\
 				var cx = \$(this).get(0).getAttribute('cx');											\n\
 				var cy = \$(this).get(0).getAttribute('cy');											\n\
@@ -123,7 +123,7 @@ method CometSWL_Planet_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
 				var nbre1 = (cx - coord\['x'\]);														\n\
 				var nbre2 = (cy - coord\['y'\]);														\n\
 				var newR = (Math.sqrt((nbre1*nbre1) + (nbre2*nbre2)));									\n\
-				newR += (newR * lag);																	\n\
+				newR += (newR * ${objName}_lag);																	\n\
 				\$(this).get(0).setAttribute('r',newR);													\n\
 				\$('#${objName}_drag').get(0).setAttribute('r',(newR*0.8));								\n\
 			},stop : function(event, ui){																\n\
