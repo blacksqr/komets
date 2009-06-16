@@ -2,6 +2,7 @@ var output     = {};
 var output_tmp = {};
 var outputVer  = {};
 var i = 0;	
+var i_tmp = 0;	
 var mutex        = false;
 var forcing_send = false;
 
@@ -31,7 +32,7 @@ function maj() {
 
 function addOutput(obj,forcing) {
 	// Ajout dans la map output la modification faite sur le client html
-	if(mutex) {output_tmp[obj.name] = obj.value;} else {output[obj.name] = obj.value; i++;}
+	if(mutex) {output_tmp[obj.name] = obj.value; i_tmp++;} else {output[obj.name] = obj.value; i++;}
 	
 	if(forcing) { 
 		forcing_send = forcing;
@@ -41,7 +42,7 @@ function addOutput(obj,forcing) {
 
 function addOutput_proc_val(proc, val, forcing) {
 	// Ajout dans la map output la modification faite sur le client html
-	if(mutex) {output_tmp[proc] = val;} else {output[proc] = val; i++;}
+	if(mutex) {output_tmp[proc] = val; i_tmp++;} else {output[proc] = val; i++;}
 	if(forcing) { 
 		forcing_send = forcing;
 		refreshClientServer(); 
@@ -78,14 +79,16 @@ function refreshClientServer() {
 										type: "POST",
 										url: "index.php",
 										data: output,
-										success : function(msg) {output = output_tmp;
+										success : function(msg) {mutex = false;
+																 output = output_tmp;
 										                         output_tmp = {};
-																 i = 0;
+																 i = i_tmp;
+																 i_tmp = 0;
 																 if(msg) {try {eval(msg);
 																	          } catch(err) { alert(err);
 																						   }
 																		 }
-																 mutex = false;
+																 
 																 if(forcing_send) {forcing_send = false;
 																				   refreshClientServer();
 																				  }

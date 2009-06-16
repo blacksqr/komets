@@ -120,7 +120,7 @@ method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
    if {[this get_mode] == "game"} { 
        set pi 3.1415926535897931
 	   set angle [expr [this get_angle]*(180/$pi)]
-       append strm "<rect id=\"${objName}_arrow_drag\" x=\"0\" y=\"-9\" width=\"[this get_power]\" height=\"18\" fill-opacity=\"0.5\" transform=\"rotate($angle,0,0)\" stroke-opacity=\"0.9\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n" 
+       append strm "<rect id=\"${objName}_arrow_drag\" x=\"0\" y=\"-9\" width=\"[expr 20+[this get_power]]\" height=\"18\" fill-opacity=\"0.5\" transform=\"rotate($angle,0,0)\" stroke-opacity=\"0.9\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n" 
 	 }
    append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
  append strm "</g>\n"
@@ -161,14 +161,14 @@ method CometSWL_Ship_PM_P_SVG_basic Render_post_JS {strm_name {dec ""}} {
 	   append strm "   var dymouse = coord\['y'\];\n"
 	   append strm "   var puissance = Math.sqrt((dxmouse*dxmouse) + (dymouse*dymouse));"
 	   append strm "   ${objName}_angle_arrow = Math.acos(dxmouse / puissance);"
-	   append strm "   if(puissance > [this get_power]) { puissance = [this get_power]; } else if(puissance <= 20) { puissance = 20; }\n"
+	   append strm "   if(puissance > 120) { puissance = 120; } else if(puissance <= 20) { puissance = 20; }\n"
 	   append strm "   if(dymouse < 0) { ${objName}_angle_arrow = (2 * Math.PI) - ${objName}_angle_arrow; }\n"
 	   append strm "   ${objName}_angle_arrow = ${objName}_angle_arrow * (180 / Math.PI);\n"
 	   append strm "   this.setAttribute('width', puissance); \n"
 	   append strm "   this.setAttribute('transform','rotate('+${objName}_angle_arrow+',0,0)');\n"
 	 append strm "},stop : function(event, ui){\n"
 	   append strm "   var rad = (${objName}_angle_arrow*Math.PI)/180.0;"
-	   append strm "   addOutput_proc_val('${objName}__XXX__prim_set_angle', rad, true);\n"
+	   append strm "   addOutput_proc_val('${objName}__XXX__prim_set_angle', rad, false);\n"
 	   append strm "   addOutput_proc_val('${objName}__XXX__prim_set_power', (this.getAttribute('width')-20), true);\n"
 	 append strm "}});\n"
   }

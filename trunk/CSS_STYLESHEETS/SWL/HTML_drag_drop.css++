@@ -2,3 +2,27 @@
   GDD_fct : Implem(Container_CUI_bridge_HTML_to_SVG);
 }
 
+#$current(inter_SWL) {
+  GDD_fct : Implem(ScrollableMonospaceInterleaving);
+}
+
+#$current(add.player)  {
+  FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "$obj Add_Params \"player \[CPool get_a_comet CometSWL_Player]\""    UNIQUE;
+}
+
+#$current(ACT.ADD.PLANET)  {
+  FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "$obj Add_Params \"ray 80 planet \[CPool get_a_comet CometSWL_Planet]\"" UNIQUE ;
+}
+
+#$current(CONT.OP_EDITION)  {
+  GDD_fct : Implem(Container_Maskable_CUI);
+  FCT_set_drag : 1;
+  FCT_set_title : Commandes du jeu SWL;
+}
+
+#$current {
+  FCT_Eval : set    cmd {}
+         --- append cmd {set PM [CSS++ cr "#${C}->PMs\[soft_type == PHP_HTML\] \\<--< } $obj {/"] --- }
+         --- append cmd "Apply_style_on \$PM \[list \] {[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++} {[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_player_HTML_V1.css++}"
+		 --- [$obj get_real_LC] Subscribe_to_Add_a_player alex_HTML_DragDrop $cmd UNIQUE ;
+}

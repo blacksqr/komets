@@ -372,7 +372,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
  }
  set dt [expr [clock clicks -millisecond] - $t0];
 
- puts "Generated in $dt ms."
+ #puts "Generated in $dt ms."
  flush $chan
 }
 
