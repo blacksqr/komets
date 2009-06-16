@@ -1,0 +1,24 @@
+#$current(SPECIFYER.COLOR) {
+  GDD_fct : Implem(Specifyer_Color_CUI_basic_system);
+}
+
+#$current {
+  FCT_Eval : set swl_PM [CSS++ $obj "#$obj <--< CometSWL"]
+         --- set LC [$obj get_LC]
+		 --- set LC_sub_player [CSS++ cr "#${swl_PM}(sub.player->LC)"]
+		 --- set LC_add_ship   [CSS++ cr "#${swl_PM}(add.ship->LC)"]
+		 --- set PM_encaps     [U_encapsulator_PM $obj "CometContainer(-set_name Container, $LC_sub_player\(), \$obj, ${LC_add_ship}())"]
+		 --- set PM_sub        [CSS++ cr "#${PM_encaps}(sub.player)"]
+		 ---   $PM_sub Add_Params "player $LC"
+		 --- set PM_add_V [CSS++ $obj "#${PM_encaps}($LC_add_ship)"]
+		 ---   $PM_add_V Subscribe_to_Trigger_prim_activate __FOREACH_PM__alex_HTML_V1 "$PM_add_V Add_Params \"player $LC ship \[CPool get_a_comet CometSWL_Ship]\""    UNIQUE
+		 --- puts "Now obj = $PM_encaps" ;
+}
+
+#$current {
+  FCT_set_player_color : 1 1 0 1;
+}
+
+#$current(SUB.PLAYER, ACT.ADD.PLAYER), #$current(CORE), #$current(CORE(>*)), #$current(CORE *) {
+  FCT_set_html_style : display inline float left;
+}

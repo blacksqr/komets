@@ -51,14 +51,12 @@ method Interleaving_PM_P_MenuHorizontal_HTML set_current_menu {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_MenuHorizontal_HTML Render_JS {strm_name mark {dec {}}} {
+method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
- if {$mark != [this get_mark]} {
-   append strm $dec "\$(function() {" "\n"
+
    append strm $dec "\$(\"#${objName}\").tabs();" "\n"
-   append strm $dec "});" "\n"
-  }
- this Render_daughters_JS strm $mark
+
+ this Render_daughters_post_JS strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
