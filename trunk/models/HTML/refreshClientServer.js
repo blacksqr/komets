@@ -20,8 +20,14 @@ $(document).ready(function() {
 		$("#IP_client").val(ip);
 	}
 
-	setInterval('refreshClientServer()',2000);		
+	//setInterval('refreshClientServer()',2000);		
+	maj();
 });
+
+function maj() {
+	refreshClientServer();
+	setTimeout('maj()',$("#Update_interval").val());
+}
 
 function addOutput(obj,forcing) {
 	// Ajout dans la map output la modification faite sur le client html
@@ -43,9 +49,7 @@ function addOutput_proc_val(proc, val, forcing) {
 }
 
 function refreshClientServer() {
-	//$("#p_debug").append("refreshClientServer --- ");
 	if(mutex == false) {
-		//$("#p_debug").append("INSIDE --- ");
 		mutex = true;
 		
 		// On enregistre la version du client et de son ip
@@ -101,7 +105,5 @@ function refreshClientServer() {
 				alert("Problème de réception des mises à jour serveur\n\n"+err);
 			}
 		});
-	} else {//if(forcing_send) { setTimeout('refreshClientServer()',1000);	 }
-	       }
-   //$("#p_debug").append("END<br/>");
+	}
 }

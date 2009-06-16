@@ -21,6 +21,7 @@ method PhysicalHTML_root constructor {name descr args} {
   set this(next_root) {}
   set this(AJAX_root) {}
   set this(One_root_per_IP) 0
+  set this(Update_interval) 2000
     set this(L_cmd_to_eval_when_plug_under_new_roots) ""
 
   set this(clients)        [list]
@@ -52,7 +53,7 @@ method PhysicalHTML_root constructor {name descr args} {
 Methodes_set_LC PhysicalHTML_root [L_methodes_set_CometRoot] {} {}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP]
+Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP Update_interval]
 Generate_List_accessor PhysicalHTML_root L_cmd_to_eval_when_plug_under_new_roots L_cmd_to_eval_when_plug_under_new_roots
 
 #___________________________________________________________________________________________________________________________________________
@@ -423,6 +424,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
  append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
  append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
+ append rep "  " "  " "  " {<input type="hidden" value="} [this get_Update_interval] {" id="Update_interval" />} "\n"
    #puts "  this Render_daughters rep"
    this Render_daughters rep "$dec  "
    #puts "  / END OF / this Render_daughters rep"
@@ -430,6 +432,12 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep "  " "  " {</form>} "\n"
  append rep "  " {</body>} "\n"
  append rep </html> "\n"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root set_Update_interval {v} {
+ set this(Update_interval) $v
+ this Concat_update $objName "set_update_interval" "\$(\"#Update_interval\").val($v);\n"
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -739,7 +747,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
-	#puts $this(update_cmd)
+	puts $this(update_cmd)
  }
  
  # J'enregistre la version du serveur dans le client
