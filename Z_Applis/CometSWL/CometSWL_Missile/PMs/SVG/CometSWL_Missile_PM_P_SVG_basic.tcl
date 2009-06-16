@@ -50,14 +50,14 @@ method CometSWL_Missile_PM_P_SVG_basic SVG_Origine {coords} {
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Missile_PM_P_SVG_basic set_X       {v}  {
  if {$v != $this(svg_x)} {
-   this send_jquery_message "SVG_Origine" "\$('#$objName').get(0).setAttribute('cx',$v);" 
+   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cx',$v)});" 
   }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Missile_PM_P_SVG_basic set_Y       {v}  {
  if {$v != $this(svg_y)} {
-   this send_jquery_message "SVG_Origine" "\$('#$objName').get(0).setAttribute('cy',$v);"
+   this send_jquery_message "SVG_Origine" "\$('#$objName').each(function(i) {this.setAttribute('cy',$v)});"
   }
 }
 
