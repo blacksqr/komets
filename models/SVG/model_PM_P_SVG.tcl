@@ -97,6 +97,7 @@ method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
 	   append cmd "   var coord = convert_coord_from_page_to_node(event.pageX,event.pageY,drag_obj.parentNode);\n"
 	   append cmd "   ${n}_dx = coord\['x'\];\n"
 	   append cmd "   ${n}_dy = coord\['y'\];\n"
+	   #append cmd "   alert('click on ' + ${n}_dx +' , '+ ${n}_dy);"
 	   append cmd "   var ma_matrice = drag_obj.getCTM();\n"
 	   append cmd "   var dCTM = drag_obj.parentNode.getCTM().inverse().mMultiply(ma_matrice);\n"
 	   append cmd {   } ${n}_ {str_dCTM = "matrix("+dCTM.a+","+dCTM.b+","+dCTM.c+","+dCTM.d+","+dCTM.e+","+dCTM.f+")";} "\n"
@@ -110,6 +111,7 @@ method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
 	 append cmd "},stop : function(event, ui){\n"
 	   append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
 	   append cmd "   var ma_matrice = drag_obj.getCTM();\n"
+	   append cmd "   var ma_matrice = drag_obj.parentNode.getCTM().inverse().mMultiply(ma_matrice);\n"
 	   append cmd "   addOutput_proc_val(\"${objName}__XXX__SVG_Origine\", ma_matrice.e + ' ' + ma_matrice.f,true);\n"
 	 append cmd "}});\n"
  }

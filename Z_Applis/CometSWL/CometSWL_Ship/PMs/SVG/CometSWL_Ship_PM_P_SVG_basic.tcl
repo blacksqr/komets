@@ -14,7 +14,9 @@ method CometSWL_Ship_PM_P_SVG_basic constructor {name descr args} {
  
  set this(svg_x) ""
  set this(svg_y) ""
- set this(mode) edition
+ set this(mode) "edition"
+ 
+ set this(current_player) ""
  
  eval "$objName configure $args"
  return $objName
@@ -39,14 +41,32 @@ Inject_code CometSWL_Ship_PM_P_SVG_basic prim_set_X \
 Inject_code CometSWL_Ship_PM_P_SVG_basic prim_set_Y \
   "set this(svg_y) \$v" \
   ""
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Ship_PM_P_SVG_basic set_player  {P}  {
+ if {$this(current_player) != ""} {$this(current_player) UnSubscribe_to_set_player_color $objName}
+ set this(current_player) $P
+ if {$P != ""} {
+   $this(current_player) Subscribe_to_set_player_color $objName "$objName Update_color"
+   this Update_color
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Ship_PM_P_SVG_basic Substitute_by {PM} {
+ this inherited $PM
+ if {[catch "$PM set_mode [this get_mode]" err]} {
+   puts "Error in \"$objName Substitute_by $PM :\n  -  exp : May be due to the non implementation of a set_mode method in $PM\n  -err : $err\""
+  }
+}
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic Update_datas {} {}
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic set_mode    {m}  {
- if {$m == "game"} {set v 0} else {set v 1}
-
+ set this(mode) $m
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -81,9 +101,8 @@ method CometSWL_Ship_PM_P_SVG_basic Update_color {} {
  set g [format %.2x [expr int([lindex $rgba 1]*255)]]
  set b [format %.2x [expr int([lindex $rgba 2]*255)]]
  set color [expr 0x$r$g${b}]
-	 puts "color : $color"
 	 
- set cmd "\$('#${objName}_drag').get(0).setAttribute('fill','#$r$g$b');"
+ set cmd "\$('#${objName}_drag').each(function(i) {this.setAttribute('fill','#$r$g$b')});"
  
  this send_jquery_message "Update_color" $cmd
 }
@@ -91,9 +110,14 @@ method CometSWL_Ship_PM_P_SVG_basic Update_color {} {
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
  upvar $strm_name strm
+ set rgba [[this get_player] get_player_color]
+ set r [format %.2x [expr int([lindex $rgba 0]*255)]]
+ set g [format %.2x [expr int([lindex $rgba 1]*255)]]
+ set b [format %.2x [expr int([lindex $rgba 2]*255)]]
+
  
  append strm "<g id=\"${objName}\" transform=\"translate([this get_X],[this get_Y])\">\n"
-   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"yellow\" stroke=\"black\" stroke-width=\"1\" />\n"
+   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
  append strm "</g>\n"
  
  this Render_daughters strm "$dec  "

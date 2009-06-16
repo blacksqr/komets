@@ -122,10 +122,10 @@ method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
 				function set_svg_origine(id,x,y) {											\n\
 				  var node = document.getElementById(id);									\n\
 				  if(node != null) {														\n\
-				    var dCTM = node.getCTM();												\n\
-				    dCTM.e = x;																\n\
-				    dCTM.f = y;																\n\
-				    node.setAttribute('transform', 'matrix('+dCTM.a+','+dCTM.b+','+dCTM.c+','+dCTM.d+','+dCTM.e+','+dCTM.f+')'); \n\
+				    var nCTM = node.parentNode.getCTM().inverse().mMultiply(node.getCTM()); \n\
+				    nCTM.e = x;																\n\
+				    nCTM.f = y;																\n\
+				    node.setAttribute('transform', 'matrix('+nCTM.a+','+nCTM.b+','+nCTM.c+','+nCTM.d+','+nCTM.e+','+nCTM.f+')'); \n\
 				   }																		\n\
 				 }																			\n\
 				"
