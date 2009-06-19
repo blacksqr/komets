@@ -72,7 +72,7 @@ method Container_PM_P_HideShow_HTML set_drag {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
+method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
 
  append strm $dec "\$(function() {" "\n" 
@@ -130,8 +130,8 @@ method Container_PM_P_HideShow_HTML Render_JS {strm_name mark {dec {}}} {
 
  append strm $dec "});" "\n"
 
- this set_mark $mark
- this Render_daughters_JS strm $mark $dec  
+ #this set_mark $mark
+ this Render_daughters_post_JS strm $dec  
 }
 
 #___________________________________________________________________________________________________________________________________________

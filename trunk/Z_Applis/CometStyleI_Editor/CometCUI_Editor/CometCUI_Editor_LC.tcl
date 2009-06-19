@@ -86,14 +86,14 @@ Inject_code CometCUI_Editor set_edited_comet \
 			  C_GDD $this(filter)_LM_LP "Implem" Container
 			  set ptf [this get_ptf_of_CUI]
               puts "  ptf = $ptf"
-			  $this(filter)_LM_LP set_PM_factories [$this(filter)_LM_LP get_L_compatible_factories_with_ptf $ptf]
-              puts "  this(filter)_LM_LP get_PM_factories = [$this(filter)_LM_LP get_PM_factories]"
+			  $this(filter)_LM_LP set_PM_factories [$this(filter)_LM_LP get_L_symetrically_compatible_factories_with_ptf $ptf]
+              puts "  this(filter)_LM_LP get_PM_factories = [$this(filter)_LM_LP get_PM_factories]\n  this(filter)_LM_LP = $this(filter)_LM_LP"
 			  set L_PMs [$this(filter)_LM_LP get_L_PM]
               puts "  this(filter)_LM_LP get_L_PM = {$L_PMs}"
 			  foreach PM $L_PMs {
                 puts "    considering PM $PM"
-			    if {![${PM}_cou_ptf Accept_for_daughter $ptf]} {
-                  puts "    $PM is not compatible with $ptf and therefore destroyed\n    $PM classe's are [gmlObject info classes $PM]"
+			    if {![$ptf Accept_for_daughter ${PM}_cou_ptf]   ||   ![${PM}_cou_ptf Accept_for_daughter $ptf]} {
+                  puts "    $PM is not fully compatible with $ptf and therefore destroyed\n    $PM classe's are [gmlObject info classes $PM]"
 				  $PM dispose
 				 } else {puts "    $PM is OK for the ptf $ptf.\n    $PM classe's are [gmlObject info classes $PM]"
                         }

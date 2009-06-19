@@ -1668,7 +1668,9 @@ method Physical_model Update_factories {L_nodes} {
    set ptf [$node get_ptf]
    if {[string equal $ptf *] || [string equal ${objName}_cou_ptf *]} {
      Add_list L_factories [$node get_L_factories]
-    } else {if {[${objName}_cou_ptf Accept_for_daughter $ptf]} {Add_list L_factories [$node get_L_factories]}
+    } else {set mother [lindex [this get_mothers] 0]
+	        if {[string equal $mother ""]} {set obj $objName} else {set obj $mother}
+			if {[${obj}_cou_ptf Accept_for_daughter $ptf]} {Add_list L_factories [$node get_L_factories]}
            }
   }
 
@@ -1784,6 +1786,22 @@ method Logical_model set_PM_factories_from_GDD {req} {
    set req "$fct $p"
   }
  eval "C_GDD $objName $req"
+}
+
+#_________________________________________________________________________________________________________
+method Logical_model get_L_symetrically_compatible_factories_with_ptf_in {ptf L_f_name} {
+ upvar $L_f_name L_f
+
+ set rep [list]
+ foreach f $L_f {
+   if {[$f Is_symetrically_compatible_with_ptf $ptf]} {lappend rep $f}
+  }
+ return $rep
+}
+
+#_________________________________________________________________________________________________________
+method Logical_model get_L_symetrically_compatible_factories_with_ptf {ptf} {
+ return [this get_L_symetrically_compatible_factories_with_ptf_in $ptf this(L_PM_factories)]
 }
 
 #_________________________________________________________________________________________________________

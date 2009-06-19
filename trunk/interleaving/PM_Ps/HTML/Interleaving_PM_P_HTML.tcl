@@ -7,6 +7,7 @@ method Interleaving_PM_P_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id Interleaving_HTML
  eval "$objName configure $args"
+ return $objName
 }
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML Render {strm_name {dec {}}} {

@@ -48,11 +48,11 @@ method CometCUI_Editor_PM_P_U_basic Update_CUI {} {
 #___________________________________________________________________________________________________________________________________________
 method CometCUI_Editor_PM_P_U_basic CUI_mode_is {LC} {
  puts "$objName CUI_mode_is {$LC}"
- set PM_CUI [CSS++ $objName "#$objName\(GRAPH.CUI)"    ]; $PM_CUI Show_elements 0 *
- set PM_FUI [CSS++ $objName "#$objName\(CONTAINER.FUI)"]; $PM_FUI Show_elements 0 *
- puts "  - PM_CUI : $PM_CUI\n  - PM_FUI : $PM_FUI"
+ foreach PM_CUI [CSS++ $objName "#$objName\(GRAPH.CUI)"    ] {$PM_CUI Show_elements 0 *}
+ foreach PM_FUI [CSS++ $objName "#$objName\(CONTAINER.FUI)"] {$PM_FUI Show_elements 0 *}
+ #puts "  - PM_CUI : $PM_CUI\n  - PM_FUI : $PM_FUI"
  foreach C $LC {
-   if {[$C get_name] == "CUI"} {$PM_CUI Show_elements 1 *}
-   if {[$C get_name] == "FUI"} {$PM_FUI Show_elements 1 *}
+   if {[$C get_name] == "CUI"} {foreach PM_CUI [CSS++ $objName "#$objName\(GRAPH.CUI)"    ] {$PM_CUI Show_elements 1 *}}
+   if {[$C get_name] == "FUI"} {foreach PM_FUI [CSS++ $objName "#$objName\(CONTAINER.FUI)"] {$PM_FUI Show_elements 1 *}}
   }
 }
