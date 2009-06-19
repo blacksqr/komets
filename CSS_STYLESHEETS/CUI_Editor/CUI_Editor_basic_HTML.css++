@@ -1,0 +1,16 @@
+#$current(TOP.INTERLEAVING) {
+  GDD_fct     : Implem(Interleaving_CUI_Menu);
+  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, ChoiceFiles_CUI_standard_system(-Add_style_class {LOAD FILE STYLE} -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_style_file \$lc}), CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
+}
+
+#$current(TOP.INTERLEAVING(EDITION_MODE)) {
+  FCT_Eval : set LC [$obj get_LC]
+         --- set L_choices [CSS++ $obj "#$LC > *"]
+         --- $LC set_currents $L_choices;
+}
+
+#$current(TOP.INTERLEAVING(CORE)) {
+  GDD_fct     : Implem(Interleaving_CUI_Menu);
+  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)} CSS" "Display EDITION_MODE CSS" ];
+}
+		

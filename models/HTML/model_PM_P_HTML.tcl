@@ -160,8 +160,9 @@ method PM_HTML Add_prim_mother   {c Lprims {index -1}} {this inherited $c $Lprim
 
 #_________________________________________________________________________________________________________
 method PM_HTML Style_class {} {
- set c [this get_style_class]
- set    rep " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" style=\""
+ #set c [this get_style_class]
+ #set    rep " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" style=\""
+ set    rep " class=\"$objName\" id=\"$objName\" style=\""
  foreach {var val} [this get_html_style] {
 	append rep $var ": " $val ";"
   }  
