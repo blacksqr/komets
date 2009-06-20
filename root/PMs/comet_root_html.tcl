@@ -85,14 +85,14 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery.multi-ddm.pack.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
  
  append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
    this Render_daughters_JS strm $mark $dec
    append strm $dec "\$(function() {\n"
-     this Render_post_JS strm $dec
+     this Render_post_JS strm "$dec    "
    append strm $dec "  });"
  append strm $dec "</script>\n"
 }
@@ -749,7 +749,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
-	puts $this(update_cmd)
+	#puts $this(update_cmd)
  }
  
  # J'enregistre la version du serveur dans le client
