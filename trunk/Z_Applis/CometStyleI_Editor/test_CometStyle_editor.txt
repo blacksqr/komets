@@ -1,8 +1,10 @@
+source c:/These/Projet\ Interface/COMETS/devCOMETS/test_SWL.tcl
+
 cr set_daughters_R [CometStyleI_Editor Style_editor "Style editor" d]
   Style_editor set_edited_comet swl
   set id_1 [Style_editor get_a_unique_version_id]
     Style_editor Add_a_new_version $id_1
-	Style_editor set_ptf_for_id $id_1 Ptf_BIGre
+	Style_editor set_ptf_for_id $id_1 Ptf_HTML
     Style_editor set_style_file_for_id $id_1 "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/drag_drop.css++"
 
   set id_2 [Style_editor get_a_unique_version_id]

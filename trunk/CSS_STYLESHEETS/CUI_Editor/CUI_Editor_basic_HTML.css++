@@ -10,7 +10,5 @@
 }
 
 #$current(TOP.INTERLEAVING(CORE)) {
-  GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)} CSS" "Display EDITION_MODE CSS" ];
+  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)} CSS" "Display EDITION_MODE CSS"];
 }
-		

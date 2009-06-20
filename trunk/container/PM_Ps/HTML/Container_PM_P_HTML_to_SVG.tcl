@@ -46,7 +46,7 @@ method Container_PM_P_HTML_to_SVG Render_post_JS {strm_name {dec {}}} {
    this Render_daughters render_daughters
  append render_daughters "</g>"
  append strm $dec "svg.add([this Encode_param_for_JS $render_daughters]);\n"
- append strm $dec "svg.configure({height: '[this get_canevas_height]',width: '[this get_canevas_width]'}, false);"
+ append strm $dec "svg.configure({height: '[this get_canevas_height]',width: '[this get_canevas_width]'}, false);\n"
  
  this Render_daughters_post_JS strm $dec
 }

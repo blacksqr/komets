@@ -75,7 +75,7 @@ method Container_PM_P_HideShow_HTML set_drag {v} {
 method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
 
- append strm $dec "\$(function() {" "\n" 
+ #append strm $dec "\$(function() {" "\n" 
 
  ### jquery pour tous les containers
  if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"
@@ -128,7 +128,7 @@ method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
 				append strm $dec "     \$(\"#${objName}_title\").attr({style : \"padding-top:\"+heightT+\"px;text-align:center;\"});" "\n"
 			 }
 
- append strm $dec "});" "\n"
+ #append strm $dec "});" "\n"
 
  #this set_mark $mark
  this Render_daughters_post_JS strm $dec  
