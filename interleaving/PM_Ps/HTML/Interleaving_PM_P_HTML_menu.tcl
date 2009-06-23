@@ -26,18 +26,18 @@ Generate_accessors Interleaving_PM_P_HTML_menu [list pipo_C_container]
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML_menu Render {strm_name {dec {}}} {
  upvar $strm_name strm
- set f [open [Comet_files_root]Comets/interleaving/PM_Ps/HTML/multi-ddm/styles2.css r]
-   set style_txt [string map [list ] [read $f]]
-   append strm $dec "<style ></style>\n"
+ set f [open [Comet_files_root]Comets/interleaving/PM_Ps/HTML/multi-ddm/styles1.css r]
+   append strm $dec "<style type=\"text/css\">\n[string map [list #multi-ddm #$this(internal_menu_id)] [read $f]]\n$dec</style>\n"
  close $f
  
  append strm $dec <div [this Style_class] {> } "\n"
    set L_daughters_not_in_menu [this get_out_daughters]
    # Generate menu
-   append strm $dec "  <ol id=\"$this(internal_menu_id)\">\n"
+   append strm $dec "  <div id=\"$this(internal_menu_id)\">\n"
      Sub_list L_daughters_not_in_menu [this Render_menu 1 this(L_menu) strm "$dec    "]
-   append strm $dec "  </ol>\n"
-   
+   append strm $dec "  </div>\n"
+   append strm $dec "  <p>_</p>\n"
+   append strm $dec "<div>    </div>\n"
    # For each daughter not present in the menu, plug it
    foreach d $L_daughters_not_in_menu {
      $d Render strm "$dec  "
@@ -50,7 +50,7 @@ method Interleaving_PM_P_HTML_menu Render {strm_name {dec {}}} {
 method Interleaving_PM_P_HTML_menu Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec "\$('#$this(internal_menu_id)').dropDownMenu({parentTag: 'ol', childTag: 'ol'});\n"
+ append strm $dec "\$('#$this(internal_menu_id)').dropDownMenu({parentMO: 'parent-hover', childMO: 'child-hover1'});\n"
  
  this Render_daughters_post_JS strm $dec
 }
@@ -86,7 +86,7 @@ method Interleaving_PM_P_HTML_menu create_pipo_hierarchy {C index L_menu_name} {
 				 $C Add_daughter_R $LC
 				 set new_PM [CSS++ $objName "#$this(pipo_C_container)->PMs.PM_HTML $C $LC"]
 				 if {[string equal $new_PM ""]} {set new_PM [CSS++ $objName "#$this(pipo_C_container)->PMs.PM_HTML $LC"]}
-				 puts "  new_PM : $new_PM"
+				 #puts "  new_PM : $new_PM"
 				 if {![string equal $new_PM ""]} {$new_PM set_style_class index_${index}_$sub_index}
 			    }
 		      }
@@ -108,27 +108,26 @@ method Interleaving_PM_P_HTML_menu Render_menu {index L_M_name strm_name dec} {
    
    foreach M $this(L_menu) {
      incr sub_index
-     #append strm {<ol>}
        switch [lindex $M 2] {
 	      CSS {puts "CSS++ cr \"#$this(pipo_C_container)->PMs.PM_HTML index_${index}_$sub_index\""
 		       append strm $dec "  <li>\n"
-			   append strm $dec "    <span>[lindex $M 0]</span>\n"
-			   append strm $dec "    <ol>\n"
+			   append strm $dec "    <a>[lindex $M 0]</a>\n"
+			   append strm $dec "    <ul>\n"
 			   foreach PM [CSS++ $objName "#$this(pipo_C_container)->PMs.PM_HTML index_${index}_$sub_index"] {
-			     Add_list L_PM_in_menu $PM
-				 append strm $dec "      <li>"
-				   $PM Render strm "$dec      "
-				 append strm $dec "      </li>\n"
+			     Add_list L_PM_in_menu [CSS++ $PM "#$PM->PMs"]
+				 append strm $dec "      <li><div class=\"menu\">\n"
+				   $PM Render strm "$dec        "
+				   #append strm $dec index_${index}_$sub_index
+				 append strm $dec "      </div></li>\n"
 			    }
-			   append strm $dec "    </ol>\n"
+			   append strm $dec "    </ul>\n"
 			   append strm $dec "  </li>\n"
 		      }
-	     MENU {append strm $dec {  <span>} [lindex $M 0] "</span>\n"
+	     MENU {append strm $dec {  <a>} [lindex $M 0] "</a>\n"
 		       set L_sub_menus [lindex $M 1]
 			   Add_list L_PM_in_menu [this Render_menu "${index}_$sub_index" L_sub_menus strm "$dec  "]
 	          }
 	    }
-	 #append strm {</ol>}
     }
 	
  return $L_PM_in_menu

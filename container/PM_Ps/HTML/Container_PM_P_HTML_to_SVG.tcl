@@ -110,7 +110,7 @@ method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
 					var ma_matrice = current_node.createSVGMatrix();						\n\
 						ma_matrice.e = coord\['x'\];										\n\
 						ma_matrice.f = coord\['y'\];										\n\
-					var matriceres = node.getCTM().inverse().mMultiply(ma_matrice);			\n\
+					var matriceres = node.getCTM().inverse().multiply(ma_matrice);			\n\
 																							\n\
 					coord\['x'\] = matriceres.e;											\n\
 					coord\['y'\] = matriceres.f;											\n\
@@ -122,7 +122,7 @@ method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
 				function set_svg_origine(id,x,y) {											\n\
 				  var node = document.getElementById(id);									\n\
 				  if(node != null) {														\n\
-				    var nCTM = node.parentNode.getCTM().inverse().mMultiply(node.getCTM()); \n\
+				    var nCTM = node.parentNode.getCTM().inverse().multiply(node.getCTM()); \n\
 				    nCTM.e = x;																\n\
 				    nCTM.f = y;																\n\
 				    node.setAttribute('transform', 'matrix('+nCTM.a+','+nCTM.b+','+nCTM.c+','+nCTM.d+','+nCTM.e+','+nCTM.f+')'); \n\
