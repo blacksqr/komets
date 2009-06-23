@@ -639,7 +639,8 @@ method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_really_add_sub {obj} {
  if {[gmlObject info exists object $obj]} {
-   set L [CSS++ $objName "#$obj, #$obj <--< *"]
+   #set L [CSS++ $objName "#$obj, #$obj <--< *"]
+   set L [list]; $obj get_L_ancestors L
   } else {set L [list $obj]}
  
  set trouve 0
@@ -669,6 +670,25 @@ method PhysicalHTML_root Clear_L_PM_really_sub_add {obj} {
 		set this(L_PM_really_sub) [lreplace $this(L_PM_really_sub) $pos $pos]
 	}
  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Minimize_L_add_sub {L_PM_name} {
+ upvar $L_PM_name L_PM
+ 
+ set L_all_descendants [list]
+ foreach PM $L_PM {
+   set L_tmp [list]; 
+   if {[gmlObject info exists object $PM]} {$PM get_L_out_descendants L_tmp;}
+   Add_list L_all_descendants [lrange $L_tmp 1 end]
+  }
+ 
+ set nL [list]
+ foreach PM $L_PM {
+   if {[lsearch $L_all_descendants $PM] == -1} {lappend nL $PM} else {puts "  On vire $PM"}
+  }
+  
+ set L_PM $nL
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -708,6 +728,10 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
 		}
 	} 
  }
+ 
+ this Minimize_L_add_sub this(L_PM_really_sub); 
+ this Minimize_L_add_sub this(L_PM_really_add); 
+ 
  
  foreach e $this(L_PM_really_sub) {
 	append strm [this Sub_JS $e] "\n"
@@ -749,6 +773,7 @@ method PhysicalHTML_root Is_update {clientversion} {
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
+	#puts "___________________________________________________"
 	#puts $this(update_cmd)
  }
  

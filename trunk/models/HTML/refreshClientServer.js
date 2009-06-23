@@ -69,8 +69,9 @@ function refreshClientServer() {
 					catch(err) {
 						alert(err);
 					}
-					output = {};
-					i = 0;
+					output = output_tmp;
+					i = i_tmp;
+					i_tmp = 0;
 					mutex = false;
 				} else if(i >= 1) {output['Comet_port'] = $("#Comet_port").val();
 								   output[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
@@ -79,11 +80,11 @@ function refreshClientServer() {
 										type: "POST",
 										url: "index.php",
 										data: output,
-										success : function(msg) {mutex = false;
-																 output = output_tmp;
+										success : function(msg) {output = output_tmp;
 										                         output_tmp = {};
 																 i = i_tmp;
 																 i_tmp = 0;
+																 mutex = false;
 																 if(msg) {try {eval(msg);
 																	          } catch(err) { alert(err);
 																						   }

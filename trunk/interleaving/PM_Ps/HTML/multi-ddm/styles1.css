@@ -41,21 +41,21 @@
 	padding: 0;
 }
 
-#multi-ddm > li ul a {
+#multi-ddm > li ul div.menu {
 	display: block;
-	width: 152px;
+	//width: 152px;
 	padding: 5px;
 	border-bottom: 1px solid #545454;
 	border-right: 1px solid #545454;
 	border-left: 1px solid #545454;
 	text-decoration: none;
-	font-weight: bold;
-	font-size: 10pt;
+	//font-weight: bold;
+	//font-size: 10pt;
 	color: #232323;
 	background-color: #c5c5c5;
 }
 
-#multi-ddm > li ul li a.first {
+#multi-ddm > li ul li div.menu.first {
 	border-top: 1px solid #545454;
 }
 
@@ -84,5 +84,5 @@
 }
 
 #multi-ddm span {
-	float: right;
+	//float: right;
 }

@@ -78,9 +78,9 @@ method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  #append strm $dec "\$(function() {" "\n" 
 
  ### jquery pour tous les containers
- if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"
-	} else { set ouvert "n"; set ferme "s" }
+ if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"} else { set ouvert "n"; set ferme "s" }
  
+ append strm $dec "     \$(\"#${objName}_icon\").remove();\n"
  append strm $dec "     \$(\"#${objName}\").addClass(\"ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\")" "\n"
  append strm $dec "	            .find(\"#${objName}_header\")" "\n"
  append strm $dec "				.prepend('<span id=\"${objName}_icon\" class=\"ui-icon ui-icon-circle-arrow-" $ouvert "\"></span>')" "\n"
