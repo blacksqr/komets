@@ -13,7 +13,9 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
    
  set this(root)         [B_noeud]   ; $this(root) Position_des_fils_changeable 0
  set this(body)         [B_polygone]; $this(body) Position_des_fils_changeable 0; $this(body) Mode_texture  1; $this(body) Mode_texture_fils   1; $this(body) Mode_texture2 1; 
-                                                                                  $this(body) Translucidite 0; $this(body) Texture_translucide 0; 
+                                                                                  $this(body) Translucidite 0; $this(body) Texture_translucide 0;
+ set this(B207_root_for_daughters) [B_noeud]; $this(body) Ajouter_fils $this(B207_root_for_daughters)
+ 
  set this(head)         [B_polygone]; $this(head) Position_des_fils_changeable 0
  set this(redim)        [B_polygone]; set contour [ProcTabDouble "0 0 0 32 16 32 16 -16 -32 -16 -32 0"]
                                         $this(redim) Ajouter_contour $contour
@@ -25,7 +27,7 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
 									  Detruire $contour
  
  this set_prim_handle        $this(root)
- this set_root_for_daughters $this(body)
+ this set_root_for_daughters $this(B207_root_for_daughters)
  $this(root) Nom_IU $objName
 
 
@@ -66,6 +68,26 @@ method Container_PM_P_BIGre_window_by_texture constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors Container_PM_P_BIGre_window_by_texture [list head_height body_color head_color redim_color]
 
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_BIGre_window_by_texture Fit_content_in_window {v} {
+ if {$v} {
+   this Subscribe_to_Win_layout ${objName}_Fit_content_in_window "$objName Layout_Fit_content_in_window"
+   this Layout_Fit_content_in_window
+  } else {this UnSubscribe_to_Win_layout ${objName}_Fit_content_in_window
+          $this(B207_root_for_daughters) maj 0 0 0 1 1
+         }
+}
+#Trace Container_PM_P_BIGre_window_by_texture Fit_content_in_window
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_BIGre_window_by_texture Layout_Fit_content_in_window {} {
+ set box [$this(B207_root_for_daughters) Boite_noeud_et_fils]
+ set ex [expr $this(width)  / [$box Tx]]
+ set ey [expr $this(height) / [$box Ty]]
+ $this(B207_root_for_daughters) Etirement $ex $ey
+ $this(B207_root_for_daughters) maj [expr -[$box BG_X]] [expr -[$box BG_Y]] \
+                                    0 $ex $ey
+}
+Trace Container_PM_P_BIGre_window_by_texture Layout_Fit_content_in_window
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_window_by_texture Resize {width height {triggered_by_redim_zone 0}} {
  set this(width)  $width
@@ -155,6 +177,7 @@ method Container_PM_P_BIGre_window_by_texture Win_layout {} {
 			  }
     }
   }
-  
 }
 
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList Container_PM_P_BIGre_window_by_texture [list Win_layout] end

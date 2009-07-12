@@ -9,6 +9,8 @@ inherit CometSWL_Planet_PM_P_B207_basic PM_BIGre
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_B207_basic constructor {name descr args} {
  this inherited $name $descr
+   set this(mode) "edition"
+ 
    this set_GDD_id CometSWL_Planet_PM_P_B207_basic
    set this(root) [B_noeud]
    set this(rap_root_change) [B_rappel [Interp_TCL] "if {\[$this(root) A_changer\]} {$objName Update_datas}"]
@@ -31,6 +33,7 @@ method CometSWL_Planet_PM_P_B207_basic constructor {name descr args} {
  $this(root) Position_des_fils_changeable 0
  $this(root) Ajouter_fils_au_debut $this(n_edition)
 
+ 
  set this(poly_translation) [B_polygone]
  set this(poly_etirement)   [B_polygone]
  $this(poly_etirement)   Couleur 0 1 0 1
@@ -66,7 +69,7 @@ Methodes_get_LC CometSWL_Planet_PM_P_B207_basic [P_L_methodes_get_CometSWL_Plane
 Generate_PM_setters CometSWL_Planet_PM_P_B207_basic [P_L_methodes_set_CometSWL_Planet_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometSWL_Planet_PM_P_B207_basic [list poly poly_translation poly_etirement]
+Generate_accessors CometSWL_Planet_PM_P_B207_basic [list poly poly_translation poly_etirement n_edition mode]
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_B207_basic Update_datas {} {
@@ -78,10 +81,11 @@ method CometSWL_Planet_PM_P_B207_basic Update_datas {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Planet_PM_P_B207_basic set_mode    {m}  {
+  set this(mode) $m
  if {$m == "game"} {set v 0} else {set v 1}
- B_configure $this(n_edition) -Afficher_noeud $v \
+ B_configure $this(n_edition) -Afficher_noeud [expr 0 & $v] \
                               -Gerer_contacts $v
- B_configure $this(poly)  -Afficher_noeud [expr 1-$v] \
+ B_configure $this(poly)  -Afficher_noeud [expr 1 | (1-$v)] \
                           -Gerer_contacts [expr 1-$v]
 }
 
@@ -107,7 +111,6 @@ method CometSWL_Planet_PM_P_B207_basic get_or_create_prims {root} {
  this set_X    [this get_X]
  this set_Y    [this get_Y]
  this set_R    [this get_R]
-# this set_mode [this get_mode]
  
  return $rep
 }

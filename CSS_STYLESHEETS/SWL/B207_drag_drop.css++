@@ -31,7 +31,7 @@
 }
 
 #$current(CONT.OP_EDITION)  {
-  FCT_Eval : U_encapsulator_PM $obj "\$obj(, CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometActivator(-set_name DESTROY -Add_style_class {ACT SUB DESTROY PLANET SHIP SWL_DESTROY} -set_text DESTROY -Subscribe_to_activate SWL {Eval_in_context \$type SWL_Destroy \\\$element}))" CONT_FOR_DAUGHTERS;
+  FCT_Eval  : U_encapsulator_PM $obj "\$obj(, CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometActivator(-set_name DESTROY -Add_style_class {ACT SUB DESTROY PLANET SHIP SWL_DESTROY} -set_text DESTROY -Subscribe_to_activate SWL {Eval_in_context \$type SWL_Destroy \\\$element}))" CONT_FOR_DAUGHTERS;
 }
 
 #$current(CONT.OP_EDITION(CometActivator.SWL_DESTROY))  {
@@ -81,11 +81,11 @@
             --- [$obj get_B207_local_menu] Origine 0 725;
 }
 
-#$current(CONT.EDITION CONT.SPACE)  {
+#$current(CONT.SPACE)  {
   FCT_Eval             : U_encapsulator_PM $obj "CometContainer(-set_name BACKGROUND -Add_style_class BACKGROUND_STAR, \$obj())";
 }
 
-#$current(CONT.EDITION CONT.SPACE(BACKGROUND_STAR))  {
+#$current(CONT.SPACE(BACKGROUND_STAR))  {
   FCT_background_color : 0 0 0 1;
   FCT_Redim_background : 0 0 1024 768;
   FCT_Eval             : set poly_node [$obj get_poly_background]
@@ -95,7 +95,7 @@
 
 
 
-#$current(CONT.EDITION CONT.SPACE(CORE))  {
+#$current(CONT.SPACE(CORE))  {
   FCT_background_color : 0 0 1 1;
   FCT_Redim_background : -999999999 -999999999 999999999 999999999;
   FCT_Origine          : 0 0;
@@ -118,9 +118,26 @@
          --- append cmd {set PM [CSS++ cr "#${C}->PMs\[soft_type == BIGre\] \\<--< } $obj {/"] --- }
          --- append cmd "Apply_style_on \$PM \[list \] {[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++} {[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_player_B207_V1.css++}"
 		 --- [$obj get_real_LC] Subscribe_to_Add_a_player alex_B207_DragDrop $cmd UNIQUE ;
+  FCT_Eval : set    cmd {}
+         --- append cmd {set PM [CSS++ cr "#${C}->PMs\[soft_type == BIGre\] \\<--< } $obj {/"] --- }
+         --- append cmd "Apply_style_on \$PM \[list \] {[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++} {[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_planet_B207_V1.css++}"
+		 --- [$obj get_real_LC] Subscribe_to_Add_a_planet alex_B207_planete_style $cmd UNIQUE ;
 }
 
 #$current(add.player)  {
   FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "$obj Add_Params \"player \[CPool get_a_comet CometSWL_Player]\""    UNIQUE;
 }
 
+#$current(CONT.SPACE(CORE))  {
+  FCT_Eval : $obj On_wheel_down "$obj Etirement_interne \$infos 1.1 1.1 \$X \$Y"
+         --- $obj On_wheel_up   "set e [expr 1.0/1.1] --- $obj Etirement_interne \$infos \$e \$e \$X \$Y";
+}
+
+#$current(CometSWL_Player) {
+  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_player_B207_V1.css++";
+}
+
+
+#$current(CometSWL_Planet) {
+  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/SWL_partial_style_planet_B207_V1.css++";
+}

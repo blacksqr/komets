@@ -44,6 +44,7 @@ method PhysicalHTML_root constructor {name descr args} {
   
   set this(concat_send,0) ""
   # ___________________________________________________________#
+  this set_PM_root $objName
   
  eval "$objName configure $args"
  return $objName

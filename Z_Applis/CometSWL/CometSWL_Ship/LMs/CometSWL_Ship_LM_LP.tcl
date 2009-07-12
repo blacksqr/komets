@@ -21,5 +21,7 @@ proc P_L_methodes_set_CometSWL_Ship_COMET_RE {} {return [list {set_X {v}} {set_Y
 Generate_LM_setters CometSWL_Ship_LM_LP [P_L_methodes_set_CometSWL_Ship_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-
-
+method CometSWL_Ship_LM_LP set_PM_active {PM} {
+ this inherited $PM
+ $PM set_R [this get_R]
+}

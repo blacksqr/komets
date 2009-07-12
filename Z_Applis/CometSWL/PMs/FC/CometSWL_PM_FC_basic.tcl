@@ -124,8 +124,9 @@ method CometSWL_PM_FC_basic Compute_a_step {dt} {
      foreach V $LV {
 	   set dx [expr [$M get_X] - [$V get_X]]
 	   set dy [expr [$M get_Y] - [$V get_Y]]
-	   set d  [expr sqrt($dx*$dx + $dy*$dy)]
-	   if {$d < [$V get_R]} {
+	   #set d  [expr sqrt($dx*$dx + $dy*$dy)]
+	   set d  [expr $dx*$dx + $dy*$dy]
+	   if {$d < [$V get_R]*[$V get_R]} {
 	     puts "$M a touché le vaisseau $V"
 	     [this get_LC] Sub_a_ship    $V
 		 [this get_LC] Sub_a_missile $M
