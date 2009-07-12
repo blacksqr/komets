@@ -29,11 +29,8 @@ method CometSWL_Ship_PM_P_B207_basic constructor {name descr args} {
                            -Ajouter_fils_au_debut $this(poly_jeu) \
                            -Position_des_fils_changeable 0
    
-   set contour [ProcOvale 0 0 $r $r 60]
-     B_configure $this(poly_edition) -Ajouter_contour $contour \
-	                                 -Origine 0 0
-     B_configure $this(poly_jeu)     -Ajouter_contour $contour \
-	                                 -Origine 0 0
+     B_configure $this(poly_edition) -Origine 0 0
+     B_configure $this(poly_jeu)     -Origine 0 0
      set this(arrow) [B_polygone]; 
 	 B_configure $this(poly_jeu) -Ajouter_fils $this(arrow) \
 	                             -Noeud_puis_fils 0
@@ -50,7 +47,7 @@ method CometSWL_Ship_PM_P_B207_basic constructor {name descr args} {
 	 set this(rap_ptr_resizing_arrow) [B_rappel [Interp_TCL]]
 	 set this(L_reperes_for_arrow)    [Liste_alx_repere2D]
 	 
-   Detruire $contour
+   
    eval "$this(poly_edition) Couleur $couleur"
    eval "$this(poly_jeu)     Couleur $couleur"
 
@@ -109,6 +106,31 @@ method CometSWL_Ship_PM_P_B207_basic set_Y       {v}  {$this(root) Py $v}
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_B207_basic set_angle   {v}  {
  $this(arrow) Rotation $v
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Ship_PM_P_B207_basic set_R {r} {
+ set contour     [ProcOvale 0 0 $r $r 60]
+ set contour_H   [ProcRect [expr -1.3*$r] [expr -0.3*$r] [expr 1.3*$r] [expr 0.3*$r]]
+ set contour_V_G [ProcRect [expr -1.5*$r] [expr -$r] [expr -1.25*$r]  [expr $r]]
+ set contour_V_D [ProcRect [expr  1.5*$r] [expr -$r] [expr  1.25*$r]  [expr $r]]
+   
+   B_configure $this(poly_jeu)     -Vider \
+                                   -Ajouter_contour $contour     \
+							       -Ajouter_contour $contour_H   \
+							       -Ajouter_contour $contour_V_G \
+							       -Ajouter_contour $contour_V_D
+
+   B_configure $this(poly_edition) -Vider \
+                                   -Ajouter_contour $contour     \
+							       -Ajouter_contour $contour_H   \
+							       -Ajouter_contour $contour_V_G \
+							       -Ajouter_contour $contour_V_D
+
+ Detruire $contour
+ Detruire $contour_H
+ Detruire $contour_V_G
+ Detruire $contour_V_D
 }
 
 #___________________________________________________________________________________________________________________________________________

@@ -8,6 +8,10 @@ method CometSWL_PM_P_U_basic constructor {name descr args} {
  this inherited $name $descr
    this set_nb_max_mothers   1
    this set_GDD_id CometSWL_PM_P_U_basic
+   
+   this set_default_op_gdd_file    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
+   this set_default_css_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/SWL/drag_drop.css++
+
  eval "$objName configure $args"
  return $objName
 }

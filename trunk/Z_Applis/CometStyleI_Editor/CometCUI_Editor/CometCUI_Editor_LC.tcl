@@ -79,7 +79,15 @@ method CometCUI_Editor Enlight {L} {
 #___________________________________________________________________________________________________________________________________________
 # Inject code for {set_edited_comet {v}} 
 Inject_code CometCUI_Editor set_edited_comet \
-            { if {[this get_edited_comet] != ""} {
+            {
+			  puts "__________________________________________"
+			  set current_PM [CSS++ cr "#$this(filter)->PMs"]
+			  puts "  Active PM is currently $current_PM"
+			  foreach PM $current_PM {
+			    puts "    $PM : L_daughters = {[$PM get_daughters]}"
+			   }
+
+			if {[this get_edited_comet] != ""} {
 			    if {[catch "$this(filter) Sub_daughter_R [this get_edited_comet]" err]} {puts "ERROR in $objName set_edited_comet $v:\n$err"}
                }
 			  [this get_Common_FC] set_edited_comet $v
@@ -94,6 +102,7 @@ Inject_code CometCUI_Editor set_edited_comet \
                 puts "    considering PM $PM"
 			    if {![$ptf Accept_for_daughter ${PM}_cou_ptf]   ||   ![${PM}_cou_ptf Accept_for_daughter $ptf]} {
                   puts "    $PM is not fully compatible with $ptf and therefore destroyed\n    $PM classe's are [gmlObject info classes $PM]"
+				  puts "    $PM has for daughters [$PM get_daughters]"
 				  $PM dispose
 				 } else {puts "    $PM is OK for the ptf $ptf.\n    $PM classe's are [gmlObject info classes $PM]"
                         }

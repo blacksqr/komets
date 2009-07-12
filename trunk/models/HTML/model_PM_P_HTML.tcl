@@ -25,6 +25,8 @@ method PM_HTML constructor {name descr args} {
 
  set class(mark) 0
  
+ set this(PM_root) ""
+ 
 # eval "$objName configure $args"
 }
 
@@ -205,16 +207,32 @@ method PM_HTML AJAX_annalyse_msg {msg_name pos L_name} {
 }
 
 #_________________________________________________________________________________________________________
+method PM_HTML get_PM_root {  } {return $this(PM_root)}
+
+#_________________________________________________________________________________________________________
+method PM_HTML set_PM_root {PM} {
+ set this(PM_root) $PM
+ foreach d [this get_daughters] {
+   if {[catch "$d set_PM_root {$PM}" err]} {puts "___________ get_PM_root non implemented for $d set_PM_root {$PM}"}
+  }
+}
+
+#_________________________________________________________________________________________________________
 method PM_HTML Do_in_root {cmd} {
- set root [this get_L_roots] 
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-     eval "$root $cmd"
- }
+ if {![string equal $this(PM_root) ""]} {
+   eval "$this(PM_root) $cmd"
+  }
+  
+#XXX set root [this get_L_roots] 
+#XXX if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+#XXX     eval "$root $cmd"
+#XXX }
 }
 
 #_________________________________________________________________________________________________________
 method PM_HTML Sub_daughter {e} {
  set rep [this inherited $e]
+   if {$rep} {catch "$e set_PM_root {}"}
    this Do_in_root "Add_L_PM_to_sub $e"
  return $rep
 }
@@ -222,6 +240,7 @@ method PM_HTML Sub_daughter {e} {
 #_________________________________________________________________________________________________________
 method PM_HTML Add_daughter {e {index -1}} {
  set rep [this inherited $e $index]
+   this set_PM_root $this(PM_root)
    this Do_in_root "Add_L_PM_to_add $e"
  return $rep
 }
@@ -325,9 +344,14 @@ method PM_HTML DragDrop_event {type x y} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML send_jquery_message {methode cmd} {
- set root [this get_L_roots]
- 
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
+ if {![string equal $this(PM_root) ""]} {
+   $this(PM_root) Concat_update $objName $methode $cmd
+  }
+
+#XXX set root [this get_L_roots]
+#XXX 
+#XXX if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+#XXX	$root Concat_update $objName $methode $cmd
+#XXX }
 }
+

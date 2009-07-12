@@ -131,7 +131,8 @@ method CometSWL Sub_a_player {C} {
 method CometSWL Add_a_planet {C} {
  this Add_L_planets $C
  $this(cont_space) Add_daughters_R $C
- foreach PM [CSS++ cr "#${C}->PMs \\<--< CONT.GAME/"] {$PM set_mode game}
+ foreach PM [CSS++ cr "#${C}->PMs \\<--< CONT.GAME/"   ] {$PM set_mode "game"}
+ foreach PM [CSS++ cr "#${C}->PMs \\<--< CONT.EDITION/"] {$PM set_mode "edition"}
  $C set_name "A planet"
 }
 
@@ -148,7 +149,8 @@ method CometSWL Add_a_ship   {CP CS} {
  $CP Add_L_ships $CS
  $this(cont_space) Add_daughters_R $CS
  $CS set_player  $CP
- foreach PM [CSS++ cr "#${CS}->PMs \\<--< CONT.GAME/"] {$PM set_mode game}
+ foreach PM [CSS++ cr "#${CS}->PMs \\<--< CONT.GAME/"   ] {$PM set_mode "game"}
+ foreach PM [CSS++ cr "#${CS}->PMs \\<--< CONT.EDITION/"] {$PM set_mode "edition"}
  $CS set_name "A ship of player [$CP get_name]"
 }
 

@@ -1,6 +1,6 @@
 #$current(TOP.INTERLEAVING) {
   GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, ChoiceFiles_CUI_standard_system(-Add_style_class {LOAD FILE STYLE} -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_style_file \$lc}), CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"))" CONT_FOR_DAUGHTERS;
+  FCT_Eval    : U_encapsulator_PM $obj "\$obj(, ChoiceFiles_CUI_standard_system(-Add_style_class {LOAD FILE STYLE} -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_style_file \$lc}), CometChoice(-set_name {Choice of the platform type} -Add_style_class {CHOICE PTF} -set_nb_min_choices 1 -set_nb_max_choices 1 -Subscribe_to_set_currents CUI_EDITOR {$current prim_set_ptf_of_CUI \[\$lc get_name\]} UNIQUE, \"Ptf_TK\", \"Ptf_HTML\", \"Ptf_FLEX\", \"Ptf_BIGre\"), CometActivator(-set_name {Update style} -set_text {Update style} -Add_style_class {ACT UPDATE} -Subscribe_to_activate CUI_EDITOR {$current Update_CUI} UNIQUE), CometContainer(-set_name CONT_FOR_DAUGHTERS -Add_style_class CONT_FOR_DAUGHTERS), CometChoice(-set_name EDITION_MODE -Add_style_class EDITION_MODE -set_nb_min_choices 0 -set_nb_max_choices 2 -Subscribe_to_set_currents CUI_EDITOR {$current CUI_mode_is \$lc}, \"CUI\", \"FUI\"), CometText(-Add_style_class SEPARATOR -set_text \"_____________\"), CometChoice(-Add_style_class FIT_FUI_TO_WINDOW -set_nb_min_choices 0, \"Fit FUI to window\"))" CONT_FOR_DAUGHTERS;
 }
 
 #$current(TOP.INTERLEAVING(EDITION_MODE)) {
@@ -11,7 +11,7 @@
 
 #$current(TOP.INTERLEAVING(CORE)) {
   GDD_fct     : Implem(Interleaving_CUI_Menu);
-  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)}" "Display EDITION_MODE" "{                                                                                                                                                                                                      } NOP"]
+  FCT_Eval    : $obj set_L_menu_and_associated_comets [list "Edit {(ACT.UPDATE, CHOICE.PTF, LOAD.FILE.STYLE)}" "Display {(EDITION_MODE, SEPARATOR, FIT_FUI_TO_WINDOW)}" "{                                                                                                                                                                                                      } NOP"]
             --- [$obj get_B207_local_menu] Origine 0 400;
 }
 			
@@ -47,5 +47,11 @@
 #$current(GRAPH.VIEWER(CORE)) {
   FCT_Eval : $obj On_wheel_down "$obj Etirement_interne \$infos 1.1 1.1 \$X \$Y"
          --- $obj On_wheel_up   "set e [expr 1.0/1.1] --- $obj Etirement_interne \$infos \$e \$e \$X \$Y";
+}
+
+
+#$current(TOP.INTERLEAVING(CometChoice.FIT_FUI_TO_WINDOW)) {
+ FCT_Eval : set FUI_win [CSS++ $current "#$current(CONTAINER.FUI)"]
+        --- [$obj get_LC] Subscribe_to_set_currents CUI_EDITOR "$FUI_win Fit_content_in_window \[expr !\[string equal \$lc {}]]"  UNIQUE;
 }
 

@@ -69,11 +69,12 @@ function refreshClientServer() {
 					catch(err) {
 						alert(err);
 					}
-					output = output_tmp;
+					/*output = output_tmp;
 					i = i_tmp;
 					i_tmp = 0;
-					mutex = false;
-				} else if(i >= 1) {output['Comet_port'] = $("#Comet_port").val();
+					mutex = false;*/
+				} /*else*/
+					if((i+i_tmp) >= 1) {output['Comet_port'] = $("#Comet_port").val();
 								   output[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
 								   if(forcing_send) {forcing_send = false;}
 						           $.ajax({
@@ -95,7 +96,7 @@ function refreshClientServer() {
 																				  }
 																},
 										error: function(msg) {mutex = false;
-										                      alert("Problème d'envoi des mises à jour client\n\n" + msg);
+										                      //alert("Problème d'envoi des mises à jour client\n\n" + msg);
 															 }
 									});
 				                 } else {mutex = false;
@@ -106,7 +107,7 @@ function refreshClientServer() {
 		    },
 			error: function(err){
 			    mutex = false;
-				alert("Problème de réception des mises à jour serveur\n\n"+err);
+				//alert("Problème de réception des mises à jour serveur\n\n"+err);
 			}
 		});
 	}

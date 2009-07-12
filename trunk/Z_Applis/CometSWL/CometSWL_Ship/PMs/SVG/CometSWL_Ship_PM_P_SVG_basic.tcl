@@ -83,14 +83,14 @@ method CometSWL_Ship_PM_P_SVG_basic SVG_Origine {coords} {
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic set_X       {v}  {
  if {$v != $this(svg_x)} {
-   this send_jquery_message "SVG_Origine" "set_svg_origine('${objName}', $v, [this get_Y]);" 
+   this send_jquery_message SVG_Origine "set_svg_origine('${objName}', $v, [this get_Y]);" 
   }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Ship_PM_P_SVG_basic set_Y       {v}  {
  if {$v != $this(svg_y)} {
-   this send_jquery_message "SVG_Origine" "set_svg_origine('${objName}', [this get_X], $v);"
+   this send_jquery_message SVG_Origine "set_svg_origine('${objName}', [this get_X], $v);"
   }
 }
 
@@ -117,12 +117,13 @@ method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
 
  
  append strm "<g id=\"${objName}\" transform=\"translate([this get_X],[this get_Y])\">\n"
+   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
    if {[this get_mode] == "game"} { 
        set pi 3.1415926535897931
 	   set angle [expr [this get_angle]*(180/$pi)]
        append strm "<rect id=\"${objName}_arrow_drag\" x=\"0\" y=\"-9\" width=\"[expr 20+[this get_power]]\" height=\"18\" fill-opacity=\"0.5\" transform=\"rotate($angle,0,0)\" stroke-opacity=\"0.9\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n" 
 	 }
-   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
+   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"[this get_R]\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
  append strm "</g>\n"
  
  this Render_daughters strm "$dec  "
