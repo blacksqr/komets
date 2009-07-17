@@ -1,0 +1,83 @@
+#$current(CometChoice) {
+ FCT_Eval: C_B_configure $obj "Origine 120 0";
+}
+
+#$current ~ CometLog activators {
+ FCT_set_method_placement: Line_h;
+}
+
+#$current ~ CometLog ~ contents ~ CometContainer \>CometSpecifyer.PM_BIGre/ {
+ FCT_set_method_placement: Line_h;
+}
+
+#$current ~ CometCamNote_Speaker ~ CometContainer \>CometSlideRemoteController/ {
+ GDD_fct : Implem(Container_CUI_window);
+ FCT_set_method_placement: Window_fit_daughters ;
+}
+
+#$current ~ CometLog ~ CometInterleaving {
+ FCT_set_method_placement: Line_v;
+}
+
+#$current ~ CometInterleaving \ CometMarker/ {
+ FCT_set_method_placement: Line_v;
+}
+
+#$current ~ CometCamNote_Speaker {
+ECA : ccn_speaker set_preso_mode,
+  $m==1,
+  puts coucou ---
+  set telec [CSS++ $obj CometSlideRemoteController] ---
+  set cont [CSS++ $obj CometContainer \>CometSlideRemoteController/] ---
+  set act_FS [CSS++ $obj CometContainer \>CometActivator/] ---
+  set slide [CSS++ $obj CometImage] ---
+  set visu [CSS++ $obj CometContainer \>CometImage/] ---
+  set bt [CSS++ $obj ccn_speaker_act_preso] ---
+  set transfo [B_transfo 1500] ---
+  set rep_svg   [C_B_get_or_create_in(rep_svg, $cont, B_noeud)] --- 
+  set rep_final [C_B_get_or_create_in(rep_final, $cont, B_noeud)] ---
+  $cont Raise --- $act_FS Raise ---
+  set GDD_id [$telec get_GDD_id] ---
+  puts Ajouter_MetaData_T_Controler_GDD_id --- C_B_configure($cont , -Ajouter_MetaData_T Controler_GDD_id $GDD_id) --- puts OK ---
+  set img_clavier [C_B_get_or_create_in(img_clavier, $visu, B_image Clavier.png)] ---
+  set boite [C_B_get($cont, Boite_noeud_et_fils)] --- puts boite_OK ---
+  set boite_PX [expr [$boite BG_X]] --- set boite_PY [expr [$boite BG_Y]] --- puts(Translation $boite_PX x $boite_PY) ---
+  C_B_Transfo( $transfo
+    , C_B_SVG_rep($cont, $rep_svg) ---
+	  C_B_SAVE_DATA($cont, Mode_texture, Mode_texture) --- puts C_B_SAVE_DATA --- C_B_SAVE_DATA($cont, Mode_texture_fils, Mode_texture_fils) --- puts FIN_C_B_SAVE_DATA ---
+	  puts C_B_configure --- C_B_configure($cont, -Mode_texture 1 -Mode_texture_fils 1) --- puts FIN_C_B_configure
+    , C_B_Morph($transfo, $rep_svg, $cont, $visu) --- 
+      C_B_fade_bt ($transfo, $bt, 1, 0.1)
+    , C_GDD($telec, Implem, N_controller_CUI_basic_keyboard) ---
+      $visu Redirect_key_events_to_PM [CSS++ $obj CometSlideRemoteController] ---
+      C_B_configure($cont, -Afficher_noeud 0 -Gerer_contacts 0) ---
+      C_B_SVG_rep($cont, $rep_final) --- 
+      $rep_svg Translation $boite_PX $boite_PY --- puts conf_rep_svg_OK ---
+	  C_B_splash($slide, $img_clavier, 1500) ---
+      B_sim_sds Prendre_evennements_lies_a NULL [eval [[CSS++ $obj CometSlideRemoteController] get_prim_handle] Liant]
+    )
+;
+ECA : ccn_speaker set_preso_mode,
+  $m==0,
+  puts DEBALLER ---
+  set telec [CSS++ $obj CometSlideRemoteController] ---
+  set cont [CSS++ $obj CometContainer \>CometSlideRemoteController/] ---
+  set act_FS [CSS++ $obj CometContainer \>CometActivator/] ---
+  set visu [CSS++ $obj CometContainer \>CometImage/] ---
+  set cont_visu [CSS++ $obj CometInterleaving > CometContainer \CometImage/] ---
+  set bt [CSS++ $obj ccn_speaker_act_preso] --- puts AVT___ ---
+  puts Val_MetaData_Controler_GDD_id --- set Controler_GDD_id [C_B_get($cont, Val_MetaData Controler_GDD_id)] --- puts $Controler_GDD_id ---
+  C_Substitute_PM_with_type($telec, $Controler_GDD_id) ---
+  set transfo [B_transfo 1500] ---
+  $cont Raise --- $act_FS Raise ---
+  C_B_configure($cont, -Afficher_noeud 1 -Gerer_contacts 1) ---
+  puts Val_MetaData_rep_svg --- set rep_svg [C_B_get($cont, Val_MetaData rep_svg)] --- puts $rep_svg  ---
+  puts Val_MetaData_rep_final --- set rep_origine [C_B_get($cont, Val_MetaData rep_final)] --- puts $rep_origine ---
+  C_B_Transfo( $transfo
+    , puts GOGOGO
+    , C_B_Morph_B($transfo, $rep_origine, $cont, $rep_svg) ---
+      C_B_fade_bt ($transfo, $bt, 0.1, 1)
+    , $visu Stop_Redirect_key_events_to_PM --- C_B_LOAD_DATA($cont, Mode_texture, Mode_texture) --- C_B_LOAD_DATA($cont, Mode_texture_fils, Mode_texture_fils) --- $cont_visu Raise
+    )
+;
+}

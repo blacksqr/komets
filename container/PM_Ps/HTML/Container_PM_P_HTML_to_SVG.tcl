@@ -5,7 +5,7 @@ inherit Container_PM_P_HTML_to_SVG PM_HTML
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HTML_to_SVG constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id FUI_Container_PM_P_HTML_to_SVG
+   this set_GDD_id Container_FUI_bridge_HTML_to_SVG_frame
    [[this get_cou] get_ptf] maj Ptf_HTML_to_SVG
 
    this set_root_for_daughters ${objName}_root_group

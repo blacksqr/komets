@@ -11,6 +11,33 @@ cr set_daughters_R [CometStyleI_Editor Style_editor "Style editor" d]
     Style_editor Add_a_new_version $id_2
 	Style_editor set_ptf_for_id $id_2 Ptf_BIGre
 	
+#_________________________________________________________________________________________________________________________________	
+#_________________________________________________________________________________________________________________________________	
+#_________________________________________________________________________________________________________________________________	
+source c:/These/Projet\ Interface/COMETS/devCOMETS/demo_dsvis2008.tcl
+
+cr set_daughters_R [CometStyleI_Editor Style_editor "Style editor" d]
+  Style_editor set_edited_comet ccn
+  set id_1 [Style_editor get_a_unique_version_id]
+    Style_editor Add_a_new_version $id_1
+	Style_editor set_ptf_for_id $id_1 Ptf_HTML
+    Style_editor set_style_file_for_id $id_1 "[Comet_files_root]Comets/CSS_STYLESHEETS/CamNote/CamNote_basic.css++"
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 set pipo [B_noeud]
 set PM_graph [CSS++ cr "#cr->PMs ~ GRAPH.TASK(CORE)"]
 set graph_root [$PM_graph get_prim_handle]

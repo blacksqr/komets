@@ -1,6 +1,11 @@
 inherit CSS_Meta_IHM_PM_P_B207_toolglass PM_BIGre
 
 #___________________________________________________________________________________________________________________________________________
+source [get_B207_files_root]SWL/B_bouton_he_shan.tcl
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_B207_toolglass constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id FUI_CSS_Meta_IHM_PM_P_B207_toolglass
@@ -29,6 +34,14 @@ method CSS_Meta_IHM_PM_P_B207_toolglass constructor {name descr args} {
 
  set this(poly_bord) [B_polygone]
    $this(n_meta) Ajouter_fils $this(poly_bord)
+   
+ # Button to switch mode from GDD access to Node Enlighting
+ set this(Bt_switch_mode) ${objName}_BT_mode
+ B_bouton_he_shan $this(Bt_switch_mode) 20 "Enlight mode" "$objName switch_toolglass_mode"
+   $this(Bt_switch_mode) Accrocher_a $this(poly_bord)
+   $this(Bt_switch_mode) Position 0 102
+   $this(Bt_switch_mode) Centrer
+   
  B_configure $this(poly_bord) -Ajouter_contour [ProcOvale 0 0 120 120 60] \
                        -Couleur 0.6 0.7 0.8 1 \
 					   -Difference $this(poly_tg) \
@@ -82,6 +95,12 @@ Generate_PM_setters CSS_Meta_IHM_PM_P_B207_toolglass [L_methodes_set_CSS_Meta_IH
 
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors CSS_Meta_IHM_PM_P_B207_toolglass [list mode_GDD_active n_meta n_for_GDD_txt_infos poly_tg poly_bord n_txt_wich_PM n_txt_GDD_which_type]
+
+#___________________________________________________________________________________________________________________________________________
+method CSS_Meta_IHM_PM_P_B207_toolglass switch_toolglass_mode {} {
+ set this(mode_GDD_active) [expr 1 - $this(mode_GDD_active)]
+ $this(Bt_switch_mode) set_text [lindex [list "Enlight mode" "GDD mode"] $this(mode_GDD_active)]
+}
 
 #___________________________________________________________________________________________________________________________________________
 method CSS_Meta_IHM_PM_P_B207_toolglass Clic_on_GDD_type {infos} {

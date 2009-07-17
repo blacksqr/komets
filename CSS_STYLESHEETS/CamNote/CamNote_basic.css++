@@ -1,0 +1,9 @@
+#$current[soft_type == BIGre] {
+  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/CamNote/CamNote_basic_B207.css++";
+}
+
+
+#$current[soft_type == PHP_HTML] {
+  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/CamNote/CamNote_basic_HTML.css++";
+}
+
