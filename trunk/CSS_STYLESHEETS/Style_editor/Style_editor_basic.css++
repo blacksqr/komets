@@ -19,3 +19,7 @@
   FCT_Raise               : top;
   FCT_set_mode_GDD_active : 0;
 }
+
+#$current(META.CSS[soft_type ~= PHP_HTML]) {
+  FCT_set_html_style : display none;
+}
