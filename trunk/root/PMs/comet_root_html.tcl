@@ -331,7 +331,9 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
      if {[string length $v] == 0} {
        set    msg {}
        append msg $comet { } $m " \{\}"
-       if {[catch {eval $msg} res]} {puts "ERROR:\n$res"}
+       if {[catch {eval $msg} res]} {
+	     if {[catch "eval $comet $m" res]} {puts "ERROR:\n$res"}
+		}
       } else {set    msg {}
               append msg $comet { } $m " \$v"
               if {[catch {eval $msg} res]} {puts "ERROR2:\n$res"}

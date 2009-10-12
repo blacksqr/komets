@@ -11,8 +11,15 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic constructor {name desc
    set this(t_ms)	    500
    set class(mark)      0
    set this(L_boutons)  [list go_to_bgn go_to_nxt go_to_prv go_to_end]
-   set this(dir)        [Comet_files_root]{./Comets/Z_Applis/CamNote/SlideRemoteController/PM_Ps/P/HTML}
-   this read_style_from_file $this(dir)/Skins/skin1.xml
+   set this(dir)        Comets/Z_Applis/CamNote/SlideRemoteController/PM_Ps/P/HTML
+   this read_style_from_file [Comet_files_root]$this(dir)/Skins/skin1.xml
+   
+   set this(current_selected) ""
+   this set_root_for_daughters $objName
+   this set_prim_handle        $objName
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "REMOTE CONTROLER" \
+                                      ]
+
  eval "$objName configure $args"
  return $objName
 }
@@ -22,18 +29,13 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic get_mark {}  {return $
 method CometSlideRemoteController_PM_P_HTML_image_dynamic set_mark {m} {set class(mark) $m}
 
 #___________________________________________________________________________________________________________________________________________
-#method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_bgn {} {[this get_LC] set_val [this get_b_inf]}
-#method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_prv {} {[this get_LC] set_val [expr ([this get_val]-1 < [this get_b_inf])?[this get_b_inf]:[this get_val]-1]}
-#method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_nxt {} {[this get_LC] set_val [expr ([this get_val]+1 > [this get_b_sup])?[this get_b_sup]:[this get_val]+1]}
-#method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_end {} {[this get_LC] set_val [this get_b_sup]}
-#___________________________________________________________________________________________________________________________________________
 Generate_PM_setters CometSlideRemoteController_PM_P_HTML_image_dynamic [L_methodes_set_SlideRemoteController]
 #___________________________________________________________________________________________________________________________________________
 
 method CometSlideRemoteController_PM_P_HTML_image_dynamic dispose {} {this inherited}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometSlideRemoteController_PM_P_HTML_image_dynamic [list t_ms]
+Generate_accessors CometSlideRemoteController_PM_P_HTML_image_dynamic [list t_ms dir]
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -42,6 +44,22 @@ Methodes_set_LC CometSlideRemoteController_PM_P_HTML_image_dynamic $L_methodes_s
 Methodes_get_LC CometSlideRemoteController_PM_P_HTML_image_dynamic $L_methodes_get_choicesN {$this(FC)}
 Methodes_set_LC CometSlideRemoteController_PM_P_HTML_image_dynamic [L_methodes_set_SlideRemoteController] {$this(FC)} {}
 Methodes_get_LC CometSlideRemoteController_PM_P_HTML_image_dynamic [L_methodes_get_SlideRemoteController] {$this(FC)}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometSlideRemoteController_PM_P_HTML_image_dynamic update_val {} {
+ set new_selected ${objName}_option_num_[this get_val]
+ this send_jquery_message Update_go_to_bgn "\$('#$this(current_selected)').removeAttr('selected'); \$('#$new_selected').attr('selected', 'selected');"
+ set this(current_selected) $new_selected
+}
+Trace CometSlideRemoteController_PM_P_HTML_image_dynamic update_val
+
+method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_bgn { } {this update_val}
+method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_prv { } {this update_val}
+method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_nxt { } {this update_val}
+method CometSlideRemoteController_PM_P_HTML_image_dynamic go_to_end { } {this update_val}
+method CometSlideRemoteController_PM_P_HTML_image_dynamic set_val   {v} {this update_val}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -60,6 +78,7 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic read_style_from_file {
 	  }
     }   
 }
+
 #___________________________________________________________________________________________________________________________________________
 method CometSlideRemoteController_PM_P_HTML_image_dynamic Render {strm_name {dec {}}} {
  upvar $strm_name strm
@@ -76,14 +95,16 @@ method CometSlideRemoteController_PM_P_HTML_image_dynamic Render {strm_name {dec
  append strm $dec {  </div>} "\n"
 
  foreach bt $this(L_boutons) {
-	append strm $dec {  <img style="z-index:2; position:absolute; left:} $this($bt,x) {; top:} $this($bt,y) {;" id="} ${objName}_$bt {" name="} ${objName}__XXX__prim_$bt {" src="} $this(dir)/Skins/$this($bt,img) {" onclick="javascript:addOutput(this,true);" onmouseout="hide('} ${objName}_txt_$bt {')" onmouseover="show('} ${objName}_txt_$bt {')" />} "\n"
+	append strm $dec {  <img style="z-index:2; position:absolute; left:} $this($bt,x) {; top:} $this($bt,y) {;" id="} ${objName}_$bt {" name="} ${objName}__XXX__prim_$bt {" src="} $this(dir)/Skins/$this($bt,img) {" onclick="javascript:addOutput_proc_val('} ${objName}__XXX__prim_$bt {', '', true);" onmouseout="hide('} ${objName}_txt_$bt {')" onmouseover="show('} ${objName}_txt_$bt {')" />} "\n"
   }
 
  append strm $dec {  <div style="position:absolute; top:} $this(go_to_slide,y) {; left:} $this(go_to_slide,x) {;" id="} $objName {_div_select">} "\n"
  append strm $dec {  <select id="} ${objName}_select {" name="} $objName {__XXX__prim_set_current" value="[this get_val]">} "\n$dec    "
  for {set i [this get_b_inf]} {$i <= [this get_b_sup]} {incr i [this get_step]} {
-    append strm "<option name=\"${objName}__XXX__prim_set_current\" value=\"$i\" " {onmouseup="javascript:addOutput(this,true);"}
-	  if {$i == [this get_val]} {append strm { selected="selected"}}
+    append strm "<option id=\"${objName}_option_num_$i\" name=\"${objName}__XXX__prim_set_current\" value=\"$i\" " {onmouseup="javascript:addOutput_proc_val('} ${objName}__XXX__prim_set_current {', '} $i {', true);"}
+	  if {$i == [this get_val]} {append strm { selected="selected"}
+	                             set this(current_selected) ${objName}_option_num_$i
+								}                    
 	append strm ">$i</option>"
   }
  append strm "\n$dec  </select>\n"

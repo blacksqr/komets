@@ -1,23 +1,8 @@
 #$current(SlideViewer) {
- width : 320px;
- height: 240px;
-}
-
-#$current(SlideViewer) {
- width : 320px;
- height: 240px;
+ FCT_set_html_style : width 320px   height 240px;
 }
 
 #$current(CometSlideRemoteController) {
- border: solid black;
- FCT_set_L_tags: center;
+ FCT_set_html_style : border "solid black";
+ FCT_set_L_tags: ;
 }
-
-#$current(CometCamNote_ExaminatorQuestions ~ CometSpecifyer) {
- width : 320px;
-}
-
-#$current(CometInterleaving) {
- GDD_fct : Implem(ScrollableMonospaceInterleaving);
-}
-

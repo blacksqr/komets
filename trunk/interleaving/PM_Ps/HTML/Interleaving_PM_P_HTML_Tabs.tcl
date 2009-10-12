@@ -67,9 +67,9 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  append strm $dec {<div } [this Style_class] ">\n"
    # Génération des rubriques
    append strm $dec " <ul>\n"
-   foreach c [[this get_nesting_CORE_LC] get_out_daughters] {
+   foreach c [[this get_nesting_CORE_LC]_LM_LP get_out_daughters] {
      append strm $dec "  " {<li>} "\n"
-     append strm $dec "    " {<a href="#} categ_$c {">} [$c get_name] {</a>} "\n"
+     append strm $dec "    " {<a href="#} categ_$c {">} [[$c get_LC] get_name] {</a>} "\n"
      append strm $dec "  " {</li>} "\n"
     }
    append strm $dec " </ul>\n"
@@ -83,7 +83,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
 method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}}} {
  upvar $strm_name strm
 
- set L [[this get_nesting_CORE_LC] get_out_daughters]
+ set L [[this get_nesting_CORE_LC]_LM_LP get_out_daughters]
  
  set pos 0
  foreach c [this get_daughters] {
@@ -94,3 +94,5 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}
   }
 
 }
+
+Trace Interleaving_PM_P_MenuHorizontal_HTML Render_daughters

@@ -36,3 +36,5 @@ Methodes_get_LC CometChoiceN $L_methodes_get_choicesN {$this(FC)}
 Manage_CallbackList CometChoiceN  set_val   end
 Manage_CallbackList CometChoiceN  set_b_inf end
 Manage_CallbackList CometChoiceN  set_b_sup end
+
+#Trace CometChoiceN set_val

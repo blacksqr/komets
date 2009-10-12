@@ -1,12 +1,12 @@
 #$current(CometChoice) {
- FCT_Eval: C_B_configure $obj "Origine 120 0";
+ FCT_Eval: C_B_configure $obj "Origine 160 0";
 }
 
 #$current ~ CometLog activators {
  FCT_set_method_placement: Line_h;
 }
 
-#$current ~ CometLog ~ contents ~ CometContainer \>CometSpecifyer.PM_BIGre/ {
+#$current ~ CometLog ~ contents ~ CometContainer \>CometSpecifyer/ {
  FCT_set_method_placement: Line_h;
 }
 
@@ -19,7 +19,7 @@
  FCT_set_method_placement: Line_v;
 }
 
-#$current ~ CometInterleaving \ CometMarker/ {
+#$current ~ CometInterleaving \>>!CometInterleaving/>> CometMarker/ {
  FCT_set_method_placement: Line_v;
 }
 
