@@ -1,0 +1,371 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+  <head>
+<meta http-equiv="Content-Type" content="application/x-www-form-urlencoded; charset=UTF-8; Accept-Language: en,fr;" />
+    <title>HTML root</title>
+    <style type="text/css">
+      
+    </style>
+    <script language="JavaScript" type="text/javascript" src="./Comets/models/HTML/jquery/jquery-1.3.2.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Comets/models/HTML/jquery/jquery.svg.min.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Comets/models/HTML/refreshClientServer.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js"></script>
+    <link type="text/css" href="./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css" rel="stylesheet" />
+    <script language="JavaScript" type="text/javascript">
+function convert_coord_from_page_to_node(x,y,node) {  						
+ var coord = new Array();													
+ coord['x'] = x;                         									
+ coord['y'] = y;                      										
+ var current_node = node;	                      							
+ 
+ while(current_node.nodeName != 'HTML' && current_node.nodeName != 'svg') {  
+ current_node = current_node.parentNode;                      			
+ }																			
+ 
+ if(current_node.nodeName == 'svg') {										
+ coord['x'] -= current_node.offsetLeft;								
+ coord['y'] -= current_node.offsetTop;									
+ var ma_matrice = current_node.createSVGMatrix();						
+ ma_matrice.e = coord['x'];										
+ ma_matrice.f = coord['y'];										
+ var matriceres = node.getCTM().inverse().mMultiply(ma_matrice);			
+ 
+ coord['x'] = matriceres.e;											
+ coord['y'] = matriceres.f;											
+ }																			
+ 
+ return coord;																
+ } 																			
+ 
+ function set_svg_origine(id,x,y) {											
+ var node = document.getElementById(id);									
+ if(node != null) {														
+ var nCTM = node.parentNode.getCTM().inverse().mMultiply(node.getCTM()); 
+ nCTM.e = x;																
+ nCTM.f = y;																
+ node.setAttribute('transform', 'matrix('+nCTM.a+','+nCTM.b+','+nCTM.c+','+nCTM.d+','+nCTM.e+','+nCTM.f+')'); 
+ }																		
+ }																			
+     $(function() {
+        $('#CPool_COMET_30_PM_P_3_internal_menu').dropDownMenu({parentMO: 'parent-hover', childMO: 'child-hover1'});
+        $("#CPool_COMET_1_PM_P_5").tabs();
+        $('#CPool_COMET_22_PM_P_9').svg();
+        $('#CPool_COMET_22_PM_P_9_pipo').svg();
+        var svg = $('#CPool_COMET_22_PM_P_9').svg('get');
+        svg.add("<g id=\"CPool_COMET_22_PM_P_9_root_group\" transform=\"translate(0,400) scale(1,-1)\"></g>");
+        svg.configure({height: '400',width: ''}, false);
+             $("#CPool_COMET_3_PM_P_5").addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all")
+        	            .find("#CPool_COMET_3_PM_P_5_header")
+        				.prepend('<span id="CPool_COMET_3_PM_P_5_icon" class="ui-icon ui-icon-circle-arrow-n"></span>')
+        				.end()
+        			.find("#CPool_COMET_3_PM_P_5_content").attr({class : "portlet-content"});
+        		$("#CPool_COMET_3_PM_P_5_title").html("Commandes du jeu SWL");
+        		$("#CPool_COMET_3_PM_P_5_header").attr({class : "portlet-header ui-widget-header"});        		$("#CPool_COMET_3_PM_P_5_icon").click(function() {
+                 if($(this).hasClass("ui-icon-circle-arrow-n")) { $(this).attr("class","ui-icon ui-icon-circle-arrow-s"); $("#CPool_COMET_3_PM_P_5_content").hide("blind"); }
+        			else { $(this).attr("class","ui-icon ui-icon-circle-arrow-n"); $("#CPool_COMET_3_PM_P_5_content").show("blind"); }
+        	      });
+        $('#CPool_COMET_22_PM_P_10').svg();
+        $('#CPool_COMET_22_PM_P_10_pipo').svg();
+        var svg = $('#CPool_COMET_22_PM_P_10').svg('get');
+        svg.add("<g id=\"CPool_COMET_22_PM_P_10_root_group\" transform=\"translate(0,400) scale(1,-1)\"></g>");
+        svg.configure({height: '400',width: ''}, false);
+      });    </script>
+  </head>
+  <body>
+    <p id="p_debug"></p>    <form class="cr_PM_P_HTML" id="cr_PM_P_HTML" style="" name="root" method="post" action="#">
+      <input type="hidden" value="9100" id="Comet_port" name="Comet_port" />
+      <input type="hidden" value="" id="IP_client" name="IP_client" />
+      <input type="hidden" value="827" id="Version_value" name="cr_PM_P_HTML__XXX__Is_update" />
+      <input type="hidden" value="2000" id="Update_interval" />
+  <div  class="Style_editor_PM_P_2" id="Style_editor_PM_P_2" style="" >
+  <div class="Style_editor_PM_P_2_cont_PM_P_1" id="Style_editor_PM_P_2_cont_PM_P_1" style="" >
+    <div class="CPool_COMET_24_PM_P_2" id="CPool_COMET_24_PM_P_2" style="" >
+      <div class="CPool_COMET_25_PM_P_2" id="CPool_COMET_25_PM_P_2" style="" > 
+        <div class="CPool_COMET_25_subspace_0_PM_P_2" id="CPool_COMET_25_subspace_0_PM_P_2" style="" >
+          <div  class="CPool_COMET_29_PM_P_2" id="CPool_COMET_29_PM_P_2" style="" >
+          <div class="CPool_COMET_29_PM_P_2_cont_PM_P_1" id="CPool_COMET_29_PM_P_2_cont_PM_P_1" style="" >
+            <div  class="U_encapsulator_PM_CPool_COMET_30_PM_P_3_66" id="U_encapsulator_PM_CPool_COMET_30_PM_P_3_66" style="" >
+            <style type="text/css">
+/**
+ * Drop Down Menu - CSS Temp
+ * March 26, 2009
+ * Corey Hart @ http://www.codenothing.com
+ */ 
+
+#CPool_COMET_30_PM_P_3_internal_menu {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li {
+	float: left;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li > a {
+	display: block;
+	width: 100px;
+	text-align:center;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-decoration: none;
+	color: #232323;
+	font-weight: bold;
+	background-color: #f1f1f1;
+	border: 1px solid #c5c5c5;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li > .parent-hover {
+	background-color: #c5c5c5;
+	border-left: 1px solid #545454;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol {
+	display: none;
+	list-style: none;
+	position: absolute;
+	margin: -1px 0 0 0;
+	z-index: 90;
+	padding: 0;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol a {
+	display: block;
+	width: 152px;
+	padding: 5px;
+	border-bottom: 1px solid #545454;
+	border-right: 1px solid #545454;
+	border-left: 1px solid #545454;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 10pt;
+	color: #232323;
+	background-color: #c5c5c5;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol li a.first {
+	border-top: 1px solid #545454;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol .child-hover1 {
+	background-color: #f1f1f1;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol .child-hover2 {
+	background-color: black;
+	color: white;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol .child-hover3 {
+	background-color: purple;
+	color: white;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol .child-hover4 {
+	background-color: blue;
+	color: white;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu > li ol li ol {
+	margin: -29px 0 0 163px;
+	position: absolute;
+}
+
+#CPool_COMET_30_PM_P_3_internal_menu span {
+	float: right;
+}
+
+            </style>
+            <div class="CPool_COMET_30_PM_P_3" id="CPool_COMET_30_PM_P_3" style="" > 
+              <div id="CPool_COMET_30_PM_P_3_internal_menu">
+                  <li>
+                    <a>Edit</a>
+                    <ol>
+                      <li><a>index_1_1</a></li>
+                      <li><a>index_1_1</a></li>
+                    </ol>
+                  </li>
+                  <li>
+                    <a>Display</a>
+                    <ol>
+                      <li><a>index_1_2</a></li>
+                    </ol>
+                  </li>
+              </div>
+              <p>a</p>
+              <p>b</p>
+              <p>c</p>
+            <div>    </div>
+              <div class="CPool_COMET_41_PM_P_1" id="CPool_COMET_41_PM_P_1" style="" >
+                <div class="CPool_COMET_30_subspace_0_PM_P_2" id="CPool_COMET_30_subspace_0_PM_P_2" style="" >
+                </div>
+                <div class="CPool_COMET_30_subspace_1_PM_P_2" id="CPool_COMET_30_subspace_1_PM_P_2" style="" >
+                </div>
+                <div class="CPool_COMET_30_subspace_2_PM_P_2" id="CPool_COMET_30_subspace_2_PM_P_2" style="" >
+                  <div class="CPool_COMET_34_PM_P_2" id="CPool_COMET_34_PM_P_2" style="" >
+                    <div class="CPool_COMET_35_PM_P_8" id="CPool_COMET_35_PM_P_8" style="" >
+                      <div  class="swl_PM_P_1" id="swl_PM_P_1" style="" >
+                      <div class="swl_PM_P_1_cont_PM_P_2" id="swl_PM_P_1_cont_PM_P_2" style="" >
+                        <input type="hidden" id="CPool_COMET_1_PM_P_5__XXX__set_current_menu" name="CPool_COMET_1_PM_P_5__XXX__set_current_menu" value="categ_CPool_COMET_2" />
+                        <div  class="CPool_COMET_1_PM_P_5" id="CPool_COMET_1_PM_P_5" style="" >
+                         <ul>
+                          <li>
+                            <a href="#categ_CPool_COMET_2">Edition Container</a>
+                          </li>
+                          <li>
+                            <a href="#categ_CPool_COMET_15">Play container</a>
+                          </li>
+                         </ul>
+                            <div id="categ_CPool_COMET_2">
+                              <div class="CPool_COMET_1_subspace_0_PM_P_4" id="CPool_COMET_1_subspace_0_PM_P_4" style="" >
+                                <div class="CPool_COMET_2_PM_P_4" id="CPool_COMET_2_PM_P_4" style="" >
+                                  <div  class="CPool_COMET_22_PM_P_9" id="CPool_COMET_22_PM_P_9" style="" >
+                                  <div style="display:none" id="CPool_COMET_22_PM_P_9_pipo">
+                                  </div>
+                                  </div>
+                                  <div class="CPool_COMET_3_PM_P_5" id="CPool_COMET_3_PM_P_5" style="" >
+                                  <div id="CPool_COMET_3_PM_P_5_header"><div id="CPool_COMET_3_PM_P_5_title"></div></div>                                  <div id="CPool_COMET_3_PM_P_5_content">                                    <div class="CPool_COMET_18_PM_P_4" id="CPool_COMET_18_PM_P_4" style="" >
+                                      <span class="CPool_COMET_19_PM_P_4" id="CPool_COMET_19_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_19_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_19_PM_P_4_button" type="button" value="New space" name="CPool_COMET_19_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_19_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_19_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                      <span class="CPool_COMET_20_PM_P_4" id="CPool_COMET_20_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_20_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_20_PM_P_4_button" type="button" value="Load space" name="CPool_COMET_20_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_20_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_20_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                      <span class="CPool_COMET_21_PM_P_4" id="CPool_COMET_21_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_21_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_21_PM_P_4_button" type="button" value="Save space" name="CPool_COMET_21_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_21_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_21_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                    </div>
+                                    <div class="CPool_COMET_4_PM_P_4" id="CPool_COMET_4_PM_P_4" style="" >
+                                      <span class="CPool_COMET_6_PM_P_4" id="CPool_COMET_6_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_6_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_6_PM_P_4_button" type="button" value="Sub planet" name="CPool_COMET_6_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_6_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_6_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                      <span class="CPool_COMET_5_PM_P_4" id="CPool_COMET_5_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_5_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_5_PM_P_4_button" type="button" value="Add planet" name="CPool_COMET_5_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_5_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_5_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                    </div>
+                                    <div class="CPool_COMET_7_PM_P_4" id="CPool_COMET_7_PM_P_4" style="" >
+                                      <span class="CPool_COMET_9_PM_P_4" id="CPool_COMET_9_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_9_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_9_PM_P_4_button" type="button" value="Sub ship" name="CPool_COMET_9_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_9_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_9_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                      <span class="CPool_COMET_8_PM_P_4" id="CPool_COMET_8_PM_P_4" style="" >
+                                      <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_8_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                      <input id="CPool_COMET_8_PM_P_4_button" type="button" value="Add ship" name="CPool_COMET_8_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_8_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_8_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                      </span>
+                                    </div>
+                                    <div class="CPool_COMET_10_PM_P_4" id="CPool_COMET_10_PM_P_4" style="" >
+                                      <div class="CPool_COMET_11_PM_P_4" id="CPool_COMET_11_PM_P_4" style="" >
+                                        <span class="CPool_COMET_13_PM_P_4" id="CPool_COMET_13_PM_P_4" style="" >
+                                        <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_13_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                        <input id="CPool_COMET_13_PM_P_4_button" type="button" value="Sub player" name="CPool_COMET_13_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_13_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_13_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                        </span>
+                                        <span class="CPool_COMET_12_PM_P_4" id="CPool_COMET_12_PM_P_4" style="" >
+                                        <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_12_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                        <input id="CPool_COMET_12_PM_P_4_button" type="button" value="Add player" name="CPool_COMET_12_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_12_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_12_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                        </span>
+                                      </div>
+                                      <div class="CPool_COMET_14_PM_P_4" id="CPool_COMET_14_PM_P_4" style="" >
+                                      </div>
+                                    </div>
+                                  </div>                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div id="categ_CPool_COMET_15">
+                              <div class="CPool_COMET_1_subspace_1_PM_P_4" id="CPool_COMET_1_subspace_1_PM_P_4" style="" >
+                                <div class="CPool_COMET_15_PM_P_4" id="CPool_COMET_15_PM_P_4" style="" >
+                                  <div  class="CPool_COMET_22_PM_P_10" id="CPool_COMET_22_PM_P_10" style="" >
+                                  <div style="display:none" id="CPool_COMET_22_PM_P_10_pipo">
+                                  </div>
+                                  </div>
+                                  <span class="CPool_COMET_16_PM_P_4" id="CPool_COMET_16_PM_P_4" style="" >
+                                  <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_16_PM_P_4_button_img" style="position:absolute; visibility:hidden;" />
+                                  <input id="CPool_COMET_16_PM_P_4_button" type="button" value="Fire!" name="CPool_COMET_16_PM_P_4__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_16_PM_P_4_button').attr('disabled','disabled');$('#CPool_COMET_16_PM_P_4_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="swl_PM_P_1_cont_daughters_PM_P_2" id="swl_PM_P_1_cont_daughters_PM_P_2" style="" >
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+            <div class="CPool_COMET_29_PM_P_2_cont_daughters_PM_P_1" id="CPool_COMET_29_PM_P_2_cont_daughters_PM_P_1" style="" >
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div  class="CPool_COMET_28_PM_P_2" id="CPool_COMET_28_PM_P_2" style="" >
+      <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_PM_P_1" style="" > 
+        <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_0_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_0_PM_P_1" style="" >
+          <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_selector_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_selector_PM_P_1" style="" >
+            <input class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_sel_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_sel_PM_P_1" style=""  type="text" value="" name ="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_sel_PM_P_1__XXX__MY_set_text" onkeyup="javascript:addOutput(this)" />            <span class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1" style="" >
+            <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1_button_img" style="position:absolute; visibility:hidden;" />
+            <input id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1_button" type="button" value="FIND" name="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1_button').attr('disabled','disabled');$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_sel_PM_P_1_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+            </span>
+            <span class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_txt_sel_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_txt_sel_PM_P_1" style="" ></span>          </div>
+        </div>
+        <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_1_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_1_PM_P_1" style="" >
+          <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_cont_rules_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_cont_rules_PM_P_1" style="" >
+            <input class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_r_name_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_r_name_PM_P_1" style=""  type="text" value="" name ="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_r_name_PM_P_1__XXX__MY_set_text" onkeyup="javascript:addOutput(this)" />            <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_cont_op_rules_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_cont_op_rules_PM_P_1" style="" >
+              <span class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1" style="" >
+              <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1_button_img" style="position:absolute; visibility:hidden;" />
+              <input id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1_button" type="button" value="DELETE SELECTED RULES" name="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1_button').attr('disabled','disabled');$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_del_PM_P_1_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+              </span>
+              <span class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1" style="" >
+              <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1_button_img" style="position:absolute; visibility:hidden;" />
+              <input id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1_button" type="button" value="SAVE RULE" name="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1_button').attr('disabled','disabled');$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_act_save_PM_P_1_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+              </span>
+            </div>
+            <input class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_rules_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_rules_PM_P_1" style=""  type="text" value="" name ="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_spec_rules_PM_P_1__XXX__MY_set_text" onkeyup="javascript:addOutput(this)" />          </div>
+        </div>
+        <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_2_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_2_PM_P_1" style="" >
+          <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_set_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_set_PM_P_1" style="" >
+            <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_cc_set_PM_P_2" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_cc_set_PM_P_2" style="" >
+            <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_cc_set_LM_LP_nested_interleaving_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_cc_set_LM_LP_nested_interleaving_PM_P_1" style="" > 
+            </div>
+            </div>
+            <span class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1" style="" >
+            <img src="Comets/activator/PM_Ps/HTML/load.gif" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1_button_img" style="position:absolute; visibility:hidden;" />
+            <input id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1_button" type="button" value="APPLY RULES" name="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1__XXX__Trigger_prim_activate" onclick="javascript:$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1_button').attr('disabled','disabled');$('#CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_act_apply_PM_P_1_button_img').attr('style','position:absolute; visibility:visible;');addOutput(this,true)" />
+            </span>
+          </div>
+        </div>
+        <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_3_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_interleaving_subspace_3_PM_P_1" style="" >
+          <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_PM_P_1" style="" > 
+            <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_subspace_0_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_subspace_0_PM_P_1" style="" >
+              <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_load_rules_PM_P_2" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_load_rules_PM_P_2" style="" >
+              <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_load_rules_LM_LP_nested_interleaving_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_load_rules_LM_LP_nested_interleaving_PM_P_1" style="" > 
+              </div>
+              </div>
+            </div>
+            <div class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_subspace_1_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_inter_files_subspace_1_PM_P_1" style="" >
+              <input class="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_save_rules_PM_P_1" id="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_save_rules_PM_P_1" style=""  type="text" value="" name ="CPool_COMET_28_PM_P_2_CSS_Meta_IHM_PM_P_U_save_rules_PM_P_1__XXX__MY_set_text" onkeyup="javascript:addOutput(this)" />            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="Style_editor_PM_P_2_cont_daughters_PM_P_1" id="Style_editor_PM_P_2_cont_daughters_PM_P_1" style="" >
+    </div>
+  </div>
+  </div>
+      <input type="hidden" value="" name="pipo_button" />
+    </form>
+  </body>
+</html>
+

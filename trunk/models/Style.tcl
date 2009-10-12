@@ -710,10 +710,12 @@ method Style COND_BASE {str_name node} {
    return [this COND_NODE str_inside $node]
   }
  
- set acc [lindex $str 0]
- set op  [lindex $str 1]
- set val [lindex $str 2]
- set str [lrange $str 3 end]
+ set str_tmp [string map [list "\]" " \]"] $str]
+ set acc [lindex $str_tmp 0]
+ set op  [lindex $str_tmp 1]
+ set val [lindex $str_tmp 2]
+ 
+ set str [lrange $str_tmp 3 end]
  
  #if {[regexp "^($this(lexic,letters)*)$this(lexic,spaces)*($this(lexic,op_cmp)*)$this(lexic,spaces)*($this(lexic,letters)*)$this(lexic,spaces)*(.*)$" $str reco acc op val str]} {
  #}

@@ -24,16 +24,9 @@ proc Is_sub_list {L1 L2} {
 #____________________________________________________________________________________
 proc Liste_to_set {L} {
  set rep [list]
- foreach e1 $L {
-   set to_be_added 1
-   foreach e2 $rep {
-     if {[string equal $e1 $e2]} {
-       set to_be_added 0
-       break
-      }
-    }
-   if {$to_be_added} {
-     lappend rep $e1
+ foreach e $L {
+   if {[lsearch $rep $e] == -1} {
+     lappend rep $e
     }
   }
  return $rep

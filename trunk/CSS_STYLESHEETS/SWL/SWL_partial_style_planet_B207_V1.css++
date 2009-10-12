@@ -1,0 +1,5 @@
+#$current {
+ FCT_On_one_pointer_Enter  : if {[$obj get_mode] != "game"} {puts "$obj mode is [$obj get_mode]" --- [$obj get_n_edition] Afficher_noeud 1};
+ FCT_On_all_pointers_Leave : if {[$obj get_mode] != "game"} {[$obj get_n_edition] Afficher_noeud 0};
+}
+

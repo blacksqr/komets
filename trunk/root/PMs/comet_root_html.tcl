@@ -32,6 +32,8 @@ method PhysicalHTML_root constructor {name descr args} {
 
   set this(marker) 0
   
+  set this(L_js_files_link) [list]
+  
   # ________Envoi de changement avec le serveur le php________#
   set this(update_send) 0
   set this(version_server) 0
@@ -56,6 +58,17 @@ Methodes_set_LC PhysicalHTML_root [L_methodes_set_CometRoot] {} {}
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP Update_interval]
 Generate_List_accessor PhysicalHTML_root L_cmd_to_eval_when_plug_under_new_roots L_cmd_to_eval_when_plug_under_new_roots
+Generate_List_accessor PhysicalHTML_root L_js_files_link                         L_js_files_link
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code PhysicalHTML_root set_L_js_files_link {} {
+ set this(L_js_files_link) [Liste_to_set] $this(L_js_files_link)
+}
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code PhysicalHTML_root Add_L_js_files_link {} {
+ set this(L_js_files_link) [Liste_to_set] $this(L_js_files_link)
+}
 
 #___________________________________________________________________________________________________________________________________________
 Generate_List_accessor PhysicalHTML_root L_PM_to_sub L_PM_to_sub
@@ -82,11 +95,15 @@ method PhysicalHTML_root CB_plug_under_new_roots {r} {}
 method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-1.3.2.min.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery-ui-1.7.1.custom.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-1.3.2.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-ui-1.7.2.custom.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
+ 
+ foreach js_file_link [this get_L_js_files_link] {
+   append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$js_file_link\"></script>\n"
+  }
  
  append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
