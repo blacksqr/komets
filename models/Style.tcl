@@ -709,7 +709,15 @@ method Style COND_BASE {str_name node} {
    set str [regexp "^$this(lexic,spaces)*(.*)$" $str reco str]
    return [this COND_NODE str_inside $node]
   }
- if {[regexp "^($this(lexic,letters)*)$this(lexic,spaces)*($this(lexic,op_cmp)*)$this(lexic,spaces)*($this(lexic,letters)*)$this(lexic,spaces)*(.*)$" $str reco acc op val str]} {
+ 
+ set acc [lindex $str 0]
+ set op  [lindex $str 1]
+ set val [lindex $str 2]
+ set str [lrange $str 3 end]
+ 
+ #if {[regexp "^($this(lexic,letters)*)$this(lexic,spaces)*($this(lexic,op_cmp)*)$this(lexic,spaces)*($this(lexic,letters)*)$this(lexic,spaces)*(.*)$" $str reco acc op val str]} {
+ #}
+ if {1} {
    #if \{[lsearch [gmlObject info classes $node] Physical_model] == -1\} \{set ptf $node\} else \{set ptf $\{node\}_cou_ptf\}
    set ptf $node
    if {[catch "set rep \[$node get_$acc\]" res]} {
@@ -719,8 +727,9 @@ method Style COND_BASE {str_name node} {
        puts "Invalid accessor ($acc) for NODE or REL ($node).\n  acc : $acc\n   op : $op\n  val : $val\n$res"
        return 0
       }
-     } 
+     }
     }
+   #puts "COND_BASE :\n  this(lexic,letters) : $this(lexic,letters)\n  this(lexic,spaces) : $this(lexic,spaces)\n  set rep \[$node get_$acc\]\n  $rep $op $val"
    switch $op {
      ==  {return [string equal $rep $val]}
      !=  {return [expr ![string equal $rep $val]]}
