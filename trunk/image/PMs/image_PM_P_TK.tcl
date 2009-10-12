@@ -5,6 +5,8 @@ inherit Image_PM_P_TK PM_TK
 #___________________________________________________________________________________________________________________________________________
 method Image_PM_P_TK constructor {name descr args} {
  set this(var_name) "${objName}_var_rb"
+ set this(img_loaded_ok) 1
+ 
  this inherited $name $descr
    this set_GDD_id CT_Image_AUI_CUI_basic_TK
    set this(img_tk_name) ""
@@ -18,6 +20,8 @@ method Image_PM_P_TK get_img_ressource {} {return $this(img_tk_name)}
 method Image_PM_P_TK get_or_create_prims {root} {
 # Define the handle
  set img $root.tk_${objName}_img
+ set this(tk_img) $img
+ 
  if {[winfo exists $img]} {
   } else {label $img
           this set_prim_handle $img
@@ -29,7 +33,10 @@ method Image_PM_P_TK get_or_create_prims {root} {
              }
 			this load_img $f
            }
-          $img configure -image $this(img_tk_name)
+          if {[catch {$img configure -image $this(img_tk_name)} err]} {
+		    set this(img_loaded_ok) 0
+			puts "In $objName\n  error while plugging to mother\n  $objName get_or_create_prims $root\n  $err"
+		   } else {set this(img_loaded_ok) 1}
 		  this Add_MetaData PRIM_STYLE_CLASS [list $img "PARAM RESULT OUT image IMAGE"]
          }
 
@@ -49,7 +56,11 @@ method Image_PM_P_TK load_img {f} {
    set this(img_tk_name) "[this get_LM]_TK_img_ressource"
    if {[catch "image create photo $this(img_tk_name) -file {$f}" res]} {
      puts "Error while loading image in $objName :\n    $res"
-    }
+    } elseif {!$this(img_loaded_ok)} {if {[catch {$this(tk_img) configure -image $this(img_tk_name)} err]} {
+										set this(img_loaded_ok) 0
+										puts "In $objName\n  error while plugging to mother\n  $objName load_img $f\n  $err"
+									   } else {set this(img_loaded_ok) 1}
+	                                 }
   }   
 }
 
