@@ -15,14 +15,15 @@ Methodes_set_LC ChoiceN_PM_P_menu_HTML $L_methodes_set_choicesN {}         {}
 Methodes_get_LC ChoiceN_PM_P_menu_HTML $L_methodes_get_choicesN {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-method DChoice_PM_P_Menu_HTML set_val {v} {
+method ChoiceN_PM_P_menu_HTML set_val {v} {
  set root [this get_L_roots] 
  set methode "selected"
 
  if {![info exists this(old_val)]} {set this(old_val) [this get_val]}
  
  if {$v != $this(old_val) && $v != ""} {
-   set cmd "\$('#${objName}_$v').attr('selected', 'selected');"
+   set    cmd "\$('#${objName}_$this(old_val)').removeAttr('selected');"
+   append cmd "\$('#${objName}_$v').attr('selected', 'selected');"
   
    if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
      $root Concat_update $objName $methode $cmd
@@ -31,7 +32,7 @@ method DChoice_PM_P_Menu_HTML set_val {v} {
    set this(old_val) $v
   } 
 }
-
+#Trace ChoiceN_PM_P_menu_HTML set_val
 #___________________________________________________________________________________________________________________________________________
 method ChoiceN_PM_P_menu_HTML Render {strm_name {dec {}}} {
  upvar $strm_name rep

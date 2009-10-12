@@ -51,3 +51,4 @@ method ChoiceN_LM_LP set_PM_active {PM} {
  $PM set_val [this get_val]
 }
 
+#Trace ChoiceN_LM_LP set_val

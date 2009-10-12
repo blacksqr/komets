@@ -10,6 +10,12 @@ method Activator_PM_P_button_HTML constructor {name descr args} {
  this inherited $name $descr
    set class(mark) 0
    this set_GDD_id CT_Activator_AUI_basic_CUI_button_HTML
+   
+   this set_root_for_daughters $objName
+   this set_prim_handle        $objName
+   this Add_MetaData PRIM_STYLE_CLASS [list $objName "BUTTON" \
+                                      ]
+
  eval "$objName configure $args"
  return $objName
 }

@@ -166,8 +166,13 @@ method CometSlideRemoteController_PM_P_basic Buffer_num_slide {ccn_PM num} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometSlideRemoteController_PM_P_basic set_val {v} {
- if {[$this(ccn) get_val] != $v} {$this(ccn) set_val $v}
+ puts "  $this(ccn) get_val => [$this(ccn) get_val]"
+ if {[$this(ccn) get_val] != $v} {
+   puts "$this(ccn) set_val $v"
+   $this(ccn) set_val $v
+  }
 }
+#Trace CometSlideRemoteController_PM_P_basic set_val
 
 #___________________________________________________________________________________________________________________________________________
 method CometSlideRemoteController_PM_P_basic set_b_inf {n} {$this(ccn) set_b_inf $n}

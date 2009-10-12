@@ -4,7 +4,6 @@
 inherit CometSlideRemoteController_LM_P ChoiceN_LM_LP
 
 method CometSlideRemoteController_LM_P constructor {name descr args} {
-puts "AVANT"
  this inherited $name $descr
 
  set this(init_ok) 0
@@ -25,7 +24,6 @@ puts "AVANT"
  set this(init_ok) 1
 
  eval "$objName configure $args"
- puts "APRES"
  return $objName
 }
 
