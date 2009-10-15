@@ -109,7 +109,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
    this Render_daughters_JS strm $mark $dec
-   append strm $dec "\$(function() {\n"
+   append strm $dec "\$(document).ready(function() {\n"
      this Render_post_JS strm "$dec    "
    append strm $dec "  });"
  append strm $dec "</script>\n"
@@ -119,7 +119,7 @@ Generate_accessors PhysicalHTML_root [list CSS PHP_page]
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Global_page {chan ad num} {
- puts "Demande de renseignement global de $ad;$num sur $chan"
+ #puts "Demande de renseignement global de $ad;$num sur $chan"
  fconfigure $chan -blocking 0
  if {![this get_direct_connection]} {
    fileevent $chan readable "$objName Send_global_info $chan"
@@ -430,16 +430,13 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep "  " "  " {<style type="text/css">} "\n"
  append rep "  " "  " "  " [this Apply_style] "\n"
  append rep "  " "  " {</style>} "\n"
-# append rep "  " "  " {<script type="text/javascript" src="script.js">		document.captureEvents(Event.MOUSEMOVE);document.onmousemove = get_mouse;</script>} "\n"
    set this(marker) [clock clicks]
-   #puts "  $objName Render_JS rep $this(marker)"
    this Render_JS rep $this(marker) "    "
-   #puts "  / END OF / $objName Render_JS rep $this(marker)"
  append rep "  " {</head>}	"\n"
-# append rep "  " {<body onMouseUp="javascript:testClick2()">} "\n"
 
  append rep "  " {<body>}	"\n"
  append rep "  " "  " {<p id="p_debug"></p>}
+ append rep "  " "  " {<textarea id="Ajax_Raw" style="width:100%; height:100px;"></textarea>}
  append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
  #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
  #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
@@ -578,9 +575,7 @@ method PhysicalHTML_root get_vclient_max {} {
  set max -1
 
 	 foreach {i v} [array get this version_client,*] {
-	   if {$v > $max} {
-		 set max $v
-		}
+	   if {$v > $max} {set max $v}
 	  }
 
  return $max
@@ -592,9 +587,7 @@ method PhysicalHTML_root get_vclient_min {} {
  set min -1
 
 	 foreach {i v} [array get this version_client,*] {
-	   if {$min == -1 || $v < $min} {
-		 set min $v
-		}
+	   if {$min == -1 || $v < $min} {set min $v}
 	  }
 
  return $min
@@ -637,7 +630,6 @@ method PhysicalHTML_root Verif_L_sub_exist_version {vencours} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Verif_obj_parents_in_L_add_sub {vclient obj} {
  if {[gmlObject info exists object $obj]} {
-   #set L [CSS++ $objName "#$obj, #$obj <--< *"]
    set L [list]; $obj get_L_ancestors L
   } else {set L [list $obj]}
   
@@ -705,7 +697,9 @@ method PhysicalHTML_root Minimize_L_add_sub {L_PM_name} {
  
  set nL [list]
  foreach PM $L_PM {
-   if {[lsearch $L_all_descendants $PM] == -1} {lappend nL $PM} else {puts "  On vire $PM"}
+   if {[lsearch $L_all_descendants $PM] == -1} {lappend nL $PM} else {
+     #puts "  On vire $PM"
+	}
   }
   
  set L_PM $nL
@@ -755,7 +749,7 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  
  foreach e $this(L_PM_really_sub) {
 	append strm [this Sub_JS $e] "\n"
-	#puts "Ma boucle L_PM_really_sub    :   $strm" 
+	#puts "\nMa boucle L_PM_really_sub    :   $strm" 
  } 
  
  foreach e $this(L_PM_really_add) {
@@ -764,7 +758,7 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
 	  append strm [[$e get_mothers] Add_JS $e] "\n"
 	  $e Render_post_JS strm
 	 } else {append strm [this Sub_JS $e] "\n"}
-	#puts "Ma boucle L_PM_really_add    :   $strm"
+	#puts "\nMa boucle L_PM_really_add    :   $strm"
  }
  set this(L_PM_really_sub) [list]
  set this(L_PM_really_add) [list]

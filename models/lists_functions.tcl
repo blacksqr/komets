@@ -11,14 +11,11 @@ proc Generate_List_accessor {class L_name suffixe} {
 
 #____________________________________________________________________________________
 proc Is_sub_list {L1 L2} {
+ set rep 1
  foreach e1 $L1 {
-   set ok 0
-   foreach e2 $L2 {
-     if {[string equal $e1 $e2]} {set ok 1; break}
-    }
-   if {$ok} {set L2 [lremove $L2 $e1]} else {return 0}
+   if {[lsearch $L2 $e1] == -1} {set rep 0; break}
   }
- return 1
+ return $rep
 }
 
 #____________________________________________________________________________________
