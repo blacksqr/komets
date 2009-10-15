@@ -13,6 +13,8 @@ method PM_HTML constructor {name descr args} {
  set this(L_tags)        {}
  set this(embeded_style) {}
  set this(html_style)    {}
+ 
+ set this(id_for_style)  {}
 
  this set_cmd_placement      ""
  this set_prim_handle        ""
@@ -35,7 +37,7 @@ method PM_HTML constructor {name descr args} {
 #method PM_HTML set_mark {m} {set class(mark) $m}
 
 Generate_List_accessor PM_HTML L_tags L_tags
-Generate_accessors     PM_HTML AJAX_id_for_daughters
+Generate_accessors     PM_HTML [list AJAX_id_for_daughters id_for_style]
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Encode_param_for_JS {txt} {
@@ -55,7 +57,7 @@ method PM_HTML Reconnect {PMD} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Show_elements_prims {b L_prims} {
- puts "$objName PM_HTML::Show_elements_prims $b {$L_prims}"
+ #puts "$objName PM_HTML::Show_elements_prims $b {$L_prims}"
  if {[string equal $L_prims ""]} {set L_prims $objName}
 # Puts some kinds of embeded style in Render_all...
  set Lr [split $this(embeded_style) "\n"]
@@ -132,6 +134,9 @@ method PM_HTML Render_post_JS {strm_name {dec {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+Manage_CallbackList PM_HTML Render_post_JS end strm
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Render_daughters_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
  foreach d [this get_daughters] {
@@ -164,11 +169,16 @@ method PM_HTML Add_prim_mother   {c Lprims {index -1}} {this inherited $c $Lprim
 method PM_HTML Style_class {} {
  #set c [this get_style_class]
  #set    rep " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" style=\""
- set    rep " class=\"$objName\" id=\"$objName\" style=\""
+ set    rep " class=\"$objName\" id=\"$objName\" style=\"[this get_html_style_in_text]\" "
+ return $rep
+}
+
+#_________________________________________________________________________________________________________
+method PM_HTML get_html_style_in_text {} {
+ set rep ""
  foreach {var val} [this get_html_style] {
 	append rep $var ": " $val ";"
   }  
- append rep "\" "
  return $rep
 }
 
@@ -282,12 +292,12 @@ method PM_HTML sub_html_style {L_vars} {
 method PM_HTML Send_updated_style {} {
  set root [this get_L_roots] 
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-   set    cmd  "\$(\"#${objName}\").removeAttr(\"style\");\n"
-   append cmd  "\$(\"#${objName}\").css({"
+   set    cmd  "\$(\"#[this get_id_for_style]\").removeAttr(\"style\");\n"
+   append cmd  "\$(\"#[this get_id_for_style]\").css({"
    foreach {var val} [this get_html_style] {
-	 append cmd $var ": \"" $val "\","
+	 append cmd \' $var \' " : \'" $val "\',"
 	}
-   # set cmd [string range $cmd 0 end-1]	
+   set cmd [string range $cmd 0 end-1]	
    append cmd "});" "\n"
  
    $root Concat_update $objName "htmlstyle" $cmd
@@ -308,12 +318,13 @@ method PM_HTML Add_JS {e} {
 	 set strm {}; $e Render strm
 	 set strm [$e Encode_param_for_JS $strm]
 	 
+	 set cmd "\$('#$e').remove();"
 	 if { $tailletot-1 > $pos} {
 		set objAfter [lindex [this get_daughters] [expr $pos+1]]
 		set objAfter [$objAfter get_prim_handle]
-		set cmd "\$($strm).insertBefore('#$objAfter');"
+		append cmd "\$($strm).insertBefore('#$objAfter');"
 	  } else {set root_for_daughters [this get_root_for_daughters]
-			  set cmd "\$($strm).appendTo('#$root_for_daughters');"
+			  append cmd "\$($strm).appendTo('#$root_for_daughters');"
 			 }
 
 	 
@@ -331,15 +342,23 @@ method PM_HTML Sub_JS {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Draggable {} {
- set cmd "\$('#$objName').draggable();"
- append cmd ""
+method PM_HTML Draggable {{v 1}} {
+ if {$v} {
+   set cmd "\$('#$objName').draggable(  )"
+   this send_jquery_message Draggable "$cmd\;"
+   this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
+     append strm \\$cmd\\\;
+	" UNIQUE
+  } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
+          set cmd "\$('#$objName').draggable( 'disable' )"
+		  this send_jquery_message Draggable "$cmd\;"
+         }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML DragDrop_event {type x y} {
  set cmd "\$('#$objName').${type}();"
- append cmd ""
+ this send_jquery_message DragDrop_event $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________

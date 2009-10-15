@@ -1,9 +1,9 @@
 set DEFINE_MODEL_COMET 1 
 
 #_________________________________________________________________________________________________________
-proc Trace {C m} {
+proc Trace {C m {stream ""}} {
  set cmd    "method $C $m {[gmlObject info arglist $C $m]} {\n"
- append cmd "puts \"\$objName $m "
+ append cmd "puts $stream \"\$objName $m "
    foreach a [gmlObject info arglist $C $m] {
      append cmd {$} [lindex $a 0] " "
     }
@@ -193,6 +193,26 @@ proc Inject_code {C mtd code_bgn code_end} {
 }
 
 #_________________________________________________________________________________________________________
+proc Add_aspect {c m mark code {position begin}} {
+ # Get the existing body
+ set body [gmlObject info body $c $m]
+ 
+ # Inject code into the body
+ set bgn_mark "# <${mark}>"
+ set end_mark "# </${mark}>"
+ if {[regexp "^(.)*${bgn_mark}\n.*$end_mark\n(.*)\$" $body reco bgn end]} {
+   set body "$bgn$bgn_mark\n$code\n$end_mark\n$end"
+  } else {if {$position == "begin"} {
+            set body "$bgn_mark\n$code\n$end_mark\n$body"
+		   } else {set body "$body\n$bgn_mark\n$code\n$end_mark"}	
+		 }
+
+ # Enter the new body into the TCL interpretor by building the command
+ set   cmd "method $c $m {[gmlObject info arglist $c $m]} {\n$body}"
+ eval $cmd
+}
+
+#_________________________________________________________________________________________________________
 proc Manage_CallbackList {c L_m pos args} {
  set L_varL_to_declare_in_constr [list]
  foreach m $L_m {
@@ -236,23 +256,29 @@ proc Manage_CallbackList {c L_m pos args} {
    append cmd "\}\n"
    eval $cmd
 # Generate the callback mechanism
+   set    cmd_to_trigger "  foreach CB \$this(L_CB_$m) {\n"
+   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for $m\n  \$err\"}\n"
+   append cmd_to_trigger "   }\n"
    set cmd "method $c $m \{$L_args\} \{\n"
      if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
        append cmd $avant {# INSERT CALLBACKS HERE} "\n"
-       append cmd " this Trigger_L_CB_$m $L_CB_name"
-         foreach a $argL {append cmd " \$$a"}
-         foreach a $args {append cmd " \$$a"}
+	   append cmd $cmd_to_trigger
+       #append cmd " this Trigger_L_CB_$m $L_CB_name"
+       #  foreach a $argL {append cmd " \$$a"}
+       #  foreach a $args {append cmd " \$$a"}
        append cmd "\n" $apres
       } else {switch $pos {
-                begin {append cmd " this Trigger_L_CB_$m $L_CB_name"
-                         foreach a $argL {append cmd " \$$a"}
-                         foreach a $args {append cmd " \$$a"}
+                begin {append cmd $cmd_to_trigger
+				       #append cmd " this Trigger_L_CB_$m $L_CB_name"
+                       #  foreach a $argL {append cmd " \$$a"}
+                       #  foreach a $args {append cmd " \$$a"}
                        append cmd "\n" $body "\n"
                       }
                 end   {append cmd $body "\n"
-                       append cmd " this Trigger_L_CB_$m $L_CB_name"
-                         foreach a $argL {append cmd " \$$a"}
-                         foreach a $args {append cmd " \$$a"}
+                       append cmd $cmd_to_trigger
+					   #append cmd " this Trigger_L_CB_$m $L_CB_name"
+                       #  foreach a $argL {append cmd " \$$a"}
+                       #  foreach a $args {append cmd " \$$a"}
                        append cmd "\n"
                       }
                }

@@ -1,4 +1,4 @@
-var output     = {};
+﻿var output     = {};
 var output_tmp = {};
 var outputVer  = {};
 var i = 0;	
@@ -16,7 +16,7 @@ $(document).ready(function() {
 		$("#IP_client").val(ip);
 	}
 	catch(err) {
-		alert("Votre navigateur ne g�re pas le java");
+		alert("Votre navigateur ne gÃ¨re pas le java");
 		ip = '127.0.0.1';
 		$("#IP_client").val(ip);
 	}
@@ -56,19 +56,17 @@ function refreshClientServer() {
 		// On enregistre la version du client et de son ip
 		outputVer[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
 		
-		// R�cup�ration de la version serveur 
+		// RÃ©cupÃ©ration de la version serveur 
 		$.ajax({
 			type: "POST",
 			url: "index.php",
 			data: outputVer,
 			success: function(msg){
 				if(msg) {
-					try { 
-						eval(msg);
-					}
-					catch(err) {
-						alert(err);
-					}
+					try {eval(msg);
+					    } catch(err) {$('Ajax_Raw').html("Erreur\n" + msg + "\n" + err );
+						              alert("BOBO\n" + msg + "___________");
+					                 }
 					/*output = output_tmp;
 					i = i_tmp;
 					i_tmp = 0;
@@ -86,17 +84,19 @@ function refreshClientServer() {
 																 i = i_tmp;
 																 i_tmp = 0;
 																 mutex = false;
-																 if(msg) {try {eval(msg);
-																	          } catch(err) { alert(err);
+																 if(msg != '') {try {eval(msg);
+																	                } catch(err) { 
+																			                 $('p_debug_encore').html("Erreur\n" + msg + "\n" + err );
+																							 alert("ERREUR\n" + msg + "___________");
 																						   }
-																		 }
+																		       }
 																 
 																 if(forcing_send) {forcing_send = false;
 																				   refreshClientServer();
 																				  }
 																},
 										error: function(msg) {mutex = false;
-										                      //alert("Probl�me d'envoi des mises � jour client\n\n" + msg);
+										                      //alert("ProblÃ¨me d'envoi des mises Ã  jour client\n\n" + msg);
 															 }
 									});
 				                 } else {mutex = false;
@@ -107,7 +107,7 @@ function refreshClientServer() {
 		    },
 			error: function(err){
 			    mutex = false;
-				//alert("Probl�me de r�ception des mises � jour serveur\n\n"+err);
+				//alert("ProblÃ¨me de rÃ©ception des mises Ã  jour serveur\n\n"+err);
 			}
 		});
 	}
