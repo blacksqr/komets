@@ -14,7 +14,7 @@ method PM_HTML constructor {name descr args} {
  set this(embeded_style) {}
  set this(html_style)    {}
  
- set this(id_for_style)  {}
+ set this(id_for_style)  $objName
 
  this set_cmd_placement      ""
  this set_prim_handle        ""
@@ -223,7 +223,7 @@ method PM_HTML get_PM_root {  } {return $this(PM_root)}
 method PM_HTML set_PM_root {PM} {
  set this(PM_root) $PM
  foreach d [this get_daughters] {
-   if {[catch "$d set_PM_root {$PM}" err]} {puts "___________ get_PM_root non implemented for $d set_PM_root {$PM}"}
+   if {[catch "$d set_PM_root {$PM}" err]} {puts "___________ set_PM_root non implemented for $d set_PM_root {$PM}"}
   }
 }
 
@@ -344,10 +344,12 @@ method PM_HTML Sub_JS {e} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Draggable {{v 1}} {
  if {$v} {
-   set cmd "\$('#$objName').draggable(  )"
-   this send_jquery_message Draggable "$cmd\;"
+   set cmd        "\$('#$objName').draggable(  )"
+   set cmd_enable "\$('#$objName').draggable( 'enable' )"
+   this send_jquery_message Draggable "$cmd\; $cmd_enable\;"
    this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
      append strm \\$cmd\\\;
+	 append strm \\$cmd_enable\\\;
 	" UNIQUE
   } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
           set cmd "\$('#$objName').draggable( 'disable' )"

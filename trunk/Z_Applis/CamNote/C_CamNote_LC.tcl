@@ -130,13 +130,13 @@ method CometCamNote maj_slide {num} {
    if {$nb>0 && $num <= $nb} {
      set img [lindex $this(L_files) [expr $num-1]]
      puts "  new image is $img"
-     if {[string equal $img [${objName}_img get_img_file_name]]} {} else {${objName}_img load_img $img}
+     if {$img != [${objName}_img get_img_file_name]} {${objName}_img load_img $img}
     }
 
-   set telec [[this get_speaker] get_telec]; if {[$telec get_val] != $num} {$telec configure -set_val $num}
+   set telec [[this get_speaker] get_telec]; if {[$telec get_val] != $num} {puts "  1"; $telec configure -set_val $num}
    foreach examinator [this get_Examinators] {
      set ce [lindex $examinator 0]
-     set telec [$ce get_telec] ; if {[$telec get_val] != $num} {$telec configure -set_val $num}
+     set telec [$ce get_telec] ; if {[$telec get_val] != $num} {puts "  2"; $telec configure -set_val $num}
     }
    # End of update
  set this(is_setting) 0

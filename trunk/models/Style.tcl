@@ -710,7 +710,7 @@ method Style COND_BASE {str_name node} {
    return [this COND_NODE str_inside $node]
   }
  
- set str_tmp [string map [list "\]" " \]"] $str]
+ set str_tmp [string map [list {]} { ]} {==} { == } {!=} { != } {~=} { ~= } {! ~} {!~} ] $str]
  set acc [lindex $str_tmp 0]
  set op  [lindex $str_tmp 1]
  set val [lindex $str_tmp 2]

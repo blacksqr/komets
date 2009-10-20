@@ -106,7 +106,7 @@ proc Generate_accessors {class_name L_vars} {
 #_________________________________________________________________________________________________________
 proc Add_Semantic_API_infos_to_contructor {get_set classe L_methodes} {
 # Edit the constructor to add informations about the semantic API
- set n_txt_constr "method $classe constructor {[gmlObject info args $classe constructor]} {"
+ set n_txt_constr "method $classe constructor {[gmlObject info arglist $classe constructor]} {"
  set nb_this_API 0; set nb_return 0
  set txt_constr [gmlObject info body $classe constructor]
  set L_lines [split $txt_constr "\n"]
@@ -156,6 +156,7 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
  
 # Add methods to the class 
  set rep [list]
+
  foreach methode $L_methodes {set    cmd "method $classe "
                                  set methode_name [lindex $methode 0]
                                  set params       [lindex $methode 1]
@@ -177,7 +178,7 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
                                  }
                               append cmd "\}"
                               eval $cmd
-                              append rep $cmd "\n"
+							  append rep $cmd "\n"
                              }
  return $rep
 }
@@ -582,11 +583,12 @@ Generate_accessors     Comet_element [list style styler]
 method Comet_element get_COMET_id {} {return $objName}
 
 #_________________________________________________________________________________________________________
-method Comet_element get_L_roots {} {
- set L {} 
- if {[llength $this(L_mothers)] == 0} {
+method Comet_element get_L_roots {} { 
+ set LMothers [this get_mothers]
+ if {[llength $LMothers] == 0} {
    return $objName
-  } else {foreach M $this(L_mothers) {Add_list L [$M get_L_roots]}
+  } else {set L [list]
+          foreach M $LMothers {Add_list L [$M get_L_roots]}
          }
  return $L
 }
@@ -2646,7 +2648,7 @@ method Physical_model set_root_for_daughters {r {index -1}}  {set this(root_for_
 method Physical_model get_prim_handle {{index -1}}  {return $this(primitives_handle)}
 method Physical_model set_prim_handle {h}           {set this(primitives_handle) $h; return $h}
 #_________________________________________________________________________________________________________
-method Physical_model get_mothers {}  {return $this(L_mothers)}
+#method Physical_model get_mothers {}  {return $this(L_mothers)}
 method Physical_model set_L_mothers {l} {set this(L_mothers) $l; return $l}
 #_________________________________________________________________________________________________________
 method Physical_model get_cmd_placement {}  {return $this(cmd_placement)}

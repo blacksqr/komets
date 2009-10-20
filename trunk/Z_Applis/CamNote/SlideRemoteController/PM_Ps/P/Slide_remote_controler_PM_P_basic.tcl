@@ -149,7 +149,7 @@ method CometSlideRemoteController_PM_P_basic set_current {v} {this Update_ccn_PM
 #___________________________________________________________________________________________________________________________________________
 method CometSlideRemoteController_PM_P_basic Buffer_num_slide {ccn_PM num} {
  puts "  $objName Buffer_num_slide $ccn_PM $num"
- if {[string equal $ccn_PM $this(current_ccn)] && [this Accept_PM_for_daughter $ccn_PM]} {} else {
+ if {[string equal $ccn_PM $this(current_ccn)] && [this Accept_PM_for_daughter $ccn_PM]} {puts "  NO"} else {
    #puts "___________\n$ccn_PM UnSubscribe_to_prim_set_val $objName\n______________"
    $ccn_PM UnSubscribe_to_prim_set_val $objName
    set this(num_to_set) $num
@@ -157,10 +157,10 @@ method CometSlideRemoteController_PM_P_basic Buffer_num_slide {ccn_PM num} {
   }
  set this(num_to_set) $num
  if {[Ptf_HTML Accept_for_daughter ${objName}_cou_ptf]} {
-   #puts "$objName is a HTML PM, it received $num from $ccn_PM"
+   puts "$objName is a HTML PM, it received $num from $ccn_PM"
    this maj_val $num
   } else {
-         #puts "$objName is NOT a HTML PM, it received $num from $ccn_PM"
+          puts "$objName is NOT a HTML PM, it received $num from $ccn_PM"
           after $this(t_ms) "$objName maj_val $num"}
 }
 

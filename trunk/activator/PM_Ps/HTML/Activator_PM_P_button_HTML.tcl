@@ -46,21 +46,17 @@ Generate_PM_setters Activator_PM_P_button_HTML [list {activate {{type {}}}}]
 method Activator_PM_P_button_HTML Trigger_prim_activate {args} {
  set cmd ""
  foreach {var val} [this get_Params] {append cmd " " $var " $val"}
- puts "  1 : $cmd"
  this prim_activate $cmd
  
  set root    [this get_L_roots] 
  set methode "val"
  set    cmd "\$('#${objName}_button').removeAttr('disabled');\n"
  append cmd "\$('#${objName}_button_img').attr('style','position:absolute; visibility:hidden;');\n"
- puts "  2 : $cmd"
  
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
  }
 }
-
-Trace Activator_PM_P_button_HTML Trigger_prim_activate
 
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_button_HTML activate {args} {}
