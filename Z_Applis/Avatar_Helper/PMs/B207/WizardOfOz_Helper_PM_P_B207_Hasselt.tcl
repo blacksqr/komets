@@ -1,9 +1,10 @@
 inherit WizardOfOz_Helper_PM_P_B207_Hasselt PM_BIGre
+if {[file exists [get_B207_files_root]]} {
 set dir [pwd]
   cd [get_B207_files_root]
   source B207_Helper.tcl
   cd $dir
-
+}
 
 #___________________________________________________________________________________________________________________________________________
 method WizardOfOz_Helper_PM_P_B207_Hasselt constructor {name descr args} {
