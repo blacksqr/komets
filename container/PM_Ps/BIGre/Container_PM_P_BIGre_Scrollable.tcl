@@ -3,7 +3,7 @@
 #___________________________________________________________________________________________________________________________________________
 inherit Container_PM_P_BIGre_Scrollable PM_BIGre
 
-source [get_B207_files_root]B_ScrollList.tcl
+if {[file exists [get_B207_files_root]]} {source [get_B207_files_root]B_ScrollList.tcl}
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_Scrollable constructor {name descr args} {
