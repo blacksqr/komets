@@ -3,7 +3,7 @@
 #___________________________________________________________________________________________________________________________________________
 inherit Container_PM_P_BIGre_normal PM_BIGre
 
-source [get_B207_files_root]B_Panel.tcl
+if {[file exists [get_B207_files_root]]} {source [get_B207_files_root]B_Panel.tcl}
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_BIGre_normal constructor {name descr args} {
