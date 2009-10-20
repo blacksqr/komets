@@ -1,5 +1,7 @@
-source [get_B207_files_root]B_Spline.tcl
-source [get_B207_files_root]B_canvas.tcl
+if {[file exists [get_B207_files_root]]} {
+  source [get_B207_files_root]B_Spline.tcl
+  source [get_B207_files_root]B_canvas.tcl
+}
 
 #_________________________________________________________________________________________________________
 inherit CometGraphBuilder_PM_P_B207_basic PM_BIGre
