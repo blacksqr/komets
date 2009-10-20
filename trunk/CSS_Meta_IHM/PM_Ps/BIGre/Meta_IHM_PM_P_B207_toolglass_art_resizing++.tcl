@@ -1,5 +1,5 @@
 inherit Meta_IHM_PM_P_B207_toolglass_art_resizing PM_BIGre
-source {C:/These/Projet Interface/BIGre/Contraintes/Constraint_Engine.tcl}
+if {[file exists [get_B207_files_root]]} {source {C:/These/Projet Interface/BIGre/Contraintes/Constraint_Engine.tcl}}
 
 #___________________________________________________________________________________________________________________________________________
 method Meta_IHM_PM_P_B207_toolglass_art_resizing constructor {name descr args} {
