@@ -553,48 +553,46 @@ method Style DSL_ID {str_name rep_name root recursive} {
 # puts "We have for candidates : \{$rep_tmp\}"
  if {[string equal $rep_tmp {}]} {return}
 
- regexp "^->($this(lettre)*)(.*)$" $str reco ext str
- if {[string equal -length 3 $ext PMs]} {set go_PM 1} else {
- if {[string equal -length 2 $ext LC ]} {set go_LC 1; set go_ext 0} else {
-   if {[string length $ext]>0} {set go_LC 1; set go_ext 1}
-  }}
+ while {[regexp "^->($this(lettre)*)(.*)$" $str reco ext str]} {
+		 if {[string equal -length 3 $ext PMs]} {set go_PM 1} else {
+		 if {[string equal -length 2 $ext LC ]} {set go_LC 1; set go_ext 0} else {
+		   if {[string length $ext]>0} {set go_LC 1; set go_ext 1}
+		  }}
 
 
-# set rep {}
-# Look for id in comet root-subgraph
+		# set rep {}
+		# Look for id in comet root-subgraph
 
- set n_rep {}
-# if {$go_LC} {
-#   foreach r $rep_tmp {
-#     Add_element n_rep [$r get_LC]
-#    }
-#  }
+		 set n_rep {}
 
- if {$go_PM} {
-   foreach r $rep_tmp {
-     set LM [$r get_LC]_LM_LP
-     foreach PM [$LM get_L_actives_PM] {
-       Add_element n_rep $PM
-      }
-    }
-  } else {if {$go_LC} {
-            if {$go_ext} {set e $ext} else {set e {}}
-            foreach r $rep_tmp {
-              Add_element n_rep [$r get_LC]$e
-             }
-           } else {set n_rep $rep_tmp}
-         }
+		 if {$go_PM} {
+		   foreach r $rep_tmp {
+			 if {[lsearch [gmlObject info classes $r] Logical_model]} {set LM $r} else {set LM [$r get_LC]_LM_LP}
+			 foreach PM [$LM get_L_actives_PM] {
+			   Add_element n_rep $PM
+			  }
+			}
+		  } else {if {$go_LC} {
+					if {$go_ext} {set e $ext} else {set e {}}
+					foreach r $rep_tmp {
+					  Add_element n_rep [$r get_LC]$e
+					 }
+				   } else {set n_rep $rep_tmp}
+				 }
 
-# Managing others marks
- set id [lreplace [split $ext .] 0 0]
- #puts "id:\"$id\""
-# puts "AVANT vérification marquage \"$id\" pour \{$n_rep\} avec ext=\"$ext\""
- if {[string length $id]>0} {
-   set old_n_rep $n_rep
-   set n_rep     {}
-   foreach r $old_n_rep {
-     if {[$r Has_for_styles $id]} {lappend n_rep $r}
-    }
+		# Managing others marks
+		 set id [lreplace [split $ext .] 0 0]
+		 if {[string length $id]>0} {
+		   set old_n_rep $n_rep
+		   set n_rep     {}
+		   foreach r $old_n_rep {
+			 if {[$r Has_for_styles $id]} {lappend n_rep $r}
+			}
+		  }
+		  
+   # DEBUG
+   set rep_tmp $n_rep
+   if {[string equal $rep_tmp {}]} {return}
   }
 # puts "APRES vérification marquage \"$id\" reste \{$n_rep\}"
 
