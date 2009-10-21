@@ -552,7 +552,8 @@ method Style DSL_ID {str_name rep_name root recursive} {
          }
 # puts "We have for candidates : \{$rep_tmp\}"
  if {[string equal $rep_tmp {}]} {return}
-
+ 
+ set n_rep $rep_tmp
  while {[regexp "^->($this(lettre)*)(.*)$" $str reco ext str]} {
 		 if {[string equal -length 3 $ext PMs]} {set go_PM 1} else {
 		 if {[string equal -length 2 $ext LC ]} {set go_LC 1; set go_ext 0} else {
@@ -567,7 +568,7 @@ method Style DSL_ID {str_name rep_name root recursive} {
 
 		 if {$go_PM} {
 		   foreach r $rep_tmp {
-			 if {[lsearch [gmlObject info classes $r] Logical_model]} {set LM $r} else {set LM [$r get_LC]_LM_LP}
+			 if {[lsearch [gmlObject info classes $r] Logical_model] >= 0} {set LM $r} else {set LM [$r get_LC]_LM_LP}
 			 foreach PM [$LM get_L_actives_PM] {
 			   Add_element n_rep $PM
 			  }
