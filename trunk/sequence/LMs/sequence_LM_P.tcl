@@ -11,7 +11,8 @@ method Sequence_LM_LP constructor {name descr args} {
  set this(comet_name) $comet_name
 
  #{PM_P_sequence_TK_basic Ptf_TK} 
-  this Add_PM_factories [Generate_factories_for_PM_type [list {Sequence_PM_P_U Ptf_ALL} \
+  this Add_PM_factories [Generate_factories_for_PM_type [list {PM_P_sequence_TK_basic Ptf_TK} \
+                                                              {Sequence_PM_P_U Ptf_ALL} \
                                                         ] $objName]
  set this(init_pas_ok) 0
  eval "$objName configure $args"
