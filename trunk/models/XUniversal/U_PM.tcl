@@ -2,6 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit PM_Universal PM_HTML
+
 #___________________________________________________________________________________________________________________________________________
 method PM_Universal constructor {name descr args} {
  this inherited $name $descr
@@ -21,14 +22,26 @@ method PM_Universal constructor {name descr args} {
  eval "$objName configure $args"
  return $objName
 }
+
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors     PM_Universal reg_exp
+
+#___________________________________________________________________________________________________________________________________________
+method PM_Universal Show_elements {b L_tags} {
+ set rep [this inherited $b $L_tags]
+ foreach d [this get_out_daughters] {$d Show_elements $b $L_tags
+									}
+
+ return $rep
+}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_Universal Show_elements_prims {b L_prims} {
  #puts "$objName PM_Universal::Show_elements_prims $b {$L_prims}"
  this inherited $b $L_prims
- foreach d [this get_out_daughters] {$d Show_elements_prims $b $L_prims}
+ foreach d [this get_out_daughters] {$d Show_elements_prims $b $L_prims
+                                     #puts "$d Show_elements_prims $b $L_prims"
+									}
 
  #puts "$objName Show_elements_prims $b {$L_prims}"
  if {$b} {

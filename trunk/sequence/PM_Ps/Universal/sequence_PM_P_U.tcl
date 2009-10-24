@@ -34,14 +34,15 @@ method Sequence_PM_P_U Display_current_step {} {
 	 $this(commande_text) set_text "Step [expr [this get_step]+1]/[llength [$LC get_out_daughters]]"
 
 	 foreach PM_not_current [CSS++ $objName "#$LC > !$C_current->PMs \\<--<  > $this(sequence_content)/"] {
+	   #puts "  hiding $PM_not_current ([[$PM_not_current get_LC] get_name])"
 	   $PM_not_current Show_elements 0 *
 	  }
 
 	 foreach PM_not_current [CSS++ $objName "#$LC > $C_current->PMs \\<--<  > $this(sequence_content)/"] {
+	   #puts "  showing $PM_not_current"
 	   $PM_not_current Show_elements 1 *
 	  }
 }
-Trace Sequence_PM_P_U Display_current_step
 
 #_________________________________________________________________________________________________________________________________
 method Sequence_PM_P_U set_LM {LM} {
