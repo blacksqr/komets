@@ -13,13 +13,12 @@ method PhysicalContainer_TK_frame get_context {} {}
 method PhysicalContainer_TK_frame get_or_create_prims {root} {
 # Define the handle
  set f $root.tk_${objName}_frame
- if {[winfo exists $f]} {
-  } else {frame $f -bd 0 -relief raised}
- this set_root_for_daughters $f
+ if {![winfo exists $f]} {frame $f -bd 0 -relief raised}
 
  this Add_MetaData PRIM_STYLE_CLASS [list $f      "ROOT FRAME"                           \
                                     ]
 
+ this set_root_for_daughters $f
  return [this set_prim_handle $f]
 }
 
