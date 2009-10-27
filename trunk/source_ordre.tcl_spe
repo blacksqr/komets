@@ -1,14 +1,18 @@
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+proc Compare_lower {a b} {return [string compare [string tolower $a] [string tolower $b]]}
+
+#___________________________________________________________________________________________________________________________________________
 proc source_recusrif {{dec {}}} {
 set rep "puts \"$dec\"\n"
  if { [catch {set L_f [glob -type f *.tcl]} err]} {set L_f ""}
- set L {}; foreach f $L_f {lappend L $f}
- set L_f [lsort $L]
+ set L [list]; foreach f $L_f {lappend L $f}
+ set L_f [lsort -command Compare_lower $L]
  foreach f $L_f {append rep "puts \"$dec : $f\"\n"
  				 append rep "source $f\n"}
  if { [catch {set L_d [glob -type d *]} err] } {set L_d ""}
- set L {}; foreach d $L_d {lappend L $d}
- set L_d [lsort $L]
-
+ set L_d [lsort -command Compare_lower $L_d]
  foreach d $L_d {append rep "cd $d\n"
                  cd $d
  				   append rep [source_recusrif "$dec/$d"]
