@@ -69,6 +69,9 @@ if {[info exists PTF_defined]} {} else {
   PTF Ptf_SVG     *  SVG      *     0 gfx
   PTF Ptf_HTML_to_SVG     *  PHP_HTML      *     0 gfx  ; 
     Ptf_HTML_to_SVG set_daughter_soft_type SVG
+  PTF Ptf_TK_CANVAS     *  TK_CANVAS      *     0 gfx
+  PTF Ptf_TK_to_CANVAS     *  TCL_TK      *     0 gfx  ; 
+    Ptf_TK_to_CANVAS set_daughter_soft_type TK_CANVAS
  } 
 
 set Tab_PTF(*)               Ptf_ALL
@@ -79,6 +82,8 @@ set Tab_PTF(TCL_TK_ALX_TXT)  Ptf_ALX_TXT
 set Tab_PTF(FLEX)            Ptf_FLEX
 set Tab_PTF(SVG)             Ptf_SVG
 set Tab_PTF(HTML_to_SVG)     Ptf_HTML_to_SVG
+set Tab_PTF(TK_CANVAS)       Ptf_TK_CANVAS
+set Tab_PTF(TK_to_CANVAS)    Ptf_TK_to_CANVAS
 
 proc get_Tab_PTF {p} {
  global Tab_PTF
