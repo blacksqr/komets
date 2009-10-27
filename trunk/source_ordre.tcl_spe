@@ -43,8 +43,8 @@ proc get_B207_files_root { } {global PM_BIGre_B207_files_root; return $PM_BIGre_
 proc set_B207_files_root {r} {global PM_BIGre_B207_files_root; set PM_BIGre_B207_files_root $r;}
 
  
-Comet_files_root    {C:/These/Projet Interface/COMETS/devCOMETS/}
-set_B207_files_root {C:/These/Projet Interface/BIGre/}
+Comet_files_root     [pwd]/../
+#set_B207_files_root {C:/These/Projet Interface/BIGre/}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
