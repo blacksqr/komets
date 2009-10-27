@@ -1,13 +1,14 @@
 proc source_recusrif {{dec {}}} {
 set rep "puts \"$dec\"\n"
  if { [catch {set L_f [glob -type f *.tcl]} err]} {set L_f ""}
- set L {}; foreach f $L_f {lappend L [string tolower $f]}
+ set L {}; foreach f $L_f {lappend L $f}
  set L_f [lsort $L]
  foreach f $L_f {append rep "puts \"$dec : $f\"\n"
  				 append rep "source $f\n"}
  if { [catch {set L_d [glob -type d *]} err] } {set L_d ""}
- set L {}; foreach d $L_d {lappend L [string tolower $d]}
+ set L {}; foreach d $L_d {lappend L $d}
  set L_d [lsort $L]
+
  foreach d $L_d {append rep "cd $d\n"
                  cd $d
  				   append rep [source_recusrif "$dec/$d"]
