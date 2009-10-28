@@ -43,7 +43,8 @@ method LogicalContainer constructor {name descr args} {
 															 {Container_PM_P_SVG_group Ptf_SVG}       \
                                                              {Container_PM_P_BIGre_window Ptf_BIGre}  \
                                                              {Container_PM_P_ALX_TXT Ptf_ALX_TXT}     \
-															 {Container_PM_P_FLEX_Box Ptf_FLEX} \
+															 {Container_PM_P_FLEX_Box Ptf_FLEX} 	  \
+															 {Container_PM_P_TK_CANVAS_basic Ptf_TK_CANVAS} \
 
                                                        ] $objName]
 
