@@ -2408,6 +2408,8 @@ method Physical_model constructor {name descr args} {
  this set_propagate_next_liste_cmd ""
 
  #set this(L_img) [list]
+ set this(interaction_class)    ""
+ set this(interaction_instance) ""
 
  eval "$objName configure $args"
  return $objName
@@ -2426,7 +2428,17 @@ method Physical_model dispose {} {
 }
 
 #_________________________________________________________________________________________________________
-Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semantic_API_prim_set]
+Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semantic_API_prim_set interaction_class]
+
+#_________________________________________________________________________________________________________
+method Physical_model set_interaction_class {C args} {
+ if {$C != $this(interaction_class)} {
+   if {[catch {$this(interaction_instance) dispose} err]} {puts "ERROR in $objName set_interaction_class $C $args\n  Error occured while disposing interaction $this(interaction_instance)"
+                                                           set this(interaction_instance) [CPool get_a_unique_name]
+                                                          }
+   eval "$C $this(interaction_instance) $objName [list $args]"
+  }
+}
 
 #_________________________________________________________________________________________________________
 method Physical_model get_PRIM_STYLE_CLASS {L_tags} {

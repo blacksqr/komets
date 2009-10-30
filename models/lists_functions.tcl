@@ -10,6 +10,12 @@ proc Generate_List_accessor {class L_name suffixe} {
 }
 
 #____________________________________________________________________________________
+proc Is_prefixe {L1 L2} {
+ set rep [string compare -length [string length $L1] $L1 $L2]
+ return [expr $rep == 0]
+}
+
+#____________________________________________________________________________________
 proc Is_sub_list {L1 L2} {
  set rep 1
  foreach e1 $L1 {
