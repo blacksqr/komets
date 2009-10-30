@@ -613,9 +613,9 @@ method Comet_element Has_for_style {s} {
 #______________________________________________________________________________
 method Comet_element Add_arg {txt_name arg} {
  upvar $txt_name txt
- if {[llength $arg] > 1 || $arg == ""} {
+ #if {[llength $arg] > 1 || $arg == ""} {
    append txt " {" $arg "}"
-  } else {append txt " $arg"}
+ # } else {append txt " $arg"}
 }
 
 #______________________________________________________________________________
@@ -635,8 +635,8 @@ method Comet_element configure args {
    if {[string equal $cmd {}]} {continue}
    if {[string equal [string index $cmd 0] | ]} {
      set cmd [string range $cmd 1 end]
-     eval $cmd
-    } else {eval "$objName $cmd"}
+	 eval $cmd
+    } else {puts "Eval : $objName $cmd"; eval "$objName $cmd"}
   }
 }
 
