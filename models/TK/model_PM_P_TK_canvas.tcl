@@ -147,3 +147,5 @@ method PM_TK_CANVAS Move_to {x y} {
  set this(x) $x; set this(y) $y
 }
 
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList PM_TK_CANVAS [list Translate Move_to] end
