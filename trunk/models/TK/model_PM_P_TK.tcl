@@ -8,7 +8,7 @@ inherit PM_TK Physical_model
 method PM_TK constructor {name {descr {}}} {          
  this inherited $name $descr
  set this(root)              {}
- set this(cmd_deconnect) {pack forget $p}
+ this set_cmd_deconnect      {pack forget $p}
  set this(L_prim_undisplayed) ""
 
 # Let's define a command that can overload the connection specified in the mother
@@ -38,7 +38,6 @@ method PM_TK Substitute_by {PM} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-#Generate_accessors PM_TK cmd_deconnect cmd_deconnect
 method PM_TK Add_daughter {m {index -1}} {
  set rep [this inherited $m $index]
  if {$index != -1} {
@@ -87,15 +86,17 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Reconnect {{PMD {}}} {
- if {[string equal $PMD {}]} {set PMD [this get_out_daughters]}
+ if {$PMD == ""} {set PMD [this get_out_daughters]}
  foreach PM $PMD {
    foreach p [$PM get_prim_handle] {
-     eval [this get_cmd_deconnect]
+     eval [$PM get_cmd_deconnect]
     }
-   this Add_prim_daughter $PM      [$PM get_prim_handle]
-   $PM  Add_prim_mother   $objName [this get_root_for_daughters]
+   set rep [this Add_prim_daughter $PM      [$PM get_prim_handle]]        
+   set rep [$PM  Add_prim_mother   $objName [this get_root_for_daughters]]
   }
 }
+
+Trace PM_TK Reconnect
 
 #___________________________________________________________________________________________________________________________________________
 method PM_TK get_width  {{PM {}}} {if {[winfo exists $this(primitives_handle)]} {return [winfo width  $this(primitives_handle)]} else {return -1}}
@@ -136,8 +137,8 @@ method PM_TK set_cmd_placement_daughters {args} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Add_prim_daughter {c Lprims {index -1}} {global debug
-                                                      set rep [this inherited $c $Lprims $index]
-													  if {$this(cmd_placement_daughters) != ""} {
+													  set rep [this inherited $c $Lprims $index]
+													  if {$this(cmd_placement_daughters) != "" && [$c get_cmd_placement] == ""} {
 													    if {[catch "eval $this(cmd_placement_daughters)" err]} {
 														  puts "___!!!___ERROR in $objName Add_prim_daughter $c {$Lprims} $index :\n$err"
 														 }

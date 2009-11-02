@@ -187,6 +187,7 @@ method PM_Universal Add_mother    {m {index -1}} {
    # XXX DEBUG 2009 02 16
    # Was : this set_cmd_deconnect [$m get_cmd_deconnect]
    this set_cmd_deconnect [string map [list $m $objName] [$m get_cmd_deconnect]]
+   this set_cmd_placement [string map [list $m $objName] [$m get_cmd_placement]]
   }
  return $rep
 }
