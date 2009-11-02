@@ -29,7 +29,7 @@ method Container_PM_P_TK_to_canvas get_or_create_prims {root} {
                                     ]
 
  this set_root_for_daughters $objName
- return [this set_prim_handle $objName]
+ return [this set_prim_handle $f]
 }
 
 #___________________________________________________________________________________________________________________________________________

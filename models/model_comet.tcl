@@ -2672,7 +2672,7 @@ method Physical_model Sub_prim_mother   {c Lprims {index -1}} {return 1}
 method Physical_model Add_prim_daughter {c Lprims {index -1}} {set rep 1
                                                              foreach p $Lprims {
                                                                if {[string equal $p NULL]} {continue}
-                                                               if {[catch {eval $this(cmd_placement)} err]} {
+                                                               if {[catch {eval [$c get_cmd_placement]} err]} {
                                                                  #puts " XXX ERROR XXX $objName Add_prim_daughter \{$Lprims\} $index"
                                                                  #puts "               $err"
                                                                  set rep 0
