@@ -64,7 +64,7 @@ method PM_Universal Hide_Elements args {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_Universal Reconnect {PMD} {
+method PM_Universal Reconnect {{PMD {}}} {
  set PMM [this get_mothers]
  $PMM Reconnect $PMD
 }
