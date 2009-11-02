@@ -30,6 +30,7 @@ method PM_TK dispose {} {foreach PMM $this(L_mothers) {$PMM Sub_prim_daughter $o
                          this inherited
                         }
 
+						
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Substitute_by {PM} {
  this inherited $PM
@@ -85,6 +86,14 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_TK Update_placement {} {
+ set PMM [this get_mothers]
+ if {[catch {$PMM Reconnect} err]} {
+   puts "ERROR occured in $objName PM_TK::Update_placement\n$err"
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_TK Reconnect {{PMD {}}} {
  if {$PMD == ""} {set PMD [this get_out_daughters]}
  foreach PM $PMD {
@@ -95,8 +104,6 @@ method PM_TK Reconnect {{PMD {}}} {
    set rep [$PM  Add_prim_mother   $objName [this get_root_for_daughters]]
   }
 }
-
-Trace PM_TK Reconnect
 
 #___________________________________________________________________________________________________________________________________________
 method PM_TK get_width  {{PM {}}} {if {[winfo exists $this(primitives_handle)]} {return [winfo width  $this(primitives_handle)]} else {return -1}}
