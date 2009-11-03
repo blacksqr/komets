@@ -18,7 +18,7 @@ method Container_PM_P_TK_CANVAS_basic get_or_create_prims {C_canvas} {
 # Define the handle
  set canvas [$C_canvas get_canvas]
  this set_canvas $canvas
- $canvas create rectangle 0 0 200 100 -fill red -tags $objName
+# $canvas create rectangle 0 0 200 100 -fill red -tags $objName
  
  this Add_MetaData PRIM_STYLE_CLASS [list $objName "CONTAINER" \
                                     ]
