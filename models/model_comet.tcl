@@ -468,6 +468,12 @@ method Comet_element Has_MetaData {var}     {return [info exists this(metadata,$
 method Comet_element Add_MetaData {var val} {set this(metadata,$var) $val}
 method Comet_element Sub_MetaData {var}     {if {[catch "unset this(metadata,$var)" res]} {return 0} else {return 1}}
 method Comet_element Val_MetaData {var}     {return $this(metadata,$var)}
+method Comet_element get_L_MetaData {}      {set L [list]
+                                             foreach {var val} [array get this metadata,*] {
+											   lappend L [string range $var 9 end] $val
+											  }
+											 return $L
+											}
 
 #_________________________________________________________________________________________________________
 # Used when deletion occur...
@@ -636,7 +642,7 @@ method Comet_element configure args {
    if {[string equal [string index $cmd 0] | ]} {
      set cmd [string range $cmd 1 end]
 	 eval $cmd
-    } else {puts "Eval : $objName $cmd"; eval "$objName $cmd"}
+    } else {eval "$objName $cmd"}
   }
 }
 
