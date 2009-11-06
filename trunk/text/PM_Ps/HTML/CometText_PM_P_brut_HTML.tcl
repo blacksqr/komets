@@ -3,45 +3,30 @@
 #_______________________________________________ Définition of the presentations __________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit CometTexte_PM_P_HTML PM_HTML
+inherit CometTexte_PM_P_brut_HTML PM_HTML
 
 #___________________________________________________________________________________________________________________________________________
-method CometTexte_PM_P_HTML constructor {name descr args} {
+method CometTexte_PM_P_brut_HTML constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id TextDisplay_CUI_label_HTML
-   
-   this Add_MetaData PRIM_STYLE_CLASS [list $objName "ROOT TEXT OUT" \
-                                      ]
+   this set_GDD_id GDD_CometTexte_PM_P_brut_HTML
    
  eval "$objName configure $args"
  return $objName
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometTexte_PM_P_HTML dispose {} {this inherited}
+method CometTexte_PM_P_brut_HTML dispose {} {this inherited}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC CometTexte_PM_P_HTML $L_methodes_set_Text {} {}
-Methodes_get_LC CometTexte_PM_P_HTML $L_methodes_get_Text {$this(FC)}
+Methodes_set_LC CometTexte_PM_P_brut_HTML $L_methodes_set_Text {} {}
+Methodes_get_LC CometTexte_PM_P_brut_HTML $L_methodes_get_Text {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-method CometTexte_PM_P_HTML set_text {v} {
- set root    [this get_L_roots] 
- set methode "replaceWith"
-
- set param [this Encode_param_for_JS $v]
- set cmd   "\$('#$objName').html($param);"
-
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
-}
-#___________________________________________________________________________________________________________________________________________
-method CometTexte_PM_P_HTML Render {strm_name {dec {}}} {
+method CometTexte_PM_P_brut_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
- append strm $dec <span [this Style_class] > [this get_text] </span>
+ append strm [this get_text]
  this Render_daughters strm "$dec "
 }
 

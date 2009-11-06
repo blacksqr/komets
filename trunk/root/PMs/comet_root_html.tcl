@@ -29,10 +29,13 @@ method PhysicalHTML_root constructor {name descr args} {
   set this(CSS) {}
   this set_style_class BODY
   set this(style) ""
-
+  
   set this(marker) 0
   
   set this(L_js_files_link) [list]
+  
+  # Pour ne pas générer les appels types COMETS
+  set this(html_compatibility_strict_mode) 0
   
   # ________Envoi de changement avec le serveur le php________#
   set this(update_send) 0
@@ -56,7 +59,7 @@ method PhysicalHTML_root constructor {name descr args} {
 Methodes_set_LC PhysicalHTML_root [L_methodes_set_CometRoot] {} {}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP Update_interval]
+Generate_accessors     PhysicalHTML_root [list direct_connection next_root AJAX_root marker One_root_per_IP Update_interval extra_css_style html_compatibility_strict_mode]
 Generate_List_accessor PhysicalHTML_root L_cmd_to_eval_when_plug_under_new_roots L_cmd_to_eval_when_plug_under_new_roots
 Generate_List_accessor PhysicalHTML_root L_js_files_link                         L_js_files_link
 
@@ -93,6 +96,8 @@ method PhysicalHTML_root CB_plug_under_new_roots {r} {}
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
+ if {[this get_html_compatibility_strict_mode]} {return}
+ 
  upvar $strm_name strm
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-1.3.2.min.js\"></script>\n"
@@ -168,12 +173,19 @@ method PhysicalHTML_root Send_global_info {chan} {
  append rep "  " "  " <form [this Style_class] { name="root" method="post" action="} [this get_PHP_page] {">} "\n"
    append rep "      " {<div class="title">Availables comets systems</div>} "\n"
    append rep "      " {<div class="content">} "\n"
+   
+   set new_L [list]
    foreach i $class(L_server_ports) {
      set port [lindex $i 0]
-     set PM   [lindex $i 1]
-     set LC   [$PM get_LC]
-     append rep "        " {<input type="radio" name="Comet_port" value="} $port {" />} "[$LC get_name] : [$LC get_descr]" <br> "\n"
+	 set PM   [lindex $i 1]
+     if {[gmlObject info exists object $PM]} {
+       set LC   [$PM get_LC]
+       append rep "        " {<input type="radio" name="Comet_port" value="} $port {" />} "[$LC get_name] : [$LC get_descr]" <br> "\n"
+	   lappend new_L $i
+	  }
     }
+   set class(L_server_ports) $new_L
+
    append rep "      " {</div>} "\n"
    append rep "      " {<br><input type="submit" VALUE="GO !" />} "\n"
  append rep "  " "  " {</form>} "\n"
@@ -353,7 +365,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
 		}
       } else {set    msg {}
               append msg $comet { } $m " \$v"
-              if {[catch {eval $msg} res]} {puts "ERROR2:\n$res"}
+              if {[catch {eval $msg} res]} {puts "ERROR2:\n  exe : $msg\n    v : $v\n  err : $res"}
              }
     } else {
         if {[string length $c] > 1} {lappend L_post_cmd "$c \{$v\}"}
@@ -429,26 +441,31 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep "  " "  " {<title>} [this get_name] {</title>} "\n"
  append rep "  " "  " {<style type="text/css">} "\n"
  append rep "  " "  " "  " [this Apply_style] "\n"
+ append rep "  " "  " "  " [this get_CSS] "\n"
  append rep "  " "  " {</style>} "\n"
    set this(marker) [clock clicks]
    this Render_JS rep $this(marker) "    "
  append rep "  " {</head>}	"\n"
 
  append rep "  " {<body>}	"\n"
- append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
- append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
- append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
- #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
- #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
- append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
- append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
- append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
- append rep "  " "  " "  " {<input type="hidden" value="} [this get_Update_interval] {" id="Update_interval" />} "\n"
-   #puts "  this Render_daughters rep"
+ 
+ if {![this get_html_compatibility_strict_mode]} {
+	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
+	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
+	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
+	 #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
+	 #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
+	 append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
+	 append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
+	 append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
+	 append rep "  " "  " "  " {<input type="hidden" value="} [this get_Update_interval] {" id="Update_interval" />} "\n"
+  }
    this Render_daughters rep "$dec  "
-   #puts "  / END OF / this Render_daughters rep"
- append rep "  " "  " "  " {<input type="hidden" value="" name="pipo_button" />} "\n"
- append rep "  " "  " {</form>} "\n"
+
+ if {![this get_html_compatibility_strict_mode]} {
+	 append rep "  " "  " "  " {<input type="hidden" value="" name="pipo_button" />} "\n"
+	 append rep "  " "  " {</form>} "\n"
+  }
  append rep "  " {</body>} "\n"
  append rep </html> "\n"
 }
@@ -755,8 +772,10 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  foreach e $this(L_PM_really_add) {
 	#append strm [$e Sub_JS] "\n"
 	if {[gmlObject info exists object $e]} {
-	  append strm [[$e get_mothers] Add_JS $e] "\n"
-	  $e Render_post_JS strm
+	  if {[$e get_mothers] != ""} {
+	    append strm [[$e get_mothers] Add_JS $e] "\n"
+		$e Render_post_JS strm
+	   } else {puts "In $objName Cmd_vserver_to_vclient {$vclient} $strm_name\n  $e n'a pas de père"}
 	 } else {append strm [this Sub_JS $e] "\n"}
 	#puts "\nMa boucle L_PM_really_add    :   $strm"
  }
