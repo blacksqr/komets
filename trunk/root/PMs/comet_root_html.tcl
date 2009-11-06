@@ -228,6 +228,12 @@ method PhysicalHTML_root set_CSS_from_file {file_name} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root set_CSS {v} {
+ set this(CSS) $v
+ this Concat_update $objName set_CSS "\$( '#CSS_${objName}' ).remove(); \$( 'head' ).append( '<style id=\"CSS_$objName\" type=\"text/css\">$v</style>' );"
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root dispose {} {
  close $this(s)
  set pos [lsearch $class(L_server_ports) $this(server_port)]
@@ -379,17 +385,6 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
   }
 
  #puts "Time to render..."
- # set rep {}
- # if {[string equal [this get_next_root] {}]} {
-   # this set_marker [clock clicks]
-   # this Render_all rep
-  # } else {set r [this get_next_root]
-          # puts "CSS++ $r \"#${r}->PMs\[soft_type==PHP_HTML\]\""
-          # set r [CSS++ $r "#${r}->PMs\[soft_type==PHP_HTML\]"]
-          # $r set_marker [clock clicks]
-          # $r Render_all rep
-          # this set_next_root {}
-         # }
 		 
  # envoi de la page complete ou juste d'un update partiel
  if {$this(update_send) == 0} {
@@ -400,6 +395,9 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
 	set this(L_PM_to_add) [list]
 	set this(L_PM_to_sub) [list]
  } else {
+    if {$this(update_cmd) != ""} {
+	  puts "$objName => Send update : $this(update_cmd)"
+	 }
 	puts -nonewline $chan $this(update_cmd) 
 	set this(update_send) 0
 	set this(update_cmd) ""
@@ -439,7 +437,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep {<meta http-equiv="Content-Type" content="application/x-www-form-urlencoded; charset=UTF-8; Accept-Language: en,fr;" />} "\n"
 
  append rep "  " "  " {<title>} [this get_name] {</title>} "\n"
- append rep "  " "  " {<style type="text/css">} "\n"
+ append rep "  " "  " {<style id="} CSS_$objName {" type="text/css">} "\n"
  append rep "  " "  " "  " [this Apply_style] "\n"
  append rep "  " "  " "  " [this get_CSS] "\n"
  append rep "  " "  " {</style>} "\n"
@@ -552,8 +550,6 @@ method PhysicalHTML_root Concat_update {objN methode cmd} {
   
  # enregistrement de la commande avec sa version
  set this(concat_send,$v_current) [list $objN $methode $cmd]
- 
- #set this(concat_send,$this(version_server)) [list $objN $methode $cmd]
  
  return ""
 }

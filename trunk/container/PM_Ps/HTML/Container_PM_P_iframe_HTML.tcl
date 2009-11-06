@@ -17,7 +17,7 @@ method Container_PM_P_iframe_HTML constructor {name descr args} {
    set this(C_root) [CPool get_a_comet CometRoot]
      set this(C_root_PM) [CPool get_a_comet PhysicalHTML_root]
      $this(C_root)_LM_LP Add_PM $this(C_root_PM); $this(C_root)_LM_LP set_PM_active $this(C_root_PM)
-	 $this(C_root_PM) set_html_compatibility_strict_mode 1
+	 #$this(C_root_PM) set_html_compatibility_strict_mode 1
 	 
    set this(cont_pipo) [CPool get_a_comet CometContainer]
 
