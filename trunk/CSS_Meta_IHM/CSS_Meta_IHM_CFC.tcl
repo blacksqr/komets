@@ -96,7 +96,7 @@ method CSS_Meta_IHM_CFC Apply_set_of_rules_to {Element L_names} {
 
    set L_rep {}
      # <DEBUG 2009 02 04> set L [split $txt "\}"]
-	 set L_sel_rule [Read_string_as_css++ $txt]
+	 set L_sel_rule [Read_string_as_css++ txt]
 	 set L {}
 	 foreach sel_rule $L_sel_rule {
 	   lappend L "[lindex $sel_rule 0] \{\n[lindex $sel_rule 1]"

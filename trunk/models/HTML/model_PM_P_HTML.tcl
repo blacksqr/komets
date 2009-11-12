@@ -300,7 +300,7 @@ method PM_HTML Send_updated_style {} {
    set cmd [string range $cmd 0 end-1]	
    append cmd "});" "\n"
  
-   $root Concat_update $objName "htmlstyle" $cmd
+   $root Concat_update $objName htmlstyle $cmd
   } 
 }
 
