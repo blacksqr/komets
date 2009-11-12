@@ -230,7 +230,11 @@ method PhysicalHTML_root set_CSS_from_file {file_name} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root set_CSS {v} {
  set this(CSS) $v
- this Concat_update $objName set_CSS "\$( '#CSS_${objName}' ).remove(); \$( 'head' ).append( '<style id=\"CSS_$objName\" type=\"text/css\">$v</style>' );"
+ set    cmd "\$( '#CSS_${objName}' ).remove(); \$( 'head' ).append( \""
+ append cmd "<style id=\\\"CSS_$objName\\\" type=\\\"text/css\\\">"
+ append cmd [string map [list "\"" "\\\"" "\n" "\\n"] $this(CSS)]
+ append cmd "</style> \");"
+ this Concat_update $objName set_CSS $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -396,7 +400,7 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
 	set this(L_PM_to_sub) [list]
  } else {
     if {$this(update_cmd) != ""} {
-	  puts "$objName => Send update : $this(update_cmd)"
+	  #puts "$objName => Send update : $this(update_cmd)"
 	 }
 	puts -nonewline $chan $this(update_cmd) 
 	set this(update_send) 0
@@ -446,6 +450,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  append rep "  " {</head>}	"\n"
 
  append rep "  " {<body>}	"\n"
+ this Render_daughters rep "$dec  "
  
  if {![this get_html_compatibility_strict_mode]} {
 	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
@@ -458,7 +463,6 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
 	 append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="} [this get_Update_interval] {" id="Update_interval" />} "\n"
   }
-   this Render_daughters rep "$dec  "
 
  if {![this get_html_compatibility_strict_mode]} {
 	 append rep "  " "  " "  " {<input type="hidden" value="" name="pipo_button" />} "\n"
@@ -539,10 +543,12 @@ method PhysicalHTML_root Concat_update {objN methode cmd} {
  # +1 pour la nouvelle version
  set v_current $this(version_server)
  set vmax      [this get_vclient_max]
+ if {$vmax == -1} {return}
  set trouve    0
  
+ set id [list $objN $methode]
  while {$v_current > $vmax} {
-   if {[lrange $this(concat_send,$v_current) 0 1] == [list $objN $methode]} {set trouve 1;  break} else {incr v_current -1}
+   if {[lrange $this(concat_send,$v_current) 0 1] == $id} {set trouve 1;  break} else {incr v_current -1}
   }
  if {!$trouve} {incr this(version_server)
                 set  v_current $this(version_server)
@@ -556,7 +562,8 @@ method PhysicalHTML_root Concat_update {objN methode cmd} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Concat_update_supp {} {
- set mini [this get_vclient_min];
+ set mini [this get_vclient_min]
+ if {$mini == -1} {return}
  
  if {$mini != -1} {
 	 foreach {vconcat cmd} [array get this concat_send,*] {
@@ -566,7 +573,7 @@ method PhysicalHTML_root Concat_update_supp {} {
 	 }
 	 
   # Update the list of elements to sub
-  set nL [list ]; 
+  set nL [list]
     foreach e [this get_L_PM_to_sub] {
 	  if {[lindex $e 0] > $mini} {lappend nL $e}
 	 }
@@ -578,7 +585,6 @@ method PhysicalHTML_root Concat_update_supp {} {
 	  if {[lindex $e 0] > $mini} {lappend nL $e}
 	 }
   this set_L_PM_to_add $nL
-
  }
 }
 

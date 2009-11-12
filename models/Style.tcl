@@ -17,7 +17,9 @@ method Style constructor args {
 
  set this(lettre) {[a-zA-Z0-9!*_\.]}
  set this(sep)    "\[ \n\]"
-
+ # XXX DEBUG OPTIMISATION
+ set this(sep) " "
+ 
  set this(lexic,letters)     {[a-zA-Z0-9_"]}
  set this(lexic,spaces)      {[ \n\t]}
  set this(lexic,op_cmp)      {[!~=<>]}
@@ -153,61 +155,42 @@ method Style Interprets_and_parse {str_name root} {
 #_     PROJ : _LM_LP | _LM_FC | ...
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-method Style DSL_SELECTOR {str_name rep_name root recursive} {
+method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
  upvar $str_name str
  upvar $rep_name rep
  
+ #puts "DSL_SELECTOR\n  -str : $str\n  -L_root : $L_root\n  -recurs  $recursive"
  if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
  if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
- #puts "DSL_SELECTOR on $root : \"$str\""
+
  if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
    set this(cmd_daughter) get_$this(sens)
    set str2 " "; append str2 $str; set str $str2
-   #puts "  1 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
   } else {if {[string index $str 0] == " "} {
             set this(cmd_daughter) get_out_$this(sens)
-			#puts "  1 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
 		   }
          }
  
- #puts "DSL_SELECTOR($root); str=\{$str\}; rec($recursive); sens($this(sens))"
- this DSL_CLASS str rep $root $recursive
- #puts "  |rep1=\{$rep\}\n  |reste: \"$str\""
+ this DSL_CLASS str rep $L_root $recursive
  set ok 0
-# if {[regexp "^$this(sep)*>$this(sep)*($this(lettre).*)\$" $str reco str]} {
-#   set ok 1; set rec 0
-#  } else {
-#      if {[regexp "^$this(sep)* +($this(lettre).*)\$" $str reco str]} {
-#        set ok 1; set rec 1
-#       }
-#     }
-# Recursion with nesting ?
+
+ # Recursion with nesting ?
  if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
  if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
 
  if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
 	   set this(cmd_daughter) get_$this(sens)
 	   set str " $str"
-	   #puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
 	  } else {if {[string index $str 0] == " "} {
 				set this(cmd_daughter) get_out_$this(sens)
-				#puts "  2 : cmd_daughter : $this(cmd_daughter)\n      str : \"$str\""
 			   }
 			 }
   
   
 # Do we have a '>>' ?
  if {[regexp "^$this(sep)*>>$this(sep)*(.*)\$" $str reco str]} {
-   set L_rep_>> {}
-   #puts "Go through path with:\n  str : $str\n  rep : \{$rep\}"
-   foreach c $rep {
-     set str_tmp $str
-     set cmd_svg $this(cmd_daughter)
-       Add_list L_rep_>> [this Go_through_path str_tmp $c $this(cmd_daughter)]
-     set this(cmd_daughter) $cmd_svg
-    }
-   #puts "  L_rep_>> : ${L_rep_>>}"
-   #if {[regexp "^$this(sep)*/(.*)\$" $str reco str]} {
+   set L_rep_>> [this Go_through_path str $c $this(cmd_daughter)]
+
      set found_end_>> 0
      while {${found_end_>>} == 0} {
        set pos_end_>> [string first / $str]
@@ -217,20 +200,14 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
        if {[string equal -length 2 $str >>]} {set str [string range $str 2 end]; set found_end_>> 1}
       }
      if {${found_end_>>} == 0} {this set_ERROR "A >>.../\[~\]>> expression do not end correctly, do not found the '>>' in : \nstr : $str"; return}
-     set n_rep {}
-     set str_tmp {}
+     set n_rep  [list]
+	 set L_next [list]
      foreach e ${L_rep_>>} {
-       foreach d [$e $this(cmd_daughter)] {
-         set str_tmp $str
-         #puts "After the path, we try \"$objName DSL_SELECTOR str_tmp L_rep_tmp_>> $d 0\""
-         set L_rep_tmp_>> {}; this DSL_SELECTOR str_tmp L_rep_tmp_>> $d 0
-         Add_list n_rep ${L_rep_tmp_>>}
-        }
-      }
-     set str $str_tmp
+       foreach d [$e $this(cmd_daughter)] {Add_list L_next $d}
+	  } 
+     this DSL_SELECTOR str n_rep $L_next 0
      set rep $n_rep
      return
-    #} else {this set_ERROR "A >>.../\[~\]>> expression do not end correctly : \nstr : $str"; return}
   }
 
 # Do we have a '>' or a ' ' ?
@@ -250,67 +227,44 @@ method Style DSL_SELECTOR {str_name rep_name root recursive} {
 # Allons voir plus loin s'il y a lieu
  if {$ok} {
    set new_rep {}
-   set str_tmp {}
-   set str_rep {}
-   set c ""
+   set c       ""
+   set L_next [list]
    foreach r $rep {
-   foreach c [$r $this(cmd_daughter)] {
-     set str_tmp $str
-     set tmp     {}
-	 #puts "plus loin avec DSL_SELECTOR:\"$str_tmp\""
-       set cmd_daughter_SVG $this(cmd_daughter)
-	   this DSL_SELECTOR str_tmp tmp $c $rec
-	   set this(cmd_daughter) $cmd_daughter_SVG
-     if {[string length $tmp]>0} {set str_rep $str_tmp}
-     set new_rep [Liste_Union $new_rep $tmp]
-    }}
-   
-   #DEBUG set str $str_rep
-     set tmp_rep ""
-	 #puts "DEBUG TIME, finishing DSL_SELECTOR with $root on $str"
-     if {$c != ""} {this DSL_SELECTOR str tmp_rep $c $rec} else {this DSL_SELECTOR str tmp_rep $root $rec}
-	 #puts "__________"
-   
+     foreach c [$r $this(cmd_daughter)] {Add_list L_next $c}
+	}
+   this DSL_SELECTOR str new_rep $L_next $rec
    set rep $new_rep
   }
-# puts "__DSL_SELECTOR($root); rep=\{$rep\}"
+  
 # Case of the virgule
  if {[regexp "^$this(sep)*,$this(sep)*(..*)\$" $str reco str]} {
-   set other_reps {}
-   set str_tmp $str
-   this DSL_SELECTOR str other_reps $root $recursive
-   #puts "set other_reps \{\}; set str \{$str_tmp\}; $objName DSL_SELECTOR str other_reps $root $recursive"
-   #puts "UNION BETWEEN $str_tmp : \{$other_reps\} AND \{$rep\}"
+   set other_reps [list]
+   this DSL_SELECTOR str other_reps $L_root $recursive
    set rep [Liste_Union $rep $other_reps]
-  } else {
- if {[regexp "^$this(sep)*\\;$this(sep)*(..*)\$" $str reco str]} {
-   set other_reps {}
-   this DSL_SELECTOR str other_reps $root $recursive
-   #puts "INTERSECTION BETWEEN \{$other_reps\} AND \{$rep\}"
-   set rep [Liste_Intersection $rep $other_reps]
-  } else {
- if {[regexp "^$this(sep)*\\\-$this(sep)*(..*)\$" $str reco str]} {
-   set other_reps {}
-   this DSL_SELECTOR str other_reps $root $recursive
-   #puts "SUBSTRACTION OF \{$other_reps\}\nFROM \{$rep\}\n"
-   Sub_list rep $other_reps
-  }
-  }}
+  } else {if {[regexp "^$this(sep)*\\;$this(sep)*(..*)\$" $str reco str]} {
+		   set other_reps [list]
+		   this DSL_SELECTOR str other_reps $L_root $recursive
+		   set rep [Liste_Intersection $rep $other_reps]
+		  } else {if {[regexp "^$this(sep)*\\\-$this(sep)*(..*)\$" $str reco str]} {
+				   set other_reps [list]
+				   this DSL_SELECTOR str other_reps $L_root $recursive
+				   Sub_list rep $other_reps
+				  }
+				 }
+		 }
+		 
 }
 
 #_________________________________________________________________________________________________________
 #_    CLASS : DEF | DEF '\' SELECTOR '/' | DEF '\>' SELECTOR '/'
 #_________________________________________________________________________________________________________
 # XXX AJOUTER LE !
-method Style DSL_CLASS {str_name rep_name root recursive} {
+method Style DSL_CLASS {str_name rep_name L_root recursive} {
  upvar $str_name str
  upvar $rep_name rep
 
-# Cas d'une expression entre parenthèse
-# if {[regexp]}
-
 # Cas classique expression entre parenthèse
- this DSL_DEF str rep $root $recursive
+ this DSL_DEF str rep $L_root $recursive
  while {[regexp "^$this(sep)*\\\\(.*)\$" $str reco str]} {
    if {[string equal -length 4 $str MATH]} {
      set str [string range $str 4 end]
@@ -335,7 +289,6 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
    if {[string equal [string index $str 0] ~]} {set cmd_daughter get_$this(sens)
                                                 set tilde ~
                                                 set str [string range $str 1 end]
-                                                #set str " $str"
                                                } else {set tilde {}
 											           set cmd_daughter $this(cmd_daughter)
                                                       }
@@ -348,85 +301,71 @@ method Style DSL_CLASS {str_name rep_name root recursive} {
                                                  }
                                                } else {set rec 1}
 #   puts "DSL_DEF($root) :\n  |rec : $rec\n  |str : $str"
-   set rep_tq  {}
-   set n_rep   {}
-   set str_tmp {}
    # Filter the responses
-      # <DEBUG 2009 02 02>
-	    set old_cmd_daughters $this(cmd_daughter)
-	    set this(cmd_daughter) $cmd_daughter
-	  # </DEBUG 2009 02 02>
-	  
-   set L_indesirables {}
-   #puts "Filtering \n  -  rep : $rep\n  -  str : $str\n  - proj : \"$proj\""
-   foreach nr $rep {
-     set original_nr $nr
-     switch $proj {
-	   _LM_LP  {set Lnr [$nr get_LC]_LM_LP}
-	   LC      {set Lnr [$nr get_LC]}
-	   PMs     {set Lnr [[$nr get_LC]_LM_LP get_L_actives_PM]}
-	   default {set Lnr $nr}
-	  }
-     foreach nr $Lnr {
-			 #puts "________Considering $nr"
-			 if {$nested} {
-			   set r [$nr get_handle_composing_comet]
-			   if {$r == ""} {continue}
-			  } else {set r $nr}
-			 foreach c [$r $cmd_daughter] {
-			   set str_tmp $str
-			   set rep_tq {}
-			   #puts "  - str_tmp : \"$str_tmp\" \n  - str : {$str}\n  - c $c"
-			   this DSL_SELECTOR str_tmp rep_tq $c $rec
-			   #puts "    * rep_tq : \{$rep_tq\}"
-			   set lg [string length $rep_tq]
-			   if {$lg>0} {
-				 if {$not==1} {Add_element L_indesirables $original_nr}
-				 Add_element n_rep $original_nr
-				}
-			  }
-			
-			  # <DEBUG 2009 02 02>
-				set this(cmd_daughter) $old_cmd_daughters
-			  # </DEBUG 2009 02 02>
+   set n_rep          [list]
+   set L_indesirables [list]
+   set L_rep_proj     [list]
+   switch $proj {
+	 _LM_LP  {foreach nr $rep {Add_list L_rep_proj [$nr get_LC]_LM_LP}}
+	 LC      {foreach nr $rep {Add_list L_rep_proj [$nr get_LC]}}
+	 PMs     {foreach nr $rep {Add_list L_rep_proj [[$nr get_LC]_LM_LP get_L_actives_PM]}}
+	 default {foreach nr $rep {Add_list L_rep_proj $nr}}
+	}
+   
+   if {$nested} {
+     set L_rep_proj_nested [list]
+	 foreach r $L_rep_proj {if {![string equal $r ""]} {Add_list L_rep_proj_nested [$r get_handle_composing_comet]}}
+     set L_rep_proj_nested $L_rep_proj
+    } else {set L_rep_proj_nested $L_rep_proj}
+	
+   set old_cmd_daughters $this(cmd_daughter)
+   set this(cmd_daughter) $cmd_daughter
 
-		   if {$not==1} {set n_rep $rep
-						 Sub_list n_rep $L_indesirables
-						}
-			 #DEBUG set str $str_rep
-		} 
-		}
-			 this DSL_SELECTOR str rep_tq $root $rec
-			 set rep $n_rep
-		   regexp "^$this(sep)*\\\)*$this(sep)*/(.*)$" $str reco str
-        
-	  
+   #puts "  Filtre (rec $rec) : $str"
+   set str_tmp $str
+   foreach r $L_rep_proj_nested {
+     set rep_tq  [list]
+     set str $str_tmp
+	 this DSL_SELECTOR str rep_tq [$r $cmd_daughter] $rec
+     if {[llength $rep_tq]} {if {$not} {
+						       Add_element L_indesirables $r
+							  } else {Add_element n_rep $r}
+						    }
+     set this(cmd_daughter) $old_cmd_daughters
+    }
+	
+   if {$not==1} {set n_rep $rep
+				 Sub_list n_rep $L_indesirables
+				}
+		
+   set rep $n_rep
   }
-# puts "DSL_CLASS : \{$rep\}"
+
 }
 
 #_________________________________________________________________________________________________________
 #_      DEF : ID | ID(SELECTOR) | ID(>SELECTOR)
 #_________________________________________________________________________________________________________
-method Style DSL_DEF {str_name rep_name root recursive} {
+method Style DSL_DEF {str_name rep_name L_root recursive} {
  upvar $str_name str
  upvar $rep_name rep
 
- this DSL_ID str rep $root $recursive
+ this DSL_ID str rep $L_root $recursive
 
 # Save state 
  set sens_SVG              $this(sens)
  set cmd_get_daughters_SVG $this(cmd_daughter)
- set this(sens)         daughters
- set this(cmd_daughter) get_out_$this(sens)
+ set this(sens)            daughters
+ set this(cmd_daughter)    get_out_$this(sens)
  
- if {[regexp "^\\\((.*)$" $str reco str]} {
+ if {[regexp "^\\\((.*)\$" $str reco str]} {
    if {[string equal [string index $str 0] >]} {set str [string range $str 1 end]
                                                 set rec 0} else {set rec 1}
-   set rep_nesting {}
-   set n_rep       {}
+   set rep_nesting [list]
+   set n_rep       [list]
    set str_tmp     {}
    set str_rep     {}
+   #XXX Find a way to optimize !
    foreach r $rep {
      set core_to_find_SVG $this(core_to_find)
 	 if {[lsearch [gmlObject info classes $r] PM_U_encapsulator] >= 0} {
@@ -436,26 +375,22 @@ method Style DSL_DEF {str_name rep_name root recursive} {
        set str_tmp $str
        set rep_nesting {}
        this DSL_SELECTOR str_tmp rep_nesting $c $rec
-       if {[string length $rep_nesting]>0} {set str_rep $str_tmp}
+       if {[llength $rep_nesting]} {set str_rep $str_tmp}
        set n_rep [Liste_Union $n_rep $rep_nesting]
       }
 	 set this(core_to_find) $core_to_find_SVG
 	}
    
-   #DEBUG set str $str_rep
-     this DSL_SELECTOR str rep_nesting $root $rec
+   this DSL_SELECTOR str rep_nesting $L_root $rec
    
    set rep $n_rep
    if {[regexp "^$this(sep)*\\)(.*)$" $str reco str]} {
-#     puts "    DSL_DEF : on passe la ) et il reste \"$str\""
     }
-#   puts "  NESTING OK; reste \"$str\""
   }
 
 # Reload state
  set this(sens)         $sens_SVG
  set this(cmd_daughter) $cmd_get_daughters_SVG
-# puts "DSL_DEF : \{$rep\}"
 }
 
 #_________________________________________________________________________________________________________
@@ -470,23 +405,22 @@ method Style Specializations {c} {
 }
 
 #_________________________________________________________________________________________________________
-method Style DSL_ID {str_name rep_name root recursive} {
+method Style DSL_ID {str_name rep_name L_root recursive} {
  upvar $str_name str
  upvar $rep_name rep
- #puts "DSL_ID on $root with \"$str\""
 
- set rep_tmp {}
- set ext {}
+ set rep_tmp [list]
+ set n_rep   [list]
+ set ext     {}
  set go_PM 0
  set go_LC 0
 
 # In case of goto
  if {[regexp "^$this(sep)*\\\#($this(lettre)*)(.*)$" $str reco id str]} {
    set id_simple   [lindex [split $id .] 0]
-   #puts "GOTO $id_simple ($id)"
    if {[gmlObject info exists object $id_simple]} {
      if {[lsearch [gmlObject info classes $id_simple] Comet_element] != -1} {
-       set root $id
+	   set L_root $id
        set str $id$str
       }
     }
@@ -495,22 +429,13 @@ method Style DSL_ID {str_name rep_name root recursive} {
      foreach spec [this Specializations $id_simple] {
        set L_id [concat $L_id [gmlObject info objects $spec]]
       }
-     foreach e $L_id {
-       set n_rep {}
-       set str_tmp "$id$str"
-       #puts "Sur $e : $str_tmp"
-       this DSL_ID str_tmp n_rep $e $recursive
-       #puts "  n_rep : \{$n_rep\}"
-       Add_list rep $n_rep
-      }
-     # Parser le reste
-     set str "$id$str"
-     #puts "  PRE GOTO avec\n    str : $str"
-       if {[llength $L_id] > 0} {this DSL_ID str n_rep [lindex $L_id 0] $recursive}
-     #puts "  FIN GOTO avec\n    str : $str\n    L_id : \{$L_id\}"
+	 set str $id$str
+     this DSL_ID str n_rep $L_id $recursive
+     Add_list rep $n_rep
+
      return
     }
-   if {![string equal $id $root]} {return {}}
+   if {![string equal $id $L_root]} {return {}}
   }
 
 # In case of negation
@@ -520,38 +445,35 @@ method Style DSL_ID {str_name rep_name root recursive} {
 
 # In case of parenthesis
  if {[regexp "^$this(sep)*\\\((.*)$" $str reco str]} {
-   #puts "AVANT parenthèse (sur $root) : \"$str\""
-   this DSL_SELECTOR str rep_tmp $root $recursive
+   this DSL_SELECTOR str rep_tmp $L_root $recursive
    if {$negation} {
      set str_all *
-     set rep_all {}
-       this DSL_SELECTOR str_all rep_all $root $recursive
+     set rep_all [list]
+       this DSL_SELECTOR str_all rep_all $L_root $recursive
      Sub_list rep_all $rep_tmp
      set rep_tmp $rep_all
     }
    regexp "^$this(sep)*\\\)$this(sep)*(.*)" $str reco str
-   #puts "APRES parenthèse (rep_tmp:\{$rep_tmp\}) : \"$str\""
   } else {
           # In case of NAME
           set id  {}
           if {[regexp "^$this(sep)*\\.*($this(lettre)*)(.*)$" $str reco id str]} {
             set id [split $id .]
-            #puts "Dans $root : Reconnu liste d'id \{$id\}"
-            if {[string length $id]==0} {return}
-            set r $root
+            if {[llength $id]==0} {return}
             if {$recursive} {
-			  #puts "$objName DSL_ID:\n  | rep_tmp : {$rep_tmp}\n  | id : $id"
-              this Add_recursively rep_tmp id $r $negation
-			  #puts "  | this Add_recursively rep_tmp id $r $negation => rep_tmp == {$rep_tmp}"
+              this Add_recursively rep_tmp id $L_root $negation
              } else {
-                 if {[string equal $id *] && $negation==0} {set rep_tmp $r} else {set hfs [$r Has_for_styles $id];
-                                                                                  if {($hfs+$negation)==1} {set rep_tmp $r}
-                                                                                 }
+                 if {[string equal $id *] && $negation==0} {set rep_tmp $L_root} else {set rep_tmp [list]
+																					   foreach r $L_root {
+																						 set hfs [$r Has_for_styles $id]
+																						 if {($hfs+$negation)==1} {Add_list rep_tmp $r}
+																					    }
+																					  }
                 }
            } else {puts "ERROR in $objName;\n  str : $str"; return}
          }
-# puts "We have for candidates : \{$rep_tmp\}"
- if {[string equal $rep_tmp {}]} {return}
+ #puts "  We have for candidates : \{$rep_tmp\}"
+ if {[llength $rep_tmp] == 0} {return}
  
  set n_rep $rep_tmp
  while {[regexp "^->($this(lettre)*)(.*)$" $str reco ext str]} {
@@ -560,11 +482,7 @@ method Style DSL_ID {str_name rep_name root recursive} {
 		   if {[string length $ext]>0} {set go_LC 1; set go_ext 1}
 		  }}
 
-
-		# set rep {}
-		# Look for id in comet root-subgraph
-
-		 set n_rep {}
+		 set n_rep [list]
 
 		 if {$go_PM} {
 		   foreach r $rep_tmp {
@@ -595,68 +513,55 @@ method Style DSL_ID {str_name rep_name root recursive} {
    set rep_tmp $n_rep
    if {[string equal $rep_tmp {}]} {return}
   }
-# puts "APRES vérification marquage \"$id\" reste \{$n_rep\}"
 
 # In case of crochets
  if {[regexp "^$this(sep)*\\\[(.*)$" $str reco str]} {
-   #puts "On $root, FILTER : $str"
    foreach r $n_rep {
      set str_tmp $str
-     #puts "  CONDITION VERIFICATION NODE($r) COND\[$str_tmp\]"
      if {[this COND_NODE str_tmp $r]} {Add_element rep $r}
     }
-   #this COND_NODE str $root
    set pos_end_braket [string first {]} $str]
      set str [string range $str [expr $pos_end_braket + 1] end]
    regexp "^$this(sep)*\\\](.*)" $str reco str
-   #puts "  RESTE : $str"
   } else {Add_list rep $n_rep}
+  
+ #puts "  Now rep = {$rep}"
 }
 
 #_________________________________________________________________________________________________________
-method Style Go_through_path {str_name root cmd} {
+method Style Go_through_path {str_name L_root cmd} {
  upvar $str_name str
- #puts "$objName Go_through_path \{$str\} $root \{$cmd\}"
- set L_rep   {}
- set n_L_rep {}
-   foreach d [$root $cmd] {
-     set str_tmp $str
-     this DSL_SELECTOR str_tmp L_rep $d 0
-     #puts "Try with $d -> \{$L_rep\}"
-    }
-   if {[llength $L_rep] > 0} {
-     foreach e $L_rep {
-       set str_rec $str
-       #puts "Recursion on $e"
-       Add_list n_L_rep [this Go_through_path str_rec $e $cmd]
-      }
-    }
- Add_element n_L_rep $root
+
+ set L_rep   [list]
+ set n_L_rep [list]
+ 
+ this DSL_SELECTOR str L_rep $d 0
+ Add_list n_L_rep [this Go_through_path str_rec $L_rep $cmd]
+	
+ Add_list n_L_rep $L_root
  return $n_L_rep
 }
 
 #_________________________________________________________________________________________________________
-method Style Add_recursively {rep_name id_name root {negation 0}} {
+method Style Add_recursively {rep_name id_name L_root {negation 0}} {
  upvar $rep_name rep
  upvar $id_name  id
 
- #puts "    $objName Add_recursively $rep $id $root $negation"
- 
- set go 0
- if {$id == "*"} {set go 1} else  {
-   if {[$root Has_for_styles $id]} {
-     if {$id == "CORE"} {
-	   if {$root == $this(core_to_find)} {set go 1} else {set go 0}
-	  } else {set go 1}
-	} 
-  }
+ foreach root $L_root {
+	 set go 0
+	 if {[string equal $id *]} {set go 1} else  {
+	   if {[$root Has_for_styles $id]} {
+		 if {[string equal $id CORE]} {
+		   if {[string equal $root $this(core_to_find)]} {set go 1}
+		  } else {set go 1}
+		}
+	  }
 
- if {($go==1 && $negation==0) || ($go==0 && $negation==1)} {
-   Add_element rep $root
-  }
+	 if {($go && !$negation) || (!$go && $negation)} {
+	   Add_element rep $root
+	  }
 
- foreach c [$root $this(cmd_daughter)] {
-   this Add_recursively rep id $c
+     this Add_recursively rep id [$root $this(cmd_daughter)]
   }
 }
 

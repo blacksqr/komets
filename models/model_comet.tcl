@@ -1,17 +1,30 @@
 set DEFINE_MODEL_COMET 1 
 
 #_________________________________________________________________________________________________________
+proc Traces {C {stream ""}} {
+ foreach m [gmlObject info methods $C] {
+   catch "Trace $C $m $stream"
+  }
+}
+
+#_________________________________________________________________________________________________________
 proc Trace {C m {stream ""}} {
- set cmd    "method $C $m {[gmlObject info arglist $C $m]} {\n"
+ #set cmd    "method $C $m {[gmlObject info arglist $C $m]} {\n"
  append cmd "puts $stream \"\$objName $m "
    foreach a [gmlObject info arglist $C $m] {
      append cmd {$} [lindex $a 0] " "
     }
  append cmd "\"\n"
- append cmd [gmlObject info body $C $m]
- append cmd "}"
+ #append cmd [gmlObject info body $C $m]
+ #append cmd "}"
  
- eval $cmd
+ Add_aspect $C $m __TRACE__ $cmd begin
+}
+
+proc Chrono {C m} {
+  Inject_code $C $m {set Chrono_t0 [clock milliseconds]
+                    } "puts \"\$objName ${C}::$m done in \[expr \[clock milliseconds\] - \$Chrono_t0\]\"
+					  " __CHRONO__
 }
 
 #_________________________________________________________________________________________________________
@@ -184,13 +197,9 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
 }
 
 #_________________________________________________________________________________________________________
-proc Inject_code {C mtd code_bgn code_end} {
- set body   [gmlObject info body    $C $mtd]
- set L_args [gmlObject info arglist $C $mtd]
- 
- set cmd "method $C $mtd {$L_args} {\n$code_bgn; $body\n$code_end}"
- 
- eval $cmd
+proc Inject_code {C mtd code_bgn code_end {mark {INJECTED_CODE}}} {
+ Add_aspect $C $mtd ${mark}_BEGIN $code_bgn begin
+ Add_aspect $C $mtd ${mark}_END   $code_end end
 }
 
 #_________________________________________________________________________________________________________
@@ -201,7 +210,7 @@ proc Add_aspect {c m mark code {position begin}} {
  # Inject code into the body
  set bgn_mark "# <${mark}>"
  set end_mark "# </${mark}>"
- if {[regexp "^(.)*${bgn_mark}\n.*$end_mark\n(.*)\$" $body reco bgn end]} {
+ if {[regexp "^(.*)${bgn_mark}\n.*${end_mark}\n(.*)\$" $body reco bgn end]} {
    set body "$bgn$bgn_mark\n$code\n$end_mark\n$end"
   } else {if {$position == "begin"} {
             set body "$bgn_mark\n$code\n$end_mark\n$body"
@@ -411,7 +420,7 @@ method Comet_element constructor {name descr args} {
  if {[info exist class(DSL_CSSpp)    ]} {} else {set class(DSL_CSSpp)     {}}
  if {[info exist class(DSL_ECA)      ]} {} else {set class(DSL_ECA)       {}}
 
- set this(default_op_gdd_file)    [Comet_files_root]Common_GDD_requests.css++
+ set this(default_op_gdd_file)    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
  set this(default_css_style_file) ""
  set this(default_css_style_still_applied) 0
  
@@ -1466,15 +1475,38 @@ method Logical_model dispose {} {
 #_________________________________________________________________________________________________________
 #__________________________________________________ Styles________________________________________________
 #_________________________________________________________________________________________________________
-proc Read_file_as_css++ {f_name} {
- if {[file exists $f_name]} {
-   set f [open $f_name]; set str [read $f]; close $f
-   return [Read_string_as_css++ $str] 
-  } else {return ""}
+proc Read_file_as_gdd_op {f_name} {
+ set f [open $f_name r]
+   set str_fct [read $f]
+   close $f
+ 
+# Process all the functions to give a list <fct_name, expr>
+ set letter {[a-zA-Z0-9_\$"{}]}
+ set space  "\[ \n\]"
+ set L_str_fct [split $str_fct "\;"]
+ set L_fct [list]
+ foreach str_fct $L_str_fct {
+   if {[regexp "^$space*($letter+)$space*:$space*(.*)$space*\$" $str_fct reco name exp]} {
+     lappend L_fct [list $name $exp]
+    }
+  }
+  
+ return $L_fct
 }
 
 #_________________________________________________________________________________________________________
-proc Read_string_as_css++ {str} {
+proc Read_file_as_css++ {f_name} {
+ set f [open $f_name]; set str [read $f]; close $f
+ return [Read_string_as_css++ str] 
+}
+
+#_________________________________________________________________________________________________________
+proc Read_string_as_css++ {str_name} {
+ upvar $str_name str
+
+ set letter {[a-zA-Z0-9_\$"{}]}
+ set space  "\[ \n\]"
+
  set L_rep ""
  set L [split $str "\n"]
  set i 0; set length [llength $L]
@@ -1487,7 +1519,20 @@ proc Read_string_as_css++ {str} {
 	   append rule $line "\n"
 	   incr i; set line [lindex $L $i]
 	  }
-	 lappend L_rep [list $sel $rule]
+	 # Mise en forme d'une liste de modification <TYPE, name, param> 
+	 # avec TYPE = [FCT | GDD | ECA | DEFAULT]
+	 set L_rules [list]
+	 foreach modif [split $rule "\;"] {
+	   if {[regexp "^$space*FCT_($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type FCT} else {
+	     if {[regexp "^$space*GDD_($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type GDD} else {
+		   if {[regexp "^$space*ECA$space*:$space*(.*)$space*\$" $modif reco val]} {set type ECA; set fct_name ""} else {
+			 if {[regexp "^$space*($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type DEFAULT} else {set type NOTHING}
+			}
+		  }
+		}
+	   if {![string equal $type NOTHING]} {lappend L_rules [list $type $fct_name [string map [list --- " ; "] $val]]}
+	  }
+	 lappend L_rep [list $sel $L_rules]
     }
    incr i
   }
@@ -1497,113 +1542,95 @@ proc Read_string_as_css++ {str} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
+# Stockage des feuilles de styles et GDD op dans un objet qui fait synchro, passer par lui pour avoir les contenus.
+# XXX OPTIMISATION
+method FPOOL constructor {} {}
+
+#_________________________________________________________________________________________________________
+if {![gmlObject info exists object FPool]} {FPOOL FPool}
+
+#_________________________________________________________________________________________________________
+method FPOOL get_file_css++ {f_name} {
+ if {![file exists $f_name]} {return ""}
+ if {[info exists this(F_CSS,$f_name)]} {
+   if {[string equal [file mtime $f_name] [lindex $this(F_CSS,$f_name) 0]]} {
+	 return [lindex $this(F_CSS,$f_name) 1]
+	}
+  }
+  
+ set this(F_CSS,$f_name) [list [file mtime $f_name] [Read_file_as_css++ $f_name]]
+ return [lindex $this(F_CSS,$f_name) 1]
+}
+
+#_________________________________________________________________________________________________________
+method FPOOL get_file_gdd_op {f_name} {
+ if {![file exists $f_name]} {return ""}
+ if {[info exists this(F_GDD,$f_name)]} {
+   if {[string equal [file mtime $f_name] [lindex $this(F_GDD,$f_name) 0]]} {
+	 return [lindex $this(F_GDD,$f_name) 1]
+	}
+  }
+  
+ set this(F_GDD,$f_name) [list [file mtime $f_name] [Read_file_as_gdd_op $f_name]]
+ return [lindex $this(F_GDD,$f_name) 1]
+}
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
 proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
- if {[file exists $GDD_op_file]} {
-   set f [open $GDD_op_file r]; set GDD_op [read $f]; close $f
-  } else {set GDD_op ""}
- set CSS    [Read_file_as_css++ $CSS_file]
+ set GDD_op [FPool get_file_gdd_op $GDD_op_file]
+ set CSS    [FPool get_file_css++  $CSS_file]
+ 
  foreach C $L_C {
    Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C $L_mapping
   }
 }
 
 #_________________________________________________________________________________________________________
-proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep ""}} {
- #puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
-# Process all the functions to give a list <fct_name, expr>
- set letter {[a-zA-Z0-9_\$"{}]}
- set space  "\[ \n\]"
- set L_str_fct [split $str_fct "\;"]
- set L_fct {}
- foreach str_fct $L_str_fct {
-   if {[regexp "^$space*($letter+)$space*:$space*(.*)$space*\$" $str_fct reco name exp]} {
-     lappend L_fct [list $name $exp]
-    }
-  }
-
+proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
+#puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
 # Let's see if some CSS rules have GDD access
  if {$L_rep == ""} {set do_css 1} else {set do_css 0}
- foreach r $str_style {
-   if {[llength $r] == 2} {
-     #puts "Cas règle simple"
-	 set root [lindex [gmlObject info objects CometRoot] 0]
-	 set L_ops [split [lindex $r 1] "\;"]
-	} else {
-	        #puts "Cas règle complexe, avec racine spécifiée:\n$r"
-	        set root  [lindex $r 1];
-	        set L_ops [split [lindex $r 2] "\;"]
-	       }
-   
+ foreach r $CSS {
    # Mapping of variables names
-#   set L_ops          [string map $L_mapping      $L_ops]
    set L_real_mapping [concat     $L_mapping      [list {$current} $current]]
-   set sel_svg        [string map $L_real_mapping [lindex $r 0]]
-   set L_ops          [string map $L_real_mapping $L_ops]
+   set r              [string map $L_real_mapping $r]
    
-   if {$do_css} {
-	 set L_rep [CSS++ $root $sel_svg]
-	}
-   #puts "_________Traitement de \"$r\"\n  - sel : $sel_svg\n  - res : $L_rep"
-   foreach op $L_ops {
-     set val {}
-     #set sel $sel_svg
-     set Req_type {}
-     #puts "__OP \"$op\""
-     if {[regexp "^\[ \\n\]*GDD_type\[ \\n\]*:\[ \\n\]*(.*)$" $op reco val]} {} else {
-       if {[regexp "^$space*GDD_fct$space*:$space*($letter+)$space*\\($space*(.*)$space*\\)$space*\$" $op reco fct_name params]} {
-         #puts "Trouvé un appel à une fonction GDD...on la traduit en expression de parcours"
-         foreach fct $L_fct {if {[string equal [lindex $fct 0] $fct_name]} {
-                               set val "? : $params : [lindex $fct 1]"
-                               set Req_type GDD
-                               break
-                              }
-                            }
-        } else {
-            if {[regexp "^$space*FCT_($letter+)$space*:$space*(.*)$space*\$" $op reco fct_name val]} {
-              set Req_type FCT
-             } else {if {[regexp "^$space*ECA$space*:$space*(.*)$space*\$" $op reco ECA_rule]} {
-                       set Req_type ECA
-                      } else {
-					          #if {![regexp "^\[ \n\]*\$" $op]} {}
-                             }
-                    }
-           }
-      }
-     switch $Req_type {
+   if {$do_css} {set L_rep [CSS++ cr [lindex $r 0]]}
+   if {![llength $L_rep]} {continue}
+   
+   foreach op [lindex $r 1] {
+     set val [lindex $op 2]
+	 switch [lindex $op 0] {
        GDD {
-            if {[llength $L_rep]==0} {continue}
-            #puts "QUERY ON GDD :\n  sel  : $sel\n  query : $val\n   -----"
             if {[catch {$dsl_q QUERY $val} res]} {puts "ERROR in style query ($dsl_q QUERY $val):\n$res\n    _____"} else {
-              set L_nodes {}
+              set L_nodes [list]
               foreach n [$dsl_q get_Result] {
                 Add_list L_nodes [lindex $n 1]
                }
-           # Charger les factories, décharger les modèles précédents...
-           #puts "for \"$L_rep\" we can plug $L_nodes"
-              set new_L_rep ""
+              set new_L_rep [list]
 			  foreach n $L_rep {
-                if {[catch "set new_n \[$n Update_factories \{$L_nodes\}\]" res]} {
+                if {[catch {set new_n [$n Update_factories $L_nodes]} res]} {
 				  puts "STYLE ERROR ($n Update_factories \{$L_nodes\}):\n$res"
 				  lappend new_L_rep $n
-				 } else {if {$new_n != ""} {
+				 } else {if {[string length $new_n]} {
 				           lappend new_L_rep $new_n
 						   if {$n == $current} {set current $new_n}
 						  }
 				        }
                }
-			#set L_rep [CSS++ $root $sel_svg]
-			set L_rep $new_L_rep
-           }}
-       FCT {
+			  set L_rep $new_L_rep
+             }
+		   }
+       FCT {set fct_name [lindex $op 1]
             foreach n $L_rep {
-              #puts "  FCT eval of \"$n $fct_name $val\""
 			  set core_PM ""; if {[[$n get_LC] Has_MetaData Core_of_PM]} {set core_PM [[$n get_LC] Val_MetaData Core_of_PM]}
-			  set val_txt [string map [list {---} " \n "] $val]
 			  set OK 1
-              if {[catch "set obj $n; $n $fct_name {$val_txt}" res]} {
-				if {[catch "set obj $n; $n $fct_name $val_txt" res]} {
-				  puts "FCT STYLE ERROR ($n $fct_name {$val_txt});\n  => $res\n  => L_rep was {$L_rep}"
-				  puts "FCT STYLE ERROR ($n $fct_name $val_txt);\n  => $res\n  => L_rep was {$L_rep}"
+              if {[catch {set obj $n; $n $fct_name $val} err1]} {
+				if {[catch "set obj $n; $n $fct_name $val" err2]} {
+				  puts "FCT STYLE ERROR ($n $fct_name {$val});\n  => $err1\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR ($n $fct_name $val);\n  => $err2\n  => L_rep was {$L_rep}"
 				  set OK 0
 				 }
                }
@@ -1611,7 +1638,6 @@ proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep
 			    # Case when the element has been encapsulated
 				if {[[$n get_LC] Has_MetaData Core_of_PM]} {
 				  set new_core_PM [[$n get_LC] Val_MetaData Core_of_PM]
-				  #puts "---     core : $core_PM\n--- new_core : $new_core_PM"
 				  if {$n == $current && $new_core_PM != $core_PM} {
 				    set current $new_core_PM
 				   }
@@ -1620,34 +1646,11 @@ proc Update_style {dsl_q dsl_css str_fct str_style current {L_mapping ""} {L_rep
              }
            }
        ECA {
-            if {[llength $L_rep] > 0} {
-              set n [lindex $L_rep 0]
-              if {[catch "[$n get_DSL_ECA] Interprets \{$ECA_rule\} \{$L_rep\}" res]} {
-                puts "ECA ERROR ([$n get_DSL_ECA] Interprets \{$ECA_rule\});\n$res"
-               }
+            set n [lindex $L_rep 0]
+            if {[catch {[$n get_DSL_ECA] Interprets $ECA_rule $L_rep} res]} {
+              puts "ECA ERROR ([$n get_DSL_ECA] Interprets \{$ECA_rule\});\n$res"
              }
            }
-      }
-	 continue 
-     if {[string equal $Req_type GDD]} {
-       #puts "Trouvé une requête GDD : \n  * $val"
-      # Lets' see which comets are concerned...
-#       set L_rep {}
-#       Style_CSSpp DSL_SELECTOR sel L_rep $root 1
-#       if {[llength $L_rep]==0} {continue}
-       if {[catch {$dsl_q QUERY $val} res]} {puts "ERROR in style query (dsl: $dsl_q):\n$res"} else {
-         #puts "query : \"$val\"\n  [$dsl_q get_Result]"
-         #puts "  $L_rep"
-         set L_nodes {}
-         foreach n [$dsl_q get_Result] {
-           Add_list L_nodes [lindex $n 1]
-          }
-         # Charger les factories, décharger les modèles précédents...
-         #puts "for \"[lindex $r 1]\" we can plug $L_nodes"
-         foreach n $L_rep {
-           $n Update_factories $L_nodes
-          }
-        }
       }
     }
   }
@@ -1694,7 +1697,7 @@ method Logical_model Update_factories {L_nodes} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Update_factories {L_nodes} {
- puts "$objName Update_factories \{$L_nodes\}"
+ #puts "$objName Update_factories \{$L_nodes\}"
  # Retrieve factories from nodes list
  # Not all factories are convenient for this PM, we have to filtred
  set L_factories {}
