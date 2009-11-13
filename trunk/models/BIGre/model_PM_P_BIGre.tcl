@@ -100,7 +100,6 @@ method PM_BIGre Etirement_interne {{infos {}} ex ey cx cy} {
    set pt_tmp [this get_a_B_point]; $pt_tmp maj [$infos Point_au_contact]
    Repere_transformation_inverse $pt_tmp $L_repere2D
    set cx [$pt_tmp X]; set cy [$pt_tmp Y]
-   #puts "New click coords are <$cx ; $cy>"
    
    this release_a_Liste_alx_repere2D $L_repere2D
    this release_a_Liste_alx_repere2D $L_rep_tmp

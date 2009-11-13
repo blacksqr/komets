@@ -133,7 +133,7 @@ method CometInterleaving_PM_P_menu_B207 Add_daughter {m {index -1}} {
 	   set menu_name   [lindex $menu_and_sel 0]
 	   set L_selectors [lindex $menu_and_sel 1]
 	   set L_PM [CSS++ $objName "#$objName $L_selectors"]
-	   if {[lindex $L_PM $m] != -1} {
+	   if {[lsearch $L_PM $m] != -1} {
 		 set plugged 1
 		 # Add to the corresponding menu
 		 set menu_root [lindex $menu_and_sel 2]
