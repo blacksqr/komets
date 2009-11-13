@@ -521,15 +521,12 @@ method Comet_element get_ancestors_and_self {} {
 }
 
 #_________________________________________________________________________________________________________
-method Comet_element Eval {cmd} {
- #puts "\n______ $objName Eval:\n$cmd\n_________\n"
- set cmd [string map [list --- "\n"] $cmd]
+method Comet_element Eval {cmd args} {
+ append cmd { } $args
+
+ set args [string map [list --- "\n"] $cmd]
  if {[catch "set obj $objName; $cmd" err]} {puts "Error in $objName Eval {$cmd}\n  -command was : set obj $objName; $cmd\n  -Error is : $err"}
  
- #set obj $objName;
- #foreach line [split $cmd "\n"] {
- #  if {[catch $line err]} {puts "Error in $objName Eval {$line}\n  -Error is : $err"}
- # } 
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -1524,7 +1521,7 @@ proc Read_string_as_css++ {str_name} {
 	 set L_rules [list]
 	 foreach modif [split $rule "\;"] {
 	   if {[regexp "^$space*FCT_($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type FCT} else {
-	     if {[regexp "^$space*GDD_($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type GDD} else {
+	     if {[regexp "^$space*GDD_fct$space*:$space*($letter+)$space*\\($space*(.*)$space*\\)$space*\$" $modif reco fct_name val]} {set type GDD} else {
 		   if {[regexp "^$space*ECA$space*:$space*(.*)$space*\$" $modif reco val]} {set type ECA; set fct_name ""} else {
 			 if {[regexp "^$space*($letter+)$space*:$space*(.*)$space*\$" $modif reco fct_name val]} {set type DEFAULT} else {set type NOTHING}
 			}
@@ -1579,6 +1576,9 @@ method FPOOL get_file_gdd_op {f_name} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
+ #puts "_____ Apply_style_on ________"
+ #puts "  $GDD_op_file\n  $CSS_file"
+ #puts "_____________________________"
  set GDD_op [FPool get_file_gdd_op $GDD_op_file]
  set CSS    [FPool get_file_css++  $CSS_file]
  
@@ -1603,8 +1603,15 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
    foreach op [lindex $r 1] {
      set val [lindex $op 2]
 	 switch [lindex $op 0] {
-       GDD {
-            if {[catch {$dsl_q QUERY $val} res]} {puts "ERROR in style query ($dsl_q QUERY $val):\n$res\n    _____"} else {
+       GDD {set fct_name [lindex $op 1]
+			set gdd_req {}
+			foreach gdd_fct $L_fct {
+			  if {[string equal [lindex $gdd_fct 0] $fct_name]} {set    gdd_req {? : }
+															     append gdd_req $val { : } [lindex $gdd_fct 1]
+															     break
+			                                                    }
+			 }
+			if {[catch {$dsl_q QUERY $gdd_req} res]} {puts "ERROR in style query ($dsl_q QUERY $gdd_req):\n$res\n    _____"} else {
               set L_nodes [list]
               foreach n [$dsl_q get_Result] {
                 Add_list L_nodes [lindex $n 1]
@@ -1629,8 +1636,8 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
 			  set OK 1
               if {[catch {set obj $n; $n $fct_name $val} err1]} {
 				if {[catch "set obj $n; $n $fct_name $val" err2]} {
-				  puts "FCT STYLE ERROR ($n $fct_name {$val});\n  => $err1\n  => L_rep was {$L_rep}"
-				  puts "FCT STYLE ERROR ($n $fct_name $val);\n  => $err2\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => $err1\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => $err2\n  => L_rep was {$L_rep}"
 				  set OK 0
 				 }
                }
@@ -1697,10 +1704,10 @@ method Logical_model Update_factories {L_nodes} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Update_factories {L_nodes} {
- #puts "$objName Update_factories \{$L_nodes\}"
+ puts "$objName Update_factories \{$L_nodes\}"
  # Retrieve factories from nodes list
  # Not all factories are convenient for this PM, we have to filtred
- set L_factories {}
+ set L_factories [list]
  foreach node $L_nodes {
    set ptf [$node get_ptf]
    if {[string equal $ptf *] || [string equal ${objName}_cou_ptf *]} {
@@ -2521,6 +2528,8 @@ method Physical_model Has_for_style {s} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Substitute_by_PM_type {t} {
+ if {[lsearch [gmlObject info classes $objName] $t] != -1} {return}
+ 
 #puts "$objName Physical_model::Substitute_by_PM_type $t"
 # Look if a t PM is ammong inactives PM of the related LM
  set LM [this get_LM]
@@ -2531,6 +2540,7 @@ method Physical_model Substitute_by_PM_type {t} {
  if {[string equal $new_PM {}]} {
    set new_PM [this get_LC]_PM_P_${t}_[$LM get_a_unique_id]
    $t $new_PM $new_PM "Created to substitute $objName as a PM of type $t"
+   puts "New version of $t"
   }
 
  this Substitute_by $new_PM
@@ -2539,20 +2549,19 @@ method Physical_model Substitute_by_PM_type {t} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Propagate_info_substitution_of {PM1 PM2} {
- #puts "<${objName}::Propagate_info_substitution_of>"
  foreach m [this get_mothers] {
    $m Propagate_info_substitution_of $PM1 $PM2
   }
- #puts "</${objName}::Propagate_info_substitution_of>"
 }
 
 #_________________________________________________________________________________________________________
 method Physical_model Substitute_by {PM} {
  #puts "$objName Physical_model::Substitute_by $PM"
  if {[string equal $PM {}]} {return}
- set L_roots [this get_L_roots]
+ 
+ #set L_roots [this get_L_roots]
  set LM [this get_LM]
- if {![string equal $LM ""]} {
+ if {![string equal $LM {}]} {
    $LM Add_PM          $PM
    $LM set_PM_active   $PM
    $LM set_PM_inactive $objName
@@ -2560,7 +2569,7 @@ method Physical_model Substitute_by {PM} {
      if {[string equal -length 9 $mtd get_L_CB_]} {
 	   if {[lsearch [gmlObject info methods $PM] $mtd] >= 0} {
 	     set mtd_set [string replace $mtd 0 0 s]
-		 set L_CB {}
+		 set L_CB [list]
 		 foreach CB [this $mtd] {
 		   if {[string equal -length 14 __FOREACH_PM__ [lindex $CB 0]]} {lappend L_CB $CB}
           }
