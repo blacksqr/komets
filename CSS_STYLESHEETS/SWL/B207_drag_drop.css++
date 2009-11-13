@@ -27,6 +27,7 @@
 }
 
 #$current(>* >>!CometSWL_Player/>> (CONT.OP.SHIP, ACT.SUB.PLANET, ACT.SUB.PLAYER))   {
+  FCT_Eval: puts "--------- On essai de cacher $obj : $obj Show_elements 0 *";
   FCT_Show_elements : 0 *;
 }
 
@@ -130,7 +131,7 @@
 
 #$current(CONT.SPACE(CORE))  {
   FCT_Eval : $obj On_wheel_down "$obj Etirement_interne \$infos 1.1 1.1 \$X \$Y"
-         --- $obj On_wheel_up   "set e [expr 1.0/1.1] --- $obj Etirement_interne \$infos \$e \$e \$X \$Y";
+         --- set e [expr 1.0/1.1] --- $obj On_wheel_up   "$obj Etirement_interne \$infos $e $e \$X \$Y";
 }
 
 #$current(CometSWL_Player) {

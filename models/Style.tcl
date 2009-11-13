@@ -130,6 +130,12 @@ method Style Interprets {str root} {
 #_________________________________________________________________________________________________________
 method Style Interprets_and_parse {str_name root} {
  upvar $str_name str
+ 
+# set str [string map [list "\\" "\\\\" "\[" "\\\[" "\]" "\\\]"] $str]
+# eval "set L \[list $str\]"
+ set strL ""
+ foreach e $str {append strL $e { }}
+ 
  set rep {}
    this set_ERROR {}
    set this(sens)         daughters
@@ -153,13 +159,20 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
  upvar $str_name str
  upvar $rep_name rep
  
- if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
- if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+ # OPTIMISATION 
+ if {[regexp {^ *>-->(.*)$} $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ if {[regexp {^ *<--<(.*)$} $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+ # WAS if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ # WAS if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
 
- if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
+ # OPTIMISATION 
+ if {[regexp {^ *\~(.*)$} $str reco str]} {
+ # WAS if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
+ #}
    set this(cmd_daughter) get_$this(sens)
-   set str2 " "; append str2 $str; set str $str2
-  } else {if {[string index $str 0] == " "} {
+   puts "  After ~ we have : $str"
+   #OPTIMISATION set str " $str"
+  } else {if {[string index $str 0] == { }} {
             set this(cmd_daughter) get_out_$this(sens)
 		   }
          }
@@ -168,12 +181,18 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
  set ok 0
 
  # Recursion with nesting ?
- if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
- if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+ # OPTIMISATION 
+ if {[regexp {^ *>-->(.*)$} $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ if {[regexp {^ *<--<(.*)$} $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+ # WAS if {[regexp "^$this(sep)*>-->(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+ # WAS if {[regexp "^$this(sep)*<--<(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
 
- if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
-	   set this(cmd_daughter) get_$this(sens)
-	   set str " $str"
+ # OPTIMISATION 
+ if {[regexp {^ *\~(.*)$} $str reco str]} {
+ # WAS if {[regexp "^$this(sep)*\\\~ *(.*)\$" $str reco str]} {
+ #}
+       set this(cmd_daughter) get_$this(sens)
+	   #OPTIMISATION set str " $str"
 	  } else {if {[string index $str 0] == " "} {
 				set this(cmd_daughter) get_out_$this(sens)
 			   }
@@ -181,11 +200,14 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
   
   
 # Do we have a '>>' ?
- if {[regexp "^$this(sep)*>>$this(sep)*(.*)\$" $str reco str]} {
+ # OPTIMISATION 
+ if {[regexp {^ *>> *(.*)$} $str reco str]} {
+ # WAS if {[regexp "^$this(sep)*>>$this(sep)*(.*)\$" $str reco str]} {
+ # }
    set L_rep_>> [this Go_through_path str $rep $this(cmd_daughter)]
 
      set found_end_>> 0
-     while {${found_end_>>} == 0} {
+     while {!$found_end_>>} {
        set pos_end_>> [string first / $str]
        if {${pos_end_>>} == -1} {break} else {set str [string range $str [expr ${pos_end_>>}+1] end]}
        if {[string equal -length 1 $str ~ ]} {set str [string range $str 1 end]; set this(cmd_daughter) get_$this(sens)}
@@ -204,18 +226,25 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
   }
 
 # Do we have a '>' or a ' ' ?
- if {[regexp "^$this(sep)*>$this(sep)*(.*)\$" $str reco str]} {
+ # OPTIMISATION 
+ if {[regexp {^ *> *(.*)$} $str reco str]} {
+ # WAS if {[regexp "^$this(sep)*>$this(sep)*(.*)\$" $str reco str]} {
+ # }
    set ok 1; set rec 0
   } else {
-      if {[regexp "^$this(sep)* +$this(sep)*(.*)\$" $str reco str]} {
+      if {[regexp {^ +(.*)$} $str reco str]} {
+      #OPTIMISATION if {[regexp "^$this(sep)* +$this(sep)*(.*)\$" $str reco str]} {
+	  #OPTIMISATION }
         if { ![string equal -length 1 $str ,]
            &&![string equal -length 1 $str \;]
            &&![string equal -length 1 $str -] } {
         set ok 1; set rec 1}
        }
      }
- if {[regexp "^$this(sep)*\$" $str]}    {return}
- if {[regexp "^$this(sep)*/.*\$" $str]} {return}
+ if {[regexp {^ *$} $str]} {return}
+ if {[regexp "^ */" $str]} {return}
+ # OPTIMISATION if {[regexp "^$this(sep)*\$" $str]}    {return}
+ # OPTIMISATION if {[regexp "^$this(sep)*/.*\$" $str]} {return}
 
 # Allons voir plus loin s'il y a lieu
  if {$ok} {
@@ -230,15 +259,21 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
   }
   
 # Case of the virgule
- if {[regexp "^$this(sep)*,$this(sep)*(..*)\$" $str reco str]} {
+ if {[regexp {^ *, *(..*)$} $str reco str]} {
+ # OPTIMISATION if {[regexp "^$this(sep)*,$this(sep)*(..*)\$" $str reco str]} {
+ #}
    set other_reps [list]
    this DSL_SELECTOR str other_reps $L_root $recursive
    set rep [Liste_Union $rep $other_reps]
-  } else {if {[regexp "^$this(sep)*\\;$this(sep)*(..*)\$" $str reco str]} {
+  } else {if {[regexp {^ *\; *(..*)$} $str reco str]} {
+          # OPTIMISATION if {[regexp "^$this(sep)*\\;$this(sep)*(..*)\$" $str reco str]} {
+		  #}
 		   set other_reps [list]
 		   this DSL_SELECTOR str other_reps $L_root $recursive
 		   set rep [Liste_Intersection $rep $other_reps]
-		  } else {if {[regexp "^$this(sep)*\\\-$this(sep)*(..*)\$" $str reco str]} {
+		  } else {if {[regexp {^ *\- *(..*)$} $str reco str]} {
+		          # OPTIMISATION if {[regexp "^$this(sep)*\\\-$this(sep)*(..*)\$" $str reco str]} {
+				  #}
 				   set other_reps [list]
 				   this DSL_SELECTOR str other_reps $L_root $recursive
 				   Sub_list rep $other_reps
@@ -257,7 +292,9 @@ method Style DSL_CLASS {str_name rep_name L_root recursive} {
 
 # Cas classique expression entre parenthèse
  this DSL_DEF str rep $L_root $recursive
- while {[regexp "^$this(sep)*\\\\(.*)\$" $str reco str]} {
+ while {[regexp {^ *\\(.*)$} $str reco str]} {
+ # OPTIMISATION while {[regexp "^$this(sep)*\\\\(.*)\$" $str reco str]} {
+ #}
    if {[string equal -length 4 $str MATH]} {
      set str [string range $str 4 end]
      #XXX PASSER A UNE FONCTION QUI ANNALYSE LES EXPR MATHEMATIQUES
@@ -268,10 +305,13 @@ method Style DSL_CLASS {str_name rep_name L_root recursive} {
      return
     }
 
-	if {![regexp "^->($this(lettre)*) +(.*)" $str reco proj str]} {set proj ""} else {puts "Projection sur $proj"}
+	if {![regexp {^->(.*) +(.*)$} $str reco proj str]} {set proj ""} else {puts "Projection sur $proj"}
+	#OPTIMISATION if {![regexp "^->($this(lettre)*) +(.*)" $str reco proj str]} {set proj ""} else {puts "Projection sur $proj"}
 	
-    if {[regexp "^$this(sep)*>-->$this(sep)*(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
-    if {[regexp "^$this(sep)*<--<$this(sep)*(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+	if {[regexp {^ *>--> *(.*)$} $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+	if {[regexp {^ *<--< *(.*)$} $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
+    #OPTIMISATION if {[regexp "^$this(sep)*>-->$this(sep)*(.*)\$" $str reco str]} {set this(sens) daughters; set this(cmd_daughter) [string map [list mothers daughters] $this(cmd_daughter)]}
+    #OPTIMISATION if {[regexp "^$this(sep)*<--<$this(sep)*(.*)\$" $str reco str]} {set this(sens) mothers  ; set this(cmd_daughter) [string map [list daughters mothers] $this(cmd_daughter)]}
     if {[string equal [string index $str 0] !]} {set str [string range $str 1 end]
                                                 set not 1
                                                } else {set not 0}
@@ -349,7 +389,9 @@ method Style DSL_DEF {str_name rep_name L_root recursive} {
  set this(sens)            daughters
  set this(cmd_daughter)    get_out_$this(sens)
  
- if {[regexp "^\\\((.*)\$" $str reco str]} {
+ if {[regexp {^\((.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^\\\((.*)\$" $str reco str]} {
+ #}
    if {[string equal [string index $str 0] >]} {set str [string range $str 1 end]
                                                 set rec 0} else {set rec 1}
    set rep_nesting [list]
@@ -375,8 +417,8 @@ method Style DSL_DEF {str_name rep_name L_root recursive} {
    #this DSL_SELECTOR str rep_nesting $L_root $rec
    
    set rep $n_rep
-   if {[regexp "^$this(sep)*\\)(.*)$" $str reco str]} {
-    }
+   regexp {^ *\)(.*)$} $str reco str
+   #OPTIMISATION if {[regexp "^$this(sep)*\\)(.*)$" $str reco str]} {}
   }
 
 # Reload state
@@ -431,12 +473,16 @@ method Style DSL_ID {str_name rep_name L_root recursive} {
   }
 
 # In case of negation
- if {[regexp "^$this(sep)*\\\!(.*)$" $str reco str]} {
+ if {[regexp {^ *\!(.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^$this(sep)*\\\!(.*)$" $str reco str]} {
+ #}
    set negation 1
   } else {set negation 0}
 
 # In case of parenthesis
- if {[regexp "^$this(sep)*\\\((.*)$" $str reco str]} {
+ if {[regexp {^ *\((.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^$this(sep)*\\\((.*)$" $str reco str]} {
+ #}
    this DSL_SELECTOR str rep_tmp $L_root $recursive
    if {$negation} {
      set str_all *
@@ -445,11 +491,12 @@ method Style DSL_ID {str_name rep_name L_root recursive} {
      Sub_list rep_all $rep_tmp
      set rep_tmp $rep_all
     }
-   regexp "^$this(sep)*\\\)$this(sep)*(.*)" $str reco str
+   regexp {^ *\) *(.*)$} $str reco str
+   #OPTIMISATION regexp "^$this(sep)*\\\)$this(sep)*(.*)" $str reco str
   } else {
           # In case of NAME
           set id  {}
-          if {[regexp "^$this(sep)*\\.*($this(lettre)*)(.*)$" $str reco id str]} {
+		  if {[regexp "^$this(sep)*\\.*($this(lettre)*)(.*)$" $str reco id str]} {
             set id [split $id .]
             if {[llength $id]==0} {return}
             if {$recursive} {
@@ -507,14 +554,17 @@ method Style DSL_ID {str_name rep_name L_root recursive} {
   }
 
 # In case of crochets
- if {[regexp "^$this(sep)*\\\[(.*)$" $str reco str]} {
+ if {[regexp {^ *\[(.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^$this(sep)*\\\[(.*)$" $str reco str]} {
+ #}
    foreach r $n_rep {
      set str_tmp $str
      if {[this COND_NODE str_tmp $r]} {Add_element rep $r}
     }
    set pos_end_braket [string first {]} $str]
      set str [string range $str [expr $pos_end_braket + 1] end]
-   regexp "^$this(sep)*\\\](.*)" $str reco str
+   regexp {^ *\](.*)$} $str reco str
+   #OPTIMISATION regexp "^$this(sep)*\\\](.*)" $str reco str
   } else {Add_list rep $n_rep}
   
 }
@@ -527,9 +577,17 @@ method Style Go_through_path {str_name L_root cmd} {
  set L_rep   [list]
  set n_L_rep [list]
  
+ set str_tmp $str
  this DSL_SELECTOR str L_rep $L_root 0
- Add_list n_L_rep [this Go_through_path str $L_rep $cmd]
-	
+ 
+ set L_desc [list]
+ foreach rep $L_rep {Add_list L_desc [$rep $cmd]} 
+ if {[llength $L_desc]} {
+   Add_list n_L_rep [this Go_through_path str_tmp $L_desc $cmd]
+  }
+
+ set str $str_tmp
+ 
  Add_list n_L_rep $L_root
  return $n_L_rep
 }
@@ -565,19 +623,24 @@ method Style COND_NODE {str_name node} {
  upvar $str_name str
 
  if {[this COND_NODE_AND str $node]} {return 1}
- if {[regexp "^\\|\\|$this(lexic,spaces)*(.*)$" $str reco str]} {
+ if {[regexp {^\|\| *(.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^\\|\\|$this(lexic,spaces)*(.*)$" $str reco str]} {
+ #}
    return [this COND_NODE str $node]
   }
 
  return 0
 }
+
 #___________________________________________________________________________________________________________________________________________
 # COND_NODE_AND : COND_NODE_NOT '&&' COND_NODE_AND | COND_NODE_NOT
 method Style COND_NODE_AND {str_name node} {
  upvar $str_name str
 
  if {[this COND_NODE_NOT str $node]} {} else {return 0}
- if {[regexp "^\\&\\&$this(lexic,spaces)*(.*)$" $str reco str]} {
+ if {[regexp {^\&\& *(.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^\\&\\&$this(lexic,spaces)*(.*)$" $str reco str]} {
+ #}
    return [this COND_NODE_AND str $node]
   }
  return 1
@@ -588,7 +651,9 @@ method Style COND_NODE_AND {str_name node} {
 method Style COND_NODE_NOT {str_name node} {
  upvar $str_name str
 
- if {[regexp "^!$this(lexic,spaces)*(.*)" $str reco str]} {
+ if {[regexp {^! *(.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^!$this(lexic,spaces)*(.*)" $str reco str]} {
+ #}
    if {[this COND_BASE str $node]} {return 0} else {return 1}
   } else {return [this COND_BASE str $node]}
 }
@@ -600,9 +665,12 @@ method Style COND_BASE {str_name node} {
  upvar $str_name str
 
  if {[string equal $str {}]} {return 1}
- if {[regexp "^\\((.*)$" $str reco str]} {
+ if {[regexp {^\((.*)$} $str reco str]} {
+ #OPTIMISATION if {[regexp "^\\((.*)$" $str reco str]} {
+ #}
    set str_inside [Compensate str ( ) 1]
-   set str [regexp "^$this(lexic,spaces)*(.*)$" $str reco str]
+   set str [regexp {^ *(.*)$} $str reco str]
+   #OPTIMISATION set str [regexp "^$this(lexic,spaces)*(.*)$" $str reco str]
    return [this COND_NODE str_inside $node]
   }
  
@@ -613,10 +681,7 @@ method Style COND_BASE {str_name node} {
  
  set str [lrange $str_tmp 3 end]
  
- #if {[regexp "^($this(lexic,letters)*)$this(lexic,spaces)*($this(lexic,op_cmp)*)$this(lexic,spaces)*($this(lexic,letters)*)$this(lexic,spaces)*(.*)$" $str reco acc op val str]} {
- #}
  if {1} {
-   #if \{[lsearch [gmlObject info classes $node] Physical_model] == -1\} \{set ptf $node\} else \{set ptf $\{node\}_cou_ptf\}
    set ptf $node
    if {[catch "set rep \[$node get_$acc\]" res]} {
     if {[catch "set rep \[${node} $acc\]" res]} {
