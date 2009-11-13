@@ -18,7 +18,6 @@ method PM_U_Container constructor {name descr args} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container dispose {} {
- puts "-_-_-_-_-_-_-_-_-_-_-_-_-_-_-$objName dispose"
  this inherited
 }
 

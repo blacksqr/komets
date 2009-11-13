@@ -49,7 +49,7 @@ proc set_B207_files_root {r} {global PM_BIGre_B207_files_root; set PM_BIGre_B207
 
  
 Comet_files_root     [pwd]/../
-#set_B207_files_root {C:/These/Projet Interface/BIGre/}
+if {[catch {set_B207_files_root $::env(B207_LIBRARY)/} err]} {puts "Impossible to find in system variable the location of B207 library..."}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________

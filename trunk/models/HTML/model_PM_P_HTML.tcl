@@ -223,7 +223,9 @@ method PM_HTML get_PM_root {  } {return $this(PM_root)}
 method PM_HTML set_PM_root {PM} {
  set this(PM_root) $PM
  foreach d [this get_daughters] {
-   if {[catch "$d set_PM_root {$PM}" err]} {puts "___________ set_PM_root non implemented for $d set_PM_root {$PM}"}
+   if {[catch "$d set_PM_root {$PM}" err]} {
+     #puts "___________ set_PM_root non implemented for $d set_PM_root {$PM}"
+	}
   }
 }
 

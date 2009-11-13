@@ -41,7 +41,7 @@ method PM_TK Substitute_by {PM} {
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Add_daughter {m {index -1}} {
  set rep [this inherited $m $index]
- if {$index != -1} {
+ if {$index != -1 && $index + 1 != [this get_nb_daughters]} {
    foreach PM [this get_daughters] {this Reconnect $PM}
   }
  return $rep
@@ -86,7 +86,7 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_TK Update_placement {} {
+method PM_TK Update_placement {args} {
  set PMM [this get_mothers]
  if {[catch {$PMM Reconnect} err]} {
    puts "ERROR occured in $objName PM_TK::Update_placement\n$err"
