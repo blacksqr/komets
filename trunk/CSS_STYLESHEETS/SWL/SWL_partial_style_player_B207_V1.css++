@@ -37,6 +37,6 @@
 }
 
 #$current {
-  FCT_set_player_color : 1 1 0 1;
+  FCT_set_player_color : [expr rand()] [expr rand()] [expr rand()] 1;
 }
 

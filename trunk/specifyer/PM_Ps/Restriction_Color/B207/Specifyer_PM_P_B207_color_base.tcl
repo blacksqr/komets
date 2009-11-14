@@ -37,18 +37,19 @@ Generate_PM_setters Specifyer_PM_P_B207_color_base [P_L_methodes_set_specifyer_C
 
 #___________________________________________________________________________________________________________________________________________
 method Specifyer_PM_P_B207_color_base Update_color {args} {
- #puts "$objName Update_color $args"
+ puts "$objName Update_color $args"
  if {[llength $args] == 4} {
    set r [lindex $args 0]
    set v [lindex $args 1]
    set b [lindex $args 2]
    set a [lindex $args 3]
-  } else {set r [expr 0x[string range $args 1 2] / 255.0]
+  } else {if {[string index $args 0] == "\{"} {set args [string range $args 1 end-1]}
+          set r [expr 0x[string range $args 1 2] / 255.0]
           set v [expr 0x[string range $args 3 4] / 255.0]
 		  set b [expr 0x[string range $args 5 6] / 255.0]
 		  set a 1
          }
- #puts "$objName prim_set_text \"$r $v $b $a\""
+ puts "$objName prim_set_text \"$r $v $b $a\""
  this prim_set_text "$r $v $b $a"
 }
 

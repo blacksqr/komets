@@ -206,15 +206,15 @@ method Style DSL_SELECTOR {str_name rep_name L_root recursive} {
  # }
    set L_rep_>> [this Go_through_path str $rep $this(cmd_daughter)]
 
-     set found_end_>> 0
-     while {!$found_end_>>} {
+     set found_end 0
+     while {!$found_end} {
        set pos_end_>> [string first / $str]
        if {${pos_end_>>} == -1} {break} else {set str [string range $str [expr ${pos_end_>>}+1] end]}
        if {[string equal -length 1 $str ~ ]} {set str [string range $str 1 end]; set this(cmd_daughter) get_$this(sens)}
 	   if {[string equal -length 1 $str " " ]} {set this(cmd_daughter) get_out_$this(sens)}
-       if {[string equal -length 2 $str >>]} {set str [string range $str 2 end]; set found_end_>> 1}
+       if {[string equal -length 2 $str >>]} {set str [string range $str 2 end]; set found_end 1}
       }
-     if {${found_end_>>} == 0} {this set_ERROR "A >>.../\[~\]>> expression do not end correctly, do not found the '>>' in : \nstr : $str"; return}
+     if {!$found_end} {this set_ERROR "A >>.../\[~\]>> expression do not end correctly, do not found the '>>' in : \nstr : $str"; return}
      set n_rep  [list]
 	 set L_next [list]
      foreach e ${L_rep_>>} {
