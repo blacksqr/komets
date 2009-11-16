@@ -9,6 +9,7 @@ if {!$found_Gmlobject} {
 	    puts "Impossible to load the binary version of gmlObject, trying to load the TCL version..."
 	    source [Comet_files_root]Comets/gml_Object.old_tcl
 	} else {
+	    proc gmlObject args { eval "gilObject $args"}
 	    puts "linux compiled gml lib loaded"
 	}
     }
