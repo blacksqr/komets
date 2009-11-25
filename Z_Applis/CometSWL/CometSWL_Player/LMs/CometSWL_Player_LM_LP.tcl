@@ -20,5 +20,10 @@ proc P_L_methodes_set_CometSWL_Player_COMET_RE {} {return [list {set_player_name
 Generate_LM_setters CometSWL_Player_LM_LP [P_L_methodes_set_CometSWL_Player_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
-
+#___________________________________________________________________________________________________________________________________________
+method CometSWL_Player_LM_LP set_PM_active {PM} {
+ this inherited $PM
+ $PM set_player_color [this get_player_color]
+ $PM set_player_name  [this get_player_name]
+}
 
