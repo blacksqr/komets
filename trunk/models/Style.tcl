@@ -370,6 +370,9 @@ method Style DSL_CLASS {str_name rep_name L_root recursive} {
 				}
 		
    set rep $n_rep
+   
+   # XXX DEBUG 
+   regexp {^ */(.*)$} $str reco str
   }
 
 }
@@ -417,6 +420,7 @@ method Style DSL_DEF {str_name rep_name L_root recursive} {
    #this DSL_SELECTOR str rep_nesting $L_root $rec
    
    set rep $n_rep
+   set str $str_tmp
    regexp {^ *\)(.*)$} $str reco str
    #OPTIMISATION if {[regexp "^$this(sep)*\\)(.*)$" $str reco str]} {}
   }

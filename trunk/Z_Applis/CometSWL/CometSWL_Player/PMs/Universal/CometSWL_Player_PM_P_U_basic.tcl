@@ -58,12 +58,10 @@ method CometSWL_Player_PM_P_U_basic set_LM {LM} {
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Player_PM_P_U_basic Update_player_color {} {
  if {[$this(spec_color) get_text] != [this get_player_color]} {
-   puts "  $objName want player [this get_LC] to get color [$this(spec_color) get_text]"
+   #puts "  $objName want player [this get_LC] to get color [$this(spec_color) get_text]"
    this prim_set_player_color [$this(spec_color) get_text]
   }
 }
-
-Trace CometSWL_Player_PM_P_U_basic Update_player_color
 
 #___________________________________________________________________________________________________________________________________________
 method CometSWL_Player_PM_P_U_basic Update_player_name {} {
