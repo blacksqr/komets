@@ -14,6 +14,10 @@ inherit Video_PM_P_BIGre PM_BIGre
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre constructor {name descr args} {
  this inherited $name $descr
+ 
+   set this(video_source) ""
+   set this(canal_audio)  ""
+   
    this set_GDD_id CT_Video_AUI_CUI_basic_B207
 
    set this(primitives_handle) [B_polygone]
@@ -31,7 +35,7 @@ Methodes_set_LC Video_PM_P_BIGre [P_L_methodes_set_Video] {} {}
 Methodes_get_LC Video_PM_P_BIGre [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_time_frame ffmpeg_frame_num]
+Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_time_frame ffmpeg_frame_num video_source canal_audio]
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Inverser_x {v} {
@@ -47,18 +51,18 @@ method Video_PM_P_BIGre Inverser_x {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre pipo {} {
- $this(img) Inverser_y 1
-}
-
-#___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Goto_pos_rel {percent} {
- 
+ if {$this(video_source) != "WEBCAM" && $this(video_source) != ""} {
+   set this(ffmpeg_frame_num) [expr int($percent * $this(ffmpeg_numFrames))]
+   FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $this(ffmpeg_buf)
+  }
 }
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre set_video_source {s canal_audio}  {
- if {[string equal $s WEBCAM]} {
+ set this(video_source) $s
+ set this(canal_audio)  $canal_audio
+ if {$s == "WEBCAM"} {
    set visu_cam [Visu_Cam]
    set texture [$visu_cam Info_texture]
    $this(primitives_handle) Vider
@@ -69,7 +73,7 @@ method Video_PM_P_BIGre set_video_source {s canal_audio}  {
   } else {set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
           FFMPEG_set_Synchronisation_threshold $this(ffmpeg_id) 0.11
           set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
-          set tx [FFMPEG_Width $this(ffmpeg_id)]
+          set tx [FFMPEG_Width  $this(ffmpeg_id)]
           set ty [FFMPEG_Height $this(ffmpeg_id)]
 		  set this(tx) $tx; set this(ty) $ty
 		  set this(img) [B_image]
@@ -80,7 +84,8 @@ method Video_PM_P_BIGre set_video_source {s canal_audio}  {
           set this(ffmpeg_rap_img)    [B_rappel [Interp_TCL]]
           set this(ffmpeg_start_ms)   [N_i_mere ms]; 
 		  set this(ffmpeg_frame_num)  0
-          set this(ffmpeg_time_frame) [expr int(1000/[FFMPEG_getFramerate $this(ffmpeg_id)])]
+		  set this(ffmpeg_numFrames)  [FFMPEG_numFrames    $this(ffmpeg_id)]
+          set this(ffmpeg_frame_rate) [FFMPEG_getFramerate $this(ffmpeg_id)]
           $this(ffmpeg_rap_img) Texte "$objName Update_frame"
 
          # Sound
@@ -107,7 +112,7 @@ method Video_PM_P_BIGre set_video_source {s canal_audio}  {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Update_frame {} {
  set ms [N_i_mere ms]; 
- set num [expr int(($ms - [this get_ffmpeg_start_ms])/[this get_ffmpeg_time_frame])]
+ set num [expr int(($ms - [this get_ffmpeg_start_ms])*$this(ffmpeg_frame_rate)/1000.0)]
  if {$num != [this get_ffmpeg_frame_num]} {
    this set_ffmpeg_frame_num $num
    FFMPEG_getImage $this(ffmpeg_id) $this(ffmpeg_buf)
@@ -120,3 +125,4 @@ method Video_PM_P_BIGre Update_frame {} {
 method Video_PM_P_BIGre set_translucidity {v}  {
  $this(primitives_handle) Couleur 3 $v
 }
+

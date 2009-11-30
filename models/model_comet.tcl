@@ -1611,7 +1611,7 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
 															     break
 			                                                    }
 			 }
-			puts " | $gdd_req"
+			#puts " | $gdd_req"
 			if {[catch {$dsl_q QUERY $gdd_req} res]} {puts "ERROR in style query ($dsl_q QUERY $gdd_req):\n$res\n    _____"} else {
               set L_nodes [list]
               foreach n [$dsl_q get_Result] {
@@ -1705,7 +1705,7 @@ method Logical_model Update_factories {L_nodes} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Update_factories {L_nodes} {
- puts "$objName Update_factories \{$L_nodes\}"
+ #puts "$objName Update_factories \{$L_nodes\}"
  # Retrieve factories from nodes list
  # Not all factories are convenient for this PM, we have to filtred
  set L_factories [list]
