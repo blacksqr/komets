@@ -76,7 +76,7 @@ inherit Interleaving_PM_P_nav_mono_TK_menu Interleaving_PM_P_nav_mono_TK
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_nav_mono_TK_menu constructor {name descr args} {
- set this(var_name) "${objName}_var"
+ set this(var_name) "${objName}_var" 
    this set_GDD_id ScrollableMonospaceInterleaving_TK
    this inherited $name $descr
  eval "$objName configure $args"
@@ -85,20 +85,25 @@ method Interleaving_PM_P_nav_mono_TK_menu constructor {name descr args} {
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_nav_mono_TK_menu get_or_create_prims {root} {
 # Define the handle
-  set menu_name "${root}.tk_menu"
-
- if {[winfo exists $menu_name]} {
-  } else {set LC [this get_LC]
-          eval tk_optionMenu $menu_name "${objName}_var" "Interlaced comets" ""
+ set this(root_name)           ${root}._${objName}_top_frame
+ set this(daughters_root_name) $this(root_name).frame_daughters
+ set this(menu_name)           $this(root_name).menu
+ 
+ if {![winfo exists $this(root_name)]} {
+          frame $this(root_name)
+		  frame $this(daughters_root_name)
+		  eval tk_optionMenu $this(menu_name) "${objName}_var" "Interlaced comets" ""
+		  pack $this(menu_name)                     -fill x
+		  pack $this(daughters_root_name) -expand 1 -fill both
          }
 
 
- this set_prim_handle $menu_name
- this set_root_for_daughters $root
+ this set_prim_handle        $this(root_name)
+ this set_root_for_daughters $this(daughters_root_name)
 
  this maj_interleaved_daughters
 
- return [this set_prim_handle $menu_name]
+ return [this set_prim_handle $this(root_name)]
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -115,15 +120,15 @@ method Interleaving_PM_P_nav_mono_TK_menu maj_interleaved_daughters {} {
  set racine  [lindex $L_prims 0]
  if {[winfo exists $racine]} {
   } else {if { $debug } { puts "  $objName : Racine $racine do not exists" }
-	  return
+	      return
          }
 
  set LC           [$this(LM) get_LC]
  set LC_daughters [$LC get_daughters]
- $racine.menu delete 0 last
+ $this(menu_name).menu delete 0 last
 
  foreach c $LC_daughters {
-   $racine.menu add radiobutton -label [$c get_name] -command "set ${objName}_var \"[$c get_name]\";\
+   $this(menu_name).menu add radiobutton -label [$c get_name] -command "set ${objName}_var \"[$c get_name]\";\
                                                                $objName set_current_LC_daughter $c"
   }
 
