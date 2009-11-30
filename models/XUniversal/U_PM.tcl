@@ -103,7 +103,7 @@ method PM_Universal Add_prim_daughter {c Lprims {index -1}} {
  set rep [$m Add_prim_daughter $c $Lprims $index]
  
  # DEBUG Manage the hidden elements
- #puts "  ___ $c Hide_Elements $this(L_prim_undisplayed)"
+ #puts "$objName PM_Universal:Add_prim_daughter => $c Hide_Elements"
  eval "$c Hide_Elements $this(L_prim_undisplayed)"
 
  #puts "  rep2 : $rep"

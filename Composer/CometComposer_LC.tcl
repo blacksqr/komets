@@ -17,6 +17,8 @@ method CometComposer constructor {name descr args} {
    CometComposer_LM_P  $this(LM_LP) $this(LM_LP) "The logical presentation of $name"
    this Add_LM $this(LM_LP);
 
+ this set_default_op_gdd_file    "[Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++"
+
  eval "$objName configure $args"
  return $objName
 }
@@ -34,7 +36,7 @@ Methodes_get_LC CometComposer [L_methodes_get_CommonFC_CometComposer_LC] {$this(
 
 #___________________________________________________________________________________________________________________________________________
 method CometComposer Recompose {composition L_Comets links ID_prefixe {destroy_L_comets 0}} {
- puts "$objName Recompose $composition {$L_Comets}"
+ #puts "$objName Recompose $composition {$L_Comets}"
  this set_handle_composing_comet "" ""
  if { $this(C_composition) != "" } {$this(C_composition) dispose; set this(C_composition) ""}
  if {$destroy_L_comets} {
@@ -49,7 +51,7 @@ method CometComposer Recompose {composition L_Comets links ID_prefixe {destroy_L
 
 # Subscribe to the creation of new PM
  foreach C $L_Comets {
-   puts "  ${C}_LM_LP Subscribe_to_set_PM_active $objName {$objName New_PM_active_for $C \$PM}"
+   #puts "  ${C}_LM_LP Subscribe_to_set_PM_active $objName {$objName New_PM_active_for $C \$PM}"
    ${C}_LM_LP Subscribe_to_set_PM_active $objName "$objName New_PM_active_for $C \$PM"
   }
   
@@ -85,12 +87,15 @@ method CometComposer Propagate_change_from_to {v Comet1 Concept1 Comet2 Concept2
 
 #___________________________________________________________________________________________________________________________________________
 method CometComposer set_redundancy {v} {
+ if {$this(adding_New_composing_PM_plugged)} {return}
+ 
  # If yes, display everything
  # If no then undisplay everything and call set_spaces
  set L_PM [CSS++ cr "#${objName}->PMs *"]
  if {$v} {
    foreach PM $L_PM {
-     $PM Hide_Elements
+     #puts "CometComposer::set_redundancy 1 => $PM Hide_Elements"
+	 $PM Hide_Elements
     }
   } else {foreach PM $L_PM {
             $PM Hide_Elements *
@@ -105,12 +110,15 @@ method CometComposer set_redundancy {v} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometComposer set_spaces {str} {
+ if {$this(adding_New_composing_PM_plugged)} {return}
+ 
  set L_spaces [split $str ";"]
  foreach space L_spaces {
    set root    [lindex $space 0]
    set L_marks [lrange $space 2 end]
    foreach PM [CSS++ cr "#${objName}->PMs <--< \\$root/   ($L_marks)"] {
-     $PM Hide_Elements
+     #puts "CometComposer::set_spaces => $PM Hide_Elements"
+	 $PM Hide_Elements
     }
   }
   
@@ -130,13 +138,16 @@ method CometComposer New_composing_PM_plugged {C PM} {
  if {$this(adding_New_composing_PM_plugged)} {return}
  set this(adding_New_composing_PM_plugged) 1
 
- if {[this get_redundancy]} {
-   #$PM Hide_Elements
+ #puts "$objName New_composing_PM_plugged $C $PM"
+ if {0 && [this get_redundancy]} {
+   $PM Hide_Elements
+   #puts "  Redundancy !"
+   set this(adding_New_composing_PM_plugged) 0
    return
   }
 
- #puts "$objName : Talking about $PM"
- #$PM Hide_Elements *
+ #puts "CometComposer:New_composing_PM_plugged 1 => $PM Hide_Elements"
+ $PM Hide_Elements *
  set L_spaces [split [this get_spaces] ";"]
  foreach space $L_spaces {
    set root    [lindex $space 0]
@@ -144,11 +155,24 @@ method CometComposer New_composing_PM_plugged {C PM} {
    #puts "--space : $space\n  root $root should display {$L_marks}"
    if {[lsearch $L_marks [$C Val_MetaData id]] != -1} {
      if {[CSS++ cr "#$PM <--< $root"] != ""} {
-	   #puts "  $PM Hide_Elements"
-	   #$PM Hide_Elements 
+	   #puts "  $PM has $root for ancestor => Show_elements 0 *"
+	   #puts "CometComposer:New_composing_PM_plugged 2 => $PM Hide_Elements"
+	   $PM Hide_Elements
 	  }
     }
   }
-  
+ 
+ set this(last_ms_to_trigger_style_update) [clock milliseconds]
+ after 100 "$objName Do_style! $this(last_ms_to_trigger_style_update)"
  set this(adding_New_composing_PM_plugged) 0
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometComposer Do_style! {ms} {
+ if {$this(last_ms_to_trigger_style_update) == $ms} {
+   set this(adding_New_composing_PM_plugged) 1
+   #puts "$objName Apply_default_style"
+   this Apply_default_style
+   set this(adding_New_composing_PM_plugged) 0
+  }
 }

@@ -1981,7 +1981,8 @@ method Logical_model set_PM_active   {PM} {set added [Add_element this(L_actives
                                            if {$added} {# Add PM in the hierarchy
                                                         this Add_PM $PM
                                                         $PM set_LM $objName
-                                                        $PM Add_EE_successor [this get_Handle_EE]
+														#catch {$PM Hide_Elements}
+                                                        #$PM Add_EE_successor [this get_Handle_EE]
                                                         # INSERT CALLBACKS HERE
                                                         return 1
                                                        }
@@ -1990,7 +1991,7 @@ method Logical_model set_PM_active   {PM} {set added [Add_element this(L_actives
 method Logical_model set_PM_inactive {PM} {set subed [Sub_element this(L_actives_PM) $PM]
                                            if {$subed} {# Recursively sub in the PM hierarchy
                                                         #$PM set_LM {}
-                                                        $PM Sub_EE_successor [this get_Handle_EE]
+                                                        #$PM Sub_EE_successor [this get_Handle_EE]
                                                         # INSERT CALLBACKS HERE
                                                         return 1
                                                        }
@@ -2473,6 +2474,7 @@ method Physical_model get_PRIM_STYLE_CLASS {L_tags} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Hide_Elements args {
+ #puts " Go with $args"
  this Show_elements 0 *
  this Show_elements 1 *
  #puts "_____$objName Physical_model::Hide_Elements $args"
@@ -2488,15 +2490,15 @@ method Physical_model Show_elements {b L_tags} {
  if {$b == 0} {
    Add_list this(hiden_prim_elements) $L_tags
   } else {Sub_list this(hiden_prim_elements) $L_tags}
- if {[string equal $L_tags ""]} {
+ if {[llength $L_tags] == 0} {
    this Show_elements_prims $b [this get_prim_handle]
-  } else {set L_PM {}
+  } else {set L_PM [list]
           foreach tags $L_tags {set L_PM [concat $L_PM [CSS++ $objName "(#$objName\(> *->LC.$tags, (*->LC *.$tags) \))->PMs"]]}
 		  foreach PM $L_PM {$PM Show_elements $b ""}
 		  #puts "  Inner COMETs : {$L_PM}"
 		  set L_prims [this get_PRIM_STYLE_CLASS $L_tags]
-		  #puts "  Primitives : {$L_prims}"
-		  if {![string equal $L_prims ""]} {this Show_elements_prims $b $L_prims}
+		  #puts "  Primitives to $b : {$L_prims}"
+		  if {[llength $L_prims] > 0} {this Show_elements_prims $b $L_prims}
          }
 }
 
@@ -2690,7 +2692,7 @@ method Physical_model Add_prim_mother   {c Lprims {index -1}} {return 1}
 method Physical_model Sub_prim_mother   {c Lprims {index -1}} {return 1}
 method Physical_model Add_prim_daughter {c Lprims {index -1}} {set rep 1
                                                              foreach p $Lprims {
-                                                               if {[string equal $p NULL]} {continue}
+                                                               if {$p == "NULL"} {continue}
                                                                if {[catch {eval [$c get_cmd_placement]} err]} {
                                                                  #puts " XXX ERROR XXX $objName Add_prim_daughter \{$Lprims\} $index"
                                                                  #puts "               $err"

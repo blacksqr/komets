@@ -7,9 +7,9 @@ inherit PM_TK Physical_model
 #___________________________________________________________________________________________________________________________________________
 method PM_TK constructor {name {descr {}}} {          
  this inherited $name $descr
- set this(root)              {}
- this set_cmd_deconnect      {pack forget $p}
- set this(L_prim_undisplayed) ""
+ set this(root)               {}
+ this set_cmd_deconnect       {pack forget $p}
+ set this(L_prim_undisplayed) [list]
 
 # Let's define a command that can overload the connection specified in the mother
  set this(cmd_connect_to_mother) ""
@@ -60,13 +60,15 @@ method PM_TK set_cmd_connect_to_mother {args} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Show_elements_prims {b L_prims} {
- #puts "$objName PM_TK::Show_elements_prims $b"
+ #puts "  $objName PM_TK::Show_elements_prims $b"
  if {$b} {
    Sub_list this(L_prim_undisplayed) $L_prims
   } else {set this(L_prim_undisplayed) [Liste_Union $this(L_prim_undisplayed) $L_prims]
          }
 #puts "Undisplay list : {$this(L_prim_undisplayed)}"
- [this get_mothers] Reconnect $objName
+ if {[catch {[this get_mothers] Reconnect $objName} err]} {
+   puts "Show_elements_prims:ERROR occured in $objName PM_TK::Update_placement\n$err"
+  }
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -80,7 +82,7 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
     }
   }
  foreach p $this(L_prim_undisplayed) {
-   if {[catch "pack forget $p" err]} {puts "ERROR : $err"}
+   if {[catch "pack forget $p" err]} {puts "$objName Add_prim_mother:ERROR pack forget : $err"}
   }
  return $rep
 }
@@ -89,7 +91,7 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
 method PM_TK Update_placement {args} {
  set PMM [this get_mothers]
  if {[catch {$PMM Reconnect} err]} {
-   puts "ERROR occured in $objName PM_TK::Update_placement\n$err"
+   puts "Update_placement:ERROR occured in $objName PM_TK::Update_placement\n$err"
   }
 }
 
@@ -139,7 +141,10 @@ method PM_TK set_cmd_placement_daughters {args} {
  set this(cmd_placement_daughters) $args
  if {[catch "eval $this(cmd_placement_daughters)" err]} {
    puts "___!!!___ERROR in $objName set_cmd_placement_daughters $args :\n$err"
+   return 0
   }
+  
+ return 1
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -150,18 +155,25 @@ method PM_TK Add_prim_daughter {c Lprims {index -1}} {global debug
 														  puts "___!!!___ERROR in $objName Add_prim_daughter $c {$Lprims} $index :\n$err"
 														 }
 													   }
-                                                      if {[expr $rep==0]} {
+                                                      if {!$rep} {
                                                         set L [this get_prim_handle]
                                                         if {[expr [llength $L]==1 && [llength $Lprims]==1]} {
                                                           if {$debug} {puts "       ERROR gave rise to \"pack forget $L\""}
 #                                                          pack forget $L
                                                          }
                                                        } else {set L [this get_prim_handle]
-#                                                               if {[expr [llength $L]==1]} {if {[winfo ismapped $L]} {} else {puts "Misère de misère dans $objName Add_prim_daughter, obligé de faire un pack $L"; pack $L}
-#                                                                                           }
                                                               }
                                                     return $rep
                                                    }
+												   
+#___________________________________________________________________________________________________________________________________________
+method PM_TK set_prim_handle {h} {
+ if {![this Has_MetaData PRIM_STYLE_CLASS]} {
+   this Add_MetaData PRIM_STYLE_CLASS [list $h ROOT]
+  }
+ return [this inherited $h]
+}
+
 #___________________________________________________________________________________________________________________________________________
 method PM_TK get_prim_handle {{index -1}}  {
  set n [lindex $this(primitives_handle) 0]
