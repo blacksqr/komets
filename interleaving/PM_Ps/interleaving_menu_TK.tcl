@@ -30,18 +30,18 @@ method Interleaving_PM_P_menu_TK get_or_create_prims {root} {
    set this(pipo_frame) "$top.pipo_frame"
    frame $this(pipo_frame)
   }
- if {![winfo exists $menu_name.$objName]} {
-   menu $menu_name.$objName -tearoff 0
+ if {![winfo exists $menu_name._$objName]} {
+   menu $menu_name._$objName -tearoff 0
   }
- $menu_name add cascade -menu $menu_name.$objName -label [[this get_LC] get_name]
+ $menu_name add cascade -menu $menu_name._$objName -label [[this get_LC] get_name]
  $top configure -menu $menu_name
 
- this set_prim_handle "$menu_name.$objName"
+ this set_prim_handle "$menu_name._$objName"
  this set_root_for_daughters $this(pipo_frame)
 
  this maj_interleaved_daughters
 
- return [this set_prim_handle $menu_name.$objName]
+ return [this set_prim_handle $menu_name._$objName]
 }
 
 #__________________________________________________
