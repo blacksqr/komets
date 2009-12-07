@@ -16,7 +16,7 @@ $(document).ready(function() {
 		$("#IP_client").val(ip);
 	}
 	catch(err) {
-		alert("Votre navigateur ne gÃ¨re pas le java");
+		//alert("Votre navigateur ne gère pas le java");
 		ip = '127.0.0.1';
 		$("#IP_client").val(ip);
 	}
