@@ -11,7 +11,9 @@
 }
 
 #$current(ACT.ADD.PLANET)  {
-  FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "$obj Add_Params \"ray 80 planet \[CPool get_a_comet CometSWL_Planet]\"" UNIQUE ;
+  FCT_Subscribe_to_Trigger_prim_activate : __FOREACH_PM__SWL "set new_planet \[CPool get_a_comet CometSWL_Planet\] 
+                                                              puts \$new_planet
+															  $obj Add_Params \"ray 80 planet \$new_planet\"" UNIQUE ;
 }
 
 #$current(CONT.OP_EDITION)  {
