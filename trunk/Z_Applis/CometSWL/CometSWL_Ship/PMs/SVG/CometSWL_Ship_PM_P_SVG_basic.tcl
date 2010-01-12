@@ -117,7 +117,6 @@ method CometSWL_Ship_PM_P_SVG_basic Render {strm_name {dec {}}} {
 
  
  append strm "<g id=\"${objName}\" transform=\"translate([this get_X],[this get_Y])\">\n"
-   append strm "<circle id=\"${objName}_drag\" cx=\"0\" cy=\"0\" r=\"10\" fill=\"#$r$g$b\" stroke=\"black\" stroke-width=\"1\" />\n"
    if {[this get_mode] == "game"} { 
        set pi 3.1415926535897931
 	   set angle [expr [this get_angle]*(180/$pi)]
