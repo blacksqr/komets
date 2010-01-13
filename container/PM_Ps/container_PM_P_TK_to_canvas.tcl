@@ -63,5 +63,10 @@ method Container_PM_P_TK_to_canvas Move {x y} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Container_PM_P_TK_to_canvas Zoom {e factor x y} {
+ $this(canvas) scale $e $x $y $factor $factor
+}
+
+#___________________________________________________________________________________________________________________________________________
 #Trace Container_PM_P_TK_to_canvas set_current_element
 #Trace Container_PM_P_TK_to_canvas Move

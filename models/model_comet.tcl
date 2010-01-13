@@ -1890,16 +1890,15 @@ method Logical_model Ptf_style {L_ptf_type} {
 
  foreach ptf_type $L_ptf_type {
    # Get the PMs matching the ptf
-   set ptf  [lindex $ptf_type 0]
-   set type [lindex $ptf_type 1]
-   set L_PMs {}
+   lassign $ptf_type ptf type
+   set L_PMs [list]
    foreach PM [this get_L_actives_PM] {
      if {[$ptf Accept_for_daughter ${PM}_cou_ptf]} {
        lappend L_PMs $PM
       }
     }
    # Replace them by new type
-   set L_PM_to_do {}
+   set L_PM_to_do [list]
    foreach PM $L_PMs {
      # Do we have a pre existing PM corresponding to type?
      if {[$PM Has_for_styles $type]} {continue}
@@ -2198,11 +2197,13 @@ global debug
                   set PMD ""
                   foreach factory $L_factories {
                     set PMD [$factory Generate [$LMD get_LC] $LMD]
-                    #puts "Logical_model Connect_PM_descendants, a PM has been factoried:\n  LM : $objName\n  $PMD"
-                    if {[string length $PMD]} {break}
+                    #puts "  Logical_model Connect_PM_descendants, a PM has been factoried:\n  LM : $objName\n  $PMD"
+                    if {$PMD != ""} {
+					  if {[$PM Accept_PM_for_daughter $PMD]} {break} else {set PMD ""}
+					 } 
                    }
-                  if {[string length $PMD]} {
-                    #puts "  $PM Add_daughter $PMD created from factory"
+                  if {$PMD != ""} {
+                    #puts "   $PM Add_daughter $PMD created from factory"
                     if {[$PM Add_daughter $PMD $index]} {
                     #puts "  $LMD Connect_PM_descendants $PMD"
                       $LMD Connect_PM_descendants $PMD
