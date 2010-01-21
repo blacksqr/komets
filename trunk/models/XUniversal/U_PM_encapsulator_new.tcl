@@ -136,6 +136,19 @@ proc get_PM_encaps_class_for_PM {PM} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+proc U_encapsulator_PM_techno {ptf PM graph {handle_for_daughters {}}} {
+ set PM_encaps [U_encapsulator_PM $PM $graph $handle_for_daughters]
+ [[$PM_encaps get_cou] get_ptf] maj $ptf
+ if {[llength [$PM_encaps get_mothers]]} {
+   $PM_encaps set_mode_plug Full
+   [$PM_encaps get_LM] Connect_PM_descendants $PM_encaps [$PM_encaps get_L_nested_handle_LM]
+   set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
+   $PM_encaps set_L_nested_daughters_PM [CSS++ $PM_encaps "#$PM_encaps ~ ($L)"]
+  }
+}
+
+
+#___________________________________________________________________________________________________________________________________________
 proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
  #puts "U_encapsulator_PM {$PM} {$graph}"
 # Save PM mothers and daughters

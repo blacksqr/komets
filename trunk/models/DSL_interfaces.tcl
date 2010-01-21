@@ -101,7 +101,7 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 			  if {$gdd_task_node == ""} {set gdd_task_node $type}
 			  #puts "gdd_task_node = $gdd_task_node"
 			  # Identifier son usine
-			  if {[$gdd_task_node get_L_factories] == ""} {
+			  if {[llength [$gdd_task_node get_L_factories]] == 0} {
 			    $this(dsl_gdd) QUERY "?n : $gdd_task_node : NODE()->REL(type~=GDD_inheritance)*->\$n()->REL(type==GDD_restriction)->NODE(name==IS_root)"
 				set gdd_rep          [lindex [$this(dsl_gdd) get_Result] 0] 
 				set root_restriction [lindex [lindex $gdd_rep 1] 0]
