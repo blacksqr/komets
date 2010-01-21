@@ -19,7 +19,7 @@ method PM_factory dispose {} {
 }
 
 #_________________________________________________________________________________________________________
-Generate_accessors PM_factory classes
+Generate_accessors PM_factory [list classes ptf]
 
 #_________________________________________________________________________________________________________
 method PM_factory Is_symetrically_compatible_with_ptf {ptf} {

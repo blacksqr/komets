@@ -17,6 +17,10 @@ method Video_PM_P_HTML constructor {name descr args} {
  return $objName
 }
 
+#___________________________________________________________________________________________________________________________________________
+Methodes_set_LC Video_PM_P_HTML [P_L_methodes_set_Video] {} {}
+Methodes_get_LC Video_PM_P_HTML [P_L_methodes_get_Video] {$this(FC)}
+
 #_________________________________________________________________________________________________________________________________
 Generate_accessors Video_PM_P_HTML [list url]
 

@@ -59,11 +59,14 @@ method Video_PM_P_BIGre Goto_pos_rel {percent} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre get_visu_cam {}  {return $this(visu_cam)}
+
+#___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre set_video_source {s canal_audio}  {
  set this(video_source) $s
  set this(canal_audio)  $canal_audio
  if {$s == "WEBCAM"} {
-   set visu_cam [Visu_Cam]
+   set visu_cam [Visu_Cam]; set this(visu_cam) $visu_cam
    set texture [$visu_cam Info_texture]
    $this(primitives_handle) Vider
    set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
