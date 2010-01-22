@@ -6,7 +6,7 @@ inherit Container_PM_P_TK_to_canvas PM_TK
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_TK_to_canvas constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id Container_CUI_TK_to_canvas
+   this set_GDD_id Container_FUI_bridge_TK_to_CANVAS_frame
    [[this get_cou] get_ptf] maj Ptf_TK_to_CANVAS
    set this(canvas) ""
    set this(current_element) ""
