@@ -13,8 +13,9 @@ method PM_U_encapsulator constructor {name descr PM_core args} {
  this inherited $name $descr
    set this(L_created)    [list]
    set this(core)         $PM_core
-   set CFC                [$PM_core get_Common_FC]
    set LM                 [$PM_core get_LM]
+   #set CFC                [$PM_core get_Common_FC]
+   set CFC                $LM
    set this(core_factice_LC) "${objName}_Fake_LC_of_$PM_core"
    set this(core_factice_LM) "$this(core_factice_LC)_LM_LP"
    this set_nesting_element [$PM_core get_nesting_element]
@@ -177,7 +178,7 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
  $PM_encaps Add_MetaData Encapsulated_graph $graph
  set obj [$PM_encaps get_core_factice_LC]
    set graph [string map [list {$obj(} "${obj}(" {$obj} "${obj}()"] $graph]
-   #puts "interpretor_DSL_comet_interface Interprets {$graph} $PM"
+   #puts "interpretor_DSL_comet_interface Interprets {$graph} \[$PM_encaps get_core_factice_LC\]_nesting_root_name"
    set L_res_Comets [interpretor_DSL_comet_interface Interprets $graph [$PM_encaps get_core_factice_LC]_nesting_root_name]
    
      foreach C "[lindex $L_res_Comets 0] [lindex $L_res_Comets 1]" {$C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps}

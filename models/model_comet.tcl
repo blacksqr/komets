@@ -2196,16 +2196,13 @@ global debug
                 if {[llength $L_factories]} {
                   set PMD ""
                   foreach factory $L_factories {
-                    set PMD [$factory Generate [$LMD get_LC] $LMD]
-                    #puts "  Logical_model Connect_PM_descendants, a PM has been factoried:\n  LM : $objName\n  $PMD"
-                    if {$PMD != ""} {
+					set PMD [$factory Generate [$LMD get_LC] $LMD]
+					if {$PMD != ""} {
 					  if {[$PM Accept_PM_for_daughter $PMD]} {break} else {set PMD ""}
 					 } 
                    }
                   if {$PMD != ""} {
-                    #puts "   $PM Add_daughter $PMD created from factory"
-                    if {[$PM Add_daughter $PMD $index]} {
-                    #puts "  $LMD Connect_PM_descendants $PMD"
+					if {[$PM Add_daughter $PMD $index]} {
                       $LMD Connect_PM_descendants $PMD
 					 }
                    }

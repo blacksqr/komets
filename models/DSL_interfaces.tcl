@@ -73,13 +73,18 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
    set type [lindex $arbre 0]
    set argu [lindex $arbre 1]
    set fils [lindex $arbre 2]
- if {[string length $name] == 0} {
+ if {$name == ""} {
    set name $prefixe
   }
 
 # Est ce un type constructeur ?
+ #puts "$objName DSL_interface_interpretor::DSL\n  L_name  = $L_name\n  prefixe = $prefixe"
+ #puts "  type = $type"
+ #puts "_________________"
+ #puts "  What is $name ?"
  set L_comets_created [list]
  if {[info exists this(lexic,$type)]} {
+   #puts "    => A constructor"
    set txt "$this(lexic,$type) $name $name {Automatically generated using the CometInterface DSL $objName} $argu"
    set type $this(lexic,$type)
    if {![gmlObject info exists object $name]} {
@@ -88,19 +93,20 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 	} else {eval "$name configure $argu"; $name set_daughters_R {}}
 # Est ce un nom de variable ?
   } else {if {[gmlObject info exists object $type]} {
+            #puts "    => A variable"
             set name $type
-            #puts "$type est un objet."
+            puts "$type est un objet."
 			# Est ce le nom d'un noeud du GDD ?							 
             if {$type == "GDD_Node" || [lsearch [gmlObject info classes $type] GDD_Node] >= 0} {
-			  #puts "In $objName : Reference to a GDD node : $type"
+			  #puts "    => A GDD_node"
 			  # Retrouver le LC correspondant dans le GDD
 			  $this(dsl_gdd) QUERY "?n : $type : NODE()->REL(type~=GDD_inheritance && type!=GDD_restriction)*->\$n()"
               set gdd_rep       [lindex [$this(dsl_gdd) get_Result] 0] 
 			  #puts "gdd_rep = $gdd_rep"
 			  set gdd_task_node [lindex [lindex $gdd_rep 1] 0]
 			  if {$gdd_task_node == ""} {set gdd_task_node $type}
-			  #puts "gdd_task_node = $gdd_task_node"
-			  # Identifier son usine
+
+			  # Identifier l'usine du LC correspondant
 			  if {[llength [$gdd_task_node get_L_factories]] == 0} {
 			    $this(dsl_gdd) QUERY "?n : $gdd_task_node : NODE()->REL(type~=GDD_inheritance)*->\$n()->REL(type==GDD_restriction)->NODE(name==IS_root)"
 				set gdd_rep          [lindex [$this(dsl_gdd) get_Result] 0] 
@@ -110,32 +116,51 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 			   } else {set factory [lindex [$gdd_task_node get_L_factories] 0]
 			           #puts "factory = $factory"
 			          }
+
 			  # Trouver toutes les implementations de $type et les donner comme usines de l'instance
 			  set name $factory
 			  set txt "set name \[CPool get_a_comet $factory $argu\]"
 			  eval $txt
 			  lappend L_comets_created $name
+
 			  # Ajouter les usines correspondants aux autres implémentations de la même tâche
-			  #puts "Reste à ajouter les bonnes usines pour $type rendu dans $name"
-			  # Add right factories
-			  set req_gdd_direct_implem "?n : $type : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
-			  set req_gdd_all_implem    "?n : $gdd_task_node : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
-			  #puts $req_gdd_direct_implem
-			  $this(dsl_gdd) QUERY $req_gdd_direct_implem; set res_gdd [$this(dsl_gdd) get_Result]
-				#puts "  res_gdd : {$res_gdd}"
-				set L_nodes_implem [lindex [lindex $res_gdd 0] 1]
-			  # Add other factories
-			  #puts $req_gdd_all_implem
-			  $this(dsl_gdd) QUERY $req_gdd_all_implem; set res_gdd [$this(dsl_gdd) get_Result]
-				#puts "  res_gdd : {$res_gdd}"
-			    Add_list L_nodes_implem [lindex [lindex $res_gdd 0] 1]
-				#puts "${name}_LM_LP Update_factories $L_nodes_implem"
-			    ${name}_LM_LP Update_factories $L_nodes_implem
+			  # Vérifier avant si le type demandé à l'origine n'est pas une CUI, auquel cas il faut ne laisser que lui comme usine
+			  set L_PM_factories ""
+			  set cameleon_type ""
+			  #puts "  set cameleon_type \[$type get_type\]"
+			  catch {set cameleon_type [$type get_type]}
+			  if {$cameleon_type == "GDD_FUI"} {
+			    set L_PM_factories [$type get_L_factories]
+				set fact [lindex $L_PM_factories 0]
+				if {[llength $L_PM_factories] > 0} {
+				  ${name}_LM_LP set_PM_factories [Generate_factories_for_PM_type [list "$fact [$type get_ptf]" \
+                                                                                 ] ${name}_LM_LP]
+				 }
+			   }
+			  
+			  if {$L_PM_factories == ""} {
+					  set req_gdd_direct_implem "?n : $type : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
+					  set req_gdd_all_implem    "?n : $gdd_task_node : NODE()<-REL(type~=GDD_inheritance && type!=GDD_restriction)*<REL(type~=GDD_implementation)<-\$n()"
+					  #puts $req_gdd_direct_implem
+					  $this(dsl_gdd) QUERY $req_gdd_direct_implem; set res_gdd [$this(dsl_gdd) get_Result]
+						#puts "  res_gdd : {$res_gdd}"
+						set L_nodes_implem [lindex [lindex $res_gdd 0] 1]
+					  
+					  # Add other factories
+					  #puts $req_gdd_all_implem
+					  $this(dsl_gdd) QUERY $req_gdd_all_implem; set res_gdd [$this(dsl_gdd) get_Result]
+						#puts "  res_gdd : {$res_gdd}"
+						Add_list L_nodes_implem [lindex [lindex $res_gdd 0] 1]
+						#puts "${name}_LM_LP Update_factories $L_nodes_implem"
+						${name}_LM_LP Update_factories $L_nodes_implem
+					  }
 			 }
            } else {global $type
                    if {[info exists $type]} {
-                     set name $type
+                     #puts "    => Something that still exists"
+					 set name $type
                     } else {if {[gmlObject info exists class $type]} {
+					         #puts "    => A class name"
 		                     # C'est un nom de classe, est ce un élément de COMET ?
                              if {$type == "Logical_consistency" || [lsearch [gmlObject info classes $type] Logical_consistency] >= 0} {
 							   set txt "set name \[CPool get_a_comet $type $argu\]"
@@ -143,7 +168,7 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 							   lappend L_comets_created $name
 							  }
 							 } else {if {[regexp {^@([0-9]*)} $type reco ad]} {
-                                       return $ad
+									   return $ad
                                       } else {puts "ERROR in DSL;\n   \"$type\" is neither a constructor nor a comet : [info exists $type]"}
 						            } 
 				            } 

@@ -7,7 +7,7 @@ method PM_factory constructor {ptf c cmd} {
  $this(ptf) maj $ptf
  set this(cmd_gen) $cmd
  set this(classes) $c
- append this(classes) { } [gmlObject info classes $c]
+ catch {append this(classes) { } [gmlObject info classes $c]}
 
  return $objName
 }
@@ -44,10 +44,8 @@ method PM_factory Generate {prefixe LM {nb 1}} {
 
  for {set i 0} {$i < $nb} {incr i} {
    set name "${prefixe}_PM_P_[$LM get_a_unique_id]"
-   while {[gmlObject info exists object $name]} {
-     set name "${prefixe}_PM_P_[$LM get_a_unique_id]"
-    }
-   if {[catch $this(cmd_gen) res]} {
+   while {[gmlObject info exists object $name]} {set name "${prefixe}_PM_P_[$LM get_a_unique_id]"}
+   if {[catch "set name \[$this(cmd_gen)\]" res]} {
      puts "Factory $objName failed :\n  cmd : $this(cmd_gen)\n  res : $res"
     } else {lappend L $name
             $LM Add_PM $name; $LM set_PM_active $name
