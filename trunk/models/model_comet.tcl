@@ -198,12 +198,25 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
 
 #_________________________________________________________________________________________________________
 proc Inject_code {C mtd code_bgn code_end {mark {INJECTED_CODE}}} {
- Add_aspect $C $mtd ${mark}_BEGIN $code_bgn begin
- Add_aspect $C $mtd ${mark}_END   $code_end end
+ set original_body [gmlObject info body $C $mtd];
+ set pipo PIPO_Inject_code_$C$mtd
+ method $C $mtd [gmlObject info arglist $C $mtd] $pipo
+ 
+ set res [Add_aspect $C $mtd ${mark}_BEGIN $code_bgn begin]
+ if {$res != ""} {
+   set body [string map [list $pipo ""] $res]
+   set res2 [Add_aspect $C $mtd ${mark}_END   $code_end end 0]
+   set body $body$res2
+   puts $body
+  } else {Add_aspect $C $mtd ${mark}_END   $code_end end
+          set body [gmlObject info body $C $mtd]
+		 }
+  
+ method $C $mtd [gmlObject info arglist $C $mtd] [string map [list $pipo $original_body] $body]
 }
 
 #_________________________________________________________________________________________________________
-proc Add_aspect {c m mark code {position begin}} {
+proc Add_aspect {c m mark code {position begin} {do_eval 1}} {
  # Get the existing body
  set body [gmlObject info body $c $m]
  
@@ -219,7 +232,13 @@ proc Add_aspect {c m mark code {position begin}} {
 
  # Enter the new body into the TCL interpretor by building the command
  set   cmd "method $c $m {[gmlObject info arglist $c $m]} {\n$body}"
- eval $cmd
+ 
+ if {$do_eval} {
+	 if {[catch {eval $cmd} err]} {
+	   return $body
+	  }
+	return ""
+  } else {return $body}
 }
 
 #_________________________________________________________________________________________________________
@@ -267,7 +286,7 @@ proc Manage_CallbackList {c L_m pos args} {
    eval $cmd
 # Generate the callback mechanism
    set    cmd_to_trigger "  foreach CB \$this(L_CB_$m) {\n"
-   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for $m\n  \$err\"}\n"
+   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for $m\\n  \$err\"}\n"
    append cmd_to_trigger "   }\n"
    set cmd "method $c $m \{$L_args\} \{\n"
      if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
