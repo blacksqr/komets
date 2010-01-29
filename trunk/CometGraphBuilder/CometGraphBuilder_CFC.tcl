@@ -2,7 +2,7 @@ inherit CometGraphBuilder_CFC CommonFC
 
 #___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC constructor {} {
- set this(handle_root) {}
+ set this(handle_root)      {}
  set this(handle_daughters) {}
  set this(node_id) 0
  set this(id)      0
@@ -89,6 +89,8 @@ method CometGraphBuilder_CFC set_marks_for {id L_marks} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometGraphBuilder_CFC get_graph_description {{root {}}} {
+ if {$this(handle_daughters) == ""} {return ""}
+ 
  set str "[$this(node_name,$this(handle_daughters)) get_name] "
  if {$this(handle_root) != ""} {
    set rep [$this(node_name,$this(handle_root)) Serialize str $root]
@@ -107,7 +109,7 @@ proc P_L_methodes_get_CometGraphBuilder {} {return [list {get_handle_root { }} {
 												   ]}
 proc P_L_methodes_set_CometGraphBuilder {} {return [list {set_handle_root {v}} {set_handle_daughters {v}} \
                                                          {Add_node_type {id name}} {Add_node_instance {id name}} \
-														 {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_n id_d}} \
+														 {Sub_node {id}} {Add_rel {id_m id_d}} {Sub_rel {id_m id_d}} \
 														 {set_marks_for {id L_marks}} \
 	 											   ]}
 
