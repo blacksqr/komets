@@ -24,7 +24,7 @@ method Container_PM_P_TK_to_canvas get_or_create_prims {root} {
  if {![winfo exists $f]} {canvas $f}
  
  set this(canvas) $f
- bind $this(canvas) <Motion>      "$objName Move %x %y"
+ bind $this(canvas) <Motion>      "+ $objName Move %x %y"
  this Add_MetaData PRIM_STYLE_CLASS [list $f "ROOT CANVAS FRAME" \
                                     ]
 
