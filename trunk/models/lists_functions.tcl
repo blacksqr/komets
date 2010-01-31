@@ -7,6 +7,7 @@ proc Generate_List_accessor {class L_name suffixe} {
  set cmd "method $class Add_$suffixe {L} {set this($L_name) \[Liste_Union \$this($L_name) \$L\]}"           ; eval $cmd
  set cmd "method $class Sub_$suffixe {L} {return \[Sub_list    this($L_name) \$L\]}"; eval $cmd
  set cmd "method $class Contains_${suffixe} {e} {return \[expr \[lsearch \$this($L_name) \$e\] >= 0\]}"; eval $cmd
+ set cmd "method $class Index_of_${suffixe} {e} {return \[lsearch \$this($L_name) \$e\]}"; eval $cmd
 }
 
 #____________________________________________________________________________________
