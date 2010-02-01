@@ -8,6 +8,15 @@ proc Traces {C {stream ""}} {
 }
 
 #_________________________________________________________________________________________________________
+proc get_specializations_of {c} {
+ set L $c
+ foreach s [gmlObject info specializations $c] {
+   set L [concat $L [get_specializations_of $s]]
+  }
+ return $L
+}
+
+#_________________________________________________________________________________________________________
 proc Trace {C m {stream ""}} {
  #set cmd    "method $C $m {[gmlObject info arglist $C $m]} {\n"
  append cmd "puts $stream \"\$objName $m "

@@ -121,9 +121,27 @@ method TK_comet_preso Display_drop_down_menu {x y} {
 
    toplevel $top; 
    set b $top.destroy
+   label $top.lab -text $this(comet_represented); pack $top.lab -side top -fill x -expand 1
    button $b -text "Destroy component" -command "$objName Ask_destroy"
      pack $b -side top -fill x
    
+   # Is it a COMET type?
+   if {[gmlObject info exists class $this(comet_represented)]} {
+	 if {[lsearch [get_specializations_of Comet_element] $this(comet_represented)] >= 0} { 
+	   set f_type ${top}.f_type
+	   frame $f_type; pack $f_type -fill both -expand 1
+	   label ${f_type}.lab; pack ${f_type}.lab -side top -expand 1 -fill x
+	   if {[lsearch [get_specializations_of Logical_consistency] $this(comet_represented)] >= 0} {
+	     ${f_type}.lab configure -text "Logical Consitency"
+	    }
+	   if {[lsearch [get_specializations_of Logical_model]       $this(comet_represented)] >= 0} {
+	     ${f_type}.lab configure -text "Logical model"
+	    }
+	   if {[lsearch [get_specializations_of Physical_model]      $this(comet_represented)] >= 0} {
+	     ${f_type}.lab configure -text "Physical model"
+	    }
+	  }
+    }
    
    set    cmd "lassign \[split \[wm geometry $top\] +\] dim tmp tmp; lassign \[split \$dim x\] tx ty; "
    append cmd "wm geometry $top \$dim+\[expr $x - \$tx / 2\]+$y"
