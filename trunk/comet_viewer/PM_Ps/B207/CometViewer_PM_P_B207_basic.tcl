@@ -128,6 +128,8 @@ method CometViewer_PM_P_B207_basic set_dot_description {v} {
          }
 }
 
+Trace CometViewer_PM_P_B207_basic set_dot_description
+
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_B207_basic Read_tk_data_from {s} {
  if {[catch "$objName catched_Read_tk_data_from $s" err]} {

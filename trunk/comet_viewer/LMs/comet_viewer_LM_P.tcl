@@ -7,7 +7,10 @@ method CometViewer_LM_P constructor {name descr args} {
  this inherited $name $descr
  
  this Add_PM_factories [Generate_factories_for_PM_type [list {CometViewer_PM_P_B207_basic Ptf_BIGre} \
+                                                             {CometViewer_PM_P_TK_CANVAS_basic Ptf_TK_CANVAS} \
                                                        ] $objName]
+
+ Add_U_fine_tuned_factory_for_encaps $objName Ptf_TK Ptf_TK_CANVAS CometViewer_PM_P_TK_CANVAS_basic {Container_FUI_bridge_TK_to_CANVAS_frame(,$obj())}
 
  eval "$objName configure $args"
  return $objName
