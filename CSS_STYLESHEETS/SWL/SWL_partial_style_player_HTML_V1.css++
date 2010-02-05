@@ -3,14 +3,14 @@
 }
 
 #$current {
-  FCT_Eval : set swl_PM [CSS++ $obj "#$obj <--< CometSWL"]
-         --- set LC [$obj get_LC]
-		 --- set LC_sub_player [CSS++ cr "#${swl_PM}(sub.player->LC)"]
-		 --- set LC_add_ship   [CSS++ cr "#${swl_PM}(add.ship->LC)"]
-		 --- set PM_encaps     [U_encapsulator_PM $obj "CometContainer(-set_name Container, $LC_sub_player\(), \$obj, ${LC_add_ship}())"]
-		 --- set PM_sub        [CSS++ cr "#${PM_encaps}(sub.player)"]
+  FCT_Eval : set swl_PM [CSS++ $obj "#$obj <--< CometSWL"] --- puts "  swl_PM : $swl_PM"
+         --- set LC [$obj get_LC] --- puts "  LC : $LC"
+		 --- set LC_sub_player [CSS++ cr "#${swl_PM}(sub.player->LC)"] --- puts "  LC_sub_player : #${swl_PM}(sub.player->LC)  ==>  $LC_sub_player"
+		 --- set LC_add_ship   [CSS++ cr "#${swl_PM}(add.ship->LC)"] --- puts "  LC_add_ship : #${swl_PM}(add.ship->LC)  ==>  $LC_add_ship"
+		 --- set PM_encaps     [U_encapsulator_PM $obj "CometContainer(-set_name Container, $LC_sub_player\(), \$obj, ${LC_add_ship}())"] --- puts "   PM_encaps : $PM_encaps"
+		 --- set PM_sub        [CSS++ cr "#${PM_encaps}(sub.player)"] --- puts "  PM_sub : $PM_sub"
 		 ---   $PM_sub Add_Params "player $LC"
-		 --- set PM_add_V [CSS++ $obj "#${PM_encaps}($LC_add_ship)"]
+		 --- set PM_add_V [CSS++ $obj "#${PM_encaps}($LC_add_ship)"] --- puts "  PM_add_V : $PM_add_V"
 		 ---   $PM_add_V Subscribe_to_Trigger_prim_activate __FOREACH_PM__alex_HTML_V1 "$PM_add_V Add_Params \"player $LC ship \[CPool get_a_comet CometSWL_Ship]\""    UNIQUE
 		 --- puts "Now obj = $PM_encaps" ;
 }

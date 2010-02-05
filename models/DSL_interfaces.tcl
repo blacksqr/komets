@@ -93,12 +93,12 @@ method DSL_interface_interpretor DSL {L_name prefixe} {
 	} else {eval "$name configure $argu"; $name set_daughters_R {}}
 # Est ce un nom de variable ?
   } else {if {[gmlObject info exists object $type]} {
-            #puts "    => A variable"
+            #puts "    => Variable $type"
             set name $type
-            puts "$type est un objet."
+            #puts "$type est un objet."
 			# Est ce le nom d'un noeud du GDD ?							 
             if {$type == "GDD_Node" || [lsearch [gmlObject info classes $type] GDD_Node] >= 0} {
-			  #puts "    => A GDD_node"
+			  puts "    => A GDD_node $type"
 			  # Retrouver le LC correspondant dans le GDD
 			  $this(dsl_gdd) QUERY "?n : $type : NODE()->REL(type~=GDD_inheritance && type!=GDD_restriction)*->\$n()"
               set gdd_rep       [lindex [$this(dsl_gdd) get_Result] 0] 
