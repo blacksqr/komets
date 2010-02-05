@@ -367,12 +367,13 @@ method Style DSL_CLASS {str_name rep_name L_root recursive} {
 	
    if {$not==1} {set n_rep $rep
 				 Sub_list n_rep $L_indesirables
+				 puts "There is a not!"
 				}
 		
    set rep $n_rep
    
    # XXX DEBUG 
-   regexp {^ */(.*)$} $str reco str
+   if {![regexp {^ *\/(.*)$} $str reco str]} {puts "WARNING ! There is no end for the filter ! in \"$str\""} else {puts "rep = $rep"}
   }
 
 }
@@ -504,7 +505,7 @@ method Style DSL_ID {str_name rep_name L_root recursive} {
             set id [split $id .]
             if {[llength $id]==0} {return}
             if {$recursive} {
-              this Add_recursively rep_tmp id $L_root $negation
+			  this Add_recursively rep_tmp id $L_root $negation
              } else {
                  if {[string equal $id *] && $negation==0} {set rep_tmp $L_root} else {set rep_tmp [list]
 																					   foreach r $L_root {
@@ -615,7 +616,7 @@ method Style Add_recursively {rep_name id_name L_root {negation 0}} {
 	   Add_element rep $root
 	  }
 
-     this Add_recursively rep id [$root $this(cmd_daughter)]
+     this Add_recursively rep id [$root $this(cmd_daughter)] $negation
   }
 }
 

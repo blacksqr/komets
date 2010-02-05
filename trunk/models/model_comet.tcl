@@ -1,6 +1,26 @@
 set DEFINE_MODEL_COMET 1 
 
 #_________________________________________________________________________________________________________
+proc Check_that {str_to_eval expected_result} {
+ set rep [eval $str_to_eval]
+ if {$rep == $expected_result} {return 1} else {return [list 0 $rep]}
+}
+
+#_________________________________________________________________________________________________________
+proc Check_that_list_are_equivalent {str_to_eval expected_result} {
+ set rep [eval $str_to_eval]
+ set intersect [Liste_Intersection $rep $expected_result]
+ if {[llength $expected_result] == [llength $intersect] && [llength $rep] == [llength $intersect]} {return 1} else {return [list 0 $rep]}
+}
+
+#_________________________________________________________________________________________________________
+proc Eval_perf {cmd nb} {
+ set t [clock milliseconds]
+ for {set i 0} {$i < $nb} {incr i} {eval $cmd}
+ puts "  Done $nb times in [expr [clock milliseconds]-$t]ms"
+}
+
+#_________________________________________________________________________________________________________
 proc Traces {C {stream ""}} {
  foreach m [gmlObject info methods $C] {
    catch "Trace $C $m $stream"
