@@ -61,7 +61,7 @@ proc Chrono {C m} {
     set cmd {};
     foreach a $args {append cmd $a { }}
     #puts "Style_CSSpp Interprets $cmd $root"; 
-    return [Style_CSSpp Interprets $cmd $root]
+    return [Style_CSSpp Interprets $root $cmd]
    }
 
 #_________________________________________________________________________________________________________

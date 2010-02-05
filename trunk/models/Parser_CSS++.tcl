@@ -74,6 +74,14 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 	 if {[lindex [lindex $L_flat $index_L_flat] 0] == "AXE"} {
 	   set axe_type [lindex [lindex $L_flat $index_L_flat] 1]
 	   switch $axe_type {
+	     CHILDREN         {lassign [lindex $L_h end] T t
+					       if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
+						   lappend L_h [lindex $L_flat $index_L_flat]
+		                  }
+		 ALL_DESCENDANTS  {lassign [lindex $L_h end] T t
+					       if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
+						   lappend L_h [lindex $L_flat $index_L_flat]
+		                  }
 	     GOTO_ANCESTORS   {lassign [lindex $L_h end] T t
 					       if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 						   lappend L_h [lindex $L_flat $index_L_flat]
@@ -121,8 +129,11 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 		               incr index_L_flat
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
 					   lassign [lindex $L_h end] T t
-					   if {$T == "AXE" && $t == "NEGATION"}    {set neg [lindex $L_h end]; set L_h [lrange $L_h 0 end-1]} else {set neg ""}
-					   lappend L_h [list AXE $axe_type $neg $L]
+					   if {$T == "AXE"} {
+					     if {$t == "NEGATION"}    {set neg [lindex $L_h end]; set L_h [lrange $L_h 0 end-1]} else {set neg ""}
+						 lappend L_h [list AXE $axe_type $neg $L]
+						} else {lappend L_h [list AXE INSIDE $L]
+						       }
 					  }
 		 INSIDE       {set L [list]; incr nb_open_parenthesis 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
 		 POST_FILTER  {set L [list]; incr nb_open_post_filter 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
@@ -156,7 +167,7 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
  if {[regexp {^ *# *(.*)$}    $str reco str_next]} {set pos_axe [string first "#" $str];   set axe GOTO}             else {
  if {[regexp {^!(.*)$}    $str reco str_next]} {set pos_axe [string first "!" $str];   set axe NEGATION}         else {
  if {[regexp {^ *> *(.*)$}    $str reco str_next]} {set pos_axe [string first ">" $str];   set axe CHILDREN}         else {
- if {[regexp {^ *~ *(.*)$}    $str reco str_next]} {set pos_axe [string first "~" $str];   set axe ALL_DESCENDANTS}  else {
+ if {[regexp {^ *\~ *(.*)$}    $str reco str_next]} {set pos_axe [string first "~" $str];   set axe ALL_DESCENDANTS}  else {
  if {[regexp {^ *\\(.*)$}   $str reco str_next]} {set pos_axe [string first "\\" $str];  set axe POST_FILTER}      
  
  }}}}}}}}}}}
@@ -173,7 +184,7 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
  set pos [string first "("  $str]
  if {$pos >= 0 && $pos < $pos_axe} {
    set pos_axe $pos
-     if { [lsearch [list DIFFERENCE UNION INTERSECTION GO_THROUGH NEGATION CHILDREN DESCENDANTS ALL_DESCENDANTS GOTO_ANCESTORS GOTO_DESCENDANTS POST_FILTER] $last_axe] >= 0} {
+     if { [lsearch [list  DIFFERENCE UNION INTERSECTION GO_THROUGH NEGATION CHILDREN DESCENDANTS ALL_DESCENDANTS GOTO_ANCESTORS GOTO_DESCENDANTS POST_FILTER] $last_axe] >= 0} {
        if {[lsearch [list DIFFERENCE UNION INTERSECTION] $last_axe] >= 0} {
 	     set pos_space [string first " " $str]
          if {$pos_space >= 0 && $pos_space < $pos_axe} {set axe GROUP} else {set axe INSIDE}
@@ -220,7 +231,7 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 method Parser_CSS++ Interprets {{L_root {}} str} {
  if {[llength $L_root] == 0} {set L_root $this(default_root)}
  lassign [this Parse $str] R pipo LF
- puts "     - LF : $LF"
+ #puts "     - LF : $LF"
  
  set this(next_name) daughters
  set this(cmd_next)  get_out_
@@ -232,7 +243,7 @@ method Parser_CSS++ Interprets {{L_root {}} str} {
  
  set L_rep [list]
  foreach C [this Parse_$R $L_root $LF 0] {Add_element L_rep [lindex $C 0]}
- 
+
  return $L_rep
 }
 
@@ -260,7 +271,7 @@ method Parser_CSS++ Parse_NODE {L_root index VAR VAL VAL2} {
  if {$this(goto_mode)} {
    set this(goto_mode) 0
    if {[gmlObject info exists object $VAR]} {set nL $VAR} else {
-   if {[gmlObject info exists class  $VAR]} {set nL [gmlObject info objects $VAR]} }
+   if {[gmlObject info exists class  $VAR]} {set nL [gmlObject info objects $VAR]} else {set nL [list]}}
   } else {set nL [this get_nodes_from_where $L_root $VAR]}
  
  set this(go_in)    0
@@ -298,18 +309,21 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
    ALL_DESCENDANTS  {set this(recurse)   1; set this(cmd_next) "get_"    ; if {!$this(go_in)} {set L_root [this get_next_level $L_root]}}
    GOTO_ANCESTORS   {set this(next_name) mothers  }
    GOTO_DESCENDANTS {set this(next_name) daughters}
-   INSIDE           {foreach C $L_root {lassign $C r in
+   INSIDE           {set state [this Save_state]
+                     set this(recurse)   1; set this(cmd_next) "get_out_"; set this(next_name) daughters
+					 foreach C $L_root {lassign $C r in
                                         set handle [$r get_handle_composing_comet]
-                                        if {$handle != ""} {lappend nL [list $handle $r]}
+                                        foreach h $handle {lappend nL [list $h $r]}
 									   }
 					 set this(go_in) 1
 					 set L_root [this Parse_ROOT $nL $VAL 0]
+					 this Load_state $state
 					}
    FILTER           {set nL [list]
                      foreach C $L_root {
                        lassign $C obj in
-					   set cmd "if {$VAL2} {lappend nL \"$C}"
-					   eval $cmd
+					   set cmd "if {$VAL2} {lappend nL \$C}"
+					   if {[catch {eval $cmd} err]} {puts "Error while evaluating the filter \"$VAL2\" for $obj\n$err"}
                       }
 					 set L_root $nL
                     }
@@ -330,13 +344,17 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
 					}
    PROJECTION       {set nL [list]
                      switch $VAL {
-                       LC      {foreach C $L_root {lassign $C r in; lappend nL [list [$r get_LC] $in]}}
+                       LC      {foreach C $L_root {lassign $C r in; lappend nL [list [$r get_LC] $in]}
+					            set L_root $nL
+							   }
 					   PMs     {foreach C $L_root {lassign $C r in
 					                               foreach PM [[$r get_LC]_LM_LP get_L_actives_PM] {lappend nL [list $PM $in]}
 												  }
 								set L_root $nL
 					           }
-					   default {foreach C $L_root {lassign $C r in; lappend nL [list [$r get_LC]$VAL $in]}}
+					   default {foreach C $L_root {lassign $C r in; lappend nL [list [$r get_LC]$VAL $in]}
+					            set L_root $nL
+							   }
 					  }
                     }
    GROUP            {set state [this Save_state]
@@ -419,10 +437,14 @@ method Parser_CSS++ get_nodes_from_where {L_root sel} {
  return $nL
 }
 
+#Trace Parser_CSS++ Interprets
+
 #Trace Parser_CSS++ get_nodes_from_where
 #___________________________________________________________________________________________________________________________________________
 proc Batterie_test_Parser_CSS++ {{display_ok 1}} {
- if {![gmlObject info exists object PS]} {Parser_CSS++ PS}
+ if {![gmlObject info exists object PS]} {Parser_CSS++ PS cr}
+ if {![gmlObject info exists object pipo_old_style_css]} {Style pipo_old_style_css -set_comet_root cr}
+ 
  set L_to_check [list {swl} \
                       {#swl} \
 					  {#cr swl} \
@@ -432,6 +454,7 @@ proc Batterie_test_Parser_CSS++ {{display_ok 1}} {
 					  {cr->PMs ~ CometContainer.PM_HTML} \
 					  {cr->PMs ~ CometInterleaving} \
 					  {cr->PMs ~ CometInterleaving CometContainer} \
+					  {#U_encapsulator_PM_CPool_COMET_24_PM_P_2_66(sub.player)} \
 					  {#swl->PMs} \
 					  {#cr swl->PMs} \
 					  {#cr swl->PMs(*)} \
@@ -461,7 +484,7 @@ proc Batterie_test_Parser_CSS++ {{display_ok 1}} {
  set nb 0
  foreach cmd $L_to_check { 
    set display "______________________________________________________________________\n  Checking : $cmd\n______________________________________________________________________\n"
-   set expected [CSS++ cr $cmd]
+   set expected [pipo_old_style_css Interprets $cmd cr]
    lassign [Check_that_list_are_equivalent [list PS Interprets cr $cmd] $expected] i err
    incr nb $i
    if {$i} {
