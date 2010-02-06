@@ -586,7 +586,7 @@ method Style Go_through_path {str_name L_root cmd} {
  this DSL_SELECTOR str L_rep $L_root 0
  
  set L_desc [list]
- foreach rep $L_rep {Add_list L_desc [$rep $cmd]} 
+ foreach rep $L_rep {Add_list L_desc [$rep $cmd]}
  if {[llength $L_desc]} {
    Add_list n_L_rep [this Go_through_path str_tmp $L_desc $cmd]
   }

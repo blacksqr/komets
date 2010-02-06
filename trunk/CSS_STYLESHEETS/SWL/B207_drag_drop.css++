@@ -37,8 +37,8 @@
 
 #$current(CONT.OP_EDITION(CometActivator.SWL_DESTROY))  {
   GDD_fct   : Implem(CT_Activator_CUI_skinnable);
-  FCT_Shape : rect 0 0 50 50 plus oval 50 50 20 20 60;
-  FCT_Color : 1 0 0 1;
+  FCT_Shape : rect 0 0 50 50 plus oval 25 50 25 15 60;
+  FCT_Color : 1 0.3 0.3 1;
   FCT_Eval  : set node [$obj get_polygon]
           --- set PM_sub_planet [CSS++ cr "#$obj <--< swl(ACT.SUB.PLANET)"]
 		  --- set PM_sub_ship   [CSS++ cr "#$obj <--< swl(ACT.SUB.SHIP)"]
