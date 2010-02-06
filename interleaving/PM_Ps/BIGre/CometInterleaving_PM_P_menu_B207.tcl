@@ -130,9 +130,9 @@ method CometInterleaving_PM_P_menu_B207 Add_daughter {m {index -1}} {
 	 set plugged 0
 	 
 	 foreach menu_and_sel $this(L_menu_and_associated_comets) {
-	   set menu_name   [lindex $menu_and_sel 0]
-	   set L_selectors [lindex $menu_and_sel 1]
+	   lassign $menu_and_sel menu_name L_selectors
 	   set L_PM [CSS++ $objName "#$objName $L_selectors"]
+	   puts "  CSS++ $objName {#$objName $L_selectors}  ==>  $L_PM"
 	   if {[lsearch $L_PM $m] != -1} {
 		 set plugged 1
 		 # Add to the corresponding menu
@@ -182,11 +182,12 @@ method CometInterleaving_PM_P_menu_B207 Update_menu_titles {} {
  
 # Unplugg presentation that are now part of a menu
  #puts "Unplugg presentation that are now part of a menu"
- set L_nodes ""
+ set L_nodes [list]
  foreach m $this(L_menu_and_associated_comets) {
    #puts "Do menu [lindex $m 0] with selector [lindex $m 1]"
    set sel [lindex $m 1]
    set LC  [CSS++ $objName "#$objName $sel"]
+   #puts "  set LC \[CSS++ $objName {#$objName $sel}\\n  ===> $LC"
    foreach C $LC {
      #puts "$this(B207_daughters) Retirer_fils [$C get_prim_handle]"
      $this(B207_daughters) Retirer_fils [$C get_prim_handle]
@@ -195,8 +196,8 @@ method CometInterleaving_PM_P_menu_B207 Update_menu_titles {} {
   }
 # Plug the presentations that are not part of a menu
  #puts "Plug the presentations that are not part of a menu"
- #set L [Lister_fils_de $this(B207_pipo_handle_daughters)]
- set L ""; foreach C [this get_out_daughters] {lappend L [$C get_prim_handle]}
+ #puts "  objName : $objName"
+ set L [list]; foreach C [this get_out_daughters] {lappend L [$C get_prim_handle]}
  #puts "      L : {$L}"
  Sub_list L $L_nodes
  #puts "  new L : {$L}"
@@ -204,6 +205,7 @@ method CometInterleaving_PM_P_menu_B207 Update_menu_titles {} {
  foreach n $L {
    #puts "$this(B207_daughters) Ajouter_fils_au_debut $n\n_________"
    #puts "  n à [$n Nb_Peres] peres"
+   #puts "  Displayed $n from [$n Val_MetaData CometPM]"
    $this(B207_daughters) Ajouter_fils_au_debut $n
   }
 }

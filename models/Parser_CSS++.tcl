@@ -74,6 +74,9 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 	 if {[lindex [lindex $L_flat $index_L_flat] 0] == "AXE"} {
 	   set axe_type [lindex [lindex $L_flat $index_L_flat] 1]
 	   switch $axe_type {
+	     DESCENDANTS      {lassign [lindex $L_h end] T t
+		                   if {$T != "AXE" || $t != "GO_THROUGH"}  {lappend L_h [lindex $L_flat $index_L_flat]}
+						  }
 	     CHILDREN         {lassign [lindex $L_h end] T t
 					       if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 						   lappend L_h [lindex $L_flat $index_L_flat]
@@ -124,7 +127,13 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					   if {$T == "AXE" && $t == "NEGATION"}    {set neg [lindex $L 0]; set L [lrange $L 1 end]} else {set neg ""}
 					   lappend L_h [list AXE $axe_type $neg $L]
 					  }
-		 GO_THROUGH   {set L [list]; incr nb_go_through       1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
+		 GO_THROUGH   {set L [list]; incr nb_go_through       1; 
+		               incr index_L_flat; 
+					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; 
+					   lassign [lindex $L_h end] T t
+					   if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
+					   lappend L_h [list AXE $axe_type $L]
+					  }
 		 GROUP        {set L [list]; incr nb_open_parenthesis 1; 
 		               incr index_L_flat
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
@@ -370,10 +379,12 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
    GO_THROUGH       {set nL [list]; set L_currents $L_root
                      set state [this Save_state]; set nb 0
 					 while {[llength $L_currents]} {
+					   set this(recurse)   0
 					   set L_currents [this get_next_level $L_currents]
 					   set L_currents  [this Parse_ROOT $L_currents $VAL 0]
+					   #puts "  Check $VAL => $L_currents"
 					   set nL [concat $nL $L_currents]
-					   this Load_state $state
+					   this Load_state $state; set this(recurse) 0
 					   
 					   incr nb; if {$nb >100} {puts "  OUT OF GO_THROUGH!!!"; break}
 					  }
