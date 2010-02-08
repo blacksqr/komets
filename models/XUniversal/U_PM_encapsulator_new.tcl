@@ -184,6 +184,7 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
      foreach C "[lindex $L_res_Comets 0] [lindex $L_res_Comets 1]" {$C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps}
 	 
    set root [CSS++ [$PM get_L_roots] "((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\! <--< > */"]
+   #puts "Style_CSSpp Parse {((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\! <--< > */}"
    #puts "_-_-_-_-_-_-  - root : $root"
    $PM_encaps set_L_nested_handle_LM $root
    if {[string equal $handle_for_daughters ""]} {
