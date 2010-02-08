@@ -221,7 +221,8 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 									if {[string equal -length 3 "PMs"    $str_tmp]} {set str_tmp [string range $str_tmp 3 end]; set axe [list $axe PMs]}
 									if {[string equal -length 3 "_LM_LP" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_LP]}
 									if {[string equal -length 3 "_LM_FC" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_FC]}
-									regexp {^ *(.*)$} $str_tmp reco str_next
+									#regexp {^ *(.*)$} $str_tmp reco str_next
+									set str_next $str_tmp
 					               }
 								   
  set pos_space [string first " " $str]
