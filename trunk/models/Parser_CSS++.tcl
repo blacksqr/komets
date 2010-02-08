@@ -124,8 +124,11 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					   lassign [lindex $L_h end] T t
 		               if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 					   lassign [lindex $L 0] T t
-					   if {$T == "AXE" && $t == "NEGATION"}    {set neg [lindex $L 0]; set L [lrange $L 1 end]} else {set neg ""}
-					   lappend L_h [list AXE $axe_type $neg $L]
+					   if {$T == "AXE" && $t == "NEGATION"}    {
+					     lappend L_h [lindex $L 0]
+						 set L [lrange $L 1 end]
+					    }
+					   lappend L_h [list AXE $axe_type $L]
 					  }
 		 GO_THROUGH   {set L [list]; incr nb_go_through       1; 
 		               incr index_L_flat; 
@@ -139,12 +142,15 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
 					   lassign [lindex $L_h end] T t
 					   if {$T == "AXE"} {
-					     if {$t == "NEGATION"}    {set neg [lindex $L_h end]; set L_h [lrange $L_h 0 end-1]} else {set neg ""}
-						 lappend L_h [list AXE $axe_type $neg $L]
+					     #if {$t == "NEGATION"}    {set neg [lindex $L_h end]; set L_h [lrange $L_h 0 end-1]} else {set neg ""}
+						 lappend L_h [list AXE $axe_type $L]
 						} else {lappend L_h [list AXE INSIDE $L]
 						       }
 					  }
-		 INSIDE       {set L [list]; incr nb_open_parenthesis 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
+		 INSIDE       {set L [list]; incr nb_open_parenthesis 1; incr index_L_flat; if {$index_L_flat == 1} {set axe_type GROUP}
+		               this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
+					   lappend L_h [list AXE $axe_type $L]
+					  }
 		 POST_FILTER  {set L [list]; incr nb_open_post_filter 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
 		 default      {lappend L_h [lindex $L_flat $index_L_flat]}
 		}
@@ -221,8 +227,8 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 									if {[string equal -length 3 "PMs"    $str_tmp]} {set str_tmp [string range $str_tmp 3 end]; set axe [list $axe PMs]}
 									if {[string equal -length 3 "_LM_LP" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_LP]}
 									if {[string equal -length 3 "_LM_FC" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_FC]}
-									#regexp {^ *(.*)$} $str_tmp reco str_next
-									set str_next $str_tmp
+									regexp {^\.*(.*)$} $str_tmp reco str_next
+									#set str_next $str_tmp
 					               }
 								   
  set pos_space [string first " " $str]
@@ -338,16 +344,17 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
 					 set L_root $nL
                     }
    POST_FILTER      {set nL [list]
+                     set neg $this(negation); set this(negation) 0
                      set state [this Save_state]
-					 lassign $VAL POST_FILTER_type neg
 					 foreach C $L_root {
 					   set this(recurse)   1; set this(cmd_next) "get_out_";
 					   lassign $C r in
 					   set L_post [list $C]
 					   #set L_post [concat $L_post [this get_next_level $L_post]]
 					   #set L_post [this get_next_level $L_post]
-					   if { [llength [this Parse_ROOT $L_post $VAL2 0]] && $neg == ""
-					      ||[llength [this Parse_ROOT $L_post $VAL2 0]] == 0 && $neg == "NEGATION"} {lappend nL $C}
+					   set L_C_post [this Parse_ROOT $L_post $VAL 0]
+					   if { [llength $L_C_post]      && !$neg
+					      ||[llength $L_C_post] == 0 &&  $neg} {lappend nL $C}
 					   this Load_state $state
 					  }
 					 set L_root $nL
@@ -367,10 +374,10 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
 							   }
 					  }
                     }
-   GROUP            {set state [this Save_state]
-                     set L_tmp [this Parse_ROOT $L_root $VAL2 0]; set state2 [this Save_state]
-					 lassign $VAL POST_FILTER_type neg
-					 if {$neg == "NEGATION"} {
+   GROUP            {set neg $this(negation); set this(negation) 0
+					 set state [this Save_state]
+					 set L_tmp [this Parse_ROOT $L_root $VAL 0]; set state2 [this Save_state]
+					 if {$neg} {
 					   this Load_state $state
 					   set L_all [this get_nodes_from_where $L_root "*"]
 					   set L_root $L_all; Sub_list L_root $L_tmp
@@ -462,6 +469,9 @@ proc Batterie_test_Parser_CSS++ {{display_ok 1}} {
 					  {#cr swl} \
 					  {* *} \
 					  {cr (*)} \
+					  {(swl, cr)} \
+					  {cr->PMs.PM_TK} \
+					  {cr->PMs.PM_TK *} \
 					  {cr->PMs ~ *} \
 					  {cr->PMs ~ CometContainer.PM_HTML} \
 					  {cr->PMs ~ CometInterleaving} \
