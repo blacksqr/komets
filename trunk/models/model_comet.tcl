@@ -521,16 +521,19 @@ method Comet_element get_L_out_descendants {L_name} {
 #_________________________________________________________________________________________________________
 #______________________________________________ MetaDatas ________________________________________________
 #_________________________________________________________________________________________________________
-method Comet_element Has_MetaData {var}     {return [info exists this(metadata,$var)]}
-method Comet_element Add_MetaData {var val} {set this(metadata,$var) $val}
-method Comet_element Sub_MetaData {var}     {if {[catch "unset this(metadata,$var)" res]} {return 0} else {return 1}}
-method Comet_element Val_MetaData {var}     {return $this(metadata,$var)}
-method Comet_element get_L_MetaData {}      {set L [list]
-                                             foreach {var val} [array get this metadata,*] {
-											   lappend L [string range $var 9 end] $val
-											  }
-											 return $L
-											}
+method Comet_element Has_MetaData   {var}       {return [info exists this(metadata,$var)]}
+method Comet_element Add_MetaData   {var val}   {set this(metadata,$var) $val}
+method Comet_element Sub_MetaData   {var}       {if {[catch "unset this(metadata,$var)" res]} {return 0} else {return 1}}
+method Comet_element Val_MetaData   {var}       {return $this(metadata,$var)}
+method Comet_element set_L_MetaData {L_var_val} {foreach {var val} [this get_L_MetaData] {this Sub_MetaData $var}
+                                                 foreach {var val} $L_var_val            {this Add_MetaData $var $val}
+											    }
+method Comet_element get_L_MetaData {}          {set L [list]
+                                                 foreach {var val} [array get this metadata,*] {
+											       lappend L [string range $var 9 end] $val
+											      }
+											     return $L
+											    }
 
 #_________________________________________________________________________________________________________
 # Used when deletion occur...
