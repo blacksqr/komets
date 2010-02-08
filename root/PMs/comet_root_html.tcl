@@ -490,13 +490,11 @@ method PhysicalHTML_root get_styler {} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Apply_style {} {
  set res {}
- set styler [this get_styler]
- if {[string equal $styler ""]} {
+ set styler [this get_DSL_CSSpp]
+ if {$styler == ""} {
    set styler [lindex [gmlObject info objects Style] 0]
    this set_styler $styler
-   if {[string equal $styler ""]} {
-     puts "$objName Apply_style: NO STYLER FOUND !!!"
-    }
+   if {$styler == ""} {puts "$objName Apply_style: NO STYLER FOUND !!!"}
   }
 
  foreach r [this get_style] {

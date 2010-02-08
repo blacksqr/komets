@@ -360,6 +360,7 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
 					 set L_root $nL
 					}
    PROJECTION       {set nL [list]
+                     set this(recurse) 0
                      switch $VAL {
                        LC      {foreach C $L_root {lassign $C r in; lappend nL [list [$r get_LC] $in]}
 					            set L_root $nL
