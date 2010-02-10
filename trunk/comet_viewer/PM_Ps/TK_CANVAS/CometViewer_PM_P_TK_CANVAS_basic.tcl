@@ -167,6 +167,12 @@ method CometViewer_PM_P_TK_CANVAS_basic Display_drop_down_menu {obj x y} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
+method CometViewer_PM_P_TK_CANVAS_basic Enlight_with_Parsed_CSS {PCSS_expr} {
+ set L_nodes  [Parsed_CSS++ [this get_L_roots] $PCSS_expr]
+ this Enlight $L_nodes
+}
+
+#_________________________________________________________________________________________________________
 method CometViewer_PM_P_TK_CANVAS_basic Enlight_with_CSS {CSS_expr} {
  set L_nodes  [CSS++ [this get_L_roots] $CSS_expr]
  this Enlight $L_nodes

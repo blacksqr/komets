@@ -245,9 +245,14 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 
 #___________________________________________________________________________________________________________________________________________
 method Parser_CSS++ Interprets {{L_root {}} str} {
+ return [this Interprets_parsed $L_root [this Parse $str]]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Parser_CSS++ Interprets_parsed {L_root P_CSS} {
  if {[llength $L_root] == 0} {set L_root $this(default_root)}
- lassign [this Parse $str] R pipo LF
- #puts "     - LF : $LF"
+
+ lassign $P_CSS R pipo LF
  
  set this(next_name) daughters
  set this(cmd_next)  get_out_
