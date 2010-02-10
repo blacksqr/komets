@@ -57,6 +57,11 @@ proc Chrono {C m} {
 }
 
 #_________________________________________________________________________________________________________
+  proc Parsed_CSS++ {root LCSS} {
+    return [Style_CSSpp Interprets_parsed $root $LCSS]
+   }
+
+#_________________________________________________________________________________________________________
   proc CSS++ {root args} {
     set cmd {};
     foreach a $args {append cmd $a { }}

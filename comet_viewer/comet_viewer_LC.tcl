@@ -36,3 +36,9 @@ method CometViewer Enlight_with_CSS {CSS_expr} {
  set L_nodes  [CSS++ [this get_L_roots] $CSS_expr]
  this Enlight $L_nodes
 }
+
+#_________________________________________________________________________________________________________
+method CometViewer Enlight_with_Parsed_CSS {PCSS_expr} {
+ set L_nodes  [Parsed_CSS++ [this get_L_roots] $PCSS_expr]
+ this Enlight $L_nodes
+}
