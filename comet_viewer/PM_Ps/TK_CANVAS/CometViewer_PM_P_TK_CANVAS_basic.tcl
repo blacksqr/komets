@@ -70,7 +70,13 @@ method CometViewer_PM_P_TK_CANVAS_basic Update_interaction {} {
  
 # Bindings for zoom
  set this(zoom_factor) 1
- bind [winfo toplevel $canvas] <MouseWheel> "+ $objName trigger %W %X %Y %D"
+ set b [bind [winfo toplevel $canvas] <MouseWheel>]
+ set new_binding ""
+ foreach line [split $b "\n"] {if {[lindex $line 0] != $objName} {append $new_binding $line "\n"}}
+ 
+ bind [winfo toplevel $canvas] <MouseWheel> $new_binding
+ 
+ bind [winfo toplevel $canvas] <MouseWheel> "+$objName trigger %W %X %Y %D"
  bind $canvas <<Wheel>> "$objName Zoom %x %y \[$objName get_delta\]"
 
  #bind $canvas <Motion> "+ $objName Motion %x %y" 
@@ -161,36 +167,6 @@ method CometViewer_PM_P_TK_CANVAS_basic Display_drop_down_menu {obj x y} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
-method CometViewer_PM_P_TK_CANVAS_basic Start_Anim_Enlight {} {
- set fond [$this(B_canvas) get_fond]; 
- if {$fond != ""} {
-   $fond Calculer_boites
-   set box  [$fond Boite_noeud]; set X [$box BG_X]; set Y [$box BG_Y]; set Ex [$box Tx]; set Ey [$box Ty]
-   foreach n [$this(B_canvas) get_highlighters] {
-     $n Ajouter_MetaData_T params_transfo "$X $Y $Ex $Ey 0 [$n Px] [$n Py] [$n Ex] [$n Ey] [$n Couleur 3]"
-     $n maj $X $Y 0 $Ex $Ey
-    }
-  }
-}
-
-#_________________________________________________________________________________________________________
-method CometViewer_PM_P_TK_CANVAS_basic Anim_Enlight {v} {
- foreach n [$this(B_canvas) get_highlighters] {
-   #puts "$n : v = $v"
-   set params [$n Val_MetaData params_transfo]
-   set X1 [lindex $params 0]; set Y1 [lindex $params 1]; set Ex1 [lindex $params 2]; set Ey1 [lindex $params 3]; set A1 [lindex $params 4]
-   set X2 [lindex $params 5]; set Y2 [lindex $params 6]; set Ex2 [lindex $params 7]; set Ey2 [lindex $params 8]; set A2 [lindex $params 9]
-   set dv [expr 1-$v]
-   $n Couleur 3 [expr $A1*$dv + $A2*$v]
-   $n maj [expr $X1*$dv + $X2*$v] \
-          [expr $Y1*$dv + $Y2*$v] \
-		  0 \
-		  [expr $Ex1*$dv + $Ex2*$v] \
-		  [expr $Ey1*$dv + $Ey2*$v]
-  }
-}
-
-#_________________________________________________________________________________________________________
 method CometViewer_PM_P_TK_CANVAS_basic Enlight_with_CSS {CSS_expr} {
  set L_nodes  [CSS++ [this get_L_roots] $CSS_expr]
  this Enlight $L_nodes
@@ -198,24 +174,22 @@ method CometViewer_PM_P_TK_CANVAS_basic Enlight_with_CSS {CSS_expr} {
 
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_TK_CANVAS_basic Enlight {L_nodes} {
- $this(B_canvas) Stop_Enlight
+ set c [this get_canvas]
  
- set L_L_elmt [list]
- foreach n $L_nodes {
-   lappend L_L_elmt [$this(B_canvas) get_nodes_representing $n]
+ $c delete ENLIGHTER_$objName
+ foreach e $L_nodes {
+   set items [$c find withtag $e]
+   Sub_list items [$c find withtag LINE_$objName]
+   Sub_list items [$c find withtag POLYGONE_$objName]
+   lassign [eval "$c bbox $items"] x1 y1 x2 y2
+   set d 8
+   incr x1 -$d; incr y1 -$d
+   incr x2  $d; incr y2  $d
+   
+   $c create rectangle $x1 $y1 $x2 $y2 -width 5 -outline yellow -tags [list $objName ENLIGHTER_$objName $e]
   }
- 
- #puts "L_L_elmt = $L_L_elmt"
- $this(B_canvas) Enlight $L_L_elmt
- 
- this Start_Anim_Enlight
- B_transfo_rap $this(animation_time) "if {\[catch \"$objName Anim_Enlight \$v\" err\]} {puts \"Error Anim_Enlight \$v:\n\$err\"}"
 }
 
-#_________________________________________________________________________________________________________
-method CometViewer_PM_P_TK_CANVAS_basic get_nodes_representing {e} {
- return [$this(B_canvas) get_nodes_representing $e]
-}
 
 #_________________________________________________________________________________________________________
 method CometViewer_PM_P_TK_CANVAS_basic get_new_mark_for_dot {} {
@@ -273,16 +247,23 @@ method CometViewer_PM_P_TK_CANVAS_basic catched_Read_tk_data_from {s} {
  if {[eof $s]} {
    #puts "in CometViewer_PM_P_TK_CANVAS_basic::$objName\n  - Server answered :\n$this(tk_str)"
    set c [this get_canvas]
-   set __tkgen_smooth_type ""
+   set __tkgen_smooth_type 1
    set str [string range $this(tk_str) [string first {$c} $this(tk_str)] end]
    
    
 	 set this(tk_str) ""
 	 foreach line [split $str "\n"] {
+	   set poly_type ""
+	   if {[string first "create line" $line] >= 0} {set poly_type LINE} else {
+	   if {[string first "create oval" $line] >= 0} {set poly_type OVAL} else {
+	   if {[string first "create rectangle" $line] >= 0} {set poly_type RECTANGLE} else {
+	   if {[string first "create polygon" $line] >= 0} {set poly_type POLYGONE} else {
+	   }}}}
 	   if {[regexp "^(.*) -tags \{(.*)\}.*\$" $line reco prefix tags]} {
-		 lappend tags $objName
+		 lappend tags $objName ${poly_type}_$objName
 		 set tags [string map [list TEXT TEXT_$objName] $tags]
 		 append this(tk_str) $prefix " -tags {$tags}\n"
+		 #puts "$prefix -tags {$tags}"
 		} else {append this(tk_str) $line "\n"
 			   }
 	  }
@@ -290,7 +271,7 @@ method CometViewer_PM_P_TK_CANVAS_basic catched_Read_tk_data_from {s} {
    
    $this(canvas) delete $objName
    
-   puts "$objName CometViewer_PM_P_TK_CANVAS_basic::catched_Read_tk_data_from\n$this(tk_str)"
+   #puts "$objName CometViewer_PM_P_TK_CANVAS_basic::catched_Read_tk_data_from\n$this(tk_str)"
    if {[catch $this(tk_str) err]} {
      puts "!!!!"
 	 puts "______________________________________________________________________\nERROR in CometViewer_PM_P_TK_CANVAS_basic::${objName}\n______________________________________________________________________\n$err\nProgram was\n$this(tk_str)"
