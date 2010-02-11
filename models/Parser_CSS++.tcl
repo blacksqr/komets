@@ -142,7 +142,14 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
 					   lassign [lindex $L_h end] T t
 					   if {$T == "AXE"} {
-					     #if {$t == "NEGATION"}    {set neg [lindex $L_h end]; set L_h [lrange $L_h 0 end-1]} else {set neg ""}
+					     if {  $t == "PROJECTION" 
+						    || $t == "GOTO_ANCESTORS"
+							|| $t == "GOTO_DESCENDANTS"
+							|| $t == "GROUP"
+							|| $t == "POST_FILTER"
+							|| $t == "INSIDE"
+							|| $t == "FILTER"
+							}    {lappend L_h [list AXE DESCENDANTS]}
 						 lappend L_h [list AXE $axe_type $L]
 						} else {lappend L_h [list AXE INSIDE $L]
 						       }
@@ -225,8 +232,8 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 									set str_tmp [string range $str 2+$pos_axe end]
 									if {[string equal -length 2 "LC"     $str_tmp]} {set str_tmp [string range $str_tmp 2 end]; set axe [list $axe LC]}
 									if {[string equal -length 3 "PMs"    $str_tmp]} {set str_tmp [string range $str_tmp 3 end]; set axe [list $axe PMs]}
-									if {[string equal -length 3 "_LM_LP" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_LP]}
-									if {[string equal -length 3 "_LM_FC" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_FC]}
+									if {[string equal -length 6 "_LM_LP" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_LP]}
+									if {[string equal -length 6 "_LM_FC" $str_tmp]} {set str_tmp [string range $str_tmp 6 end]; set axe [list $axe _LM_FC]}
 									regexp {^\.*(.*)$} $str_tmp reco str_next
 									#set str_next $str_tmp
 					               }
@@ -310,13 +317,30 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
    DIFFERENCE       {set state [this Save_state]
                      set L1 [Liste_to_set [this Parse_ROOT $L_root $VAL  0]]; this Load_state $state
                      set L2 [this Parse_ROOT $L_root $VAL2 0]; this Load_state $state
-					 Sub_list L1 $L2
-					 set L_root $L1
+					 set L_root [list]
+					 foreach e1 $L1 {
+					   set e1_1 [lindex $e1 0]
+					   set found 0
+					   foreach e2 $L2 {
+					     set e2_1 [lindex $e2 0]
+						 if {$e1_1 == $e2_1} {set found 1; break;}
+						}
+					   if {!$found} {lappend L_root $e1}
+					  }
                     }
    UNION            {set state [this Save_state]
                      set L2 [this Parse_ROOT $L_root $VAL2 0]; this Load_state $state
                      set L1 [this Parse_ROOT $L_root $VAL  0]; this Load_state $state
-					 set L_root [concat $L1 $L2]
+					 set L_root [list]
+					 foreach e1 $L1 {
+					   set e1_1 [lindex $e1 0]
+					   set found 0
+					   foreach e2 $L2 {
+					     set e2_1 [lindex $e2 0]
+						 if {$e1_1 == $e2_1} {set found 1; break;}
+						}
+					   if {$found} {lappend L_root $e1}
+					  }
                     }
    INTERSECTION     {set state [this Save_state]
                      set L1 [Liste_to_set [this Parse_ROOT $L_root $VAL  0]]; this Load_state $state
