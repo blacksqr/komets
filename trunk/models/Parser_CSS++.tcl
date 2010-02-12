@@ -331,6 +331,11 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
    UNION            {set state [this Save_state]
                      set L2 [this Parse_ROOT $L_root $VAL2 0]; this Load_state $state
                      set L1 [this Parse_ROOT $L_root $VAL  0]; this Load_state $state
+					 set L_root [concat $L1 $L2]
+                    }
+   INTERSECTION     {set state [this Save_state]
+                     set L1 [Liste_to_set [this Parse_ROOT $L_root $VAL  0]]; this Load_state $state
+                     set L2 [Liste_to_set [this Parse_ROOT $L_root $VAL2 0]]; this Load_state $state
 					 set L_root [list]
 					 foreach e1 $L1 {
 					   set e1_1 [lindex $e1 0]
@@ -341,11 +346,6 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
 						}
 					   if {$found} {lappend L_root $e1}
 					  }
-                    }
-   INTERSECTION     {set state [this Save_state]
-                     set L1 [Liste_to_set [this Parse_ROOT $L_root $VAL  0]]; this Load_state $state
-                     set L2 [Liste_to_set [this Parse_ROOT $L_root $VAL2 0]]; this Load_state $state
-					 set L_root [Liste_Intersection $L1 $L2]
                     }
    GOTO             {set this(goto_mode) 1}
    NEGATION         {set this(negation)  1}
