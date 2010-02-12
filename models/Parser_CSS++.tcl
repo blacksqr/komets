@@ -298,8 +298,18 @@ method Parser_CSS++ Parse_NODE {L_root index VAR VAL VAL2} {
  
  if {$this(goto_mode)} {
    set this(goto_mode) 0
-   if {[gmlObject info exists object $VAR]} {set nL $VAR} else {
-   if {[gmlObject info exists class  $VAR]} {set nL [gmlObject info objects $VAR]} else {set nL [list]}}
+   set L_N [split $VAR .]
+   set N [lindex $L_N 0]; set rest  [lrange $L_N 1 end]
+   if {[gmlObject info exists object $N]} {set nL $N} else {
+   if {[gmlObject info exists class  $N]} {set nL [gmlObject info objects $N]} else {set nL [list]}}
+   
+   if {[llength $rest] > 0} {
+     set state [this Save_state] 
+       set this(negation) 0; set this(recurse) 0
+       set nL [this get_nodes_from_where $nL [join $rest .]]
+     this Load_state $state
+    }
+	
   } else {set nL [this get_nodes_from_where $L_root $VAR]}
  
  set this(go_in)    0
