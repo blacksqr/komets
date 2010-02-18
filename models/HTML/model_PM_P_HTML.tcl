@@ -378,3 +378,6 @@ method PM_HTML send_jquery_message {methode cmd} {
 #XXX }
 }
 
+method PM_HTML Bg {r g b a} {
+	this add_html_style [list "background-color" "rgba($r,$g,$b,$a)"];
+}
