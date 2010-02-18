@@ -169,7 +169,7 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
  lassign [lindex $L_h end] T t
  if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 }
-
+# 
 #___________________________________________________________________________________________________________________________________________
 method Parser_CSS++ Parse_selector {str {last_axe ""}} {
  if {$str == ""} {return ""}
