@@ -390,3 +390,20 @@ method PM_HTML Float {position} {
 method PM_HTML Clear {position} {
 	this add_html_style [list "clear" "$position"];
 }
+method PM_HTML Display {display} {
+	this add_html_style [list "display" "$display"];
+}
+method PM_HTML BorderColor {r g b a} {
+	this add_html_style [list "border-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+}
+method PM_HTML BorderWidth {width} {
+	this add_html_style [list "border-width" "$width px"];
+}
+method PM_HTML BorderStyle {style} {
+	this add_html_style [list "border-style" "$style"];
+}
+method PM_HTML Border {width style color} {
+	lassign $color r g b a 
+	this add_html_style [list "border" "$width px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+}
+
