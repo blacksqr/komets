@@ -379,5 +379,8 @@ method PM_HTML send_jquery_message {methode cmd} {
 }
 
 method PM_HTML Bg {r g b a} {
-	this add_html_style [list "background-color" "rgba($r,$g,$b,$a)"];
+	this add_html_style [list "background-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+}
+method PM_HTML Fg {r g b a} {
+	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
 }
