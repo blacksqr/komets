@@ -31,9 +31,9 @@ method Interleaving_PM_P_MenuHorizontal_HTML get_current_menu {} {
      set this(current_menu) ""
     }
   }
- if {[string equal $this(current_menu) {}]} {
+ if {$this(current_menu) == ""} {
    set L [[this get_nesting_CORE_LC] get_out_daughters]
-   set this(current_menu) categ_[lindex $L 0]
+   set this(current_menu) categ_${objName}_[lindex $L 0]
   }
  return $this(current_menu)
 }
@@ -69,7 +69,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
    append strm $dec " <ul>\n"
    foreach c [[this get_nesting_CORE_LC]_LM_LP get_out_daughters] {
      append strm $dec "  " {<li>} "\n"
-     append strm $dec "    " {<a href="#} categ_$c {">} [[$c get_LC] get_name] {</a>} "\n"
+     append strm $dec "    " {<a href="#} categ_${objName}_$c {">} [[$c get_LC] get_name] {</a>} "\n"
      append strm $dec "  " {</li>} "\n"
     }
    append strm $dec " </ul>\n"
@@ -87,7 +87,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}
  
  set pos 0
  foreach c [this get_daughters] {
-   append strm $dec {<div id="} categ_[lindex $L $pos] {">} "\n"
+   append strm $dec {<div id="} categ_${objName}_[lindex $L $pos] {">} "\n"
      $c Render_all strm "$dec  "
    append strm $dec {</div>} "\n"
    incr pos

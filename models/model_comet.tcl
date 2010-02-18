@@ -555,6 +555,11 @@ method Comet_element Basic_Sub_mother   {m} {Sub_list this(L_mothers) $m}
 Generate_accessors Comet_element [list default_css_style_still_applied default_css_style_file default_op_gdd_file GDD_id nesting_element Semantic_API_get Semantic_API_set]
 
 #_________________________________________________________________________________________________________
+Inject_code Comet_element set_GDD_id {
+ this Add_style_class $v
+} {} __ADD_RELATED_STYLE__
+
+#_________________________________________________________________________________________________________
 method Comet_element Apply_default_style {} {
  Apply_style_on $objName [list] [this get_default_op_gdd_file] [this get_default_css_style_file]
  set this(default_css_style_still_applied) 1
@@ -1677,8 +1682,10 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
    if {![llength $L_rep]} {continue}
    
    foreach op [lindex $r 1] {
-     set val [lindex $op 2]
-	 switch [lindex $op 0] {
+     lassign $op op_type op_fct_name val op_cond
+	 #set val [lindex $op 2]
+
+	 switch $op_type {
        GDD {set fct_name [lindex $op 1]
 			set gdd_req {}
 			foreach gdd_fct $L_fct {
@@ -1695,8 +1702,16 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
                }
               set new_L_rep [list]
 			  foreach n $L_rep {
+			    if {$op_cond != ""} {
+ 				  if {![$n Has_for_style $op_cond]} {
+				    puts "$n has not for style $op_cond, let's continue..."
+					lappend new_L_rep $n
+				    continue
+				   }
+				 }
+				
                 if {[catch {set new_n [$n Update_factories $L_nodes]} res]} {
-				  puts "STYLE ERROR ($n Update_factories \{$L_nodes\}):\n$res"
+				  puts "STYLE ERROR ($n Update_factories \{$L_nodes\})"
 				  lappend new_L_rep $n
 				 } else {if {[string length $new_n]} {
 				           lappend new_L_rep $new_n
@@ -1713,8 +1728,8 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
 			  set OK 1
               if {[catch {set obj $n; $n $fct_name $val} err1]} {
 				if {[catch "set obj $n; $n $fct_name $val" err2]} {
-				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => $err1\n  => L_rep was {$L_rep}"
-				  puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => $err2\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => L_rep was {$L_rep}"
 				  set OK 0
 				 }
                }
@@ -1795,7 +1810,10 @@ method Physical_model Update_factories {L_nodes} {
            }
   }
 
- if {[llength $L_factories]==0} {puts "_-_-_- There is no factory for {$L_nodes}"; return $objName}
+ if {[llength $L_factories]==0} {
+   #puts "_-_-_- In $objName Update_factories {$L_nodes}. There is no compatible factory "
+   return $objName
+  }
  foreach f $L_factories {
    if {[this Has_for_style $f]} {return $objName}
   }
