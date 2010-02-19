@@ -1944,6 +1944,17 @@ method Logical_model get_L_symetrically_compatible_factories_with_ptf {ptf} {
 }
 
 #_________________________________________________________________________________________________________
+method Logical_model get_L_compatible_factories_to_plug_under_ptf {ptf} {
+ set L_rep [list]
+ 
+ foreach f [this get_PM_factories] {
+   if {[$ptf Accept_for_daughter [$f get_ptf]]} {lappend L_rep $f}
+  }
+  
+ return $L_rep
+}
+
+#_________________________________________________________________________________________________________
 method Logical_model get_L_compatible_factories_with_ptf_in {ptf L_f_name} {
  upvar $L_f_name L_f
 
@@ -2285,7 +2296,11 @@ global debug
 #              # Search among factories
 #                puts "No PM in the daughter were found to plug as daughter to the current one ($PM)...We try to generate one"
                 if {$debug} {puts "  <$objName Connect_PM_descendants CASE 0-2 />"}
-				set L_factories [$LMD get_L_compatible_factories_with_ptf [${PM}_cou get_ptf]]
+				#set L_factories [$LMD get_L_compatible_factories_with_ptf [${PM}_cou get_ptf]]
+				set L_factories [$LMD get_L_compatible_factories_to_plug_under_ptf [${PM}_cou get_ptf]]
+				
+				
+				
 				if {$debug} {puts "  L_factories : {$L_factories}"}
                 if {[llength $L_factories]} {
                   set PMD ""
@@ -2298,7 +2313,7 @@ global debug
                   if {$PMD != ""} {
 					if {[$PM Add_daughter $PMD $index]} {
                       $LMD Connect_PM_descendants $PMD
-					 }
+					 } else {$LMD set_PM_inactive $PMD}
                    }
                  }
 				if {$debug} {puts "</${objName}::Connect_PM_descendants_CASE_0>" }
