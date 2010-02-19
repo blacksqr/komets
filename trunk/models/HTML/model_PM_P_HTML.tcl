@@ -406,4 +406,14 @@ method PM_HTML Border {width style color} {
 	lassign $color r g b a 
 	this add_html_style [list "border" "$width px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
 }
+method PM_HTML BackgroundImage {imageName} {
+	this add_html_style [list "background-image" "url('src_img/$imageName')"];
+}
 
+method PM_HTML BorderRadius {radius} {
+	this add_html_style [list "-moz-border-radius" "$radius px"];
+	this add_html_style [list "-webkit-border-radius" "$radius px"];
+	this add_html_style [list "border-radius" "$radius px"];
+
+
+}
