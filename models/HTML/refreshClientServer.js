@@ -64,8 +64,8 @@ function refreshClientServer() {
 			success: function(msg){
 				if(msg) {
 					try {eval(msg);
-					    } catch(err) {$('Ajax_Raw').html("Erreur\n" + msg + "\n" + err );
-						              alert("BOBO\n" + msg + "___________");
+					    } catch(err) {$('#Ajax_Raw').html("Erreur in 1\n" + msg + "\n________________________________\n" + err );
+						              //alert("BOBO\n" + msg + "___________");
 					                 }
 					/*output = output_tmp;
 					i = i_tmp;
@@ -86,8 +86,8 @@ function refreshClientServer() {
 																 mutex = false;
 																 if(msg != '') {try {eval(msg);
 																	                } catch(err) { 
-																			                 $('p_debug_encore').html("Erreur\n" + msg + "\n" + err );
-																							 alert("ERREUR\n" + msg + "___________");
+																			                 $('#Ajax_Raw').html("Erreur in 2\n" + msg + "\n" + err );
+																							 //alert("ERREUR\n" + msg + "___________");
 																						   }
 																		       }
 																 

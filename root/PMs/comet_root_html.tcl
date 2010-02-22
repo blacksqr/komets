@@ -454,7 +454,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  
  if {![this get_html_compatibility_strict_mode]} {
 	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
-	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
+	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:block; width:100%; height:100px;"></textarea>}
 	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
 	 #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
 	 #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
