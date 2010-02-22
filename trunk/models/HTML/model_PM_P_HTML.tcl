@@ -29,6 +29,8 @@ method PM_HTML constructor {name descr args} {
  
  set this(PM_root) ""
  
+ if {![info exists class(enable_AJAX_UPDATE)]} {set class(enable_AJAX_UPDATE) 1}
+ 
 # eval "$objName configure $args"
 }
 
@@ -38,6 +40,10 @@ method PM_HTML constructor {name descr args} {
 
 Generate_List_accessor PM_HTML L_tags L_tags
 Generate_accessors     PM_HTML [list AJAX_id_for_daughters id_for_style]
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML get_class_enable_AJAX_UPDATE { } {return $class(enable_AJAX_UPDATE)}
+method PM_HTML set_class_enable_AJAX_UPDATE {v} {set class(enable_AJAX_UPDATE) $v}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Encode_param_for_JS {txt} {
@@ -223,7 +229,7 @@ method PM_HTML get_PM_root {  } {return $this(PM_root)}
 method PM_HTML set_PM_root {PM} {
  set this(PM_root) $PM
  foreach d [this get_daughters] {
-   if {[catch "$d set_PM_root {$PM}" err]} {
+   if {[catch {if {[$d get_PM_root] != $PM} {$d set_PM_root $PM}} err]} {
      #puts "___________ set_PM_root non implemented for $d set_PM_root {$PM}"
 	}
   }
@@ -231,7 +237,7 @@ method PM_HTML set_PM_root {PM} {
 
 #_________________________________________________________________________________________________________
 method PM_HTML Do_in_root {cmd} {
- if {![string equal $this(PM_root) ""]} {
+ if {$this(PM_root) != ""} {
    eval "$this(PM_root) $cmd"
   }
   
@@ -245,7 +251,7 @@ method PM_HTML Do_in_root {cmd} {
 method PM_HTML Sub_daughter {e} {
  set rep [this inherited $e]
    if {$rep} {catch "$e set_PM_root {}"}
-   this Do_in_root "Add_L_PM_to_sub $e"
+   if {$class(enable_AJAX_UPDATE)} {this Do_in_root "Add_L_PM_to_sub $e"}
  return $rep
 }
 
@@ -253,7 +259,7 @@ method PM_HTML Sub_daughter {e} {
 method PM_HTML Add_daughter {e {index -1}} {
  set rep [this inherited $e $index]
    this set_PM_root $this(PM_root)
-   this Do_in_root "Add_L_PM_to_add $e"
+   if {$class(enable_AJAX_UPDATE)} {this Do_in_root "Add_L_PM_to_add $e"}
  return $rep
 }
 
@@ -292,8 +298,10 @@ method PM_HTML sub_html_style {L_vars} {
 
 #_________________________________________________________________________________________________________
 method PM_HTML Send_updated_style {} {
- set root [this get_L_roots] 
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
+ #set root [this get_L_roots] 
+ set root $this(PM_root)
+ 
+ if {$class(enable_AJAX_UPDATE)} {
    set    cmd  "\$(\"#[this get_id_for_style]\").removeAttr(\"style\");\n"
    append cmd  "\$(\"#[this get_id_for_style]\").css({"
    foreach {var val} [this get_html_style] {
@@ -367,7 +375,7 @@ method PM_HTML DragDrop_event {type x y} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML send_jquery_message {methode cmd} {
- if {![string equal $this(PM_root) ""]} {
+ if {$class(enable_AJAX_UPDATE) && $this(PM_root) != ""} {
    $this(PM_root) Concat_update $objName $methode $cmd
   }
 
