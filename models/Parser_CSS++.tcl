@@ -58,6 +58,10 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
  upvar $index_L_flat_name        index_L_flat
  upvar $nb_go_through_name       nb_go_through
  
+ set tmp_nb_open_post_filter $nb_open_post_filter
+ set tmp_nb_go_through       $nb_go_through
+ set tmp_nb_open_parenthesis $nb_open_parenthesis
+ 
  set do_it_again 1
  while {$do_it_again} {
      if {$index_L_flat >= [llength $L_flat]} {break}
@@ -122,6 +126,7 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
          POST_FILTER  {incr nb_open_post_filter
 		               set L [list]; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; 
 					   lassign [lindex $L_h end] T t
+					   set tmp_nb_open_post_filter $nb_open_post_filter
 		               if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 					   lassign [lindex $L 0] T t
 					   if {$T == "AXE" && $t == "NEGATION"}    {
@@ -134,12 +139,14 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 		               incr index_L_flat; 
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; 
 					   lassign [lindex $L_h end] T t
+					   set tmp_nb_go_through       $nb_go_through
 					   if {$T == "AXE" && $t == "DESCENDANTS"} {set L_h [lrange $L_h 0 end-1]}
 					   lappend L_h [list AXE $axe_type $L]
 					  }
 		 GROUP        {set L [list]; incr nb_open_parenthesis 1; 
 		               incr index_L_flat
 					   this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
+					   set tmp_nb_open_parenthesis $nb_open_parenthesis
 					   lassign [lindex $L_h end] T t
 					   if {$T == "AXE"} {
 					     if {  $t == "PROJECTION" 
@@ -156,12 +163,25 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					  }
 		 INSIDE       {set L [list]; incr nb_open_parenthesis 1; incr index_L_flat; if {$index_L_flat == 1} {set axe_type GROUP}
 		               this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through
+					   set tmp_nb_open_parenthesis $nb_open_parenthesis
+					   lassign [lindex $L_h end] T t
+					   if { ($T == "AXE" || $T == "")
+					      &&( $t == "UNION"
+						    ||$t == "DIFFERENCE"
+							||$t == "INTERSECTION"
+							||$t == ""
+						    )
+						  } {set axe_type GROUP}
 					   lappend L_h [list AXE $axe_type $L]
 					  }
 		 POST_FILTER  {set L [list]; incr nb_open_post_filter 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
 		 default      {lappend L_h [lindex $L_flat $index_L_flat]}
 		}
 	  }
+
+   if { $tmp_nb_open_post_filter != $nb_open_post_filter
+      ||$tmp_nb_go_through       != $nb_go_through 
+	  ||$tmp_nb_open_parenthesis != $nb_open_parenthesis } {set do_it_again 0}
 	  
    if {$do_it_again} {incr index_L_flat}
   }
