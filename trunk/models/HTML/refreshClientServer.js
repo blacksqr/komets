@@ -63,9 +63,12 @@ function refreshClientServer() {
 			data: outputVer,
 			success: function(msg){
 				if(msg) {
+				    //$('#Ajax_Raw').css('display', 'block');
+					$('#Ajax_Raw').text("Received : \n" + msg);
 					try {eval(msg);
-					    } catch(err) {$('#Ajax_Raw').html("Erreur in 1\n" + msg + "\n________________________________\n" + err );
-						              //alert("BOBO\n" + msg + "___________");
+					    } catch(err) {$('#Ajax_Raw').css('display', 'block');
+						              $('#Ajax_Raw').text("Erreur in 1\n" + msg + "\n________________________________\n" + err);
+									  //alert("BOBO\n" + msg + "___________");
 					                 }
 					/*output = output_tmp;
 					i = i_tmp;
@@ -85,8 +88,10 @@ function refreshClientServer() {
 																 i_tmp = 0;
 																 mutex = false;
 																 if(msg != '') {try {eval(msg);
-																	                } catch(err) { 
-																			                 $('#Ajax_Raw').html("Erreur in 2\n" + msg + "\n" + err );
+																	                 $('#Ajax_Raw').text("Received : \n" + msg);
+																					} catch(err) { 
+																			                 $('#Ajax_Raw').css('display', 'block');
+																							 $('#Ajax_Raw').text("Erreur in 2\n" + msg + "\n");
 																							 //alert("ERREUR\n" + msg + "___________");
 																						   }
 																		       }
