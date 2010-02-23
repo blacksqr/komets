@@ -454,7 +454,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  
  if {![this get_html_compatibility_strict_mode]} {
 	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
-	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:block; width:100%; height:100px;"></textarea>}
+	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
 	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
 	 #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
 	 #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
@@ -813,3 +813,36 @@ method PhysicalHTML_root Is_update {clientversion} {
  # J'enregistre la version du serveur dans le client
  set this(version_client,$ipclient) $this(version_server)
 }
+
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Enlight {L_nodes} {
+ set cmd ""
+
+# Destruction of previous enlighters
+  append cmd {$('div.}  $objName {_Enlighter').remove();} "\n"
+  
+# Creation of new enlighters
+ foreach n $L_nodes {
+   # Création d'une frame(?) sous la racine
+   append cmd "\$('body').append(\"<div id=\\\"${objName}_Enlighter_for_$n\\\" class=\\\"${objName}_Enlighter\\\"></div>\")\;\n"
+   # Get coordinates of the targeted element n
+   append cmd "var Enlight_tx = \$('#${n}').width()\;\n"
+   append cmd "var Enlight_ty = \$('#${n}').height()\;\n"
+   append cmd "var Enlight_x  = \$('#${n}').offset().left\;\n"
+   append cmd "var Enlight_y  = \$('#${n}').offset().top\;\n"
+   # Placement
+   append cmd "\$('#${objName}_Enlighter_for_${n}').css({'position' : 'absolute', 'top' : Enlight_y + 'px', 'left' : Enlight_x + 'px', 'width' : Enlight_tx + 'px', 'height' : Enlight_ty + 'px'})\;\n"
+   append cmd "\$('#${objName}_Enlighter_for_${n}').show('pulsate', {}, 500)\;\n"
+   append cmd "\$('#${objName}_Enlighter_for_${n}').hover(function(){\$(this).text('${n}')}, function(){\$(this).text('')})\;\n"
+  }
+ 
+ # Coloration of all enlighters
+ append cmd "\$('div.${objName}_Enlighter').css('background-color', 'rgba(255, 255, 0, 0.5)')\;\n"
+ 
+ # Send the update
+ this Concat_update $objName Enlight $cmd
+ 
+ puts $cmd
+}
+
