@@ -42,3 +42,6 @@ method CometViewer Enlight_with_Parsed_CSS {PCSS_expr} {
  set L_nodes  [Parsed_CSS++ [this get_L_roots] $PCSS_expr]
  this Enlight $L_nodes
 }
+
+#_________________________________________________________________________________________________________
+Manage_CallbackList CometViewer [list Enlight] end

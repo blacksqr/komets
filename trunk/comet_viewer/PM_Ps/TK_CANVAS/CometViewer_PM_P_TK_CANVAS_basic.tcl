@@ -114,12 +114,10 @@ method CometViewer_PM_P_TK_CANVAS_basic Button_press {b x y} {
    set L_tags [$canvas gettags $item]
    set obj    [lindex $L_tags 0]
    if {[gmlObject info exists object $obj]} {
-	  if {[lindex [gmlObject info classes $obj] 0] == "GDD_Node"} {
 		switch $b {
-		        1 {this prim_set_L_selected_nodes $obj}
+		        1 {puts $obj; this prim_Enlight $obj}
 		  default {this Display_drop_down_menu $obj $x $y}
 		 }
-	   }
 	 }
    }
  
@@ -153,7 +151,7 @@ method CometViewer_PM_P_TK_CANVAS_basic Display_drop_down_menu {obj x y} {
 
    toplevel $top; 
    set b $top.destroy
-   button $b -text "Destroy component" -command "puts BOUM!; destroy $top"
+   button $b -text "Destroy component" -command "puts {$obj ... BOUM!}; destroy $top"
      pack $b -side top -fill x
    
    

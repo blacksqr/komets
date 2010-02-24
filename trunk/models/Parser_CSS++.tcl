@@ -40,6 +40,7 @@ method Parser_CSS++ Parse {str} {
  set L_hierachical_rep   [list]
  
  set index_L_rep 0
+ puts "L_rep = $L_rep"
  this Build_hierarchy L_hierachical_rep L_rep index_L_rep nb_open_parenthesis nb_open_post_filter nb_go_through
 
  if {$nb_open_parenthesis != 0} {puts "  WARNING : nb_open_parenthesis = $nb_open_parenthesis"}
