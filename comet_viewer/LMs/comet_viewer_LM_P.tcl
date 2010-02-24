@@ -21,5 +21,5 @@ Methodes_set_LC CometViewer_LM_P [L_methodes_set_CometViewer] {}          {$this
 Methodes_get_LC CometViewer_LM_P [L_methodes_get_CometViewer] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_PM_set_CometViewer_COMET_RE {} {return [list {set_represented_element {v}} {set_go_out_daughters {v}} {set_go_inside_level {v}} ]}
+proc P_L_methodes_PM_set_CometViewer_COMET_RE {} {return [list {Enlight {v}} {set_represented_element {v}} {set_go_out_daughters {v}} {set_go_inside_level {v}} ]}
   Generate_LM_setters CometViewer_LM_P [P_L_methodes_PM_set_CometViewer_COMET_RE]
