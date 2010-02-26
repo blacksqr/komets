@@ -422,6 +422,9 @@ method PM_HTML BorderRadius {radius} {
 	this add_html_style [list "-moz-border-radius" "$radius px"];
 	this add_html_style [list "-webkit-border-radius" "$radius px"];
 	this add_html_style [list "border-radius" "$radius px"];
+}
 
-
+method PM_HTML Bg_gradient {type color} {
+	lassign $color r g b a 
+	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba($r,$g,$b,$a), white)" ]
 }
