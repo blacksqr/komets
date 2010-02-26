@@ -426,5 +426,5 @@ method PM_HTML BorderRadius {radius} {
 
 method PM_HTML Bg_gradient {type color} {
 	lassign $color r g b a 
-	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba($r,$g,$b,$a), white)" ]
+	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), white)" ]
 }
