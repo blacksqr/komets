@@ -1672,7 +1672,7 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
    set L_real_mapping [concat     $L_mapping      [list {$current} $current]]
    set r              [string map $L_real_mapping $r]
    
-   if {$do_css} {set L_rep [CSS++ cr [lindex $r 0]]}
+   #if {$do_css} {set L_rep [CSS++ cr [lindex $r 0]]}
    if {$do_css} {
      #puts "  Parsed CSS : [lindex $r 0]"
 	 set L_rep [Parsed_CSS++ cr [lindex $r 0]]
