@@ -413,6 +413,31 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Mouse_hover {L} {
+ foreach e $L {
+   if {[gmlObject info exists object $e]} {
+     if {[lsearch [gmlObject info classes $e] Physical_model] >= 0} {
+	   this HTML_element_selected $e
+	   break
+	  }
+    }
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root HTML_element_selected {v} {}
+
+Manage_CallbackList PhysicalHTML_root [list HTML_element_selected] end
+Trace PhysicalHTML_root HTML_element_selected
+
+#___________________________________________________________________________________________________________________________________________
+method PhysicalHTML_root Do_Mouse_hover {v} {
+ if {$v} {
+   this Concat_update ${objName} Do_Mouse_hover {$('body').attr('onMouseDown', 'javascript:mouseEventHandler(event);');}
+  } else {this Concat_update ${objName} Do_Mouse_hover {$('body').attr('onMouseDown', '');}}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Render {strm_name {dec {}}} {
  upvar $strm_name rep
 
@@ -449,7 +474,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
    this Render_JS rep $this(marker) "    "
  append rep "  " {</head>}	"\n"
 
- append rep "  " {<body>}	"\n"
+ append rep "  " {<body onMouseDown="">}	"\n"
  this Render_daughters rep "$dec  "
  
  if {![this get_html_compatibility_strict_mode]} {
@@ -475,7 +500,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root set_Update_interval {v} {
  set this(Update_interval) $v
- this Concat_update $objName "set_update_interval" "\$(\"#Update_interval\").val($v);\n"
+ this Concat_update ${objName} "set_update_interval" "\$(\"#Update_interval\").val($v);\n"
 }
 
 #___________________________________________________________________________________________________________________________________________

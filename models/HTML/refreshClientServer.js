@@ -1,4 +1,41 @@
-﻿var output     = {};
+﻿//____________________________________________________________________________________________________________________
+//____________________________________________________________________________________________________________________
+//____________________________________________________________________________________________________________________
+function get_node_id_and_all_ancestors_id(node) {
+	var rep = "";
+	if (node.nodeName != "body") {
+		rep = node.id;
+		if(node.parentNode) {rep = rep + " " + get_node_id_and_all_ancestors_id(node.parentNode);}
+	}
+	
+	return rep;
+}
+
+//____________________________________________________________________________________________________________________
+function mouseEventHandler(mEvent) {
+	if (!mEvent)
+		mEvent=window.event;
+	  
+	  
+	  // Internet Explorer
+	  if (mEvent.srcElement)
+	  {
+		var id_list = get_node_id_and_all_ancestors_id(mEvent.srcElement);
+		addOutput_proc_val(document.forms[0].id + '__XXX__Mouse_hover', id_list, false);
+	  }
+	  // Netscape and Firefox
+	  else if (mEvent.target)
+	  {
+		var id_list = get_node_id_and_all_ancestors_id(mEvent.target);
+		addOutput_proc_val(document.forms[0].id + '__XXX__Mouse_hover', id_list, false);
+	  }
+}
+
+
+//____________________________________________________________________________________________________________________
+//____________________________________________________________________________________________________________________
+//____________________________________________________________________________________________________________________
+var output     = {};
 var output_tmp = {};
 var outputVer  = {};
 var i = 0;	

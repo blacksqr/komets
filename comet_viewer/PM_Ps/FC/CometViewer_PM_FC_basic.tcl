@@ -82,7 +82,8 @@ method CometViewer_PM_FC_basic Comet_to_dot {C str_name dec L_OK_recurse go_insi
  upvar $str_name str
  
  set inside_comets [CSS++ $C "#${C}(*) - #$C *"]
- append str $dec "  $C\[label=\"[[$C get_LC] get_name]\"\];\n"
+ set name [[$C get_LC] get_name]
+ append str $dec {  }  $C {[label="} [string map [list "\n" {\n}] $name] {"];} "\n"
 
  if {[lsearch [gmlObject info classes $C] Physical_model] != -1} {
    set prim [$C get_hiden_prim_elements]
