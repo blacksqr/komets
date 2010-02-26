@@ -386,7 +386,8 @@ method PM_HTML send_jquery_message {methode cmd} {
 #XXX }
 }
 
-method PM_HTML Bg {r g b a} {
+method PM_HTML Bg {color} {
+	lassign $color r g b a  
 	this add_html_style [list "background-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
 }
 method PM_HTML Fg {r g b a} {
@@ -424,7 +425,8 @@ method PM_HTML BorderRadius {radius} {
 	this add_html_style [list "border-radius" "$radius px"];
 }
 
-method PM_HTML Bg_gradient {type color} {
-	lassign $color r g b a 
-	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), white)" ]
+method PM_HTML Bg_gradient {color1 color2} {
+	lassign $color1 r g b a 
+	lassign $color2 r1 g1 b1 a1 
+	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1))" ]
 }
