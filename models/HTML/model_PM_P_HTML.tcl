@@ -430,3 +430,8 @@ method PM_HTML Bg_gradient {color1 color2} {
 	lassign $color2 r1 g1 b1 a1 
 	this add_html_style [list "background" "-moz-linear-gradient(0deg, rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1))" ]
 }
+method PM_HTML FG {color1} {
+	lassign $color1 r g b a 
+
+	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"]
+}
