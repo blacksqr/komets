@@ -72,11 +72,11 @@ method CometViewer_PM_P_TK_CANVAS_basic Update_interaction {} {
  set this(zoom_factor) 1
  set b [bind [winfo toplevel $canvas] <MouseWheel>]
  set new_binding ""
- foreach line [split $b "\n"] {if {[lindex $line 0] != $objName} {append $new_binding $line "\n"}}
+ foreach line [split $b "\n"] {if {[lindex $line 0] != $objName} {append new_binding $line "\n"}}
  
  bind [winfo toplevel $canvas] <MouseWheel> $new_binding
  
- bind [winfo toplevel $canvas] <MouseWheel> "+$objName trigger %W %X %Y %D"
+ bind [winfo toplevel $canvas] <MouseWheel> "+ $objName trigger %W %X %Y %D"
  bind $canvas <<Wheel>> "$objName Zoom %x %y \[$objName get_delta\]"
 
  #bind $canvas <Motion> "+ $objName Motion %x %y" 
