@@ -2667,7 +2667,7 @@ method Physical_model Propagate_info_substitution_of {PM1 PM2} {
 #_________________________________________________________________________________________________________
 method Physical_model Substitute_by {PM} {
  #puts "$objName Physical_model::Substitute_by $PM"
- if {[string equal $PM {}]} {return}
+ if {$PM == ""} {return}
  
  #set L_roots [this get_L_roots]
  set LM [this get_LM]
