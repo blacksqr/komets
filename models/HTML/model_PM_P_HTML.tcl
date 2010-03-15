@@ -468,3 +468,9 @@ method PM_HTML FG {color1} {
 	lassign $color1 r g b a 
 	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"]
 }
+method PM_HTML COLUMN {nb} {
+    if {$nb > 1} {
+	this add_html_style [list "-moz-column-count" "$nb"]
+    }
+
+}
