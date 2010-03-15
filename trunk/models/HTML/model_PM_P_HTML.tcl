@@ -301,7 +301,7 @@ method PM_HTML Send_updated_style {} {
  #set root [this get_L_roots] 
  set root $this(PM_root)
  
- if {$class(enable_AJAX_UPDATE)} {
+ if {$class(enable_AJAX_UPDATE) && $root != ""} {
    set    cmd  "\$(\"#[this get_id_for_style]\").removeAttr(\"style\");\n"
    append cmd  "\$(\"#[this get_id_for_style]\").css({"
    foreach {var val} [this get_html_style] {

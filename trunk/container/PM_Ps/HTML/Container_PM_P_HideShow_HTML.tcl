@@ -139,7 +139,7 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec <div  [this Style_class] > "\n"
-   append strm $dec "<div id=\"${objName}_header\"><div id=\"${objName}_title\"></div></div>"
+   append strm $dec "<div id=\"${objName}_header\"><div id=\"${objName}_title\">$this(title)</div></div>"
    append strm $dec "<div id=\"${objName}_content\">"
       this Render_daughters strm "$dec  "
    append strm $dec "</div>"
