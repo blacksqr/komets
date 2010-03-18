@@ -1,5 +1,6 @@
 if {[catch "load {C:/These/Projet Interface/BIGre/FFMPEG_for_TCL.dll}" err]} {
   set Video_PM_P_BIGre_ff_mpeg_OK 0
+  puts "ERROR while loading FFMPEG library:\n$err"
  } else {set Video_PM_P_BIGre_ff_mpeg_OK 1;
          ffmpeg_init
 		}
@@ -25,6 +26,9 @@ method Video_PM_P_BIGre constructor {name descr args} {
 
  this set_prim_handle        $this(primitives_handle)
  this set_root_for_daughters $this(primitives_handle)
+ 
+ set this(video_ex) 1; set this(video_ey) 1
+ this Origine 0 0
 
  eval "$objName configure $args"
  return $objName
@@ -36,6 +40,40 @@ Methodes_get_LC Video_PM_P_BIGre [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_time_frame ffmpeg_frame_num video_source canal_audio]
+
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre Origine {x y} {
+ set this(video_x) $x; set this(video_y) $y
+ this Px $x
+ this Py $y
+}
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre Py {v} {
+ this inherited $v
+ set this(video_y) $v
+ if {[this get_video_source] != "WEBCAM"} {
+   set bbox [$this(primitives_handle) Boite_noeud]
+   $this(primitives_handle) Translation_interne 0 [expr $this(video_ey) * [$bbox Ty]]
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre Etirement {x y} {
+ set this(video_ex) $x; set this(video_ey) $y
+ if {[this get_video_source] == "WEBCAM"} {
+   $this(primitives_handle) Etirement $x $y
+  } else {set px []; set py []
+          set bbox [$this(primitives_handle) Boite_noeud]
+          # set bg_x_1 [$bbox BG_X]; set bg_y_1 [$bbox BG_Y]; puts "Deb $bg_x_1 $bg_y_1"
+          $this(primitives_handle) Etirement $x $y
+		  # $this(primitives_handle) Calculer_boites
+		  # set bg_x_2 [$bbox BG_X]; set bg_y_2 [$bbox BG_Y]; puts "Fin $bg_x_2 $bg_y_2"
+          # $this(primitives_handle) Translation_interne [expr $bg_x_1 - $bg_x_2] [expr $bg_y_1 - $bg_y_2]
+          $this(primitives_handle) Etirement_interne 1 -1 [$bbox Cx] [$bbox Cy]
+		  this Origine $this(video_x) $this(video_y)
+		  puts $this(primitives_handle)
+         }
+}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Inverser_x {v} {
@@ -60,6 +98,11 @@ method Video_PM_P_BIGre Goto_pos_rel {percent} {
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre get_visu_cam {}  {return $this(visu_cam)}
+
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre get_B207_currrent_video_img {} {
+ if {[this get_video_source] == "WEBCAM"} {return $this(visu_cam)} else {return $this(img)}
+}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre set_video_source {s canal_audio}  {
@@ -106,20 +149,32 @@ method Video_PM_P_BIGre set_video_source {s canal_audio}  {
   
          # Gogogo!!!
           N_i_mere abonner_a_fin_simulation [$this(ffmpeg_rap_img) Rappel]
-		  
-		    $this(primitives_handle)  Ajouter_fils $this(img)
-			$this(img) Etirement 1 1
+		 
+		# DEBUG
+		   this Update_frame 1
+		   set texture [$this(img) Info_texture]
+		   $this(primitives_handle) Vider
+		   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
+		   $this(primitives_handle) Info_texture $texture
+		   
+		   $this(primitives_handle) Etirement_interne 1 -1 [expr $tx / 2.0] [expr $ty / 2.0]
+		   #$this(primitives_handle) Ajouter_fils $this(img)
+		   #$this(img) Afficher_noeud 0
+		    # OLD $this(primitives_handle) Ajouter_fils $this(img)
+		# /DEBUG
+		
+		#$this(img) Etirement 1 1
          }
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre Update_frame {} {
+method Video_PM_P_BIGre Update_frame {{force_update 0}} {
  set ms [N_i_mere ms]; 
  set num [expr int(($ms - [this get_ffmpeg_start_ms])*$this(ffmpeg_frame_rate)/1000.0)]
- if {$num != [this get_ffmpeg_frame_num]} {
+ if {$force_update || $num != [this get_ffmpeg_frame_num]} {
    this set_ffmpeg_frame_num $num
    FFMPEG_getImage $this(ffmpeg_id) $this(ffmpeg_buf)
-   $this(img) maj_raw $this(tx) $this(ty) [GL_rvb] 3 $this(ffmpeg_buf)
+   $this(img) maj_raw_with_transfo $this(tx) $this(ty) [GL_rvb] 3 [GL_rvba] 4 $this(ffmpeg_buf)
   }
  # N_i_mere Fermer_flux $this(B207_audio_stream)
 }
