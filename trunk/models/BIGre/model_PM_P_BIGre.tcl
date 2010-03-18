@@ -378,11 +378,24 @@ method PM_BIGre Raise {args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_BIGre Redirect_key_events_to_z_txt {prim} {
+ puts "$objName Redirect_key_events_to_z_txt $prim"
+ set    cmd "set prim $prim ;\n"
+ append cmd {set evt [B_sim_couche Evt_courant];} "\n"
+ append cmd {set ptr [$evt Ptr]; set pt [$ptr P_Point];} "\n"
+ append cmd {set res ""; puts "Redirect keys z_txt"; catch "B_sim_sds Prendre_evennements_lies_a $pt [$prim Liant]" res; }
+
+ $this(rap_redirect_key) Texte $cmd
+ [this get_prim_handle] desabonner_de_detection_pointeur [$this(rap_redirect_key) Rappel]
+ [this get_prim_handle] abonner_a_detection_pointeur     [$this(rap_redirect_key) Rappel]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_BIGre Redirect_key_events_to_PM {PM} {
  set    cmd "set prim \[$PM get_prim_handle\];\n"
  append cmd {set evt [B_sim_couche Evt_courant];} "\n"
  append cmd {set ptr [$evt Ptr]; set pt [$ptr P_Point];} "\n"
- append cmd {set res ""; catch "B_sim_sds Prendre_evennements_lies_a $pt [$prim Liant]" res; }
+ append cmd {set res ""; puts "Redirect keys to PM"; catch "B_sim_sds Prendre_evennements_lies_a $pt [$prim Liant]" res; }
 
  $this(rap_redirect_key) Texte $cmd
  [this get_prim_handle] desabonner_de_detection_pointeur [$this(rap_redirect_key) Rappel]
