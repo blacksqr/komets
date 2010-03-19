@@ -27,6 +27,7 @@ method Video_PM_P_BIGre constructor {name descr args} {
  this set_prim_handle        $this(primitives_handle)
  this set_root_for_daughters $this(primitives_handle)
  
+ set this(video_x)  0; set this(video_y)  0
  set this(video_ex) 1; set this(video_ey) 1
  this Origine 0 0
 
@@ -61,14 +62,10 @@ method Video_PM_P_BIGre Py {v} {
 method Video_PM_P_BIGre Etirement {x y} {
  set this(video_ex) $x; set this(video_ey) $y
  if {[this get_video_source] == "WEBCAM"} {
+   puts "$this(primitives_handle) Etirement $x $y"
    $this(primitives_handle) Etirement $x $y
-  } else {set px []; set py []
-          set bbox [$this(primitives_handle) Boite_noeud]
-          # set bg_x_1 [$bbox BG_X]; set bg_y_1 [$bbox BG_Y]; puts "Deb $bg_x_1 $bg_y_1"
+  } else {set bbox [$this(primitives_handle) Boite_noeud]
           $this(primitives_handle) Etirement $x $y
-		  # $this(primitives_handle) Calculer_boites
-		  # set bg_x_2 [$bbox BG_X]; set bg_y_2 [$bbox BG_Y]; puts "Fin $bg_x_2 $bg_y_2"
-          # $this(primitives_handle) Translation_interne [expr $bg_x_1 - $bg_x_2] [expr $bg_y_1 - $bg_y_2]
           $this(primitives_handle) Etirement_interne 1 -1 [$bbox Cx] [$bbox Cy]
 		  this Origine $this(video_x) $this(video_y)
 		  puts $this(primitives_handle)
@@ -184,3 +181,11 @@ method Video_PM_P_BIGre set_translucidity {v}  {
  $this(primitives_handle) Couleur 3 $v
 }
 
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre set_resolution {x y} {
+ if {[this get_video_source] == "WEBCAM"} {
+   $this(visu_cam) set_resolution $x $y
+   $this(primitives_handle) Vider
+   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $x $y]
+  }
+}
