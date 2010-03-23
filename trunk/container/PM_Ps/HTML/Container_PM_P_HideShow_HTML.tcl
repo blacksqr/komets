@@ -57,7 +57,8 @@ method Container_PM_P_HideShow_HTML set_title {v} {
  set root         [this get_L_roots]
  set this(marker) [clock clicks]
  set methode      "title"
- set cmd          "\$(\"#${objName}_title\").html(\"[this get_title]\");"
+ set title [this Encode_param_for_JS [this get_title]]
+ set cmd          "\$(\"#${objName}_title\").html($title);"
  
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
@@ -94,7 +95,8 @@ method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  append strm $dec "				.end()" "\n"
  append strm $dec "			.find(\"#${objName}_content\").attr({class : \"portlet-content\"});" "\n"
  
- append strm $dec "		\$(\"#${objName}_title\").html(\"" [this get_title] "\");" "\n"
+ set title [this Encode_param_for_JS [this get_title]]
+ append strm $dec "		\$(\"#${objName}_title\").html(" $title ");" "\n"
 
  if {[this get_header_place] == "top" || [this get_header_place] == "bottom"} {
 		append strm $dec "		\$(\"#${objName}_header\").attr({class : \"portlet-header ui-widget-header\"});"
