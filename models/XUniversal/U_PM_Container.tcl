@@ -8,9 +8,9 @@ method PM_U_Container constructor {name descr args} {
  this inherited $name $descr
    this set_nb_max_daughters 99999
    this set_nb_max_mothers   1
-   set this(L_nested_handle_LM)    {}
-   set this(L_nested_daughters_PM) {}
-   set this(L_nested_daughters_LM) {}
+   set this(L_nested_handle_LM)    [list]
+   set this(L_nested_daughters_PM) [list]
+   set this(L_nested_daughters_LM) [list]; set this(L_nested_daughters_LM_only) [list]
    set this(mode_plug)			   Empty
  eval "$objName configure $args"
  return $objName
@@ -22,27 +22,43 @@ method PM_U_Container dispose {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors PM_U_Container [list L_nested_daughters_LM L_nested_daughters_PM L_nested_handle_LM mode_plug]
+Generate_accessors PM_U_Container [list L_nested_daughters_LM L_nested_daughters_PM L_nested_handle_LM L_nested_daughters_LM_only mode_plug]
 
 #___________________________________________________________________________________________________________________________________________
-method PM_U_Container Register_nested_element_from {Ln} {
- foreach n $Ln {
-   #puts "Considering $n"
-   set n_ancestors [CSS++ $objName "#$n <--< * \\!>*/"]
-   set n_handles   [CSS++ $objName "#${objName}(>*->LC)"]
-   if {![Is_sub_list $n_ancestors $n_handles]} {continue}
-   #if {![$n Has_MetaData Generated_to_be_encapsulated_in]}             {continue}
-   #if { [$n Val_MetaData Generated_to_be_encapsulated_in] != $objName} {continue}
-   #puts "  OK"
-   this Add_composing_comet          $n
-   this Register_nested_element_from [$n get_out_daughters]
-  }
+method PM_U_Container Register_nested_elements {} {
+ set L_LC_inside [CSS++ $objName "#${objName}(>*->LC, >*->LC *)"]
+ this set_L_composing_comets $L_LC_inside
 }
+
+#___________________________________________________________________________________________________________________________________________
+# method PM_U_Container Register_nested_element_from {Ln} {
+ # foreach n $Ln {
+   # set n_ancestors [CSS++ $objName "#$n <--< * \\!>*/"]
+   # set n_handles   [CSS++ $objName "#${objName}(>*->LC)"]
+   # if {![Is_sub_list $n_ancestors $n_handles]} {continue}
+   # this Add_composing_comet          $n
+   # this Register_nested_element_from [$n get_out_daughters]
+  # }
+# }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container set_L_nested_daughters_PM {L} {
  set this(L_nested_daughters_PM) $L
- this set_handle_comet_daughters $L ""
+ 
+ set L_PM [list]; foreach e $L {lappend L_PM [lindex $e 0]}
+ this set_handle_comet_daughters $L_PM ""
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_U_Container Update_L_nested_daughters_PM {} {
+ set L [join [this get_L_nested_daughters_LM_only] ", "]; set L_nested_daughters_PM [list]
+ foreach PM [CSS++ $objName "#$objName ~ ($L)"] LM_mark [this get_L_nested_daughters_LM] {
+   if {$PM != ""} {lassign $LM_mark LM mark
+                   lappend L_nested_daughters_PM [list $PM $mark]
+				  }
+  }
+  
+ this set_L_nested_daughters_PM $L_nested_daughters_PM
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -52,7 +68,7 @@ method PM_U_Container Add_mother    {m {index -1}} {
  if {$rep} {
    this set_mode_plug Empty
    this set_daughters {}
-   this set_L_nested_daughters_PM ""
+   this set_L_nested_daughters_PM [list]
    this set_mode_plug Full
    #global debug; set debug 1
    #puts "   ___ Connect PM descendant, type = [${objName}_cou_ptf get_soft_type]"
@@ -61,22 +77,24 @@ method PM_U_Container Add_mother    {m {index -1}} {
    
   #puts "  obj $objName prim : [this get_prim_handle]\n  obj daughters : {[this get_daughters]}\n  Mother $m prim : [$m get_root_for_daughters]"
   # Let's find a nested PM among handles to connect to $m
-   set L [join [this get_L_nested_daughters_LM] ", "]
-   this set_L_nested_daughters_PM [CSS++ $objName "#$objName ~ ($L)"]
-   if {[llength [this get_L_nested_daughters_PM]] == 0} {
-     this set_L_nested_daughters_PM [CSS++ $objName "#[this get_L_nested_daughters_LM]->PMs"]
+  this Update_L_nested_daughters_PM
+  
+  if {[llength [this get_L_nested_daughters_PM]] == 0} {
+     puts "STRANGE !!! In $objName Add_mother $m $index"
+     this set_L_nested_daughters_PM [list [CSS++ $objName "#[this get_L_nested_daughters_LM_only]->PMs"] *]
     }
-   #puts "_______________\n  $objName set_L_nested_daughters_PM {[this get_L_nested_daughters_PM]}\n__________________________"
+
    this set_mode_plug Full
-   if {![string equal $this(L_nested_handle_LM) ""]} {
+   if {$this(L_nested_handle_LM) != ""} {
      set LC [$this(L_nested_handle_LM) get_LC]
-	 if {![string equal $LC ""]} {this Register_nested_element_from $LC}
+	 if {$LC != ""} {this Register_nested_elements}
     }
 	
    this Apply_default_style
   } else {this set_daughters {}; this set_mode_plug Empty; puts "$objName Add_mother $m => GROS ECHEC"}
 
  
+ puts "FIN $objName Add_mother $m $index"
  return $rep
 }
 
@@ -84,7 +102,13 @@ method PM_U_Container Add_mother    {m {index -1}} {
 method PM_U_Container Basic_Sub_daughter {d} {
 # A daughter has been deleted !
  this inherited $d
- Sub_list this(L_nested_daughters_PM) $d
+ foreach e $this(L_nested_daughters_PM) {
+   if {[lindex $e 0] == $d} {set this(L_nested_daughters_PM) [lreplace $this(L_nested_daughters_PM) $pos $pos]
+                             break
+							}
+   incr pos
+  }
+ # OLD Sub_list this(L_nested_daughters_PM) $d
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -96,13 +120,13 @@ method PM_U_Container Sub_daughter {m} {
    set rep [this inherited $m]
   } else {
          #if {![gmlObject info exists object $m]} {puts "$objName PM_U_Container::Sub_daughter $m !!!\n  - $m NO MORE EXISTS"; return [this inherited $m]}
-		  set pos [lsearch $this(L_nested_daughters_PM) $m]
+		  set pos [lsearch -index 0 $this(L_nested_daughters_PM) $m]
 		  if {$pos != -1} {
-		    #puts "  $m is a nested daughter"
-			set this(L_nested_daughters_PM) [lreplace this(L_nested_daughters_PM) $pos $pos]
+		    set this(L_nested_daughters_PM) [lreplace $this(L_nested_daughters_PM) $pos $pos]
 			if {[llength $this(L_nested_daughters_PM)] == 0} {set this(mode_plug) Empty}
 			set rep [this inherited $m]
-		   } else {set pos [lsearch [this get_handle_composing_comet] $m]
+		   } else {
+		           set pos [lsearch [this get_handle_composing_comet] $m]
 		           if {$pos != -1} {
 				     this Sub_handle_composing_comet $m
 					 set rep [this inherited $m]
@@ -110,7 +134,8 @@ method PM_U_Container Sub_daughter {m} {
 		          }
 		  set rep 0
 		  if {$debug} {puts "<$objName Unplug $ m from nested_daughters/>"}
-		  foreach PM $this(L_nested_daughters_PM) {
+		  foreach PM_mark $this(L_nested_daughters_PM) {
+		    lassign $PM_mark PM mark
             set rep [expr $rep || [$PM Sub_daughter $m]]
            }
 		  #return $rep 
@@ -149,7 +174,7 @@ method PM_U_Container Sub_mother {m} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container Add_daughter {m {index -1}} {
- global debug; 
+ global debug
  if {$debug} {puts "<${objName}::Add_daughter $m>"}
  if {[lsearch $this(L_nested_handle_LM) [$m get_LM]] >= 0} {
    set nb [this get_nb_max_daughters]
@@ -162,16 +187,24 @@ method PM_U_Container Add_daughter {m {index -1}} {
 			 if {$debug} {puts "  CASE 2, rep $rep"}
            } else {set rep 1
 		           if {$index == -1} {set i end} else {set i $index}
-		           set handle_daughter [lindex $this(L_nested_daughters_PM) $i]
-				   if {$handle_daughter == ""} {set handle_daughter [lindex $this(L_nested_daughters_PM) end]}
-				   if {$handle_daughter != ""} {
-				     $handle_daughter Add_daughter $m $index
-					 [$handle_daughter get_LM] Connect_PM_descendants $handle_daughter [$m get_LM]
+				   
+				   # Find the daughters handler that must be connected to $m\n
+				   foreach handle $this(L_nested_daughters_PM) {
+				     lassign $handle handle_daughter CSSpp_mark
+					 if {[$m Has_for_style $CSSpp_mark]} {
+					   $handle_daughter Add_daughter $m $index
+					   [$handle_daughter get_LM] Connect_PM_descendants $handle_daughter [$m get_LM]
+					   break
+					  } else {lappend L_still_done }
 				    }
-				   #foreach PM $this(L_nested_daughters_PM) {
-                   #  set rep [expr $rep && [$PM Add_daughter $m $index]]
-                   #  [$PM get_LM] Connect_PM_descendants $PM [$m get_LM]
-                   # }
+				   
+				   
+		           # OLD set handle_daughter [lindex $this(L_nested_daughters_PM) $i]
+				   # if {$handle_daughter == ""} {
+				     # set handle_daughter [lindex $this(L_nested_daughters_PM) end]
+					# } else {$handle_daughter Add_daughter $m $index
+					        # [$handle_daughter get_LM] Connect_PM_descendants $handle_daughter [$m get_LM]
+				           # }
 				   if {$debug} {puts "  CASE 3, rep $rep"}
                   }
          }
@@ -186,11 +219,10 @@ method PM_U_Container Add_daughter {m {index -1}} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container Reconnect {PMD} {
- #puts "$objName Reconnect $PMD"
  set L_d [this get_daughters]
  set rep [this inherited [Liste_Intersection $PMD $L_d]]
- #puts "  rep : $rep"
- foreach PM $this(L_nested_daughters_PM) {
+ foreach PM_mark $this(L_nested_daughters_PM) {
+   lassign $PM_mark PM m
    $PM Reconnect [$PM get_daughters]
   }
  
@@ -205,45 +237,45 @@ method PM_U_Container Update {} {
      this Sub_mother $m
      this Add_mother $m
 }
-#method PM_U_Container set_L_nested_handle_LM {L} {set this(L_nested_handle_LM) $L}
+#
+
+#___________________________________________________________________________________________________________________________________________
+method PM_U_Container set_L_nested_daughters_LM {L} {
+ set this(L_nested_daughters_LM) [list]; set this(L_nested_daughters_LM_only) [list]
+ foreach e $L {
+   lassign $e LM mark; lappend this(L_nested_daughters_LM_only) $LM
+   if {$mark == ""} {set mark *}
+   lappend this(L_nested_daughters_LM) [list $LM $mark]
+  }
+}
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container Add_prim_daughter {c Lprims {index -1}} {
- #puts "$objName Add_prim_daughter $c $Lprims"
  set rep [this inherited $c $Lprims $index]
- #puts "  rep : $rep"
  return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container Sub_prim_daughter {c Lprims {index -1}} {
- #puts "$objName Sub_prim_daughter $c $Lprims"
  set rep [this inherited $c $Lprims $index]
- #puts "  rep : $rep"
  return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container get_or_create_prims {root} {
- #puts "$objName get_or_create_prims $root"
  set rep [this inherited $root]
- #puts "  rep : $rep"
  return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container get_prim_handle {{index -1}}  {
- #puts "$objName get_prim_handle $index"
  set rep [this inherited $index]
- #puts "  rep : $rep"
  return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container get_root_for_daughters {{index -1}} {
- #puts "$objName get_root_for_daughters $index"
  set rep [this inherited $index]
- #puts "  rep : $rep"
  return $rep
 }
 
