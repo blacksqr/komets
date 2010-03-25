@@ -102,7 +102,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
 		this get_tabs_css_style tmp
 		append  msg [this Encode_param_for_JS $tmp]
 		append  msg "\");" 
-		this Concat_update $objName Tabs_css_style $msg 
+		this send_jquery_message Tabs_css_style $msg 
 	} else {
 		return [this inherited $lstyles $id] 
 	}
