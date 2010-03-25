@@ -46,10 +46,14 @@ method PM_HTML get_class_enable_AJAX_UPDATE { } {return $class(enable_AJAX_UPDAT
 method PM_HTML set_class_enable_AJAX_UPDATE {v} {set class(enable_AJAX_UPDATE) $v}
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML get_id_for_style {{id {}}} {
+ if {$id == ""} {return $this(id_for_style)} else {return $id}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Encode_param_for_JS {txt} {
  set    rep "\""
- append rep [string map [list {"} {\"} "\n" {\n}] $txt]
- #" pour fermer le guillemet au dessus (mise en pages...)
+ append rep [string map [list "\"" {\"} "\n" {\n}] $txt]
  append rep "\""
  return $rep
 }
@@ -181,9 +185,9 @@ method PM_HTML Style_class {} {
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML get_html_style_in_text {} {
+method PM_HTML get_html_style_in_text {{id {}}} {
  set rep ""
- foreach {var val} [this get_html_style] {
+ foreach {var val} [this get_html_style $id] {
 	append rep $var ": " $val ";"
   }  
  return $rep
@@ -265,53 +269,55 @@ method PM_HTML Add_daughter {e {index -1}} {
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML set_html_style {lstyles} {
+method PM_HTML set_html_style {lstyles {id {}}} {
  set Lsub [list ]
- foreach {var val} [this get_html_style] {
+ foreach {var val} [this get_html_style $id] {
    lappend Lsub $var
   }
- this sub_html_style $Lsub
- this add_html_style $lstyles 
+ this sub_html_style $Lsub    $id
+ this add_html_style $lstyles $id
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML get_html_style {} {
+method PM_HTML get_html_style {{id {}}} {
  set L [list]
- foreach {var val} [array get this html_style,*] {lappend L [string range $var 11 end] $val; }
+ set size [string length html_style$id,]
+ foreach {var val} [array get this html_style$id,*] {lappend L [string range $var $size end] $val; }
  return $L
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML add_html_style {L_var_val} {
+method PM_HTML add_html_style {L_var_val {id {}}} {
  foreach {var val} $L_var_val {
-   set this(html_style,$var) $val
+   set this(html_style$id,$var) $val
   }
- this Send_updated_style
+ this Send_updated_style $id
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML sub_html_style {L_vars} {
+method PM_HTML sub_html_style {L_vars {id {}}} {
  foreach var $L_vars {
-	unset this(html_style,$var)
+	unset this(html_style$id,$var)
   }
- this Send_updated_style
+ this Send_updated_style $id
 }
 
 #_________________________________________________________________________________________________________
-method PM_HTML Send_updated_style {} {
+method PM_HTML Send_updated_style {{id {}}} {
  #set root [this get_L_roots] 
  set root $this(PM_root)
  
  if {$class(enable_AJAX_UPDATE) && $root != ""} {
-   set    cmd  "\$(\"#[this get_id_for_style]\").removeAttr(\"style\");\n"
-   append cmd  "\$(\"#[this get_id_for_style]\").css({"
-   foreach {var val} [this get_html_style] {
+   set id_style [this get_id_for_style $id]
+   set    cmd  "\$(\"#${id_style}\").removeAttr(\"style\");\n"
+   append cmd  "\$(\"#${id_style}\").css({"
+   foreach {var val} [this get_html_style $id] {
 	 append cmd \' $var \' " : \'" $val "\',"
 	}
    set cmd [string range $cmd 0 end-1]	
    append cmd "});" "\n"
  
-   $root Concat_update $objName htmlstyle $cmd
+   $root Concat_update $objName htmlstyle$id $cmd
   } 
 }
 
