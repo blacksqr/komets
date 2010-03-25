@@ -152,8 +152,8 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec <div  [this Style_class] > "\n"
-   append strm $dec "<div id=\"${objName}_header\" style=\"[this get_html_style_in_text header]\"><div id=\"${objName}_title\">$this(title)</div></div>"
-   append strm $dec "<div id=\"${objName}_content\">"
+   append strm $dec "<div id=\"${objName}_header\" style=\"[this get_html_style_in_text ${objName}_header]\"><div id=\"${objName}_title\">$this(title)</div></div>"
+   append strm $dec "<div id=\"${objName}_content\" style=\"[this get_html_style_in_text ${objName}_content]\">"
       this Render_daughters strm "$dec  "
    append strm $dec "</div>"
  append strm $dec </div> "\n"
@@ -161,19 +161,4 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
 
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HideShow_HTML Bg_gradient_bar {color1 color2 angle} {
-puts "Bg Gradient Bar"
-
-	lassign $color1 r g b a 
-	lassign $color2 r1 g1 b1 a1 
-	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1))" ] ${objName}_header
-	#this add_html_style [list "background" "-webkit-gradient(linear,0 0, 0% 100%, from(rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)), to(rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1)))" ]
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HideShow_HTML Bg_bar {color} {
-	puts "Bg Gradient Bar"
-	lassign $color r g b a  
-	this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] ${objName}_header
-}
 

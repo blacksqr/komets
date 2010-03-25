@@ -8,6 +8,9 @@ method Interleaving_PM_P_MenuHorizontal_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id ScrollableMonospaceInterleaving_HTML
    this set_mark 0
+    
+	this set_html_style "" ${objName}_tabs
+	this set_html_style "" ${objName}_selected
    set this(current_menu) {}
  eval "$objName configure $args"
 }
@@ -66,9 +69,17 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  append strm $dec "<input type=\"hidden\" id=\"${objName}__XXX__set_current_menu\" name=\"${objName}__XXX__set_current_menu\" value=\"[this get_current_menu]\" />\n"
  append strm $dec {<div } [this Style_class] ">\n"
    # Génération des rubriques
-   append strm $dec " <ul>\n"
+   append strm $dec " <style id=\"${objName}_tabs_style\" type=\"text/css\">\n"
+   append strm $dec ".${objName}_tabs.ui-state-default { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}"
+   append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}"
+   append strm $dec ".${objName}_tabs.ui-tabs-nav{ \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}"
+   append strm $dec "</style>\n"
+   append strm $dec " <ul class=\"${objName}_tabs\">\n"
    foreach c [[this get_nesting_CORE_LC]_LM_LP get_out_daughters] {
-     append strm $dec "  " {<li>} "\n"
+     append strm $dec "  " "<li class=\"${objName}_tabs\" >" "\n"
      append strm $dec "    " {<a href="#} categ_${objName}_$c {">} [[$c get_LC] get_name] {</a>} "\n"
      append strm $dec "  " {</li>} "\n"
     }
