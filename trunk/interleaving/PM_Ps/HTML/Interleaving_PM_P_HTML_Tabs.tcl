@@ -62,16 +62,18 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
  this Render_daughters_post_JS strm $dec
 }
 
+#___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec {}}} {
 	 upvar $strm_name strm
     append strm $dec ".${objName}_tabs.ui-state-default { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}"
+   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}\n"
    append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}"
+   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"
    append strm $dec ".${objName}_tabs.ui-tabs-nav{ \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}"
+   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}\n"
 	
 }
+
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
@@ -95,16 +97,32 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  append strm $dec {</div>} "\n"
 }
 
-method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuHorizontal_HTML add_html_style {L_var_val {id {}}} {
+    this inherited $L_var_val $id
 	if {[lsearch [list ${objName}_tabs ${objName}_selected ${objName}_header] $id] >= 0} {
-		set msg "\$(\"${objName}_tabs_style\").text(\""
+		set msg "\$(\"#${objName}_tabs_style\").text("
 		set tmp "" 
 		this get_tabs_css_style tmp
 		append  msg [this Encode_param_for_JS $tmp]
-		append  msg "\");" 
+		append  msg ");" 
+		puts "$objName send_jquery_message Tabs_css_style $msg"
 		this send_jquery_message Tabs_css_style $msg 
-	} else {
-		return [this inherited $lstyles $id] 
+	 }
+}
+
+Trace Interleaving_PM_P_MenuHorizontal_HTML add_html_style
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
+    this inherited $lstyles $id
+	if {[lsearch [list ${objName}_tabs ${objName}_selected ${objName}_header] $id] >= 0} {
+		set msg "\$(\"${objName}_tabs_style\").text("
+		set tmp "" 
+		this get_tabs_css_style tmp
+		append  msg [this Encode_param_for_JS $tmp]
+		append  msg ");" 
+		this send_jquery_message Tabs_css_style $msg 
 	}
 
 }
@@ -124,4 +142,4 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}
 
 }
 
-Trace Interleaving_PM_P_MenuHorizontal_HTML Render_daughters
+#Trace Interleaving_PM_P_MenuHorizontal_HTML Render_daughters
