@@ -844,12 +844,18 @@ method Comet_element get_toplevel_nesting_PM {} {
 method Comet_element get_out_daughters { } {
  set L_rep {}
  set L_h_d [this get_handle_comet_daughters]
- if {$L_h_d == "" } {
+ if {[llength $L_h_d] == 0} {
    if {[llength [this get_handle_composing_comet]] == 0} {return [this get_daughters]} else {return {}}
   }
+
+	   set rep [list]
+	   foreach d $L_h_d {set rep [concat $rep [$d get_out_daughters]]}
+       return $rep
+	 
+	 
  foreach d $L_h_d {
    foreach n [$d get_out_daughters] {
-     if {[lsearch [$n get_rec_L_nesting_element] $objName] == -1} {lappend L_rep $n}
+     # OLD if {[lsearch [$n get_rec_L_nesting_element] $objName] == -1} {lappend L_rep $n}
     }
   }
  return $L_rep
@@ -2545,7 +2551,7 @@ method Physical_model constructor {name descr args} {
  set this(interaction_instance) ""
  
 # Manage a particular order for daughters
- set this(L_display_order) [list]; set this(is_getting_daughters) 0
+ set this(L_display_order) [list]; set this(is_getting_daughters) 0; set this(is_computing_out_daughters) 0
 
  eval "$objName configure $args"
  return $objName
@@ -2569,20 +2575,42 @@ method Physical_model dispose {} {
 Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semantic_API_prim_set interaction_class L_display_order]
 
 #_________________________________________________________________________________________________________
+Inject_code Physical_model set_L_display_order {} {
+ set L_d [this get_out_daughters]; puts "  L_d : $L_d"
+ foreach e $L_d {this Sub_daughter $e}
+ foreach e $L_d {puts "    $e"; this Add_daughter $e}
+}
+
+#_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 method Physical_model get_daughters {} {
  if {[llength $this(L_display_order)]} {
    if {$this(is_getting_daughters)} {return [this inherited]}
    set this(is_getting_daughters) 1
-   set L_D [list]; foreach e $this(L_display_order) {lappend L_D "NODE $e"}
-   set exp [list ROOT {} "{AXE GOTO {}} {NODE $objName} {AXE CHILDREN {}} {AXE GROUP {{AXE UNION {$L_D}}}}"]
-   #puts "Style_CSSpp Interprets_parsed $exp"
-   set rep [Style_CSSpp Interprets_parsed $objName $exp]
+   set exp "#$objName > ("
+   append exp [join $this(L_display_order) ", "] ")"
+   set rep [CSS++ $objName $exp]
    set this(is_getting_daughters) 0
    return $rep
   } else {return [this inherited]}
 }
+
+#_________________________________________________________________________________________________________
+method Physical_model get_out_daughters {} {
+ set L_h_d [this get_handle_comet_daughters]
+ if {$this(is_computing_out_daughters) || [llength $L_h_d] == 0 || $this(L_display_order) == ""} {
+   set rep [this inherited]
+  } else {set this(is_computing_out_daughters) 1
+		  set exp "(#"
+		  append exp [join $L_h_d ", #"] ") > (" [join $this(L_display_order) ", "] ", *)"
+		  set rep [CSS++ $objName $exp]
+		  set this(is_computing_out_daughters) 0
+		 }
+		 
+ return $rep
+}
+		
 
 #_________________________________________________________________________________________________________
 method Physical_model set_interaction_class {C args} {

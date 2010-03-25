@@ -33,7 +33,6 @@ method CometCamNote_ExaminatorQuestions_PM_U set_LM {LM} {
     }
    set L $this(internal_spec)_LM_LP
    this set_L_nested_handle_LM    $L
-   #this set_L_nested_daughters_LM $L
   } else {this inherited $LM}
 }
 
