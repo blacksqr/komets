@@ -62,6 +62,16 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
  this Render_daughters_post_JS strm $dec
 }
 
+method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec {}}} {
+	 upvar $strm_name strm
+    append strm $dec ".${objName}_tabs.ui-state-default { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}"
+   append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}"
+   append strm $dec ".${objName}_tabs.ui-tabs-nav{ \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}"
+	
+}
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
@@ -70,12 +80,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  append strm $dec {<div } [this Style_class] ">\n"
    # Génération des rubriques
    append strm $dec " <style id=\"${objName}_tabs_style\" type=\"text/css\">\n"
-   append strm $dec ".${objName}_tabs.ui-state-default { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}"
-   append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}"
-   append strm $dec ".${objName}_tabs.ui-tabs-nav{ \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}"
+   this get_tabs_css_style strm $dec
    append strm $dec "</style>\n"
    append strm $dec " <ul class=\"${objName}_tabs\">\n"
    foreach c [[this get_nesting_CORE_LC]_LM_LP get_out_daughters] {
@@ -90,6 +95,19 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  append strm $dec {</div>} "\n"
 }
 
+method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
+	if {[lsearch [list ${objName}_tabs ${objName}_selected ${objName}_header] $id] >= 0} {
+		set msg "\$(\"${objName}_tabs_style\").text(\""
+		set tmp "" 
+		this get_tabs_css_style tmp
+		append  msg [this Encode_param_for_JS $tmp]
+		append  msg "\");" 
+		this Concat_update $objName Tabs_css_style $msg 
+	} else {
+		return [this inherited $lstyles $id] 
+	}
+
+}
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}}} {
  upvar $strm_name strm
