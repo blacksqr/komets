@@ -7,7 +7,7 @@ method CometTravel_PM_P_U constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id N_CometTravel_PM_P_U
    # Nested COMET graph
-   set this(cont_root) [CPool get_a_comet CometContainer -Add_style_class root]
+   set this(cont_root)   [CPool get_a_comet CometContainer -Add_style_class root]
      set this(spec_from) [CPool get_a_comet CometSpecifyer -Add_style_class "PARAM IN from"]
 	 set this(spec_to)   [CPool get_a_comet CometSpecifyer -Add_style_class "PARAM IN to"]
 	 set this(act_go)    [CPool get_a_comet CometActivator -Add_style_class "PARAM CONFIRM COMPUTE compute_travel"]

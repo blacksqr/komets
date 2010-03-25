@@ -116,7 +116,7 @@ global debug
 	set node_name       "$this(comet_name)_subspace_$this(num_sub)"
 	set node_name_LM_LP "${node_name}_LM_LP"
 	incr this(num_sub)
-	CometContainer $node_name "Workspace of [[$m get_LC] get_name]" {Each is used to embody a daughter}
+	CometContainer $node_name "Workspace of [[$m get_LC] get_name]" {Each is used to embody a daughter} -Add_style_class [$m get_LC]
 	if {($index == -1) || ([llength $this(L_handle_composing_daughters)] <= $index)} {
 	  set pos [llength $this(L_handle_composing_daughters)]
 	 } else {set pos $index}

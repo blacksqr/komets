@@ -2056,9 +2056,16 @@ method Logical_model set_LC {lc} {set this(LC) $lc;
 #_________________________________________________________________________________________________________
 method Logical_model Sub_daughter {m} {
  set res [this inherited $m]
- if {[expr $res == 1]} {
+ if {$res == 1} {
 # # Let's deconnect all PMs who only have for mothers PMs from $m
-   foreach PM [$m get_L_actives_PM] {
+   set L_PM_m [$m get_L_actives_PM]
+   foreach PM [this get_L_actives_PM] {
+     foreach PM_m $L_PM_m {$PM Sub_daughter $PM_m}
+   
+   
+     continue
+   
+   # TAKE CARE OF THIS OLD CODE!!! PROBABLY BUGGED CAUSE THE TEST HAS NO MORE SENS
      set L_mothers [$PM get_mothers]
      set to_be_deconnected 1
      foreach PM_mother $L_mothers {
@@ -2072,6 +2079,7 @@ method Logical_model Sub_daughter {m} {
       }
     }
   }
+  
  return $res
 }
 
@@ -2535,17 +2543,22 @@ method Physical_model constructor {name descr args} {
  #set this(L_img) [list]
  set this(interaction_class)    ""
  set this(interaction_instance) ""
+ 
+# Manage a particular order for daughters
+ set this(L_display_order) [list]; set this(is_getting_daughters) 0
 
  eval "$objName configure $args"
  return $objName
 }
+
+
 #_________________________________________________________________________________________________________
 method Physical_model dispose {} {
  #puts "$objName Physical_model::dispose";
  set LM [this get_LM]
- if {[string equal $LM {}]} {} else {$LM set_PM_inactive $objName
-                                     $LM Sub_PM          $objName
-                                    }
+ if {$LM != ""} {$LM set_PM_inactive $objName
+                 $LM Sub_PM          $objName
+                }
 
  set cou $this(cou)
  this inherited
@@ -2553,7 +2566,23 @@ method Physical_model dispose {} {
 }
 
 #_________________________________________________________________________________________________________
-Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semantic_API_prim_set interaction_class]
+Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semantic_API_prim_set interaction_class L_display_order]
+
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+#_________________________________________________________________________________________________________
+method Physical_model get_daughters {} {
+ if {[llength $this(L_display_order)]} {
+   if {$this(is_getting_daughters)} {return [this inherited]}
+   set this(is_getting_daughters) 1
+   set L_D [list]; foreach e $this(L_display_order) {lappend L_D "NODE $e"}
+   set exp [list ROOT {} "{AXE GOTO {}} {NODE $objName} {AXE CHILDREN {}} {AXE GROUP {{AXE UNION {$L_D}}}}"]
+   #puts "Style_CSSpp Interprets_parsed $exp"
+   set rep [Style_CSSpp Interprets_parsed $objName $exp]
+   set this(is_getting_daughters) 0
+   return $rep
+  } else {return [this inherited]}
+}
 
 #_________________________________________________________________________________________________________
 method Physical_model set_interaction_class {C args} {

@@ -143,8 +143,10 @@ proc U_encapsulator_PM_techno {ptf PM graph {handle_for_daughters {}}} {
  if {[llength [$PM_encaps get_mothers]]} {
    $PM_encaps set_mode_plug Full
    [$PM_encaps get_LM] Connect_PM_descendants $PM_encaps [$PM_encaps get_L_nested_handle_LM]
-   set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
-   $PM_encaps set_L_nested_daughters_PM [CSS++ $PM_encaps "#$PM_encaps ~ ($L)"]
+   
+   $PM_encaps Update_L_nested_daughters_PM
+   # set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
+   # $PM_encaps set_L_nested_daughters_PM [CSS++ $PM_encaps "#$PM_encaps ~ ($L)"]
   }
 }
 
@@ -153,7 +155,7 @@ proc U_encapsulator_PM_techno {ptf PM graph {handle_for_daughters {}}} {
 proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
  #puts "U_encapsulator_PM {$PM} {$graph} $handle_for_daughters"
 # Save PM mothers and daughters
- set L_mothers {} 
+ set L_mothers [list]
    foreach m [$PM get_out_mothers] {
      set L_m_d [$m get_daughters]
      lappend L_mothers [list $m [lsearch $L_m_d $PM]]
@@ -166,11 +168,19 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
    if {[string equal [$PM Val_MetaData Encapsulated_graph] $graph]} {
      #puts "  - NOTHING TO DO";
 	 return $PM
-	}
+	} else {
+	        # Destroy what is inside !!!
+			$PM set_mothers   [list]
+			$PM set_daughters [list]
+			foreach LC [$PM get_L_composing_comets] {
+			  if {![$LC Has_for_style CORE]} {puts "  Disposing $LC"; $LC dispose}
+			 }
+	       }
    set PM_encaps $PM
+   set PM [$PM_encaps get_core]
   } else {$PM set_mothers   ""
           $PM set_daughters ""
-		  set LM [$PM get_LM]
+		  #set LM [$PM get_LM]
 		  set PM_encaps "U_encapsulator_PM_${PM}_[interpretor_DSL_comet_interface get_a_unique_id]"
 		    [get_PM_encaps_class_for_PM $PM] $PM_encaps U_encapsulator_PM "Generated to encapsulate $PM" $PM
          }
@@ -181,17 +191,27 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
    #puts "interpretor_DSL_comet_interface Interprets {$graph} \[$PM_encaps get_core_factice_LC\]_nesting_root_name"
    set L_res_Comets [interpretor_DSL_comet_interface Interprets $graph [$PM_encaps get_core_factice_LC]_nesting_root_name]
    
-     foreach C "[lindex $L_res_Comets 0] [lindex $L_res_Comets 1]" {$C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps}
+   foreach C [concat [lindex $L_res_Comets 0] [lindex $L_res_Comets 1]] {
+     $C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps
+	}
 	 
    set root [CSS++ [$PM get_L_roots] "((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\! <--< > */"]
    #puts "Style_CSSpp Parse {((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\! <--< > */}"
    #puts "_-_-_-_-_-_-  - root : $root"
    $PM_encaps set_L_nested_handle_LM $root
-   if {[string equal $handle_for_daughters ""]} {
-     set handle_for_daughters [$PM get_LM]
-	} else {set handle_for_daughters [CSS++ $root "$handle_for_daughters"]
+   if {$handle_for_daughters == ""} {
+     set handle_for_daughters [list [list [$PM get_LM] *]]
+	} else {set new_handle_for_daughters [list]
+	        foreach h $handle_for_daughters {
+			  lassign $h handle_mark daughters_mark
+	          lappend new_handle_for_daughters [list [CSS++ $root ${handle_mark}->_LM_LP] $daughters_mark]
+			  #set handle_for_daughters [CSS++ $root $handle_for_daughters]
+			 }
+			set handle_for_daughters $new_handle_for_daughters
 	       }
-   $PM_encaps set_L_nested_daughters_LM [CSS++ cr "#${handle_for_daughters}->_LM_LP"]
+   $PM_encaps set_L_nested_daughters_LM $handle_for_daughters
+   # OLD $PM_encaps set_L_nested_daughters_LM [CSS++ cr "#${handle_for_daughters}->_LM_LP"]
+   
    #puts "$PM_encaps L_nested_daughters_LM is {[$PM_encaps get_L_nested_daughters_LM]}"
  #$PM Substitute_by $PM_encaps
 		set nesting_element [$PM_encaps get_nesting_element]
@@ -199,17 +219,20 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
  [$PM_encaps get_LM] Connect_PM_descendants $PM_encaps [$PM_encaps get_L_nested_handle_LM]
  
  foreach m $L_mothers   {[lindex $m 0] Add_daughter $PM_encaps [lindex $m 1]}
- #puts "End of adding mothers ($L_mothers) to $PM_encaps"
+
  if {[llength $L_mothers] == 0} {
    $PM_encaps set_mode_plug Full
    [$PM_encaps get_LM] Connect_PM_descendants $PM_encaps [$PM_encaps get_L_nested_handle_LM]
-   set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
-   $PM_encaps set_L_nested_daughters_PM [CSS++ cr "#$PM_encaps ~ ($L)"]
-   #puts "Did the job for $PM_encaps"
-  } else {set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
-		  #puts "_________________ EVAL ___________________"
-		  #puts "$PM_encaps set_L_nested_daughters_PM \[CSS++ cr \"#$PM_encaps ~ ($L)\"\]"  
-          $PM_encaps set_L_nested_daughters_PM [CSS++ cr "#$PM_encaps ~ ($L)"]
+
+   $PM_encaps Update_L_nested_daughters_PM
+   
+   # set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
+   # $PM_encaps set_L_nested_daughters_PM [CSS++ cr "#$PM_encaps ~ ($L)"]
+   
+  } else {
+          $PM_encaps Update_L_nested_daughters_PM
+		  # set L [join [$PM_encaps get_L_nested_daughters_LM] ", "]
+          # $PM_encaps set_L_nested_daughters_PM [CSS++ cr "#$PM_encaps ~ ($L)"]
          }
  #$PM_encaps set_daughters $L_daugthers
  #puts "___________________________________\n$PM_encaps set_daughters {$L_daugthers}___________________________________\n"
@@ -218,6 +241,9 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
    $PM_encaps Add_daughter $d
   }
  #puts "___________________________________"
+
+
+ $PM_encaps Register_nested_elements
  return $PM_encaps
 }
 
