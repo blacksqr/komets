@@ -2576,9 +2576,9 @@ Generate_accessors Physical_model [list hiden_prim_elements cmd_deconnect Semant
 
 #_________________________________________________________________________________________________________
 Inject_code Physical_model set_L_display_order {} {
- set L_d [this get_out_daughters]; puts "  L_d : $L_d"
+ set L_d [this get_out_daughters]
  foreach e $L_d {this Sub_daughter $e}
- foreach e $L_d {puts "    $e"; this Add_daughter $e}
+ foreach e $L_d {this Add_daughter $e}
 }
 
 #_________________________________________________________________________________________________________
