@@ -412,10 +412,7 @@ method PM_HTML send_jquery_message {methode cmd} {
 #XXX }
 }
 
-method PM_HTML Bg {color} {
-	lassign $color r g b a  
-	this add_html_style [list "background" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-}
+
 method PM_HTML Fg {r g b a} {
 	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
 }
@@ -451,12 +448,6 @@ method PM_HTML BorderRadius {radius} {
 	this add_html_style [list "border-radius" "$radius px"];
 }
 
-method PM_HTML Bg_gradient {color1 color2 angle	} {
-	lassign $color1 r g b a 
-	lassign $color2 r1 g1 b1 a1 
-	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1))" ]
-	#this add_html_style [list "background" "-webkit-gradient(linear,0 0, 0% 100%, from(rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)), to(rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1)))" ]
-}
 
 method PM_HTML HEIGHT {x} {
 	this add_html_style [list "height" "$x%"]
@@ -472,10 +463,29 @@ method PM_HTML LEFT {x} {
 method PM_HTML TOP {x} {
 	this add_html_style [list "top" "$x%"]
 }
-method PM_HTML FG {color1} {
+
+
+method PM_HTML Bg_gradient {color1 color2 angle {target {}} } {
+	puts "Bg_gradient $color1 $color2 $angle $target"
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
 	lassign $color1 r g b a 
-	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"]
+	lassign $color2 r1 g1 b1 a1 
+	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1))" ]  $id 
+	
 }
+method PM_HTML FG {color1 {target {}} } {
+	puts "Fg $color1 $target"
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
+	lassign $color1 r g b a 
+	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
+}
+method PM_HTML Bg {color {target {}} } {
+	puts "Bg $color $target"	
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
+	lassign $color r g b a  
+	this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
+}
+
 method PM_HTML COLUMN {nb} {
     if {$nb > 1} {
 	this add_html_style [list "-moz-column-count" "$nb"]
@@ -484,10 +494,3 @@ method PM_HTML COLUMN {nb} {
 
 }
 
-method PM_HTML Bg_gradient_bar {args} {
-	puts "error $objName"
-}
-
-method PM_HTML Bg_bar {args} {
-	puts "error $objName"
-}
