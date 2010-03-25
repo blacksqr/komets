@@ -59,11 +59,12 @@ method CSS_Meta_IHM_PM_P_U_1 set_LM {LM} {
    set this(inter_files)   "${objName}_CSS_Meta_IHM_PM_P_U_inter_files"
      set this(load_rules)    "${objName}_CSS_Meta_IHM_PM_P_U_load_rules"
      set this(save_rules)    "${objName}_CSS_Meta_IHM_PM_P_U_save_rules"
+   set this(cont_daughters) "${objName}_CSS_Meta_IHM_PM_P_U_daughters"
 
 # set L [list $this(bt_bgn) $this(bt_prv) $this(ccn) $this(bt_nxt) $this(bt_end)]
  set L $this(interleaving)_LM_LP
  this set_L_nested_handle_LM    $L
- this set_L_nested_daughters_LM $L
+ this set_L_nested_daughters_LM $this(cont_daughters)_LM_LP
  
  if {![gmlObject info exists object $this(interleaving)]} {
 #   set class($LM) $LM
@@ -84,6 +85,7 @@ method CSS_Meta_IHM_PM_P_U_1 set_LM {LM} {
      CometInterleaving $this(inter_files) "Files" {} -Add_style_class files_operations
        CometChoice    $this(load_rules) "Load rules" {} -Add_style_class rules_load
        CometSpecifyer $this(save_rules) "Save rules" {} -Add_style_class rules_save
+	 CometContainer $this(cont_daughters) "Handle for out daughters"     {} -Add_style_class "HANDLE handle DAUGHTERS daughters"
 
   # Configuration
    $this(load_rules) configure -set_nb_max_choices 9999 -Subscribe_to_set_currents $objName "$objName Load_rules_from_files" 1
@@ -97,7 +99,7 @@ method CSS_Meta_IHM_PM_P_U_1 set_LM {LM} {
   }
 
  if {$this(reconnect_LM)} {
-   $this(interleaving) Add_daughters_R [list $this(cont_selector) $this(cont_rules) $this(cont_set) $this(inter_files)]
+   $this(interleaving) Add_daughters_R [list $this(cont_selector) $this(cont_rules) $this(cont_set) $this(inter_files) $this(cont_daughters)]
      $this(cont_selector) Add_daughters_R [list $this(spec_sel) $this(act_sel) $this(txt_sel)]
      $this(cont_rules)    Add_daughters_R [list $this(spec_r_name) $this(cont_op_rules) $this(spec_rules)]
        $this(cont_op_rules) Add_daughters_R [list $this(act_del) $this(act_save)]
