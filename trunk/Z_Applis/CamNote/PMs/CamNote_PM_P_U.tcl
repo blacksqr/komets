@@ -46,12 +46,13 @@ method CometCamNote_PM_U set_LM {LM} {
    set this(internal_log) ${objName}_C_log
    if {![gmlObject info exists object $this(internal_log)]} {
      set this(cont) [CPool get_a_comet CometContainer]
+	 set this(cont_daughters) [CPool get_a_comet CometContainer]
 	 CometLog $this(internal_log) "Log to [this get_LC]" {}
-	 $this(cont) Add_daughter_R $this(internal_log)
+	 $this(cont) Add_daughter_R [list $this(internal_log) $this(cont_daughters)]
 	}
    set L $this(cont)_LM_LP
    this set_L_nested_handle_LM    $L
-   this set_L_nested_daughters_LM $L
+   this set_L_nested_daughters_LM $this(cont_daughters)_LM_LP
   } else {this inherited $LM}
 }
 
