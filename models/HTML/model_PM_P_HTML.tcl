@@ -49,6 +49,7 @@ method PM_HTML set_class_enable_AJAX_UPDATE {v} {set class(enable_AJAX_UPDATE) $
 method PM_HTML Encode_param_for_JS {txt} {
  set    rep "\""
  append rep [string map [list {"} {\"} "\n" {\n}] $txt]
+ #" pour fermer le guillemet au dessus (mise en pages...)
  append rep "\""
  return $rep
 }
@@ -447,7 +448,8 @@ method PM_HTML BorderRadius {radius} {
 method PM_HTML Bg_gradient {color1 color2 angle	} {
 	lassign $color1 r g b a 
 	lassign $color2 r1 g1 b1 a1 
-	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg, rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1))" ]
+	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a), rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1))" ]
+	#this add_html_style [list "background" "-webkit-gradient(linear,0 0, 0% 100%, from(rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)), to(rgba([expr int(256 * $r1)],[expr int(256 * $g1)],[expr int(256 * $b1)],$a1)))" ]
 }
 
 method PM_HTML HEIGHT {x} {
@@ -471,6 +473,15 @@ method PM_HTML FG {color1} {
 method PM_HTML COLUMN {nb} {
     if {$nb > 1} {
 	this add_html_style [list "-moz-column-count" "$nb"]
-    }
+	this add_html_style [list "-webkit-column-count" "$nb"]
+   }
 
+}
+
+method PM_HTML Bg_gradient_bar {args} {
+	puts "error $objName"
+}
+
+method PM_HTML Bg_bar {args} {
+	puts "error $objName"
 }
