@@ -491,3 +491,11 @@ method PM_HTML COLUMN {nb} {
 
 }
 
+method PM_HTML enrich {Pm} {
+	puts "$objName enrich $Pm"
+	return 
+	#for {set i 0} {$i < 100} {incr i} {	puts "$objName enrich $Pm"}
+	U_encapsulator_PM $objName {CometContainer(, $Pm, $obj)} 
+}
+
+# U_encapsulator_PM CPool_COMET_55_PM_P_17 {CometContainer(, CPool_COMET_72 ,$obj)}
