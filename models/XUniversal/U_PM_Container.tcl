@@ -26,7 +26,7 @@ Generate_accessors PM_U_Container [list L_nested_daughters_LM L_nested_daughters
 
 #___________________________________________________________________________________________________________________________________________
 method PM_U_Container Register_nested_elements {} {
- set L_LC_inside [CSS++ $objName "#${objName}(>*->LC, >*->LC *)"]
+ set L_LC_inside [CSS++ $objName "#${objName}(>*->LC.GENERATED_FOR_$objName, >*->LC GENERATED_FOR_$objName)"]
  this set_L_composing_comets $L_LC_inside
 }
 
