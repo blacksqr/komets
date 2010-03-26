@@ -193,6 +193,7 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
    
    foreach C [concat [lindex $L_res_Comets 0] [lindex $L_res_Comets 1]] {
      $C Add_MetaData "Generated_to_be_encapsulated_in" $PM_encaps
+	 $C Add_style_class GENERATED_FOR_$PM_encaps
 	}
 	 
    set root [CSS++ [$PM get_L_roots] "((#${obj}->_LM_LP <--< *), #${obj}->_LM_LP) \\! <--< > */"]
