@@ -124,8 +124,8 @@ method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
 		append  msg ");" 
 		this send_jquery_message Tabs_css_style $msg 
 	}
-
 }
+
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}}} {
  upvar $strm_name strm
