@@ -106,12 +106,10 @@ method Interleaving_PM_P_MenuHorizontal_HTML add_html_style {L_var_val {id {}}} 
 		this get_tabs_css_style tmp
 		append  msg [this Encode_param_for_JS $tmp]
 		append  msg ");" 
-		puts "$objName send_jquery_message Tabs_css_style $msg"
+		#puts "$objName send_jquery_message Tabs_css_style $msg"
 		this send_jquery_message Tabs_css_style $msg 
 	 }
 }
-
-Trace Interleaving_PM_P_MenuHorizontal_HTML add_html_style
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
@@ -142,4 +140,3 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}
 
 }
 
-#Trace Interleaving_PM_P_MenuHorizontal_HTML Render_daughters

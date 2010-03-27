@@ -90,8 +90,10 @@ method PM_TK Add_prim_mother {c L_prims {index -1}} {
 #___________________________________________________________________________________________________________________________________________
 method PM_TK Update_placement {args} {
  set PMM [this get_mothers]
- if {[catch {$PMM Reconnect} err]} {
-   puts "Update_placement:ERROR occured in $objName PM_TK::Update_placement\n$err"
+ if {$PMM != ""} {
+	 if {[catch {$PMM Reconnect} err]} {
+	   puts "Update_placement:ERROR occured in $objName PM_TK::Update_placement\n$err"
+	  }
   }
 }
 

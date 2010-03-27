@@ -94,7 +94,7 @@ method PM_U_Container Add_mother    {m {index -1}} {
   } else {this set_daughters {}; this set_mode_plug Empty; puts "$objName Add_mother $m => GROS ECHEC"}
 
  
- puts "FIN $objName Add_mother $m $index"
+ #puts "FIN $objName Add_mother $m $index"
  return $rep
 }
 

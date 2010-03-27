@@ -46,6 +46,7 @@ method PM_U_encapsulator constructor {name descr PM_core args} {
  return $objName
 }
 
+  
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors PM_U_encapsulator [list core core_factice_LC core_factice_LM]
 
@@ -170,14 +171,22 @@ proc U_encapsulator_PM {PM graph {handle_for_daughters {}}} {
 	 return $PM
 	} else {
 	        # Destroy what is inside !!!
-			$PM set_mothers   [list]
-			$PM set_daughters [list]
-			foreach LC [$PM get_L_composing_comets] {
-			  if {![$LC Has_for_style CORE]} {puts "  Disposing $LC"; $LC dispose}
+			set PM_encaps $PM
+			set PM [$PM_encaps get_core]
+
+			$PM_encaps set_mothers   [list]
+			$PM_encaps set_daughters [list]
+
+		    $PM_encaps set_nesting_element       [$PM get_nesting_element]
+		    $PM_encaps set_L_nested_handle_LM    [$PM get_LM]
+		    $PM_encaps set_L_nested_daughters_LM [$PM get_LM]
+
+			set L_LC [$PM_encaps get_L_composing_comets]
+			Sub_element L_LC [$PM get_LC]
+			foreach LC $L_LC {
+			  puts "  Disposing $LC"; $LC dispose
 			 }
 	       }
-   set PM_encaps $PM
-   set PM [$PM_encaps get_core]
   } else {$PM set_mothers   ""
           $PM set_daughters ""
 		  #set LM [$PM get_LM]
