@@ -468,12 +468,12 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
 }
 
-method PM_HTML COLUMN {nb} {
+method PM_HTML COLUMN {nb {target {}}} {
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
     if {$nb > 1} {
-	this add_html_style [list "-moz-column-count" "$nb"]
-	this add_html_style [list "-webkit-column-count" "$nb"]
+	this add_html_style [list "-moz-column-count" "$nb"] $id
+	this add_html_style [list "-webkit-column-count" "$nb"] $id
    }
-
 }
 
 method PM_HTML enrich {Pm} {
