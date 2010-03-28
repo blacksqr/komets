@@ -490,4 +490,9 @@ method PM_HTML Guidage {text} {
 	U_encapsulator_PM $objName "CometContainer(, "$name :", \$obj())" 
 }
 
+method PM_HTML Reorder {v} {
+	set L_reord [this get_out_daughters]
+	set L_reord [MAGELLAN__PERMUTATION $v $L_reord]
+	this set_L_display_order $L_reord
+}
 # U_encapsulator_PM CPool_COMET_55_PM_P_17 {CometContainer(, CPool_COMET_72 ,$obj)}
