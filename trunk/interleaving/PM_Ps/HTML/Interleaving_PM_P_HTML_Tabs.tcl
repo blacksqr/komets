@@ -75,6 +75,15 @@ method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec 
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_MenuHorizontal_HTML get_ordered_LC_daughters {} {
+ set L [list]
+ foreach LC [CSS++ $objName "(#$objName > *->LC, #$objName > * > *->LC) ; (#[this get_LC] > *)"] {
+   lappend L $LC
+  }
+ return $L
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
 
@@ -85,7 +94,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render {strm_name {dec {}}} {
    this get_tabs_css_style strm $dec
    append strm $dec "</style>\n"
    append strm $dec " <ul class=\"${objName}_tabs\">\n"
-   foreach c [[this get_nesting_CORE_LC]_LM_LP get_out_daughters] {
+   foreach c [this get_ordered_LC_daughters] {
      append strm $dec "  " "<li class=\"${objName}_tabs\" >" "\n"
      append strm $dec "    " {<a href="#} categ_${objName}_$c {">} [[$c get_LC] get_name] {</a>} "\n"
      append strm $dec "  " {</li>} "\n"
@@ -128,10 +137,10 @@ method Interleaving_PM_P_MenuHorizontal_HTML set_html_style {lstyles {id {}}} {
 method Interleaving_PM_P_MenuHorizontal_HTML Render_daughters {strm_name {dec {}}} {
  upvar $strm_name strm
 
- set L [[this get_nesting_CORE_LC]_LM_LP get_out_daughters]
+ set L [this get_ordered_LC_daughters]
  
  set pos 0
- foreach c [this get_daughters] {
+ foreach c [this get_out_daughters] {
    append strm $dec {<div id="} categ_${objName}_[lindex $L $pos] {">} "\n"
      $c Render_all strm "$dec  "
    append strm $dec {</div>} "\n"

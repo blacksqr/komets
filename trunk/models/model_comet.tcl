@@ -1673,7 +1673,7 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
 
 #_________________________________________________________________________________________________________
 proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
-#puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
+# puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
 # Let's see if some CSS rules have GDD access
  if {$L_rep == ""} {set do_css 1} else {set do_css 0}
  foreach r $CSS {
@@ -1737,8 +1737,10 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
 			  set OK 1
               if {[catch {set obj $n; $n $fct_name $val} err1]} {
 				if {[catch "set obj $n; $n $fct_name $val" err2]} {
+				  puts "____________RULE__________________________\n$r\__________________________________________"
 				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => L_rep was {$L_rep}"
-				  puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => L_rep was {$L_rep}"
+				  #puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => L_rep was {$L_rep}"
+				  puts "__________________________________________"
 				  set OK 0
 				 }
                }
