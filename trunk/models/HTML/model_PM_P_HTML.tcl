@@ -403,9 +403,6 @@ method PM_HTML send_jquery_message {methode cmd} {
 }
 
 
-method PM_HTML Fg {r g b a} {
-	this add_html_style [list "color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-}
 method PM_HTML Float {position} {
 	this add_html_style [list "float" $position]
 }
@@ -455,22 +452,20 @@ method PM_HTML TOP {x} {
 }
 
 
-method PM_HTML Bg_gradient {color1 color2 angle {target {}} } {
+method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
-	lassign $color1 r g b a 
-	lassign $color2 r1 g1 b1 a1 
-	this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1))" ]  $id 
 	
-}
-method PM_HTML FG {color1 {target {}} } {
-	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
-	lassign $color1 r g b a 
+	lassign $BG_param type bg1 bg2 angle 
+
+	lassign $bg1 r g b a 
+	lassign $bg2 r1 g1 b1 a1 
+	#puts "$type : rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"
+	switch -- $type {
+		"uniform" { this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id }
+		"gradient" {this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1))" ]  $id }		
+	}
+	lassign $FG_param r g b a  
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
-}
-method PM_HTML Bg {color {target {}} } {
-	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
-	lassign $color r g b a  
-	this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
 }
 
 method PM_HTML COLUMN {nb} {
