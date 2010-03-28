@@ -317,6 +317,10 @@ method Parser_CSS++ Parse_ROOT {L_root L_syntax index} {
 method Parser_CSS++ Parse_NODE {L_root index VAR VAL VAL2} {
  
  if {$this(goto_mode)} {
+     # <DEBUG ?>
+	 set this(recurse) 0
+	 # </DEBUG ?>
+
    set this(goto_mode) 0
    set L_N [split $VAR .]
    set N [lindex $L_N 0]; set rest  [lrange $L_N 1 end]
@@ -325,12 +329,14 @@ method Parser_CSS++ Parse_NODE {L_root index VAR VAL VAL2} {
    
    if {[llength $rest] > 0} {
      set state [this Save_state] 
-       set this(negation) 0; set this(recurse) 0
+       set this(negation) 0; 
+	   # DEBUG? set this(recurse) 0
        set nL [this get_nodes_from_where $nL [join $rest .]]
      this Load_state $state
     }
 	
-  } else {set nL [this get_nodes_from_where $L_root $VAR]}
+  } else {set nL [this get_nodes_from_where $L_root $VAR]
+		 }
  
  set this(go_in)    0
  set this(negation) 0
