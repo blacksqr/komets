@@ -279,6 +279,8 @@ method Parser_CSS++ Interprets {{L_root {}} str} {
 method Parser_CSS++ Interprets_parsed {L_root P_CSS} {
  if {[llength $L_root] == 0} {set L_root $this(default_root)}
 
+ set state [this Save_state]
+ 
  lassign $P_CSS R pipo LF
  
  set this(next_name) daughters
@@ -292,6 +294,8 @@ method Parser_CSS++ Interprets_parsed {L_root P_CSS} {
  set L_rep [list]
  foreach C [this Parse_$R $L_root $LF 0] {Add_element L_rep [lindex $C 0]}
 
+ this Load_state $state 
+ 
  return $L_rep
 }
 
@@ -343,7 +347,6 @@ method Parser_CSS++ Parse_NODE {L_root index VAR VAL VAL2} {
  
  return $nL
 }
-
 
 #___________________________________________________________________________________________________________________________________________
 method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {

@@ -359,6 +359,37 @@ method PM_HTML Sub_JS {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML Drag_zone {v {id {}}} {
+ if {$id == ""} {set id $objName}
+ 
+}
+
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML get_Drop_zone_cmd {} {
+ set L_rep [list]
+ foreach {filter cmd} [array get this Drop_zone,*] {
+   lappend L_rep [string range $filter 10 end] $cmd
+  }
+  
+ return $L_rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Drop_zone {metadata_filter cmd {id {}}} {
+ if {$id == ""} {set id $objName}
+ 
+ set this(Drop_zone,$metadata_filter) $cmd
+ 
+ set    fct "\$('$id').droppable();\n"
+ append fct "\$('$id').droppable({drop: function(event, ui) {"
+ foreach {filter cmd} [this get_Drop_zone_cmd] {
+   append fct ""
+  }
+ append fct "}});\n"
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Draggable {{v 1}} {
  if {$v} {
    set cmd        "\$('#$objName').draggable(  )"
