@@ -43,7 +43,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML get_current_menu {} {
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML AJAX_set_current_menu {v} {
- puts "$objName AJAX_set_current_menu $v"
+ #puts "$objName AJAX_set_current_menu $v"
  [this get_L_roots] set_AJAX_root NOTHING
  this set_current_menu $v
 }

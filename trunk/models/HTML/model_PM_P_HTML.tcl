@@ -434,37 +434,30 @@ method PM_HTML send_jquery_message {methode cmd} {
 }
 
 
-method PM_HTML Float {position} {
-	this add_html_style [list "float" $position]
-}
-method PM_HTML Clear {position} {
-	this add_html_style [list "clear" $position]
-}
-method PM_HTML Display {display} {
-	this add_html_style [list "display" $display]
-}
-method PM_HTML BorderColor {r g b a} {
-	this add_html_style [list "border-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-}
-method PM_HTML BorderWidth {width} {
-	this add_html_style [list "border-width" "$width px"]
-}
-method PM_HTML BorderStyle {style} {
-	this add_html_style [list "border-style" $style]
-}
-method PM_HTML Border {width style color} {
-	lassign $color r g b a 
-	this add_html_style [list "border" "$width px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-}
-method PM_HTML BackgroundImage {imageName} {
-	this add_html_style [list "background-image" "url('src_img/$imageName')"];
-}
+# method PM_HTML Float {position} {
+	# this add_html_style [list "float" $position]
+# }
+# method PM_HTML Clear {position} {
+	# this add_html_style [list "clear" $position]
+# }
+# method PM_HTML Display {display} {
+	# this add_html_style [list "display" $display]
+# }
+# method PM_HTML BorderColor {r g b a} {
+	# this add_html_style [list "border-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+# }
+# method PM_HTML BorderWidth {width} {
+	# this add_html_style [list "border-width" "$width px"]
+# }
+# method PM_HTML BorderStyle {style} {
+	# this add_html_style [list "border-style" $style]
+# }
 
-method PM_HTML BorderRadius {radius} {
-	this add_html_style [list "-moz-border-radius" "$radius px"];
-	this add_html_style [list "-webkit-border-radius" "$radius px"];
-	this add_html_style [list "border-radius" "$radius px"];
-}
+# method PM_HTML BackgroundImage {imageName} {
+	# this add_html_style [list "background-image" "url('src_img/$imageName')"];
+# }
+
+
 
 
 method PM_HTML HEIGHT {x} {
@@ -474,13 +467,13 @@ method PM_HTML HEIGHT {x} {
 method PM_HTML WIDTH {x} {
 	this add_html_style [list "width" "$x%"]	
 }
-method PM_HTML LEFT {x} {
-	this add_html_style [list "left" "$x%"]
-}
+# method PM_HTML LEFT {x} {
+	# this add_html_style [list "left" "$x%"]
+# }
 
-method PM_HTML TOP {x} {
-	this add_html_style [list "top" "$x%"]
-}
+# method PM_HTML TOP {x} {
+	# this add_html_style [list "top" "$x%"]
+# }
 
 
 method PM_HTML bg_fg {BG_param FG_param {target {}} } {
@@ -498,23 +491,14 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	lassign $FG_param r g b a  
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
 }
-
-method PM_HTML COLUMN {nb {target {}}} {
-	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
-    if {$nb > 1} {
-	this add_html_style [list "-moz-column-count" "$nb"] $id
-	this add_html_style [list "-webkit-column-count" "$nb"] $id
-   }
-}
-
 method PM_HTML enrich {Pm} {
 	U_encapsulator_PM $objName "CometContainer(, ${Pm}(), \$obj())" 
 }
 
-method PM_HTML Guidage {text} {
-	set name [[this get_LC] get_name]
-	U_encapsulator_PM $objName "CometContainer(, "$name :", \$obj())" 
-}
+# method PM_HTML Guidage {text} {
+	# set name [[this get_LC] get_name]
+	# U_encapsulator_PM $objName "CometContainer(, "$name :", \$obj())" 
+# }
 
 method PM_HTML Reorder {v} {
 	set L_reord [[this get_LC] get_out_daughters]
@@ -522,3 +506,10 @@ method PM_HTML Reorder {v} {
 	this set_L_display_order $L_reord
 }
 # U_encapsulator_PM CPool_COMET_55_PM_P_17 {CometContainer(, CPool_COMET_72 ,$obj)}
+
+
+method PM_HTML Column {nb} {
+}
+method PM_HTML Border {width style color {radius {}}} {
+	
+}
