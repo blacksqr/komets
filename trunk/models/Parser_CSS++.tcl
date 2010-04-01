@@ -7,7 +7,15 @@
 #___________________________________________________________________________________________________________________________________________
 method Parser_CSS++ constructor {default_root} {
  set this(default_root) $default_root
- 
+
+ set this(next_name) daughters
+ set this(cmd_next)  get_out_
+ set this(go_in)     0
+ #set this(L_syntax)  $LF
+ set this(negation)  0
+ set this(recurse)   1
+ set this(goto_mode) 0
+
  return $objName
 }
 
