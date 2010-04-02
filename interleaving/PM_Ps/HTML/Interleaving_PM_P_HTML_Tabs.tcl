@@ -64,8 +64,8 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec {}}} {
-	 upvar $strm_name strm
-    append strm $dec ".${objName}_tabs.ui-state-default { \n"
+ upvar $strm_name strm
+   append strm $dec ".${objName}_tabs.ui-state-default { \n"
    append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}\n"
    append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
    append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"

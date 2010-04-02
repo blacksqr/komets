@@ -180,7 +180,7 @@ method PM_HTML Add_prim_mother   {c Lprims {index -1}} {this inherited $c $Lprim
 method PM_HTML Style_class {} {
  #set c [this get_style_class]
  #set    rep " class=\"$this(names_obj) $this(base_classes) $c\" id=\"$objName\" style=\""
- set    rep " class=\"$objName\" id=\"$objName\" style=\"[this get_html_style_in_text]\" "
+ set    rep " class=\"$objName [this get_LM] [this get_LC]\" id=\"$objName\" style=\"[this get_html_style_in_text]\" "
  return $rep
 }
 
@@ -361,7 +361,18 @@ method PM_HTML Sub_JS {e} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Drag_zone {v {id {}}} {
  if {$id == ""} {set id $objName}
- 
+
+ if {$v} {
+   set cmd        "\$('#$objName').draggable( {opacity: 0.7, helper: 'clone'} )"
+   set cmd_enable ""
+   this send_jquery_message Drag_zone_$objName "$cmd\; $cmd_enable\;"
+   this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
+     append strm \"\\$cmd\\\;\"
+	" UNIQUE
+  } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
+          set cmd "\$('#$objName').draggable( 'disable' )"
+		  this send_jquery_message Drag_zone_$objName "$cmd\;"
+         } 
 }
 
 
@@ -376,17 +387,29 @@ method PM_HTML get_Drop_zone_cmd {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML Trigger_Drop_cmd {PM__metadata_filter} {
+ lassign $PM__metadata_filter PM metadata_filter
+
+ eval $this(Drop_zone,$metadata_filter)
+}
+
+Trace PM_HTML Trigger_Drop_cmd
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Drop_zone {metadata_filter cmd {id {}}} {
  if {$id == ""} {set id $objName}
  
  set this(Drop_zone,$metadata_filter) $cmd
  
- set    fct "\$('$id').droppable();\n"
- append fct "\$('$id').droppable({drop: function(event, ui) {"
+ set fct "\$('#$id').droppable({drop: function(event, ui) {"
  foreach {filter cmd} [this get_Drop_zone_cmd] {
-   append fct ""
+   append fct "if ( ui.draggable.hasClass( '$metadata_filter\') ) {addOutput_proc_val('${objName}__XXX__Trigger_Drop_cmd' , ui.draggable.attr('id') + ' $metadata_filter\', true);}"
   }
- append fct "}});\n"
+ append fct "}});"
+ 
+ this send_jquery_message Drop_zone_$objName $fct
+ puts "Eval in JS :\n$fct"
+ this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Drop_zone" "append strm \"\\$fct\"" UNIQUE
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -394,14 +417,14 @@ method PM_HTML Draggable {{v 1}} {
  if {$v} {
    set cmd        "\$('#$objName').draggable(  )"
    set cmd_enable "\$('#$objName').draggable( 'enable' )"
-   this send_jquery_message Draggable "$cmd\; $cmd_enable\;"
+   this send_jquery_message Draggable_$objName "$cmd\; $cmd_enable\;"
    this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
      append strm \\$cmd\\\;
 	 append strm \\$cmd_enable\\\;
 	" UNIQUE
   } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
           set cmd "\$('#$objName').draggable( 'disable' )"
-		  this send_jquery_message Draggable "$cmd\;"
+		  this send_jquery_message Draggable_$objName "$cmd\;"
          }
 }
 
