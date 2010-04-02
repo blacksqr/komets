@@ -500,7 +500,7 @@ method Comet_element dispose {} {
  foreach ee $L_e {$ee dispose}
 
  set nesting_node [this get_nesting_element]
- if {![string equal $nesting_node {}]} {$nesting_node Sub_composing_comet $objName}
+ if {$nesting_node != ""} {$nesting_node Sub_composing_comet $objName}
  
  this inherited
 }
