@@ -11,7 +11,8 @@ method Interleaving_PM_P_MenuHorizontal_HTML constructor {name descr args} {
     
 	this set_html_style "" ${objName}_tabs
 	this set_html_style "" ${objName}_selected
-   set this(current_menu) {}
+    set this(current_menu) {}
+	
  eval "$objName configure $args"
 }
 
