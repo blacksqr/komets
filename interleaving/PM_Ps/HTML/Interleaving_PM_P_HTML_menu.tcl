@@ -26,9 +26,12 @@ Generate_accessors Interleaving_PM_P_HTML_menu [list pipo_C_container]
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML_menu Render {strm_name {dec {}}} {
  upvar $strm_name strm
- set f [open [Comet_files_root]Comets/interleaving/PM_Ps/HTML/multi-ddm/styles1.css r]
-   append strm $dec "<style type=\"text/css\">\n[string map [list #multi-ddm #$this(internal_menu_id)] [read $f]]\n$dec</style>\n"
- close $f
+ # set f [open [Comet_files_root]Comets/interleaving/PM_Ps/HTML/multi-ddm/styles1.css r]
+   # append strm $dec "<style type=\"text/css\">\n[string map [list #multi-ddm #$this(internal_menu_id)] [read $f]]\n$dec</style>\n"
+ # close $f
+ 
+ append strm $dec {<link type="text/css" href="./Comets/interleaving/PM_Ps/HTML/multi-ddm/styles1.css"/>} "\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/interleaving/PM_Ps/HTML/multi-ddm/jquery.multi-ddm.pack.js\"></script>\n"
  
  append strm $dec <div [this Style_class] {> } "\n"
    set L_daughters_not_in_menu [this get_out_daughters]
