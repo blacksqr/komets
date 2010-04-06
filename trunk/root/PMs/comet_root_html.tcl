@@ -108,6 +108,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
  #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
  
+ 
  foreach js_file_link [this get_L_js_files_link] {
    append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$js_file_link\"></script>\n"
   }
