@@ -393,8 +393,6 @@ method PM_HTML Trigger_Drop_cmd {PM__metadata_filter} {
  eval $this(Drop_zone,$metadata_filter)
 }
 
-Trace PM_HTML Trigger_Drop_cmd
-
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Drop_zone {metadata_filter cmd {id {}}} {
  if {$id == ""} {set id $objName}
