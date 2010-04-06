@@ -1738,7 +1738,7 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
               if {[catch {set obj $n; $n $fct_name $val} err1]} {
 				if {[catch "set obj $n; $n $fct_name $val" err2]} {
 				  puts "____________RULE__________________________\n$r\__________________________________________"
-				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => L_rep was {$L_rep}"
+				  puts "FCT STYLE ERROR 1 ($n $fct_name {$val});\n  => L_rep was {$L_rep}\n  => CSS was : [lindex $r 0]"
 				  #puts "FCT STYLE ERROR 2 ($n $fct_name $val);\n  => L_rep was {$L_rep}"
 				  puts "__________________________________________"
 				  set OK 0
