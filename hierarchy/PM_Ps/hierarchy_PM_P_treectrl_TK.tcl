@@ -14,7 +14,7 @@ method PM_P_treectrl_TK constructor {name descr args} {
 method PM_P_treectrl_TK dispose {} {this inherited}
 
 #_________________________________________________________________________________________________________
-Methodes_set_LC PM_P_treectrl_TK [L_methodes_set_hierarchy] {$this(FC)} {}
+Methodes_set_LC PM_P_treectrl_TK [L_methodes_set_hierarchy] {} {}
 Methodes_get_LC PM_P_treectrl_TK [L_methodes_get_hierarchy] {$this(FC)}
 
 #_________________________________________________________________________________________________________
