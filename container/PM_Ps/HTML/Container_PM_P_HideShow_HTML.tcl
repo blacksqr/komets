@@ -37,7 +37,7 @@ method Container_PM_P_HideShow_HTML set_header_place {hp} {
  append cmd "     \$(\"#${objName}_header\").insertBefore(\"#${objName}_content\");"
  append cmd "});" "\n"
  
- this Render_JS cmd $this(marker)
+ this Render_post_JS cmd $this(marker)
  
  if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
 	$root Concat_update $objName $methode $cmd
@@ -95,7 +95,7 @@ method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  append strm $dec "     \$(\"#${objName}_icon\").remove();\n"
  append strm $dec "     \$(\"#${objName}\").addClass(\"ui-widget ui-widget-content ui-helper-clearfix ui-corner-all\")" "\n"
  append strm $dec "	            .find(\"#${objName}_header\")" "\n"
- append strm $dec "				.prepend('<span id=\"${objName}_icon\" class=\"ui-icon ui-icon-circle-arrow-" $ouvert "\"></span>')" "\n"
+ append strm $dec "				.prepend('<span id=\"${objName}_icon\" style=\"float: right;\" class=\"ui-icon ui-icon-circle-arrow-" $ouvert "\"></span>')" "\n"
  append strm $dec "				.end()" "\n"
  append strm $dec "			.find(\"#${objName}_content\").attr({class : \"portlet-content\"});" "\n"
  
@@ -152,7 +152,7 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec <div  [this Style_class] > "\n"
-   append strm $dec "<div id=\"${objName}_header\" style=\"[this get_html_style_in_text ${objName}_header]\"><div id=\"${objName}_title\">$this(title)</div></div>"
+   append strm $dec "<div id=\"${objName}_header\" style=\"[this get_html_style_in_text ${objName}_header]\"><span id=\"${objName}_title\" style=\"\">$this(title)</span></div>"
    append strm $dec "<div id=\"${objName}_content\" style=\"[this get_html_style_in_text ${objName}_content]\">"
       this Render_daughters strm "$dec  "
    append strm $dec "</div>"

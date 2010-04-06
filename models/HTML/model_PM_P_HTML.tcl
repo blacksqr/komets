@@ -314,7 +314,7 @@ method PM_HTML Send_updated_style {{id {}}} {
    foreach {var val} [this get_html_style $id] {
 	 append cmd \' $var \' " : \'" $val "\',"
 	}
-   set cmd [string range $cmd 0 end-1]	
+   if {[string index $cmd end] == ","} {set cmd [string range $cmd 0 end-1]}
    append cmd "});" "\n"
  
    $root Concat_update $objName htmlstyle$id $cmd
