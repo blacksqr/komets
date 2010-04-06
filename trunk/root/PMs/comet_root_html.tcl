@@ -100,17 +100,19 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  
  upvar $strm_name strm
  
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-1.3.2.min.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-ui-1.7.2.custom.min.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
+ append strm $dec {<link type="text/css" href="./Comets/models/HTML/jquery/css/cupertino/jquery-ui-1.8.custom.css" rel="stylesheet" />} "\n"
+ append strm $dec "<style type=\"text/css\"> body{ font: 80% \"Trebuchet MS\", sans-serif;} </style>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-1.4.2.min.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-ui-1.8.custom.min.js\"></script>\n"
+ #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
+ #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
  
  foreach js_file_link [this get_L_js_files_link] {
    append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$js_file_link\"></script>\n"
   }
  
- append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
+ #append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
    this Render_daughters_JS strm $mark $dec
