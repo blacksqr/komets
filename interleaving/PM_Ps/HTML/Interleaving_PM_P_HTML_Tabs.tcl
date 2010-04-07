@@ -11,6 +11,8 @@ method Interleaving_PM_P_MenuHorizontal_HTML constructor {name descr args} {
     
 	this set_html_style "" ${objName}_tabs
 	this set_html_style "" ${objName}_selected
+	this set_html_style "" ${objName}_header
+	
     set this(current_menu) {}
 	
  eval "$objName configure $args"
@@ -118,7 +120,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML add_html_style {L_var_val {id {}}} 
 		append  msg ");" 
 		#puts "$objName send_jquery_message Tabs_css_style $msg"
 		this send_jquery_message Tabs_css_style $msg 
-	 }
+	 } 
 }
 
 #___________________________________________________________________________________________________________________________________________

@@ -512,8 +512,8 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	lassign $FG_param r g b a  
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
 }
-method PM_HTML enrich {Pm} {
-	U_encapsulator_PM $objName "CometContainer(, ${Pm}(), \$obj())" 
+method PM_HTML enrich {LC} {
+	U_encapsulator_PM $objName "CometContainer(, ${LC}(), \$obj())" 
 }
 
 # method PM_HTML Guidage {text} {
@@ -532,5 +532,4 @@ method PM_HTML Reorder {v} {
 method PM_HTML Column {nb} {
 }
 method PM_HTML Border {width style color {radius {}}} {
-	
 }
