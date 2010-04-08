@@ -60,7 +60,7 @@ method Interleaving_PM_P_accordion_HTML Render_post_JS {strm_name {dec {}}} {
 
    append strm $dec "\$(\"#${objName}\").accordion();" "\n"
 
- this Render_daughters_post_JS strm $dec
+ this inherited strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -128,7 +128,4 @@ method Interleaving_PM_P_accordion_HTML set_html_style {lstyles {id {}}} {
 		this send_jquery_message Tabs_css_style $msg 
 	}
 }
-
-#___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_accordion_HTML Render_daughters {strm_name {dec {}}} {}
 

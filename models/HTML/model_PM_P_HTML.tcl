@@ -359,23 +359,24 @@ method PM_HTML Sub_JS {e} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Drag_zone {v {id {}}} {
+method PM_HTML Drag_zone {v {id {}} {abs 1}} {
  if {$id == ""} {set id $objName}
-
+ if {$abs} {set id "#$id"} else {set id ".$id"}
+ 
  if {$v} {
-   set cmd        "\$('#$objName').draggable( {opacity: 0.7, helper: 'clone'} )"
+   set cmd        "\$('$id').draggable( {opacity: 0.7, helper: 'clone'} )"
    set cmd_enable ""
    this send_jquery_message Drag_zone_$objName "$cmd\; $cmd_enable\;"
    this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
      append strm \"\\$cmd\\\;\"
 	" UNIQUE
   } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
-          set cmd "\$('#$objName').draggable( 'disable' )"
+          set cmd "\$('$id').draggable( 'disable' )"
 		  this send_jquery_message Drag_zone_$objName "$cmd\;"
          } 
 }
 
-
+Trace PM_HTML Drag_zone
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML get_Drop_zone_cmd {} {
  set L_rep [list]
