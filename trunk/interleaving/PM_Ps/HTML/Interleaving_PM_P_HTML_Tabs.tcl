@@ -62,7 +62,7 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
 
    append strm $dec "\$(\"#${objName}\").tabs();" "\n"
 
- this Render_daughters_post_JS strm $dec
+ this inherited strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
