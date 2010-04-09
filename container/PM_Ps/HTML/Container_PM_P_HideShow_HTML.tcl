@@ -47,7 +47,7 @@ method Container_PM_P_HideShow_HTML set_header_place {hp} {
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HideShow_HTML set_LM {LM} {
  set rep [this inherited $LM]
- set this(title) [[this get_LC] get_name]
+ if {$LM != ""} {set this(title) [[this get_LC] get_name]}
  return $rep
 }
 
