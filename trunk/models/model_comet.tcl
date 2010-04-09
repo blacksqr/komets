@@ -2693,9 +2693,10 @@ method Physical_model Is_active {} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Has_for_style {s} {
- if {[this inherited $s]} {return 1}
- if {$s == ""} {set s "{}"}
- return [eval [this get_LM] Has_for_style $s]
+ if {[this inherited $s]} {return 1} else {
+   if {$this(LM) != ""} {return [$this(LM) Has_for_style $s]}
+  }
+ return 0
 }
 
 #_________________________________________________________________________________________________________
