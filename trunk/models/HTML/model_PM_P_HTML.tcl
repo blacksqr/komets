@@ -507,11 +507,11 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	lassign $bg2 r1 g1 b1 a1 
 	#puts "$type : rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"
 	switch -- $type {
-		"uniform" { this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id }
-		"gradient" {this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1))" ]  $id }		
+		"uniform" { this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a) !important"] $id }
+		"gradient" {this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1)) !important" ]  $id }		
 	}
 	lassign $FG_param r g b a  
-	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a)"] $id 
+	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a) !important"] $id 
 }
 method PM_HTML enrich {LC} {
 	U_encapsulator_PM $objName "CometContainer(, ${LC}(), \$obj())" 
