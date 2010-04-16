@@ -24,18 +24,26 @@ method Container_PM_P_HTML Render {strm_name {dec {}}} {
  append strm $dec </div> "\n"
 }
 method Container_PM_P_HTML Column {nb} {
-    if {$nb > 1} {
+    if {$nb >= 1} {
 	this add_html_style [list "-moz-column-count" "$nb"]
 	this add_html_style [list "-webkit-column-count" "$nb"] 
+	this add_html_style [list "-moz-column-rule" "solid black 1px"]
+	this add_html_style [list "-webkit-column-rule" "solid black 1px"]
+	foreach daugther [this get_out_daughters] {
+		$daugther Block 1
+	}
    }
 }
-method Container_PM_P_HTML Border {width style color {radius {}}} {
+method Container_PM_P_HTML Border {width style color {radius {}}  {target {}}} {
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target ; }
 	lassign $color r g b a 
-	this add_html_style [list "border" "${width}px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+	this add_html_style [list "border" "${width}px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a) !important"] $id ; 
 	if {$radius != {}} {
-		this add_html_style [list "-moz-border-radius" "${radius}px"];
-		this add_html_style [list "-webkit-border-radius" "${radius}px"];
-		this add_html_style [list "border-radius" "${radius}px"];
+		this add_html_style [list "-moz-border-radius" "${radius}px"] $id ;
+		this add_html_style [list "-webkit-border-radius" "${radius}px"] $id ;
+		this add_html_style [list "border-radius" "${radius}px"] $id ;
 	}
 }
+
+
 
