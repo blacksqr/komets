@@ -476,7 +476,8 @@ method Comet_element constructor {name descr args} {
  set this(default_op_gdd_file)    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
  set this(default_css_style_file) ""
  set this(default_css_style_still_applied) 0
- 
+#___________________Default Properties Styles ___________________ 
+ set this(MAGELLAN_Designer_constraint) {}
 #______________________________________
  eval "$objName configure $args"
  return $objName
@@ -653,7 +654,8 @@ method Comet_element set_DSL_ECA {v} {set class(DSL_ECA) $v}
 #_________________________________________________________________________________________________________
 Generate_List_accessor Comet_element style_class style_class
 Generate_List_accessor Comet_element L_marks     L_marks
-Generate_accessors     Comet_element [list style styler]
+Generate_List_accessor Comet_element MAGELLAN_Designer_constraint MAGELLAN_Designer_constraint
+Generate_accessors     Comet_element [list style styler MAGELLAN_Designer_constraint]
 
 #_________________________________________________________________________________________________________
 method Comet_element get_COMET_id {} {return $objName}

@@ -159,4 +159,9 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
  append strm $dec </div> "\n"
 }
 
-
+method Container_PM_P_HideShow_HTML Float_daughters {position} {
+	this add_html_style [list "overflow" "auto"] ${objName}_content
+	foreach daugther [this get_out_daughters] {
+		$daugther Float $position
+	}
+}

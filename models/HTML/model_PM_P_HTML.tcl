@@ -135,6 +135,7 @@ method PM_HTML Render_all {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
+this MAGELLAN_Designer_constraint
  this Render_daughters strm $dec
 }
 
@@ -158,6 +159,7 @@ method PM_HTML Render_daughters_post_JS {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Render_JS {strm_name mark {dec {}}} {
  upvar $strm_name strm
+ this MAGELLAN_Designer_constraint
  this Render_daughters_JS strm $mark $dec
 }
 
@@ -456,50 +458,16 @@ method PM_HTML send_jquery_message {methode cmd} {
 }
 
 
-# method PM_HTML Float {position} {
-	# this add_html_style [list "float" $position]
-# }
-# method PM_HTML Clear {position} {
-	# this add_html_style [list "clear" $position]
-# }
-# method PM_HTML Display {display} {
-	# this add_html_style [list "display" $display]
-# }
-# method PM_HTML BorderColor {r g b a} {
-	# this add_html_style [list "border-color" "rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-# }
-# method PM_HTML BorderWidth {width} {
-	# this add_html_style [list "border-width" "$width px"]
-# }
-# method PM_HTML BorderStyle {style} {
-	# this add_html_style [list "border-style" $style]
-# }
-
-# method PM_HTML BackgroundImage {imageName} {
-	# this add_html_style [list "background-image" "url('src_img/$imageName')"];
-# }
-
-
-
 
 method PM_HTML HEIGHT {x} {
 	this add_html_style [list "height" "$x%"]
 }
-
 method PM_HTML WIDTH {x} {
 	this add_html_style [list "width" "$x%"]	
 }
-# method PM_HTML LEFT {x} {
-	# this add_html_style [list "left" "$x%"]
-# }
-
-# method PM_HTML TOP {x} {
-	# this add_html_style [list "top" "$x%"]
-# }
-
 
 method PM_HTML bg_fg {BG_param FG_param {target {}} } {
-	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target }
+	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target ; }
 	
 	lassign $BG_param type bg1 bg2 angle 
 
@@ -509,6 +477,8 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	switch -- $type {
 		"uniform" { this add_html_style [list "background" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a) !important"] $id }
 		"gradient" {this add_html_style [list "background" "-moz-linear-gradient(${angle}deg,rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a), rgba([expr int(255 * $r1)],[expr int(255 * $g1)],[expr int(255 * $b1)],$a1)) !important" ]  $id }		
+		default {puts stderr "bg_fg pas bon : $type" ;
+		this add_html_style [list "background" "rgba(128,0,128,0.5) /*erreur*/ !important"] $id }		
 	}
 	lassign $FG_param r g b a  
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a) !important"] $id 
@@ -523,14 +493,38 @@ method PM_HTML enrich {LC} {
 # }
 
 method PM_HTML Reorder {v} {
+	if {[lsearch [this get_MAGELLAN_Designer_constraint] FIXED_ORDER] > -1} {return}
 	set L_reord [[this get_LC] get_out_daughters]
 	set L_reord [MAGELLAN__PERMUTATION $v $L_reord]
 	this set_L_display_order $L_reord
 }
 # U_encapsulator_PM CPool_COMET_55_PM_P_17 {CometContainer(, CPool_COMET_72 ,$obj)}
 
-
+method PM_HTML Block {t} {
+	this add_html_style [list "display" "block"]	
+}
 method PM_HTML Column {nb} {
 }
-method PM_HTML Border {width style color {radius {}}} {
+method PM_HTML Border {width style color {radius {}}  {target {}}} {
+
+}
+method PM_HTML MAGELLAN_Designer_constraint {} {
+
+	foreach constraint [[this get_LC] get_MAGELLAN_Designer_constraint] {
+		if {[lindex $constraint 0] == "LIST"} {
+			foreach daugther [this get_out_daughters] {
+				$daugther Block 1
+			}
+		}
+	}
+}
+method PM_HTML Float {position} {
+	this add_html_style [list "float" $position]	
+}
+
+method PM_HTML Float_daughters {position} {
+	this add_html_style [list "overflow" "auto"]
+	foreach daugther [this get_out_daughters] {
+		$daugther Float $position
+	}
 }
