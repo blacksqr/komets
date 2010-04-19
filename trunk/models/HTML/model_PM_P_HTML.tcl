@@ -324,6 +324,11 @@ method PM_HTML Send_updated_style {{id {}}} {
 }
 
 #_________________________________________________________________________________________________________
+method PM_HTML Concat_update {o m cmd} {
+ if {$this(PM_root) != ""} {$this(PM_root) Concat_update $o $m $cmd}
+}
+
+#_________________________________________________________________________________________________________
 method PM_HTML Add_JS {e} {
  if {[gmlObject info exists object $e]} {
      set marker [clock clicks]

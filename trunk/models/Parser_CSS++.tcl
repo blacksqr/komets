@@ -182,7 +182,6 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 						  } {set axe_type GROUP}
 					   lappend L_h [list AXE $axe_type $L]
 					  }
-		 POST_FILTER  {set L [list]; incr nb_open_post_filter 1; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; lappend L_h [list AXE $axe_type $L]}
 		 default      {lappend L_h [lindex $L_flat $index_L_flat]}
 		}
 	  }
@@ -250,7 +249,8 @@ method Parser_CSS++ Parse_selector {str {last_axe ""}} {
 									set pos_end_filter [string first {]} $str_tmp]
 									set axe [list FILTER [string range $str_tmp 0 ${pos_end_filter}-1]]
 									set str_tmp [string range $str_tmp ${pos_end_filter}+1 end]
-									regexp {^ *(.*)$} $str_tmp reco str_next
+									#OLD regexp {^ *(.*)$} $str_tmp reco str_next
+									set str_next $str_tmp
 					               }
  
  

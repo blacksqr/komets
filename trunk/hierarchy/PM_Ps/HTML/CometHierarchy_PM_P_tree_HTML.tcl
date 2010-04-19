@@ -64,9 +64,11 @@ method CometHierarchy_PM_P_tree_HTML Recurse_display {strm_name dec L_h level} {
  if {$img_name != "void.png"} {append strm " onclick=\"CometHierarchy_PM_P_tree_HTML__switch_plus_minus('${objName}_icon_of_$id', '${objName}_daughters_of_$id', 0); \""}
  append strm ">\n"
  append strm $dec "<img src=\"./Comets/hierarchy/PM_Ps/HTML/images/" $img_name "\""
- append strm "/></span> <span id=\"${objName}_item_$id\" class=\"${objName}_item\">" $name "</span>\n"
+ append strm "/></span> <span id=\"${objName}_item_$id\" class=\"CometHierarchy_PM_P_tree_HTML_NODE ${objName}_item"
+ if {$img_name == "void.png"} {append strm " ${objName}_leaf"}
+ append strm "\">" $name "</span>\n"
  
- append strm $dec "<div id=\"${objName}_daughters_of_$id\" style=\"margin-left: [expr $level * 10]px;\">\n"
+ append strm $dec "<div id=\"${objName}_daughters_of_$id\" style=\"margin-left: 10px;\">\n"
  foreach d $L_daughters {
    this Recurse_display strm "$dec  " $d $level
   }
@@ -74,6 +76,21 @@ method CometHierarchy_PM_P_tree_HTML Recurse_display {strm_name dec L_h level} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometHierarchy_PM_P_tree_HTML set_item_draggable {v} {
+method CometHierarchy_PM_P_tree_HTML set_all_item_draggable {v} {
  this Drag_zone $v ${objName}_item 0
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometHierarchy_PM_P_tree_HTML set_leaf_item_draggable {v} {
+ this Drag_zone $v ${objName}_leaf 0
+}
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code CometHierarchy_PM_P_tree_HTML set_L_h {} {
+ set    cmd "\$('#$objName').html("
+   set strm ""
+   this Recurse_display strm "" [this get_L_h] 0
+   append cmd [this Encode_param_for_JS $strm]
+ append cmd ");\n"
+ this Concat_update $objName set_L_h $cmd
 }
