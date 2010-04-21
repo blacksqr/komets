@@ -11,8 +11,13 @@ method Container_PM_P_HideShow_HTML constructor {name descr args} {
  this set_html_style "" ${objName}_header
  this set_html_style "" ${objName}_content
  
+ this set_root_for_daughters ${objName}_content
+ 
  set this(drag)         0
+ set this(resizable)    0
+ 
    this set_GDD_id Container_Maskable_HTML
+   
  eval "$objName configure $args"
  return $objName
 }
@@ -70,24 +75,35 @@ method Container_PM_P_HideShow_HTML set_title {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Container_PM_P_HideShow_HTML set_drag {v} {
+method Container_PM_P_HideShow_HTML Resizable {v {id {}}} {
+ set this(resizable) $v
+
+ if {$v == 1} {set cmd "\$( '#${objName}_content').resizable( {alsoResize: '#$objName'} );"
+               this Subscribe_to_Render_post_JS ${objName}_Container_PM_P_HideShow_HTML::Resizable [this Translate_JS_for_subscribe cmd] UNIQUE
+ } else {set cmd "\$( '#${objName}_content').resizable().resizable('destroy');"
+         this UnSubscribe_to_Render_post_JS ${objName}_Container_PM_P_HideShow_HTML::Resizable
+		}
+ 
+ 
+ this send_jquery_message Resize_$objName $cmd 
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HideShow_HTML Draggable {v} {
  set this(drag) $v
  
- set root         [this get_L_roots]
- set methode      "drag"
- if {$v == 1} { set cmd          "\$(\"#${objName}\").draggable({handle : '#${objName}_header'});"
- } else { set cmd          "\$(\"#${objName}\").draggable('destroy');" }
+ if {$v == 1} {set cmd "\$(\"#${objName}\").draggable({handle : '#${objName}_header'});"
+               this Subscribe_to_Render_post_JS ${objName}_Container_PM_P_HideShow_HTML::Draggable [this Translate_JS_for_subscribe cmd] UNIQUE
+ } else {set cmd "\$(\"#${objName}\").draggable().draggable('destroy');"
+         this UnSubscribe_to_Render_post_JS ${objName}_Container_PM_P_HideShow_HTML::Draggable
+		}
  
- if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-	$root Concat_update $objName $methode $cmd
- }
+ this send_jquery_message Drag_$objName $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
-
- #append strm $dec "\$(function() {" "\n" 
 
  ### jquery pour tous les containers
  if {[this get_header_place] == "left" || [this get_header_place] == "right"} { set ouvert "w"; set ferme "e"} else { set ouvert "n"; set ferme "s" }
@@ -141,10 +157,8 @@ method Container_PM_P_HideShow_HTML Render_post_JS {strm_name {dec {}}} {
 				append strm $dec "     \$(\"#${objName}_title\").attr({style : \"padding-top:\"+heightT+\"px;text-align:center;\"});" "\n"
 			 }
 
- #append strm $dec "});" "\n"
-
- #this set_mark $mark
- this Render_daughters_post_JS strm $dec  
+ 
+ this inherited strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -159,6 +173,7 @@ method Container_PM_P_HideShow_HTML Render {strm_name {dec {}}} {
  append strm $dec </div> "\n"
 }
 
+#___________________________________________________________________________________________________________________________________________
 method Container_PM_P_HideShow_HTML Float_daughters {position} {
 	this add_html_style [list "overflow" "auto"] ${objName}_content
 	foreach daugther [this get_out_daughters] {
