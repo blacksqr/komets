@@ -8,8 +8,9 @@ method CometHierarchy_PM_P_tree_HTML constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id FUI_CometHierarchy_PM_P_tree_HTML
    
-   set this(item_draggable) 0
-   
+   set this(all_item_draggable)  0
+   set this(leaf_item_draggable) 0
+    
  eval "$objName configure $args"
  return $objName
 }
@@ -19,7 +20,7 @@ Methodes_set_LC CometHierarchy_PM_P_tree_HTML [L_methodes_set_hierarchy] {} {}
 Methodes_get_LC CometHierarchy_PM_P_tree_HTML [L_methodes_get_hierarchy] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometHierarchy_PM_P_tree_HTML [list item_draggable]
+Generate_accessors CometHierarchy_PM_P_tree_HTML [list all_item_draggable leaf_item_draggable]
 
 #___________________________________________________________________________________________________________________________________________
 method CometHierarchy_PM_P_tree_HTML Render {strm_name {dec {}}} {
@@ -39,9 +40,9 @@ method CometHierarchy_PM_P_tree_HTML Render {strm_name {dec {}}} {
 method CometHierarchy_PM_P_tree_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
  
- if {[this get_item_draggable]} {
-   append strm $dec "\$('.${objName}_item').draggable( {opacity: 0.7, helper: 'clone'} );\n"
-  }
+ if {[this get_all_item_draggable ]} {this set_all_item_draggable  1}
+ if {[this get_leaf_item_draggable]} {this set_leaf_item_draggable 1}
+
  this inherited strm $dec
 }
 
@@ -75,13 +76,14 @@ method CometHierarchy_PM_P_tree_HTML Recurse_display {strm_name dec L_h level} {
  append strm $dec "</div>\n" $dec "</div>\n" 
 }
 
+
 #___________________________________________________________________________________________________________________________________________
-method CometHierarchy_PM_P_tree_HTML set_all_item_draggable {v} {
+Inject_code CometHierarchy_PM_P_tree_HTML set_all_item_draggable {} {
  this Drag_zone $v ${objName}_item 0
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometHierarchy_PM_P_tree_HTML set_leaf_item_draggable {v} {
+Inject_code CometHierarchy_PM_P_tree_HTML set_leaf_item_draggable {} {
  this Drag_zone $v ${objName}_leaf 0
 }
 

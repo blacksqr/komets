@@ -1,5 +1,13 @@
-#$current[soft_type == PHP_HTML](TREE) {
+#$current[soft_type == PHP_HTML](INTERLEAVING.GLOBAL) {
+ FCT_set_L_display_order:  ADD.WS  TREE.EDITED.COMETS  TREE.TOOLKIT.GDD  *;
+}
+
+#$current[soft_type == PHP_HTML](TREE.EDITED.COMETS) {
  FCT_set_html_style: border "solid black 1px" float left height 600px overflow scroll;
+}
+
+#$current[soft_type == PHP_HTML](TREE.TOOLKIT.GDD) {
+ FCT_set_html_style: border "solid black 1px" float right height 600px overflow scroll;
 }
 
 #$current[soft_type == PHP_HTML](TREE.EDITION.COMETS) {
@@ -11,6 +19,14 @@
 }
 
 #$current[soft_type == PHP_HTML](CONTAINER.CANVAS.EDITION) {
- FCT_set_html_style: background rgb(128,128,128) float left width 400px height 600px border "solid black 1px";
- FCT_Drop_zone: CometHierarchy_PM_P_tree_HTML_NODE "puts \"coucou de \$PM\"";
+ FCT_set_html_style: background rgb(128,128,128) display block width 600px height 600px border "solid black 1px" overflow hidden;
+ FCT_Resizable: 1;
+}
+
+#$current[soft_type == PHP_HTML]  {
+ FCT_Subscribe_to_Add_a_new_workspace: HTML_style "Apply_style_on \[CSS++ $current \"$current(\$new_WS)\"\] \[list \\\$COMET_WS \$new_WS \\\$COMET_EDITION $current\] \"\[Comet_files_root\]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++\" \"\[Comet_files_root]Comets/CometEdition_comet/PMs/CSSpp/partial_CometEdition_comet_PM_P_HTML_basic_for_new_workspace.csspp\"" UNIQUE;
+}
+
+#$current[soft_type == PHP_HTML](CONTAINER.CANVAS.EDITION > WORKSPACE)  {
+ FCT_Eval: Apply_style_on $obj [list \$COMET_WS [$obj get_LC] \$COMET_EDITION $current] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CometEdition_comet/PMs/CSSpp/partial_CometEdition_comet_PM_P_HTML_basic_for_new_workspace.csspp";
 }

@@ -382,8 +382,8 @@ method PM_HTML Drag_zone {v {id {}} {abs 1}} {
 		  this send_jquery_message Drag_zone_$objName "$cmd\;"
          } 
 }
-
 Trace PM_HTML Drag_zone
+
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML get_Drop_zone_cmd {} {
  set L_rep [list]
@@ -419,19 +419,51 @@ method PM_HTML Drop_zone {metadata_filter cmd {id {}}} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Draggable {{v 1}} {
+method PM_HTML Translate_JS_for_subscribe {cmd_name} {
+ upvar $cmd_name cmd
+ 
+ set cmd_subscribe ""
+ foreach line [split $cmd "\n"] {
+   append cmd_subscribe "append strm \"" [string map [list {$} {\$} {;} {\;} "\"" {\"}] $line] "\"\n"
+  }
+  
+ return $cmd_subscribe
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Resizable {v {id {}}} {
+ if {$id == ""} {set id $objName}
+ 
+ set    cmd ""
+ append cmd "var parent = \$('#$id').parent();"
+ append cmd "\$('#$id').resizable( {containment: parent} );\n\$('#$id').resizable( 'disable' );\n"
+
  if {$v} {
-   set cmd        "\$('#$objName').draggable(  )"
-   set cmd_enable "\$('#$objName').draggable( 'enable' )"
-   this send_jquery_message Draggable_$objName "$cmd\; $cmd_enable\;"
-   this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" "
-     append strm \\$cmd\\\;
-	 append strm \\$cmd_enable\\\;
-	" UNIQUE
-  } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
-          set cmd "\$('#$objName').draggable( 'disable' )"
-		  this send_jquery_message Draggable_$objName "$cmd\;"
+   append cmd "\$('#$id').resizable( 'enable' );\n"
+   this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Resizable" [this Translate_JS_for_subscribe cmd] UNIQUE
+  } else {append cmd "\$('#$id').resizable( 'destroy' );\n"
+          this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Resizable"
          }
+		 
+ this send_jquery_message Rezisable_$objName $cmd
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Draggable {{v 1}} {
+ set id $objName 
+ 
+ set    cmd ""
+ append cmd "var parent = \$('#$id').parent();"
+ append cmd "\$('#$id').draggable( {containment: parent} );\n\$('#$id').draggable( 'disable' );\n"
+
+ if {$v} {
+   append cmd "\$('#$id').draggable( 'enable' );\n"
+   this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable" [this Translate_JS_for_subscribe cmd] UNIQUE
+  } else {this UnSubscribe_to_Render_post_JS "${objName}_PM_HTML::Draggable"
+          append cmd "\$('#$objName').draggable( 'disable' );\n"
+         }
+		 
+ this send_jquery_message Draggable_$objName $cmd
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -461,8 +493,6 @@ method PM_HTML send_jquery_message {methode cmd} {
 #XXX	$root Concat_update $objName $methode $cmd
 #XXX }
 }
-
-
 
 method PM_HTML HEIGHT {x} {
 	this add_html_style [list "height" "$x%"]

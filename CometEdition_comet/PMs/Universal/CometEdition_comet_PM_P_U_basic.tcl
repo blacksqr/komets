@@ -19,14 +19,17 @@ method CometEdition_comet_PM_P_U_basic constructor {name descr args} {
    set this(C_inter_PM_views)           [CPool get_a_comet CometInterleaving -Add_style_class "INTERLEAVING EDITION COMETS PM" -set_name "Editions"]
    
    set this(C_daughter_handle) [CPool get_a_comet CometContainer -set_name "Handle for out daughters"]
+   set this(C_act_add_WS)      [CPool get_a_comet CometActivator -set_text "Add a workspace" -set_name "Add a workspace" \
+                                                                 -Subscribe_to_activate $objName "$objName Add_a_new_workspace" \
+																 -Add_style_class [list ACT ADD WS] ]
    set this(C_act_validate)    [CPool get_a_comet CometActivator -set_text "Validate scores and continue" -set_name "Validate score and continue" \
                                                                  -Subscribe_to_activate $objName "$objName Validate_scores" \
 															     -Add_style_class [list ACT VALIDATE] ]
    
 
    $this(C_inter_PM_views) Add_daughters_R $this(C_container_canvas)
-   set this(C_inter)     [CPool get_a_comet CometInterleaving]
-     $this(C_inter) set_daughters_R [list $this(C_hier_edited_comets) $this(C_inter_PM_views) $this(C_hier_existing_comets)]
+   set this(C_inter)     [CPool get_a_comet CometInterleaving -Add_style_class "INTERLEAVING GLOBAL"]
+     $this(C_inter) set_daughters_R [list $this(C_act_add_WS) $this(C_hier_edited_comets) $this(C_hier_existing_comets) $this(C_inter_PM_views)]
 
    $this(C_root) set_daughters_R [list $this(C_inter) $this(C_daughter_handle)]
    
@@ -47,8 +50,21 @@ Generate_PM_setters CometEdition_comet_PM_P_U_basic [P_L_methodes_set_CometEditi
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic set_LM {LM} {
  set rep [this inherited $LM]
- if {$LM != ""} {this init_gdd_hierarchy}
+ if {$LM != ""} {this set_edited_root [this get_edited_root]
+				}
  return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic set_mothers {v} {
+ this inherited $v
+ this init_gdd_hierarchy
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic Add_mother {m {index -1}} {
+ this inherited $m $index
+ this init_gdd_hierarchy
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -58,7 +74,10 @@ method CometEdition_comet_PM_P_U_basic init_gdd_hierarchy {} {
  set dsl [this get_DSL_GDD_QUERY]
  $dsl QUERY "?t : IS_root : NODE()<-REL()*<-\$t(type == GDD_C&T)"
  foreach T [lindex [lindex [$dsl get_Result] 0] 1] {
-   $dsl QUERY "?n : $T : NODE()<-REL()*<-\$n(type == GDD_FUI && ptf ~= Ptf_HTML)"
+   set root_GDD_node [[this get_L_roots] get_GDD_id]
+   if {[gmlObject info exists object $root_GDD_node]} {set techno_ptf    [$root_GDD_node get_ptf]
+                                                      } else {set techno_ptf Ptf_HTML}
+   $dsl QUERY "?n : $T : NODE()<-REL()*<-\$n(type == GDD_FUI && ptf ~= $techno_ptf)"
    set L_FUI [lindex [lindex [$dsl get_Result] 0] 1]
    if {[llength $L_FUI]} {lappend L_interactors [list $T {} $L_FUI]}
   }
@@ -77,12 +96,29 @@ Inject_code CometEdition_comet_PM_P_U_basic set_edited_root {} {
  this Reset_PM_views
 }
 
-Trace CometEdition_comet_PM_P_U_basic set_edited_root
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic Add_new_Comet {parent comet} {
+ if {[regexp {^.*_item_(.*)$} $comet reco GDD_node]} {
+   puts "  let's examine $GDD_node"
+   if {[lsearch [gmlObject info classes $GDD_node] GDD_Node] >= 0} {
+     set comet [lindex [interpretor_DSL_comet_interface Interprets  "${GDD_node}()" [CPool get_a_unique_name]] 0]
+	 $comet Add_MetaData Generated_by_$objName 1
+	} else {set comet $GDD_node}
+  }
+  
+ $parent Add_daughters_R $comet
+}
+
+Trace CometEdition_comet_PM_P_U_basic Add_new_Comet
 
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic Reset_PM_views {} {
-
+ foreach LC [CSS++ $objName "#$this(C_container_canvas) *"] {
+   if {[$LC Has_MetaData Generated_by_$objName]} {puts "  Disposing $LC"; $LC dispose}
+  }
 }
+
+Trace CometEdition_comet_PM_P_U_basic Reset_PM_views
 
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic get_L_h_edited_comet {root} {
@@ -93,3 +129,14 @@ method CometEdition_comet_PM_P_U_basic get_L_h_edited_comet {root} {
   
  return [list $root [list name [$root get_name]] $L]
 }
+
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic Add_a_new_workspace {} {
+ set new_WS [lindex [interpretor_DSL_comet_interface Interprets  "Container_CUI_window()" [CPool get_a_unique_name]] 0]
+ $new_WS configure -Add_style_class "CONTAINER WORKSPACE" -Add_MetaData Generated_by_$objName 1 -set_name "WS"
+ $this(C_container_canvas) Add_daughters_R $new_WS
+}
+
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList CometEdition_comet_PM_P_U_basic [list Add_a_new_workspace] end
+

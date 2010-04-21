@@ -1648,8 +1648,8 @@ method FPOOL get_file_gdd_op {f_name} {
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________
 proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
- #puts "_____ Apply_style_on ________"
- #puts "  $GDD_op_file\n  $CSS_file"
+ # puts "_____ Apply_style_on ________"
+ # puts "  $GDD_op_file\n  $CSS_file\n  L_C : $L_C\n  L_mapping : $L_mapping"
  set GDD_op [FPool get_file_gdd_op $GDD_op_file]
  set CSS    [FPool get_file_css++  $CSS_file]
  
@@ -1657,7 +1657,7 @@ proc Apply_style_on {L_C L_mapping GDD_op_file CSS_file} {
    Update_style [$C get_DSL_GDD_QUERY] [$C get_styler] $GDD_op $CSS $C $L_mapping
   }
   
- #puts "_____________________________"
+# puts "_____________________________"
 }
 
 #_________________________________________________________________________________________________________
@@ -1675,7 +1675,7 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
 
 #_________________________________________________________________________________________________________
 proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
-# puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $str_fct\n  - rules : $str_style\n  - current = $current\n  - L_mapping : $L_mapping"
+ # puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $L_fct\n  - current = $current\n  - L_mapping : $L_mapping\n  -L_rep : $L_rep"
 # Let's see if some CSS rules have GDD access
  if {$L_rep == ""} {set do_css 1} else {set do_css 0}
  foreach r $CSS {
