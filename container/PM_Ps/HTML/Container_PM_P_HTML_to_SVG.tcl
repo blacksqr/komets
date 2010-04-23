@@ -27,6 +27,7 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec "<div [this Style_class]>\n"
+    append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/svg/jquery.svg.min.js\"></script>\n"
 	append strm $dec "<div style=\"display:none\" id=\"${objName}_pipo\">\n"
 	append strm $dec "</div>\n"
  append strm $dec "</div>\n"

@@ -18,13 +18,34 @@
  FCT_set_leaf_item_draggable: 1;
 }
 
+#$current[soft_type == PHP_HTML](INTERLEAVING.EDITION.COMETS TOTO) {
+ GDD_fct: Implem(CUI_Interleaving_Tabs);
+}
+
+#$current[soft_type == PHP_HTML](TREE.ACTUAL.PMs) {
+ FCT_Eval: U_encapsulator_PM $obj "CometContainer(-Add_style_class ROOT, \"Tree of the actual presentations\", \$obj())";
+}
+
+#$current[soft_type == PHP_HTML](TREE.ACTUAL.PMs(ROOT)) {
+ FCT_set_html_style: border "solid black 1px" width 600px;
+}
+
+#$current[soft_type == PHP_HTML](TREE.ACTUAL.PMs(CORE)) {
+}
+
 #$current[soft_type == PHP_HTML](CONTAINER.CANVAS.EDITION) {
  FCT_set_html_style: background rgb(128,128,128) display block width 600px height 600px border "solid black 1px" overflow hidden;
  FCT_Resizable: 1;
+ FCT_Catch_mouse_event: onContextMenu false;
+ FCT_Eval: source [Comet_files_root]Comets/CometEdition_comet/PMs/CSSpp/HTML_canvas_context_menu.tcl
+       --- $obj Subscribe_to_HTML_element_selected HTML_style "CometEdition_PM_P_U_basic_HTML___display_L_PM $current 200 100 \$L_PM" UNIQUE;
 }
 
 #$current[soft_type == PHP_HTML]  {
  FCT_Subscribe_to_Add_a_new_workspace: HTML_style "Apply_style_on \[CSS++ $current \"$current(\$new_WS)\"\] \[list \\\$COMET_WS \$new_WS \\\$COMET_EDITION $current\] \"\[Comet_files_root\]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++\" \"\[Comet_files_root]Comets/CometEdition_comet/PMs/CSSpp/partial_CometEdition_comet_PM_P_HTML_basic_for_new_workspace.csspp\"" UNIQUE;
+ FCT_Subscribe_to_get_possible_FUI   : HTML_style "CometEdition_PM_P_U_basic_HTML___display_L_GDD_FUI $current 200 100 \$PM \$L_GDD_FUI" UNIQUE;
+ FCT_Subscribe_to_Exec_a_substitution: HTML_style "CometEdition_PM_P_U_basic_HTML___Update_PM $current \$PM \$new_PM" UNIQUE;
+ FCT_Subscribe_to_Update_PMs_tree    : HTML_style "Apply_style_on \[CSS++ $current \"$current(TREE.ACTUAL.PMs)\"\] \[list \\\$COMET_EDITION $current\] \"\[Comet_files_root\]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++\" \"\[Comet_files_root]Comets/CometEdition_comet/PMs/CSSpp/partial_CometEdition_comet_PM_P_HTML_basic_for_PMs_tree_update.csspp\"" UNIQUE;
 }
 
 #$current[soft_type == PHP_HTML](CONTAINER.CANVAS.EDITION > WORKSPACE)  {

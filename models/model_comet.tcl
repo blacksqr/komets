@@ -159,8 +159,8 @@ proc Add_Semantic_API_infos_to_contructor {get_set classe L_methodes} {
  set L_lines [split $txt_constr "\n"]
  set done 0
  foreach line $L_lines {
-   if {[regexp {^ *set this(Semantic_API_$get_set) .*$} $line reco]} {
-     append n_txt_constr " set this(Semantic_API_$get_set) \[list $L_methodes\]\n"
+   if {[regexp "^ *set this\\\(Semantic_API_$get_set\\\) *\\\[list *(.*) *\\\].*\$" $line reco L_prev_mtd]} {
+     append n_txt_constr " set this(Semantic_API_$get_set) \[list $L_prev_mtd $L_methodes\]\n"
 	 set done 1
     } else {if {$done == 0 && [regexp {^(.*)return(.*)$} $line reco avant apres]} {
 	          append n_txt_constr " set this(Semantic_API_$get_set) \[list $L_methodes\]\n${avant}return$apres\n"
@@ -2712,7 +2712,7 @@ method Physical_model Substitute_by_PM_type {t} {
  foreach PM [$LM get_L_inactives_PM] {
    if {[lsearch [gmlObject info classes $PM] $t] != -1} {set new_PM $PM; break;}
   }
- if {[string equal $new_PM {}]} {
+ if {$new_PM == ""} {
    set new_PM [this get_LC]_PM_P_${t}_[$LM get_a_unique_id]
    $t $new_PM $new_PM "Created to substitute $objName as a PM of type $t"
    puts "New version of $t"

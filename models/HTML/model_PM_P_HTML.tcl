@@ -46,6 +46,38 @@ method PM_HTML get_class_enable_AJAX_UPDATE { } {return $class(enable_AJAX_UPDAT
 method PM_HTML set_class_enable_AJAX_UPDATE {v} {set class(enable_AJAX_UPDATE) $v}
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML HTML_mouse_event {event_L} {
+ lassign $event_L event L
+ 
+ set L_rep [list]
+ 
+ foreach e $L {
+   if {[gmlObject info exists object $e]} {
+     if {[lsearch [gmlObject info classes $e] Physical_model] >= 0} {
+	   lappend L_rep $e
+	  }
+    }
+  }
+  
+ this HTML_element_selected $event $L_rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML HTML_element_selected {event L_PM} {}
+
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList PM_HTML [list HTML_element_selected] end
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Catch_mouse_event {event return_value {id {}}} {
+ if {$id == ""} {set id "#$objName"}
+ set cmd "\$('$id').attr('$event', \"javascript:mouseEventHandler(event, '$objName'); return $return_value;\" );"
+ this Concat_update $objName Catch_mouse_event $cmd
+ 
+ this Subscribe_to_Render_post_JS Catch_mouse_event_$objName [this Translate_JS_for_subscribe cmd]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML get_id_for_style {{id {}}} {
  if {$id == ""} {return $this(id_for_style)} else {return $id}
 }
@@ -424,7 +456,7 @@ method PM_HTML Translate_JS_for_subscribe {cmd_name} {
  
  set cmd_subscribe ""
  foreach line [split $cmd "\n"] {
-   append cmd_subscribe "append strm \"" [string map [list {$} {\$} {;} {\;} "\"" {\"}] $line] "\"\n"
+   append cmd_subscribe "append strm \"" [string map [list {$} {\$} {;} {\;} "\"" {\"} "\\" {\\}] $line] "\"\n"
   }
   
  return $cmd_subscribe

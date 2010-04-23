@@ -10,6 +10,9 @@ method CometHierarchy_PM_P_tree_HTML constructor {name descr args} {
    
    set this(all_item_draggable)  0
    set this(leaf_item_draggable) 0
+   set this(all_item_droppable)  0
+   set this(leaf_item_droppable) 0
+
     
  eval "$objName configure $args"
  return $objName
@@ -20,7 +23,19 @@ Methodes_set_LC CometHierarchy_PM_P_tree_HTML [L_methodes_set_hierarchy] {} {}
 Methodes_get_LC CometHierarchy_PM_P_tree_HTML [L_methodes_get_hierarchy] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors CometHierarchy_PM_P_tree_HTML [list all_item_draggable leaf_item_draggable]
+Generate_accessors CometHierarchy_PM_P_tree_HTML [list all_item_draggable leaf_item_draggable all_item_droppable leaf_item_droppable]
+
+#___________________________________________________________________________________________________________________________________________
+Add_Semantic_API_infos_to_contructor set CometHierarchy_PM_P_tree_HTML [list {set_all_item_draggable {v}} \
+                                                                             {set_leaf_item_draggable {v}} \
+													                         {set_all_item_droppable {v}} \
+													                         {set_leaf_item_droppable {v}}]
+
+#___________________________________________________________________________________________________________________________________________
+Add_Semantic_API_infos_to_contructor get CometHierarchy_PM_P_tree_HTML [list {get_all_item_draggable {}} \
+                                                                             {get_leaf_item_draggable {}} \
+													                         {get_all_item_droppable {}} \
+													                         {get_leaf_item_droppable {}}]
 
 #___________________________________________________________________________________________________________________________________________
 method CometHierarchy_PM_P_tree_HTML Render {strm_name {dec {}}} {
@@ -78,14 +93,24 @@ method CometHierarchy_PM_P_tree_HTML Recurse_display {strm_name dec L_h level} {
 
 
 #___________________________________________________________________________________________________________________________________________
-Inject_code CometHierarchy_PM_P_tree_HTML set_all_item_draggable {} {
- this Drag_zone $v ${objName}_item 0
-}
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+Inject_code CometHierarchy_PM_P_tree_HTML set_all_item_draggable {} {this Drag_zone $v ${objName}_item 0}
+#___________________________________________________________________________________________________________________________________________
+Inject_code CometHierarchy_PM_P_tree_HTML set_leaf_item_draggable {} {this Drag_zone $v ${objName}_leaf 0}
 
 #___________________________________________________________________________________________________________________________________________
-Inject_code CometHierarchy_PM_P_tree_HTML set_leaf_item_draggable {} {
- this Drag_zone $v ${objName}_leaf 0
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+Inject_code CometHierarchy_PM_P_tree_HTML set_all_item_droppable  {} {this Drop_zone $v "$objName Drop_on \$objName \$PM" ${objName}_item}
+#___________________________________________________________________________________________________________________________________________
+Inject_code CometHierarchy_PM_P_tree_HTML set_leaf_item_droppable {} {this Drag_zone $v ${objName}_leaf 0}
+
+#___________________________________________________________________________________________________________________________________________
+method CometHierarchy_PM_P_tree_HTML Drop_on {drop_zone dropped_element} {
+
 }
+Trace CometHierarchy_PM_P_tree_HTML Drop_on
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometHierarchy_PM_P_tree_HTML set_L_h {} {

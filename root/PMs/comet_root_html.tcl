@@ -104,7 +104,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<style type=\"text/css\"> body{ font: 80% \"Trebuchet MS\", sans-serif;} </style>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-1.4.2.min.js\"></script>\n"
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-ui-1.8.custom.min.js\"></script>\n"
- #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.svg.min.js\"></script>\n"
+ 
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
  #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
  
@@ -268,9 +268,7 @@ method PhysicalHTML_root Close_clients {} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root List_clients {} {
- foreach c $this(clients) {
-   puts $c
-  }
+ return $this(clients)
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -279,10 +277,7 @@ method PhysicalHTML_root Read_from_PHP {chan} {
   
   if { [eof $chan] } {
     close $chan
-    set nc [list]
-    foreach e $this(clients) {if {[string equal $e $chan]} {} else {lappend nc $e}}
-    set this(clients) $nc
-    puts "$objName : Déconnection de $chan, reçut [string length $this(msg)] octets"
+	set this(clients) [lremove $this(clients) $chan]
     return
   } else {append this(msg) [read $chan]
 				  if {$this(msg_attended_length) == -1} {
@@ -304,6 +299,8 @@ method PhysicalHTML_root Read_from_PHP {chan} {
 					 }
 					set this(msg_attended_length) -1
 					set this(msg)                 ""
+					
+					set this(clients) [lremove $this(clients) $chan]
 					close $chan
 				    #puts "Done!"; 
 				   }
@@ -416,28 +413,8 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root Mouse_hover {L} {
- foreach e $L {
-   if {[gmlObject info exists object $e]} {
-     if {[lsearch [gmlObject info classes $e] Physical_model] >= 0} {
-	   this HTML_element_selected $e
-	   break
-	  }
-    }
-  }
-}
-
-#___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root HTML_element_selected {v} {}
-
-Manage_CallbackList PhysicalHTML_root [list HTML_element_selected] end
-Trace PhysicalHTML_root HTML_element_selected
-
-#___________________________________________________________________________________________________________________________________________
-method PhysicalHTML_root Do_Mouse_hover {v} {
- if {$v} {
-   this Concat_update ${objName} Do_Mouse_hover {$('body').attr('onMouseDown', 'javascript:mouseEventHandler(event);');}
-  } else {this Concat_update ${objName} Do_Mouse_hover {$('body').attr('onMouseDown', '');}}
+method PhysicalHTML_root Do_Mouse_hover {} {
+ this Catch_mouse_event onMouseDown 
 }
 
 #___________________________________________________________________________________________________________________________________________
