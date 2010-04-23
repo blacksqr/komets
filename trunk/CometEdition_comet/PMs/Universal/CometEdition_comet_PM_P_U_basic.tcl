@@ -16,6 +16,7 @@ method CometEdition_comet_PM_P_U_basic constructor {name descr args} {
    set this(C_hier_edited_comets)       [CPool get_a_comet CometHierarchy    -Add_style_class "TREE EDITED EDITION COMETS"     -set_name "Tree of edited comets"]
    set this(C_hier_existing_comets)     [CPool get_a_comet CometHierarchy    -Add_style_class "TREE TOOLKIT COMETS GDD"        -set_name "Toolkit of existing comets"]
    set this(C_container_canvas)         [CPool get_a_comet CometContainer    -Add_style_class "CONTAINER CANVAS EDITION"       -set_name "Canvas for WYSIWYG builder"]
+   set this(C_hier_PMs)                 [CPool get_a_comet CometHierarchy    -Add_style_class "TREE ACTUAL PMs"                -set_name "Canvas for WYSIWYG builder"]
    set this(C_inter_PM_views)           [CPool get_a_comet CometInterleaving -Add_style_class "INTERLEAVING EDITION COMETS PM" -set_name "Editions"]
    
    set this(C_daughter_handle) [CPool get_a_comet CometContainer -set_name "Handle for out daughters"]
@@ -27,7 +28,7 @@ method CometEdition_comet_PM_P_U_basic constructor {name descr args} {
 															     -Add_style_class [list ACT VALIDATE] ]
    
 
-   $this(C_inter_PM_views) Add_daughters_R $this(C_container_canvas)
+   $this(C_inter_PM_views) Add_daughters_R [list $this(C_container_canvas) $this(C_hier_PMs)]
    set this(C_inter)     [CPool get_a_comet CometInterleaving -Add_style_class "INTERLEAVING GLOBAL"]
      $this(C_inter) set_daughters_R [list $this(C_act_add_WS) $this(C_hier_edited_comets) $this(C_hier_existing_comets) $this(C_inter_PM_views)]
 
@@ -75,9 +76,9 @@ method CometEdition_comet_PM_P_U_basic init_gdd_hierarchy {} {
  $dsl QUERY "?t : IS_root : NODE()<-REL()*<-\$t(type == GDD_C&T)"
  foreach T [lindex [lindex [$dsl get_Result] 0] 1] {
    set root_GDD_node [[this get_L_roots] get_GDD_id]
-   if {[gmlObject info exists object $root_GDD_node]} {set techno_ptf    [$root_GDD_node get_ptf]
-                                                      } else {set techno_ptf Ptf_HTML}
-   $dsl QUERY "?n : $T : NODE()<-REL()*<-\$n(type == GDD_FUI && ptf ~= $techno_ptf)"
+   if {[gmlObject info exists object $root_GDD_node]} {set this(techno_ptf)    [$root_GDD_node get_ptf]
+                                                      } else {set this(techno_ptf) Ptf_HTML}
+   $dsl QUERY "?n : $T : NODE()<-REL()*<-\$n(type == GDD_FUI && ptf ~= $this(techno_ptf))"
    set L_FUI [lindex [lindex [$dsl get_Result] 0] 1]
    if {[llength $L_FUI]} {lappend L_interactors [list $T {} $L_FUI]}
   }
@@ -117,7 +118,6 @@ method CometEdition_comet_PM_P_U_basic Reset_PM_views {} {
    if {[$LC Has_MetaData Generated_by_$objName]} {puts "  Disposing $LC"; $LC dispose}
   }
 }
-
 Trace CometEdition_comet_PM_P_U_basic Reset_PM_views
 
 #___________________________________________________________________________________________________________________________________________
@@ -138,5 +138,30 @@ method CometEdition_comet_PM_P_U_basic Add_a_new_workspace {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Manage_CallbackList CometEdition_comet_PM_P_U_basic [list Add_a_new_workspace] end
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic get_possible_FUI {PM} {
+ set L_GDD_FUI [Retrieve_equivalents_implem_of [this get_DSL_GDD_QUERY] [$PM get_GDD_id] "" "ptf ~= $this(techno_ptf)" 1]
+ puts "L_GDD_FUI = $L_GDD_FUI"
+}
+Trace CometEdition_comet_PM_P_U_basic get_possible_FUI
 
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic Exec_a_substitution {PM_FUI} {
+ lassign $PM_FUI PM FUI
+ set class [lindex [$FUI get_L_factories] 0]
+ if {$class != ""} {
+   if {[catch {set new_PM [$PM Substitute_by_PM_type $class]} err]} {set new_PM ""; puts stderr "  ERROR in \"$objName Exec_a_substitution {$PM_FUI}\":\n  $err"}
+  }
+}
+Trace CometEdition_comet_PM_P_U_basic Exec_a_substitution
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic Update_PMs_tree {} {
+ $this(C_hier_PMs) set_L_h [this get_L_h_edited_comet [CSS++ $objName "#${objName}(CONTAINER.CANVAS.EDITION > *)"]]
+}
+
+#___________________________________________________________________________________________________________________________________________
+Manage_CallbackList CometEdition_comet_PM_P_U_basic [list Add_a_new_workspace get_possible_FUI Exec_a_substitution Update_PMs_tree] end

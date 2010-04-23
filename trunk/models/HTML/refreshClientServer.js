@@ -12,7 +12,7 @@ function get_node_id_and_all_ancestors_id(node) {
 }
 
 //____________________________________________________________________________________________________________________
-function mouseEventHandler(mEvent) {
+function mouseEventHandler(mEvent, tcl_obj) {
 	if (!mEvent)
 		mEvent=window.event;
 	  
@@ -21,14 +21,14 @@ function mouseEventHandler(mEvent) {
 	  if (mEvent.srcElement)
 	  {
 		var id_list = get_node_id_and_all_ancestors_id(mEvent.srcElement);
-		addOutput_proc_val(document.forms[0].id + '__XXX__Mouse_hover', id_list, false);
 	  }
 	  // Netscape and Firefox
 	  else if (mEvent.target)
 	  {
 		var id_list = get_node_id_and_all_ancestors_id(mEvent.target);
-		addOutput_proc_val(document.forms[0].id + '__XXX__Mouse_hover', id_list, false);
 	  }
+	  
+	addOutput_proc_val(tcl_obj + '__XXX__HTML_mouse_event', mEvent.type + ' {' + id_list + '}', true);
 }
 
 
