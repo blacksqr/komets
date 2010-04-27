@@ -69,14 +69,15 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec {}}} {
  upvar $strm_name strm
-	append strm $dec ".${objName}_tabs.ui-state-default a {	background-color:transparent !important; }"
-   append strm $dec ".${objName}_tabs.ui-state-default a, .${objName}_tabs li.ui-state-default{ \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}\n"
-   append strm $dec ".${objName}_tabs.ui-tabs-selected a, .${objName}_tabs li.ui-tabs-selected{ \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"
-   append strm $dec ".${objName}_tabs.ui-tabs-nav { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}\n"
-	
+   append strm $dec "#${objName} h3.ui-state-active { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_active]\n}\n"
+   
+   append strm $dec "#${objName} h3.ui-state-default { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_inactive]\n}\n"
+   
+   append strm $dec "#${objName} div. accordion-content-active { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_content]\n}\n"
+   	
 }
 
 #___________________________________________________________________________________________________________________________________________

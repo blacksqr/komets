@@ -65,14 +65,20 @@ method Interleaving_PM_P_accordion_HTML Render_post_JS {strm_name {dec {}}} {
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_accordion_HTML get_tabs_css_style {strm_name {dec {}}} {
- upvar $strm_name strm
-   append strm $dec ".${objName}_tabs.ui-state-default { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}\n"
-   append strm $dec ".${objName}_tabs.ui-tabs-selected { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"
-   append strm $dec ".${objName}_tabs.ui-tabs-nav{ \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_header]\n}\n"
-	
+  upvar $strm_name strm
+   append strm $dec "#${objName} h3.ui-state-active { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_active]\n}\n"
+   append strm $dec "#${objName} h3.ui-state-active a { \n"
+   append strm $dec "color : inherit ;\n}\n"
+   
+   
+   append strm $dec "#${objName} h3.ui-state-default { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_inactive]\n}\n"
+      append strm $dec "#${objName} h3.ui-state-default a { \n"
+   append strm $dec "color : inherit ;\n}\n"
+   append strm $dec "#${objName} div.${objName}_content { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_content]\n}\n"
+   	
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -105,7 +111,7 @@ method Interleaving_PM_P_accordion_HTML Render {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_accordion_HTML add_html_style {L_var_val {id {}}} {
     this inherited $L_var_val $id
-	if {[lsearch [list ${objName}_tabs ${objName}_selected ${objName}_header] $id] >= 0} {
+	if {[lsearch [list ${objName}_active ${objName}_inactive] $id] >= 0} {
 		set msg "\$(\"#${objName}_tabs_style\").text("
 		set tmp "" 
 		this get_tabs_css_style tmp
@@ -119,13 +125,31 @@ method Interleaving_PM_P_accordion_HTML add_html_style {L_var_val {id {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_accordion_HTML set_html_style {lstyles {id {}}} {
     this inherited $lstyles $id
-	if {[lsearch [list ${objName}_tabs ${objName}_selected ${objName}_header] $id] >= 0} {
+	if {[lsearch [list ${objName}_active ${objName}_inactive] $id] >= 0} {
 		set msg "\$(\"${objName}_tabs_style\").text("
 		set tmp "" 
 		this get_tabs_css_style tmp
 		append  msg [this Encode_param_for_JS $tmp]
 		append  msg ");" 
 		this send_jquery_message Tabs_css_style $msg 
+	}
+}
+
+
+method Interleaving_PM_P_accordion_HTML Float_daughters {position} {
+	this add_html_style [list "overflow" "auto"] ${objName}_content
+	foreach daugther [this get_out_daughters] {
+		$daugther Float $position
+	}
+}
+
+method Interleaving_PM_P_accordion_HTML Border {width style color {radius {}}  {target {}}} {	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target ; }
+	lassign $color r g b a 
+	this add_html_style [list "border" "${width}px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a) !important"] $id ; 
+	if {$radius != {}} {
+		this add_html_style [list "-moz-border-radius" "${radius}px"] $id ;
+		this add_html_style [list "-webkit-border-radius" "${radius}px"] $id ;
+		this add_html_style [list "border-radius" "${radius}px"] $id ;
 	}
 }
 

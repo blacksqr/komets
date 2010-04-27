@@ -586,7 +586,13 @@ method PM_HTML MAGELLAN_Designer_constraint {} {
 	}
 }
 method PM_HTML Float {position} {
-	this add_html_style [list "float" $position]	
+	if {$position == "center" } {
+		this add_html_style [list "margin" "auto"]	
+		
+	} else {
+		this add_html_style [list "float" $position]	
+	}
+	
 }
 
 method PM_HTML Float_daughters {position} {
