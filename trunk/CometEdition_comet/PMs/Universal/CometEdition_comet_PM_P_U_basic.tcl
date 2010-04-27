@@ -160,8 +160,8 @@ Trace CometEdition_comet_PM_P_U_basic Exec_a_substitution
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic Update_PMs_tree {} {
- $this(C_hier_PMs) set_L_h [this get_L_h_edited_comet [CSS++ $objName "#${objName}(CONTAINER.CANVAS.EDITION > *)"]]
+ $this(C_hier_PMs) set_L_h [this get_L_h_edited_comet [CSS++ $objName "#${objName}(CONTAINER.CANVAS.EDITION)"]]
 }
 
 #___________________________________________________________________________________________________________________________________________
-Manage_CallbackList CometEdition_comet_PM_P_U_basic [list Add_a_new_workspace get_possible_FUI Exec_a_substitution Update_PMs_tree] end
+Manage_CallbackList CometEdition_comet_PM_P_U_basic [list Add_a_new_workspace get_possible_FUI Exec_a_substitution Update_PMs_tree Add_new_Comet] end

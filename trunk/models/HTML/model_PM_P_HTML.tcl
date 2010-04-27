@@ -371,7 +371,7 @@ method PM_HTML Add_JS {e} {
 	 set pos       [lsearch [this get_daughters] $e]
 	 set tailletot [llength [this get_daughters]]
 	  
-	 set strm {}; $e Render strm
+	 set strm {}; $e Render_all strm
 	 set strm [$e Encode_param_for_JS $strm]
 	 
 	 set cmd "\$('#$e').remove();"
@@ -434,12 +434,13 @@ method PM_HTML Trigger_Drop_cmd {PM__metadata_filter} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Drop_zone {metadata_filter cmd {id {}}} {
+method PM_HTML Drop_zone {metadata_filter cmd {id {}} {abs 1}} {
  if {$id == ""} {set id $objName}
+ if {$abs} {set id "#$id"} else {set id ".$id"}
  
  set this(Drop_zone,$metadata_filter) $cmd
  
- set fct "\$('#$id').droppable({drop: function(event, ui) {"
+ set fct "\$('$id').droppable({drop: function(event, ui) {"
  foreach {filter cmd} [this get_Drop_zone_cmd] {
    append fct "if ( ui.draggable.hasClass( '$metadata_filter\') ) {addOutput_proc_val('${objName}__XXX__Trigger_Drop_cmd' , ui.draggable.attr('id') + ' $metadata_filter\', true);}"
   }

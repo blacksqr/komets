@@ -40,7 +40,7 @@ method Interleaving_PM_P_HTML_menu Render {strm_name {dec {}}} {
    append strm $dec "<div>    </div>\n"
    # For each daughter not present in the menu, plug it
    foreach d $L_daughters_not_in_menu {
-     $d Render strm "$dec  "
+     $d Render_all strm "$dec  "
     }
    
  append strm "$dec</div>\n"
