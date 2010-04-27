@@ -1,0 +1,7 @@
+#$current  {
+ FCT_set_html_style: background rgb(196,196,196) border "solid black 1px" position absolute; 
+ FCT_Draggable: 1;
+ FCT_Resizable: 1;
+ FCT_Eval: puts "  COMET_EDITION : $COMET_EDITION\n       COMET_WS : $COMET_WS\n            obj : $obj";
+ FCT_Drop_zone: CometHierarchy_PM_P_tree_HTML_NODE "$COMET_EDITION Add_new_Comet $COMET_WS \$PM"  $current_content;
+}
