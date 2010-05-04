@@ -1,3 +1,5 @@
 #$current {
- FCT_set_leaf_item_droppable: 1;
+ FCT_Eval: puts "Mise à jour de l'arbre des PMs ($obj)";
+ FCT_set_items_droppable: 1   Generated_by_CometEdition_comet_PM_P_U_basic   CometHierarchy_PM_P_tree_HTML_NODE   CometEdition__drop_zone   CometEdition__can_drop_on_zone;
+ FCT_Subscribe_to_Drop_on: HTML_style "$COMET_EDITION Add_new_Comet \[\[$obj get_item \$drop_zone\] get_LC\] \$dropped_element" UNIQUE;
 }

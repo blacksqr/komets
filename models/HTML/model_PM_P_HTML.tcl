@@ -39,7 +39,7 @@ method PM_HTML constructor {name descr args} {
 #method PM_HTML set_mark {m} {set class(mark) $m}
 
 Generate_List_accessor PM_HTML L_tags L_tags
-Generate_accessors     PM_HTML [list AJAX_id_for_daughters id_for_style]
+Generate_accessors     PM_HTML [list AJAX_id_for_daughters id_for_style embeded_style]
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML get_class_enable_AJAX_UPDATE { } {return $class(enable_AJAX_UPDATE)}
@@ -371,7 +371,7 @@ method PM_HTML Add_JS {e} {
 	 set pos       [lsearch [this get_daughters] $e]
 	 set tailletot [llength [this get_daughters]]
 	  
-	 set strm {}; $e Render_all strm
+	 set strm {}; $e Render strm
 	 set strm [$e Encode_param_for_JS $strm]
 	 
 	 set cmd "\$('#$e').remove();"
@@ -417,6 +417,16 @@ method PM_HTML Drag_zone {v {id {}} {abs 1}} {
 Trace PM_HTML Drag_zone
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML get_Drop_zone_filters {} {
+ set L_rep [list]
+ foreach {filter cmd} [array get this Drop_zone,*] {
+   lappend L_rep .[string range $filter 10 end]
+  }
+  
+ return [join $L_rep ", "]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML get_Drop_zone_cmd {} {
  set L_rep [list]
  foreach {filter cmd} [array get this Drop_zone,*] {
@@ -427,29 +437,32 @@ method PM_HTML get_Drop_zone_cmd {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Trigger_Drop_cmd {PM__metadata_filter} {
- lassign $PM__metadata_filter PM metadata_filter
+method PM_HTML Trigger_Drop_cmd {PM__DROP__metadata_filter} {
+ lassign $PM__DROP__metadata_filter PM DROP_zone metadata_filter
 
  eval $this(Drop_zone,$metadata_filter)
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_HTML Drop_zone {metadata_filter cmd {id {}} {abs 1}} {
+method PM_HTML Drop_zone {metadata_filter cmd {id {}} {abs 1} {activeClass {}} {hoverClass {}}} {
  if {$id == ""} {set id $objName}
  if {$abs} {set id "#$id"} else {set id ".$id"}
  
  set this(Drop_zone,$metadata_filter) $cmd
  
- set fct "\$('$id').droppable({drop: function(event, ui) {"
+ set fct "\$('$id').droppable({accept: '[this get_Drop_zone_filters]', "
+   if {$activeClass != ""} {append fct "activeClass: '$activeClass', "}
+   if {$hoverClass  != ""} {append fct "hoverClass: '$hoverClass', "}
+ append fct "drop: function(event, ui) {"
  foreach {filter cmd} [this get_Drop_zone_cmd] {
-   append fct "if ( ui.draggable.hasClass( '$metadata_filter\') ) {addOutput_proc_val('${objName}__XXX__Trigger_Drop_cmd' , ui.draggable.attr('id') + ' $metadata_filter\', true);}"
+   append fct "if ( ui.draggable.hasClass( '$metadata_filter\') ) {addOutput_proc_val('${objName}__XXX__Trigger_Drop_cmd' , ui.draggable.attr('id') + ' ' + \$(this).attr('id') + ' $metadata_filter\', true);}"
   }
  append fct "}});"
  
  this send_jquery_message Drop_zone_$objName $fct
- puts "Eval in JS :\n$fct"
- this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Drop_zone" "append strm \"\\$fct\"" UNIQUE
+ this Subscribe_to_Render_post_JS "${objName}_PM_HTML::Drop_zone" [this Translate_JS_for_subscribe fct] UNIQUE
 }
+Trace PM_HTML Drop_zone
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Translate_JS_for_subscribe {cmd_name} {
@@ -519,21 +532,19 @@ method PM_HTML send_jquery_message {methode cmd} {
  if {$class(enable_AJAX_UPDATE) && $this(PM_root) != ""} {
    $this(PM_root) Concat_update $objName $methode $cmd
   }
-
-#XXX set root [this get_L_roots]
-#XXX 
-#XXX if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-#XXX	$root Concat_update $objName $methode $cmd
-#XXX }
 }
 
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML HEIGHT {x} {
 	this add_html_style [list "height" "$x%"]
 }
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML WIDTH {x} {
 	this add_html_style [list "width" "$x%"]	
 }
 
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	if {$target == "core" || $target == ""} {set id {}} else { set id ${objName}_$target ; }
 	
@@ -551,15 +562,13 @@ method PM_HTML bg_fg {BG_param FG_param {target {}} } {
 	lassign $FG_param r g b a  
 	this add_html_style [list "color" "rgba([expr int(255 * $r)],[expr int(255 * $g)],[expr int(255 * $b)],$a) !important"] $id 
 }
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML enrich {LC} {
 	U_encapsulator_PM $objName "CometContainer(, ${LC}(), \$obj())" 
 }
 
-# method PM_HTML Guidage {text} {
-	# set name [[this get_LC] get_name]
-	# U_encapsulator_PM $objName "CometContainer(, "$name :", \$obj())" 
-# }
-
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Reorder {v} {
 	if {[lsearch [this get_MAGELLAN_Designer_constraint] FIXED_ORDER] > -1} {return}
 	set L_reord [[this get_LC] get_out_daughters]
@@ -568,14 +577,20 @@ method PM_HTML Reorder {v} {
 }
 # U_encapsulator_PM CPool_COMET_55_PM_P_17 {CometContainer(, CPool_COMET_72 ,$obj)}
 
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Block {t} {
 	this add_html_style [list "display" "block"]	
 }
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Column {nb} {
 }
-method PM_HTML Border {width style color {radius {}}  {target {}}} {
 
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML Border {width style color {radius {}}  {target {}}} {
 }
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML MAGELLAN_Designer_constraint {} {
 
 	foreach constraint [[this get_LC] get_MAGELLAN_Designer_constraint] {
@@ -586,16 +601,17 @@ method PM_HTML MAGELLAN_Designer_constraint {} {
 		}
 	}
 }
+
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Float {position} {
 	if {$position == "center" } {
 		this add_html_style [list "margin" "auto"]	
-		
 	} else {
 		this add_html_style [list "float" $position]	
 	}
-	
 }
 
+#___________________________________________________________________________________________________________________________________________
 method PM_HTML Float_daughters {position} {
 	this add_html_style [list "overflow" "auto"]
 	foreach daugther [this get_out_daughters] {

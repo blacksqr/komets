@@ -3,5 +3,5 @@
  FCT_Draggable: 1;
  FCT_Resizable: 1;
  FCT_Eval: puts "  COMET_EDITION : $COMET_EDITION\n       COMET_WS : $COMET_WS\n            obj : $obj";
- FCT_Drop_zone: CometHierarchy_PM_P_tree_HTML_NODE "$COMET_EDITION Add_new_Comet $COMET_WS \$PM"  $current_content;
+ FCT_Drop_zone: CometHierarchy_PM_P_tree_HTML_NODE "$COMET_EDITION Add_new_Comet $COMET_WS \$PM" $current_content 1 CometEdition__drop_zone CometEdition__can_drop_on_zone;
 }

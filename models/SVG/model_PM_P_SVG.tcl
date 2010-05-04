@@ -38,7 +38,7 @@ method PM_SVG Add_JS {e} {
      $e Render_JS      cmd [$bridge get_last_marker]
  
      set pipo_svg [$bridge get_pipo_svg]
-	 set strm ""; $e Render strm
+	 set strm ""; $e Render_all strm
      set strm    [$e Encode_param_for_JS $strm]
      append cmd  "var svg = \$('#$pipo_svg').svg('get');\n"
      append cmd  "svg.add($strm);\n" 

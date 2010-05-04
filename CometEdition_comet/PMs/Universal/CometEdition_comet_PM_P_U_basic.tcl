@@ -110,15 +110,12 @@ method CometEdition_comet_PM_P_U_basic Add_new_Comet {parent comet} {
  $parent Add_daughters_R $comet
 }
 
-Trace CometEdition_comet_PM_P_U_basic Add_new_Comet
-
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic Reset_PM_views {} {
  foreach LC [CSS++ $objName "#$this(C_container_canvas) *"] {
    if {[$LC Has_MetaData Generated_by_$objName]} {puts "  Disposing $LC"; $LC dispose}
   }
 }
-Trace CometEdition_comet_PM_P_U_basic Reset_PM_views
 
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic get_L_h_edited_comet {root} {
@@ -144,7 +141,6 @@ method CometEdition_comet_PM_P_U_basic get_possible_FUI {PM} {
  set L_GDD_FUI [Retrieve_equivalents_implem_of [this get_DSL_GDD_QUERY] [$PM get_GDD_id] "" "ptf ~= $this(techno_ptf)" 1]
  puts "L_GDD_FUI = $L_GDD_FUI"
 }
-Trace CometEdition_comet_PM_P_U_basic get_possible_FUI
 
 #___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic Exec_a_substitution {PM_FUI} {
@@ -154,13 +150,29 @@ method CometEdition_comet_PM_P_U_basic Exec_a_substitution {PM_FUI} {
    if {[catch {set new_PM [$PM Substitute_by_PM_type $class]} err]} {set new_PM ""; puts stderr "  ERROR in \"$objName Exec_a_substitution {$PM_FUI}\":\n  $err"}
   }
 }
-Trace CometEdition_comet_PM_P_U_basic Exec_a_substitution
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
+method CometEdition_comet_PM_P_U_basic get_L_edited_PM {root} {
+ set L [list]
+ foreach d [$root get_out_daughters] {
+   lappend L [this get_L_edited_PM $d]
+  }
+  
+
+ set LC [$root get_LC]
+ set L_att_val [list name [$LC get_name] class]
+ if {[$LC Has_MetaData Generated_by_$objName]} {
+   lappend L_att_val "Generated_by_CometEdition_comet_PM_P_U_basic Generated_by_$objName"
+  } else {lappend L_att_val ""}
+  
+ return [list $root $L_att_val $L]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometEdition_comet_PM_P_U_basic Update_PMs_tree {} {
- $this(C_hier_PMs) set_L_h [this get_L_h_edited_comet [CSS++ $objName "#${objName}(CONTAINER.CANVAS.EDITION)"]]
+ $this(C_hier_PMs) set_L_h [this get_L_edited_PM [CSS++ $objName "#${objName}(CONTAINER.CANVAS.EDITION)"]]
 }
 
 #___________________________________________________________________________________________________________________________________________

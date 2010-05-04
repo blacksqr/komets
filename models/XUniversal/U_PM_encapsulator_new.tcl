@@ -130,7 +130,8 @@ proc get_PM_encaps_class_for_PM {PM} {
   # Semantic API
    set sem_API_get [$PM get_Semantic_API_get]
    set sem_API_set [$PM get_Semantic_API_set]
-   Methodes_get_LC $class_U_PM $sem_API_get {$this(FC)}
+   #Methodes_get_LC $class_U_PM $sem_API_get {$this(FC)}
+   Methodes_get_LC $class_U_PM $sem_API_get {$this(core)}
    Methodes_set_LC $class_U_PM $sem_API_set {$this(core_factice_LM)} {}
    Generate_PM_setters $class_U_PM [$PM get_Semantic_API_prim_set] 
   }

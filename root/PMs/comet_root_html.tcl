@@ -402,11 +402,11 @@ method PhysicalHTML_root Analyse_message {chan txt_name} {
     if {$this(update_cmd) != ""} {
 	  #puts "$objName => Send update : $this(update_cmd)"
 	 }
-	puts -nonewline $chan $this(update_cmd) 
+	puts -nonewline $chan $this(update_cmd)
 	set this(update_send) 0
 	set this(update_cmd) ""
  }
- set dt [expr [clock clicks -millisecond] - $t0];
+ set dt [expr [clock clicks -millisecond] - $t0]
 
  #puts "Generated in $dt ms."
  flush $chan
@@ -461,8 +461,6 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
 	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
 	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
 	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
-	 #append rep "  " "  " "  " {<input type="submit" value="soumettre" />} "\n"
-	 #append rep "  " "  " "  " {<input type="reset"  value="Annuler" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="} $this(version_server) {" id="Version_value" name="} $objName {__XXX__Is_update" />} "\n"
@@ -551,7 +549,7 @@ method PhysicalHTML_root Concat_update {objN methode cmd} {
  
  set id [list $objN $methode]
  while {$v_current > $vmax} {
-   if {[lrange $this(concat_send,$v_current) 0 1] == $id} {set trouve 1;  break} else {incr v_current -1}
+   if {[lrange $this(concat_send,$v_current) 0 1] == $id} {set trouve 1; break} else {incr v_current -1}
   }
  if {!$trouve} {incr this(version_server)
                 set  v_current $this(version_server)
@@ -737,7 +735,8 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  
  # XXX GROS PROBLEME car BCP de version sont générés lors d'un drag...
  #     => Optimiser l'ajout de versions
- for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} {
+ # XXX DEBUG for {set ver $this(version_server)} {$ver > $vclient} {incr ver -1} {}
+ for {set ver [expr $vclient + 1]} {$ver <= $this(version_server)} {incr ver} {
  
 	set objN [lindex $this(concat_send,$ver) 0]
 	set met  [lindex $this(concat_send,$ver) 1]
@@ -811,8 +810,8 @@ method PhysicalHTML_root Is_update {clientversion} {
 	this Cmd_vserver_to_vclient $vclient this(update_cmd)
 	# j'enregistre le numéro de version du serveur à envoyer
 	append this(update_cmd) "\$(\"#Version_value\").val($this(version_server));\n"
-	#puts "___________________________________________________"
-	#puts $this(update_cmd)
+	# puts "___________________________________________________"
+	# puts $this(update_cmd)
  }
  
  # J'enregistre la version du serveur dans le client

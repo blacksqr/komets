@@ -1,0 +1,10 @@
+*.CometEdition__drop_zone {
+  border: dashed yellow 2px;
+  background: rgba(255,255,128,0.5);
+}
+
+*.CometEdition__can_drop_on_zone {
+  border: solid green 2px;
+  background: rgba(128,255,128,1);
+}
+
