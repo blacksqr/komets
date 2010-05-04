@@ -116,7 +116,7 @@ method Interleaving_PM_P_HTML_menu Render_menu {index L_M_name strm_name dec} {
 			   foreach PM [CSS++ $objName "#$this(pipo_C_container)->PMs.PM_HTML index_${index}_$sub_index"] {
 			     Add_list L_PM_in_menu [CSS++ $PM "#$PM->PMs"]
 				 append strm $dec "      <li><div class=\"menu\">\n"
-				   $PM Render strm "$dec        "
+				   $PM Render_all strm "$dec        "
 				   #append strm $dec index_${index}_$sub_index
 				 append strm $dec "      </div></li>\n"
 			    }

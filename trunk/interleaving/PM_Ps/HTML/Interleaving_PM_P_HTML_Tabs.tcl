@@ -69,15 +69,16 @@ method Interleaving_PM_P_MenuHorizontal_HTML Render_post_JS {strm_name {dec {}}}
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_MenuHorizontal_HTML get_tabs_css_style {strm_name {dec {}}} {
  upvar $strm_name strm
-   append strm $dec "#${objName} h3.ui-state-active { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_active]\n}\n"
+   append strm $dec "#${objName} ul li a { color : inherit ; \nbackground : inherit ; \n} \n"
    
-   append strm $dec "#${objName} h3.ui-state-default { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_inactive]\n}\n"
+   append strm $dec "#${objName} ul li.ui-state-default { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_tabs]\n}\n"
    
-   append strm $dec "#${objName} div. accordion-content-active { \n"
-   append strm $dec "[this get_html_style_in_text ${objName}_content]\n}\n"
-   	
+   append strm $dec "#${objName} ul li.ui-tabs-selected { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"
+   
+   append strm $dec "#${objName} ul.ui-tabs-nav { \n"
+   append strm $dec "[this get_html_style_in_text ${objName}_selected]\n}\n"
 }
 
 #___________________________________________________________________________________________________________________________________________
