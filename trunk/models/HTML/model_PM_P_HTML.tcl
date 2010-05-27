@@ -35,6 +35,21 @@ method PM_HTML constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_HTML load_HTML_from_file        {file_name L_maps} {
+ set   f [open $file_name r]
+ set rep [string map $L_maps [read $f]]
+ close $f
+ 
+ return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML load_HTML_from_file_for_JS {file_name L_maps} {
+ set rep [this load_HTML_from_file $file_name $L_maps]
+ return [string map [list "\n" "" "\t" "" "\"" "\\\""] $rep]
+}
+
+#___________________________________________________________________________________________________________________________________________
 #method PM_HTML get_mark {}  {return $class(mark)}
 #method PM_HTML set_mark {m} {set class(mark) $m}
 
