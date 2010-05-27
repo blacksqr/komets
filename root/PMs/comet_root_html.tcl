@@ -106,6 +106,7 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/js/jquery-ui-1.8.custom.min.js\"></script>\n"
  
  append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/refreshClientServer.js\"></script>\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/root/PMs/Highlight.js\"></script>\n"
  #append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/jquery.multi-ddm.pack.js\"></script>\n"
  
  
@@ -821,32 +822,10 @@ method PhysicalHTML_root Is_update {clientversion} {
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Enlight {L_nodes} {
- set cmd ""
-
-# Destruction of previous enlighters
-  append cmd {$('div.}  $objName {_Enlighter').remove();} "\n"
-  
-# Creation of new enlighters
- foreach n $L_nodes {
-   # Création d'une frame(?) sous la racine
-   append cmd "\$('body').append(\"<div id=\\\"${objName}_Enlighter_for_$n\\\" class=\\\"${objName}_Enlighter\\\"></div>\")\;\n"
-   # Get coordinates of the targeted element n
-   append cmd "var Enlight_tx = \$('#${n}').width()\;\n"
-   append cmd "var Enlight_ty = \$('#${n}').height()\;\n"
-   append cmd "var Enlight_x  = \$('#${n}').offset().left\;\n"
-   append cmd "var Enlight_y  = \$('#${n}').offset().top\;\n"
-   # Placement
-   append cmd "\$('#${objName}_Enlighter_for_${n}').css({'position' : 'absolute', 'top' : Enlight_y + 'px', 'left' : Enlight_x + 'px', 'width' : Enlight_tx + 'px', 'height' : Enlight_ty + 'px'})\;\n"
-   append cmd "\$('#${objName}_Enlighter_for_${n}').show('pulsate', {}, 500)\;\n"
-   append cmd "\$('#${objName}_Enlighter_for_${n}').hover(function(){\$(this).text('${n}')}, function(){\$(this).text('')})\;\n"
-  }
- 
- # Coloration of all enlighters
- append cmd "\$('div.${objName}_Enlighter').css('background-color', 'rgba(255, 255, 0, 0.5)')\;\n"
+ set cmd "Kill_highlights_of_class('Highlight_$objName');"
+ foreach n $L_nodes {append cmd "Highlight('$n', 'Highlight_$objName', 255, 255, 0, 0.5); "}
  
  # Send the update
  this Concat_update $objName Enlight $cmd
- 
- puts $cmd
 }
 
