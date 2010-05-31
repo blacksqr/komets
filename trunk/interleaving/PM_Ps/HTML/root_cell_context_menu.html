@@ -1,0 +1,42 @@
+<div id="$ID" title="Edition of cell" style="background: white; border: solid black 2px; position: absolute;">
+  <input type="hidden" class="line"/>
+  <input type="hidden" class="column"/>
+  <div class="" onclick="$LINE_BEFORE; $('#$ID').remove();">
+    Add a line before
+  </div>
+  <div class="" onclick="$LINE_AFTER; $('#$ID').remove();">
+    Add a line after
+  </div>
+  <div><hr/></div>
+  <div class="" onclick="$COL_BEFORE; $('#$ID').remove();">
+    Add a column before
+  </div>
+  <div class="" onclick="$COL_AFTER; $('#$ID').remove();">
+    Add a column after
+  </div>
+  <div><hr/></div>
+  <div class="" onclick="$ADD_CELL_BEFORE; $('#$ID').remove();">
+    Add cell before
+  </div>
+  <div class="" onclick="$ADD_CELL_AFTER; $('#$ID').remove();">
+    Add cell after
+  </div>
+  <div><hr/></div>
+  <div class="" onclick="$DEL_CELL; $('#$ID').remove();">
+    Delete cell
+  </div>
+  <div class="" onclick="$DEL_LINE; $('#$ID').remove();">
+    Delete line
+  </div>
+  <div class="" onclick="$DEL_COLUMN; $('#$ID').remove();">
+    Delete column
+  </div>
+  <div><hr/></div>
+  <div class="" onclick="$('#$ID').remove();">
+    Cancel
+  </div>
+</div>
+
+<style media="all" type="text/css">
+  #$ID > div:hover {background: yellow;}
+</style>

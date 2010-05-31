@@ -1,8 +1,14 @@
-<div id="$ID" style="text-align: right;">
+<div id="$ID" title="Edition of cell" style="text-align: right;">
+  <input type="hidden" class="line"/>
+  <input type="hidden" class="column"/>
+  <input type="hidden" class="sel"/>
   <div>
-    <span>Lines   : </span><input type="text" name="nb_lines"   value="$NB_LINES"  />
+    <span>Columns : </span><input class="nb_columns" type="text" name="nb_columns" value="$NB_COLMUNS"/>
   </div>
   <div>
-    <span>Columns : </span><input type="text" name="nb_columns" value="$NB_COLMUNS"/>
+    <span>Lines   : </span><input class="nb_lines"   type="text" name="nb_lines"   value="$NB_LINES"  />
+  </div>
+  <div style="margin-top: 10px;">
+    <input type="button" value="OK" onclick="$ON_CLICK_OK"/>
   </div>
 </div>
