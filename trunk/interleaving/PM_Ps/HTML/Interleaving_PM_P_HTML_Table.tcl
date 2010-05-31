@@ -6,8 +6,7 @@ inherit Interleaving_PM_P_HTML_Table PM_HTML
 method Interleaving_PM_P_HTML_Table constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id FUI_HTML_Interleaving_Table
-   set this(descr_table) "{*}"
-   set this(mode)        "use"
+   set this(descr_table) [list [list *]]
    set this(L_colors)    [list {1 0 0} \
                                {0 1 0} \
 							   {0 0 1} \
@@ -21,17 +20,41 @@ method Interleaving_PM_P_HTML_Table constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Interleaving_PM_P_HTML_Table [list descr_table mode]
+Generate_accessors Interleaving_PM_P_HTML_Table [list descr_table]
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML_Table Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- if {[this get_mode] == "edition"} {return [this Render_edition strm $dec]}
- 
+ append strm $dec <div [this Style_class] {> } "\n"
+ append strm $dec "<img id=\"goto_meta_UI_of_$objName\" onclick=\"addOutput_proc_val('${objName}__XXX__Display_meta_UI', '1', true);\" style=\"position: absolute; z-index: 1;\" src=\"Comets/models/HTML/tools.png\"></img>\n"
+ append strm $dec "<table style=\"position: absolute; z-index: 0;\">\n"
+   this Render_table strm $dec
+ append strm $dec </table> "\n"
+ append strm $dec </div> "\n"
+}
+Trace Interleaving_PM_P_HTML_Table Render
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_HTML_Table Update_layout {b} {
+ if {$b} {
+   set    cmd "\$('#$objName > table').html("
+     set strm ""
+	 this Render_table strm ""
+     append cmd [this Encode_param_for_JS $strm] ");"
+	 this Render_JS      cmd ""
+	 this Render_post_JS cmd ""
+	 
+	 this Concat_update $objName Update_layout $cmd
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_HTML_Table Render_table {strm_name {dec {}}} {
+ upvar $strm_name strm
+
  set L_D [list]
  
- append strm $dec <table [this Style_class] {> } "\n"
    foreach row $this(descr_table) {
      append strm $dec "  <tr>\n"
      foreach column $row {
@@ -43,7 +66,8 @@ method Interleaving_PM_P_HTML_Table Render {strm_name {dec {}}} {
 	     if {$tx > 1} {append strm " colspan=\"$tx\""}
 		 if {$ty > 1} {append strm " rowspan=\"$ty\""}
 	   append strm ">\n"
-	   foreach D [CSS++ $objName "#$objName > * > $sel"] {
+	   if {$sel != ""} {set L_D_CSS [CSS++ $objName "#$objName > * > $sel"]} else {set L_D_CSS [list]}
+	   foreach D $L_D_CSS {
 	     set do_render 1
 	     if {$sel == "*" && [lsearch $L_D $D] >= 0} {set do_render 0}
 		 if {$do_render} {
@@ -56,19 +80,31 @@ method Interleaving_PM_P_HTML_Table Render {strm_name {dec {}}} {
 	  }
 	 append strm $dec "  </tr>\n"
     }
-
- append strm "$dec</table>\n"
 }
-Trace Interleaving_PM_P_HTML_Table Render
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML_Table maj_interleaved_daughters {} {}
 
 #___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_HTML_Table Display_meta_UI {b} {
+ set    cmd "\$('#Meta_UI_of_$objName').remove();"
+ if {$b} {
+   set strm ""
+   this Render_edition strm ""; set strm [this Encode_param_for_JS $strm]; puts "___________\n\n\n$strm\n\n\n"
+   append cmd "\$('#$objName').append(" $strm ");"
+   append cmd "\$('#Meta_UI_of_$objName').dialog();"
+   this Render_JS_meta_UI cmd ""
+  } 
+ 
+ this Concat_update $objName Display_meta_UI $cmd
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML_Table Render_edition {strm_name dec} {
  upvar $strm_name strm
  
- append strm $dec "<table id=\"Meta_UI_of_$objName\">\n"
+ append strm $dec "<div title=\"Meta UI of [[this get_LC] get_name]\" id=\"Meta_UI_of_$objName\">\n"
+ append strm $dec "<table>\n"
    append strm $dec "  <tr>\n"
    append strm $dec "  <td>\n"
      this Render_edition_daughers strm "$dec    "
@@ -78,6 +114,11 @@ method Interleaving_PM_P_HTML_Table Render_edition {strm_name dec} {
    append strm $dec "  </td>\n"
    append strm $dec "</tr>"
  append strm $dec "</table>\n"
+ 
+ append strm $dec "<div style=\"margin-top: 10px; text-align: right;\">\n"
+ append strm $dec "<input type=\"button\" value=\"Apply\" onclick=\"addOutput_proc_val('${objName}__XXX__Update_layout', '1', true);\"/>\n"
+ append strm $dec "</div>\n"
+ append strm $dec "</div>\n"
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -138,7 +179,7 @@ method Interleaving_PM_P_HTML_Table Render_edition_layout   {strm_name dec} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Interleaving_PM_P_HTML_Table Render_post_JS {strm_name {dec {}}} {
+method Interleaving_PM_P_HTML_Table Render_JS_meta_UI {strm_name {dec {}}} {
  upvar $strm_name strm
  
  append strm $dec "\$('#Layout_of_$objName .layout_cell').droppable({accept: '.WS_$objName', activeClass: 'active_drop_$objName', hoverClass: 'hoverClass_$objName', drop: function(event, ui) {addOutput_proc_val('${objName}__XXX__Drop_cell' , ui.draggable.attr('id') + ' ' + \$(this).attr('id'), true);}});\n"
@@ -156,7 +197,6 @@ method Interleaving_PM_P_HTML_Table Render_post_JS {strm_name {dec {}}} {
 	}
    incr num_line
   }
- this inherited strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -258,7 +298,7 @@ method Interleaving_PM_P_HTML_Table Delete_cell {l_c} {
    lassign [lindex $row $i] sel x y; if {$x == ""} {set x 1}
    incr i $x; incr pos
   }
- set new_line          [lreplace $line $pos $pos]
+ set new_line          [lreplace $row $pos $pos]
  set this(descr_table) [lreplace $this(descr_table) $l $l $new_line]
 
  # Send the AJAX update
