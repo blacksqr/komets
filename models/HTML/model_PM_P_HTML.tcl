@@ -103,7 +103,8 @@ method PM_HTML get_id_for_style {{id {}}} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Encode_param_for_JS {txt} {
  set    rep "\""
- append rep [string map [list "\"" {\"} "\n" {\n}] $txt]
+   set txt [string map [list {\"} %GUILLEMETS% "\"" {\"} "\n" {\n}] $txt]
+   append rep [string map [list %GUILLEMETS% {\\\"}] $txt]
  append rep "\""
  return $rep
 }
