@@ -25,3 +25,8 @@ method LogicalVideo set_PM_active {PM} {
  set s [this get_video_source]
  if {![string equal $s {}]} {$PM set_video_source $s [this get_audio_canal]}
 }
+
+#___________________________________________________________________________________________________________________________________________
+proc P_L_methodes_set_Video_COMET_RE {} {return [list {set_video_source {s audio_canal}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}}]}
+Generate_LM_setters LogicalVideo [P_L_methodes_set_Video_COMET_RE]
+

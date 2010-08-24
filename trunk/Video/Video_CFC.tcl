@@ -5,12 +5,13 @@ inherit Video_CFC CommonFC
 
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC constructor {} {
- set this(video_source) ""
- set this(audio_canal)  0
+ set this(video_source)  ""
+ set this(audio_canal)   0
+ set this(L_infos_sound) ""
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_CFC [list audio_canal video_source]
+Generate_accessors Video_CFC [list audio_canal video_source L_infos_sound]
 
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC set_video_source {src canal} {
@@ -32,6 +33,6 @@ method Video_CFC go_to_frame {nb} {}
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_get_Video {} {return [list {get_video_source { }} {get_audio_canal {}}]}
-proc P_L_methodes_set_Video {} {return [list {set_video_source {s audio_canal}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} ]}
+proc P_L_methodes_get_Video {} {return [list {get_L_infos_sound { }} {get_video_source { }} {get_audio_canal {}}]}
+proc P_L_methodes_set_Video {} {return [list {set_L_infos_sound {v}} {set_video_source {s audio_canal}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} ]}
 
