@@ -11,15 +11,24 @@ method Video_PM_P_BIGre constructor {name descr args} {
     
    this set_GDD_id CT_Video_AUI_CUI_basic_B207
 
+   set this(img) [B_image]
+   $this(img) Inverser_y 1
+
    set this(primitives_handle) [B_polygone]
    $this(primitives_handle) abonner_a_LR_parcours [$this(primitives_handle) LR_Av_pre_rendu] [$this(rap_placement) Rappel]
 
+   set this(rap_img_update)        [B_rappel [Interp_TCL] "$objName Update_B207_img"]
+   N_i_mere abonner_a_fin_simulation [$this(rap_img_update) Rappel]
+   
  this set_prim_handle        $this(primitives_handle)
  this set_root_for_daughters $this(primitives_handle)
+ $this(primitives_handle) Translucidite 0
  
  set this(video_x)  0; set this(video_y)  0
  set this(video_ex) 1; set this(video_ey) 1
- this Origine 0 0
+ 
+ set this(img_has_to_be_updated) 0
+ set this(buffer_for_update)     ""
 
  eval "$objName configure $args"
  return $objName
@@ -30,14 +39,74 @@ Methodes_set_LC Video_PM_P_BIGre [P_L_methodes_set_Video] {} {}
 Methodes_get_LC Video_PM_P_BIGre [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_time_frame ffmpeg_frame_num]
+Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img]
 
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre Origine {x y} {
+Generate_PM_setters Video_PM_P_BIGre [P_L_methodes_set_Video_FC_COMET_RE]
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre Update_image {} {
+ set this(img_has_to_be_updated) 1
+ if {$this(buffer_for_update) != ""} {
+   this decr_buffer_use $this(buffer_for_update)
+  }
+ set this(buffer_for_update) $buffer
+ this incr_buffer_use   $buffer
+}
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre set_video_source {}  {
+ set tx [this get_video_width]
+ set ty [this get_video_height]
+ 
+ if {$s != "WEBCAM"} {
+   puts "$objName set_video_source\n  Update of the image with size [this get_video_width] x [this get_video_height] "
+   $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 [this get_last_buffer]
+   
+   set texture [$this(img) Info_texture]
+   $this(primitives_handle) Vider
+   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
+   $this(primitives_handle) Info_texture $texture
+ 
+   $this(primitives_handle) Etirement_interne 1 -1 [expr $tx / 2.0] [expr $ty / 2.0]
+   
+   
+   # Audio with Fmod
+   if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
+   set buf_len [expr int(2 * [this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
+   set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
+                                                      $audio_canal \
+													  $buf_len \
+													  [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] \
+													  [this get_sample_rate] \
+													  [this get_L_infos_sound] \
+													  ]
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre Update_B207_img {} {
+ if {$this(img_has_to_be_updated)} {
+   $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
+   this decr_buffer_use $this(buffer_for_update)
+   set this(buffer_for_update) ""
+   set this(img_has_to_be_updated) 0
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_P_BIGre Origine {x y} {*
  set this(video_x) $x; set this(video_y) $y
  this Px $x
  this Py $y
 }
+
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Py {v} {
  this inherited $v
@@ -52,7 +121,7 @@ method Video_PM_P_BIGre Py {v} {
 method Video_PM_P_BIGre Etirement {x y} {
  set this(video_ex) $x; set this(video_ey) $y
  if {[this get_video_source] == "WEBCAM"} {
-   puts "$this(primitives_handle) Etirement $x $y"
+   #puts "$this(primitives_handle) Etirement $x $y"
    $this(primitives_handle) Etirement $x $y
   } else {set bbox [$this(primitives_handle) Boite_noeud]
           $this(primitives_handle) Etirement $x $y
@@ -76,14 +145,6 @@ method Video_PM_P_BIGre Inverser_x {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre Goto_pos_rel {percent} {
- if {[this get_video_source] != "WEBCAM" && [this get_video_source] != ""} {
-   set this(ffmpeg_frame_num) [expr int($percent * $this(ffmpeg_numFrames))]
-   FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $this(ffmpeg_buf)
-  }
-}
-
-#___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre get_visu_cam {}  {return $this(visu_cam)}
 
 #___________________________________________________________________________________________________________________________________________
@@ -91,77 +152,6 @@ method Video_PM_P_BIGre get_B207_currrent_video_img {} {
  if {[this get_video_source] == "WEBCAM"} {return $this(visu_cam)} else {return $this(img)}
 }
 
-#___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre set_video_source {s canal_audio}  {
- if {$s == "WEBCAM"} {
-   set visu_cam [Visu_Cam]; set this(visu_cam) $visu_cam
-   set texture [$visu_cam Info_texture]
-   $this(primitives_handle) Vider
-   set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
-   set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
-   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
-   $this(primitives_handle) Info_texture $texture
-  } else {set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
-          FFMPEG_set_Synchronisation_threshold $this(ffmpeg_id) 0.11
-          set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
-          set tx [FFMPEG_Width  $this(ffmpeg_id)]
-          set ty [FFMPEG_Height $this(ffmpeg_id)]
-		  set this(tx) $tx; set this(ty) $ty
-		  set this(img) [B_image]
-		    $this(img) Inverser_y 1
-
-          set this(ffmpeg_buf) [FFMPEG_Get_a_buffer $t]
-
-          set this(ffmpeg_rap_img)    [B_rappel [Interp_TCL]]
-          set this(ffmpeg_start_ms)   [N_i_mere ms]; 
-		  set this(ffmpeg_frame_num)  0
-		  set this(ffmpeg_numFrames)  [FFMPEG_numFrames    $this(ffmpeg_id)]
-          set this(ffmpeg_frame_rate) [FFMPEG_getFramerate $this(ffmpeg_id)]
-          $this(ffmpeg_rap_img) Texte "$objName Update_frame"
-
-         # Sound
-          set sample_rate [FFMPEG_Sound_sample_rate $this(ffmpeg_id)]
-          set cb_audio [Get_FFMPEG_FMOD_Stream_Info_audio]
-          #set canal_audio 0
-          set buf_len [expr int(2 * [FFMPEG_Nb_channels $this(ffmpeg_id)] * $sample_rate / [FFMPEG_getFramerate $this(ffmpeg_id)])]
-          set L_infos_B207_sound [FFMPEG_Info_for_sound_CB $this(ffmpeg_id)]
-          if {[FFMPEG_Nb_channels $this(ffmpeg_id)] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
- 
-          set this(B207_audio_stream) [N_i_mere Nouveau_flux $cb_audio $canal_audio $buf_len [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] $sample_rate $L_infos_B207_sound]
-          FFMPEG_set_Debug_mode $this(ffmpeg_id) 0
-          FFMPEG_Audio_buffer_size $this(ffmpeg_id)
-          puts "Info audio :\n  - Sample rate : $sample_rate\n  - Mono([FSOUND_Mono])/Stereo([FSOUND_Stereo]) : $mono_stereo "
-  
-         # Gogogo!!!
-          N_i_mere abonner_a_fin_simulation [$this(ffmpeg_rap_img) Rappel]
-		 
-		# DEBUG
-		   this Update_frame 1
-		   set texture [$this(img) Info_texture]
-		   $this(primitives_handle) Vider
-		   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
-		   $this(primitives_handle) Info_texture $texture
-		   
-		   $this(primitives_handle) Etirement_interne 1 -1 [expr $tx / 2.0] [expr $ty / 2.0]
-		   #$this(primitives_handle) Ajouter_fils $this(img)
-		   #$this(img) Afficher_noeud 0
-		    # OLD $this(primitives_handle) Ajouter_fils $this(img)
-		# /DEBUG
-		
-		#$this(img) Etirement 1 1
-         }
-}
-
-#___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre Update_frame {{force_update 0}} {
- set ms [N_i_mere ms]; 
- set num [expr int(($ms - [this get_ffmpeg_start_ms])*$this(ffmpeg_frame_rate)/1000.0)]
- if {$force_update || $num != [this get_ffmpeg_frame_num]} {
-   this set_ffmpeg_frame_num $num
-   FFMPEG_getImage $this(ffmpeg_id) $this(ffmpeg_buf)
-   $this(img) maj_raw_with_transfo $this(tx) $this(ty) [GL_rvb] 3 [GL_rvba] 4 $this(ffmpeg_buf)
-  }
-}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre is_translucide {{v {}}}  {

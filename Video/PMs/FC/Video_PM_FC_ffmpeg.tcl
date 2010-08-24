@@ -1,10 +1,3 @@
-if {[catch "load {C:/These/Projet Interface/BIGre/FFMPEG_for_TCL.dll}" err]} {
-  set Video_PM_FC_ffmpeg_OK 0
-  puts "ERROR while loading FFMPEG library:\n$err"
- } else {set Video_PM_FC_ffmpeg_OK 1
-         ffmpeg_init
-		}
-
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #_______________________________________________ Définition of the presentations __________________________________________________
@@ -17,6 +10,15 @@ method Video_PM_FC_ffmpeg constructor {name descr args} {
  this inherited $name $descr
     
    this set_GDD_id CT_Video_FC_ffmpeg
+   
+   set this(is_updating) 0
+   if {![info exists class(ffmpeg_init_OK)]} {
+     if {[catch "load {[get_B207_files_root]FFMPEG_for_TCL.dll}" err]} {
+       error "ERROR while loading FFMPEG library:\n$err"
+      } else {ffmpeg_init
+	          set class(ffmpeg_init_OK) 1
+	         }
+    }
 
  eval "$objName configure $args"
  return $objName
@@ -27,7 +29,10 @@ Methodes_set_LC Video_PM_FC_ffmpeg [P_L_methodes_set_Video] {} {}
 Methodes_get_LC Video_PM_FC_ffmpeg [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_PM_FC_ffmpeg [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_time_frame ffmpeg_frame_num]
+Generate_accessors Video_PM_FC_ffmpeg [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_frame_num]
+
+#___________________________________________________________________________________________________________________________________________
+Generate_PM_setters Video_PM_FC_ffmpeg [P_L_methodes_set_Video_FC_COMET_RE]
 
 
 #___________________________________________________________________________________________________________________________________________
@@ -48,12 +53,15 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
    set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
    $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
    $this(primitives_handle) Info_texture $texture
-  } else {set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
+  } else {if {![file exists $s]} {error "Video file \"$s\" does not exists !"}
+          set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
+          
           FFMPEG_set_Synchronisation_threshold $this(ffmpeg_id) 0.11
           set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
           set tx [FFMPEG_Width  $this(ffmpeg_id)]
           set ty [FFMPEG_Height $this(ffmpeg_id)]
-		  set this(tx) $tx; set this(ty) $ty
+		  this prim_set_video_width  $tx
+		  this prim_set_video_height $ty
 		  
 		  set this(img) [B_image]
 		    $this(img) Inverser_y 1
@@ -69,12 +77,19 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
           set sample_rate [FFMPEG_Sound_sample_rate $this(ffmpeg_id)]
           set cb_audio    [Get_FFMPEG_FMOD_Stream_Info_audio]
           set buf_len [expr int(2 * [FFMPEG_Nb_channels $this(ffmpeg_id)] * $sample_rate / [FFMPEG_getFramerate $this(ffmpeg_id)])]
-          this user_set_L_infos_sound [FFMPEG_Info_for_sound_CB $this(ffmpeg_id)]
+          this prim_set_L_infos_sound [FFMPEG_Info_for_sound_CB $this(ffmpeg_id)]
           if {[FFMPEG_Nb_channels $this(ffmpeg_id)] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
  
-          FFMPEG_set_Debug_mode $this(ffmpeg_id) 0
+          FFMPEG_set_Debug_mode    $this(ffmpeg_id) 0
           FFMPEG_Audio_buffer_size $this(ffmpeg_id)
+		  
+		  this prim_set_sample_rate     $sample_rate
+		  this prim_set_nb_channels     [FFMPEG_Nb_channels $this(ffmpeg_id)]
+		  this prim_set_video_framerate $this(ffmpeg_frame_rate)
+		  this prim_set_cb_audio        $cb_audio
+		  
           puts "Info audio (Video_PM_P_BIGre $objName):\n  - Sample rate : $sample_rate\n  - Mono([FSOUND_Mono])/Stereo([FSOUND_Stereo]) : $mono_stereo "
+		  this Update_frame 1
          }
 }
 
@@ -88,8 +103,10 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
  if {$force_update || $num != [this get_ffmpeg_frame_num]} {
    this set_ffmpeg_frame_num $num
    FFMPEG_getImage $this(ffmpeg_id) $this(ffmpeg_buf)
+   this set_last_buffer             $this(ffmpeg_buf)
+   this prim_Update_image           $this(ffmpeg_buf)
   }
   
  set this(is_updating) 0
- after 1 "$objName Update_frame"
+ after 10 "$objName Update_frame"
 }
