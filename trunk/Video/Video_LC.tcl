@@ -11,8 +11,13 @@ method CometVideo constructor {name descr args} {
  set CFC_name "${objName}_CFC"
    Video_CFC $CFC_name
    this set_Common_FC $CFC_name
+   
 # LMs
- set this(LM_LP) "${objName}_LM_LP";
+ set this(LM_FC) "${objName}_LM_FC";
+   LogicalVideo_FC $this(LM_FC) $this(LM_FC) "The functionnal manager of $objName";
+   this Add_LM $this(LM_FC)
+
+   set this(LM_LP) "${objName}_LM_LP";
    LogicalVideo $this(LM_LP) $this(LM_LP) "The logical presentation of $objName";
    this Add_LM $this(LM_LP)
 
