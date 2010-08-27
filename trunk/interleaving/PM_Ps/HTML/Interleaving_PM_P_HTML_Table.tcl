@@ -384,7 +384,7 @@ method Interleaving_PM_P_HTML_Table JS_Update_edition_layout {} {
  
  set    cmd "\$('#Table_layout_root_$objName').html("
  append cmd [this Encode_param_for_JS $strm] ");\n"
- this Render_post_JS cmd
+ this Render_JS_meta_UI cmd
  
  this Concat_update $objName Update_edition_layout $cmd
 }

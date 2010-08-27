@@ -29,6 +29,8 @@ method Video_PM_P_BIGre constructor {name descr args} {
  
  set this(img_has_to_be_updated) 0
  set this(buffer_for_update)     ""
+ 
+ set this(B207_audio_stream)     ""
 
  eval "$objName configure $args"
  return $objName
@@ -42,7 +44,7 @@ Methodes_get_LC Video_PM_P_BIGre [P_L_methodes_get_Video] {$this(FC)}
 Generate_accessors Video_PM_P_BIGre [list ffmpeg_rap_img]
 
 #___________________________________________________________________________________________________________________________________________
-Generate_PM_setters Video_PM_P_BIGre [P_L_methodes_set_Video_FC_COMET_RE]
+Generate_PM_setters Video_PM_P_BIGre [P_L_methodes_set_Video_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -57,21 +59,34 @@ Inject_code Video_PM_P_BIGre Update_image {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre Close_video {} {
+   # Close the previous audio flow
+   if {$this(B207_audio_stream) != ""} {
+     puts "    Close previous audio stream $this(B207_audio_stream) ..."
+	 while {[N_i_mere Fermer_flux $this(B207_audio_stream)] == 0} {
+	   puts "    waiting for stream to be ready"
+	  }
+	 puts "    ... done !"
+	}   
+}
+Trace Video_PM_P_BIGre Close_video
+
+#___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_P_BIGre set_video_source {}  {
  set tx [this get_video_width]
  set ty [this get_video_height]
  
  if {$s != "WEBCAM"} {
-   puts "$objName set_video_source\n  Update of the image with size [this get_video_width] x [this get_video_height] "
    $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 [this get_last_buffer]
    
    set texture [$this(img) Info_texture]
    $this(primitives_handle) Vider
    $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
    $this(primitives_handle) Info_texture $texture
- 
+   $this(primitives_handle) Etirement 1 1
    $this(primitives_handle) Etirement_interne 1 -1 [expr $tx / 2.0] [expr $ty / 2.0]
    
+   this Origine $this(video_x) $this(video_y)
    
    # Audio with Fmod
    if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
@@ -101,7 +116,7 @@ method Video_PM_P_BIGre Update_B207_img {} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre Origine {x y} {*
+method Video_PM_P_BIGre Origine {x y} {
  set this(video_x) $x; set this(video_y) $y
  this Px $x
  this Py $y
