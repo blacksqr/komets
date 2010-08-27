@@ -33,28 +33,20 @@ proc Do_rec_source {path} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-if {[string equal [info proc Comet_files_root] ""]} {
-  set comet_files_root ""
-  proc Comet_files_root {{d {}}} {
-   global comet_files_root;
-   if {[string length $d] == 0} {
-     return $comet_files_root
-    } else {return [set comet_files_root $d]}
-  }
- }
- 
 set PM_BIGre_B207_files_root ""
 proc get_B207_files_root { } {global PM_BIGre_B207_files_root; return $PM_BIGre_B207_files_root;}
 proc set_B207_files_root {r} {global PM_BIGre_B207_files_root; set PM_BIGre_B207_files_root $r;}
 
  
-Comet_files_root     [pwd]/../
 if {[catch {set_B207_files_root $::env(B207_LIBRARY)/} err]} {puts "Impossible to find in system variable the location of B207 library..."}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 source gml_Object.tcl
+
+Comet_files_root     [pwd]/../
+
 
 cd models
   eval [source_recusrif models]

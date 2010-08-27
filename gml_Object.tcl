@@ -7,7 +7,14 @@ if {[lsearch [info proc] Comet_files_root] == -1} {
  cd ..
    set cfr [pwd]/
  cd Comets
- proc Comet_files_root {} "return {$cfr}"
+  set comet_files_root ""
+  proc Comet_files_root {{d {}}} {
+   global comet_files_root;
+   if {[string length $d] == 0} {
+     return $comet_files_root
+    } else {return [set comet_files_root $d]}
+  }
+ Comet_files_root $cfr
 }
 
 if {!$found_Gmlobject} {

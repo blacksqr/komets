@@ -20,6 +20,7 @@ Methodes_get_LC LogicalVideo_FC [P_L_methodes_get_Video] {$this(FC)}
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_set_Video_FC_COMET_RE {} {return [list {set_L_infos_sound {v}} {Update_image {buffer}} {set_video_width {v}} {set_video_height {v}} \
                                                          {set_cb_audio {v}} {set_nb_channels {v}} {set_sample_rate {v}} {set_video_framerate {v}} \
+														 {Close_video {}} {set_video_nbFrames {v}} \
 														 ]}
 Generate_LM_setters LogicalVideo_FC [P_L_methodes_set_Video_FC_COMET_RE]
 
