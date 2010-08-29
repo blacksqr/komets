@@ -47,7 +47,7 @@ method Video_PM_P_TK get_or_create_prims {root} {
      set this(photo) [image create photo -format "raw -max 255 -nomap 1" -width $tx -height $ty]
     }
    label $this(lab) -image $this(photo)
-   this Add_MetaData PRIM_STYLE_CLASS [list $this(lab) "PARAM RESULT OUT text TEXT"]
+   this Add_MetaData PRIM_STYLE_CLASS [list $this(lab) "PARAM RESULT OUT video VIDEO"]
   }
  this set_root_for_daughters $root
 
@@ -57,7 +57,7 @@ method Video_PM_P_TK get_or_create_prims {root} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method Video_PM_P_TK play_video_stream_locally {b} {
+method Video_PM_P_TK Play_video_stream_locally {b} {
  set this(play_video_stream) $b
 }
 
