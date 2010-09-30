@@ -44,7 +44,7 @@ method Interleaving_PM_P_menu_TK get_or_create_prims {root} {
  return [this set_prim_handle $menu_name._$objName]
 }
 
-#__________________________________________________
+#___________________________________________________________________________________________________________________________________________
 Methodes_set_LC Interleaving_PM_P_menu_TK [P_L_methodes_set_CometInterleaving] {}  {}
 Methodes_get_LC Interleaving_PM_P_menu_TK [P_L_methodes_get_CometInterleaving] {}
 
