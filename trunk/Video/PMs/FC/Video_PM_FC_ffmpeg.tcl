@@ -93,8 +93,6 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
    $this(primitives_handle) Vider
    set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
    set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
-   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
-   $this(primitives_handle) Info_texture $texture
   } else {if {![file exists $s]} {error "Video file \"$s\" does not exists !"}
           if {$this(ffmpeg_id) != ""} {FFMPEG_Lock $this(ffmpeg_id); puts "Lock"; set unlock 1} else {set unlock 0}
           set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]

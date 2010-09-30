@@ -252,8 +252,8 @@ method PhysicalHTML_root dispose {} {
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root New_connexion {chan ad num} {
  fconfigure $chan -blocking 0
-   set this(msg) ""
-   set this(msg_attended_length) -1
+   set this(${chan},msg) ""
+   set this(${chan},msg_attended_length) -1
  fileevent $chan readable "$objName Read_from_PHP $chan"
  fconfigure $chan -encoding utf-8
  #puts "$objName : Connection de la part de $ad;$num sur $chan"
@@ -280,28 +280,32 @@ method PhysicalHTML_root Read_from_PHP {chan} {
     close $chan
 	set this(clients) [lremove $this(clients) $chan]
     return
-  } else {append this(msg) [read $chan]
-				  if {$this(msg_attended_length) == -1} {
-					set pos [string first " " $this(msg)]
-				    set this(msg_attended_length) [string range $this(msg) 0 [expr $pos - 1]]
-					set this(msg)                 [string range $this(msg) [expr $pos + 1] end]
-					#puts " Premier paquet :\n  lg : $this(msg_attended_length)\n  txt : $this(msg)"
+  } else {append this(${chan},msg) [read $chan]
+				  if {$this(${chan},msg_attended_length) == -1} {
+					set pos [string first " " $this(${chan}msg)]
+				    set this(${chan},msg_attended_length) [string range $this(${chan},msg) 0 [expr $pos - 1]]
+					set this(${chan},msg)                 [string range $this(${chan},msg) [expr $pos + 1] end]
+					#puts " Premier paquet :\n  lg : $this(${chan},msg_attended_length)\n  txt : $this(${chan},msg)"
 				   }
-	              set recept [string length $this(msg)]
+	              set recept [string length $this(${chan},msg)]
 				  #puts "  -   % : $recept / $this(msg_attended_length)"
-				  if {$recept >= $this(msg_attended_length)} {
-				    set original_msg $this(msg)
-					if {[catch {$objName Analyse_message $chan this(msg)} err]} {
+				  if {$recept >= $this(${chan},msg_attended_length)} {
+				    set original_msg $this(${chan},msg)
+					if {[catch {$objName Analyse_message $chan this(${chan},msg)} err]} {
 					  puts $err					  
 					  #
 					  #set rep ""; this Render_all rep
 					  set err_txt "ERROR in COMETs:<br/>message was :<br/>$original_msg<br/>ERROR was<br/>$err"
 	                  puts $chan $err_txt
 					 }
-					set this(msg_attended_length) -1
-					set this(msg)                 ""
+					set this(${chan},msg_attended_length) -1
+					set this(${chan},msg)                 ""
 					
 					set this(clients) [lremove $this(clients) $chan]
+					
+					unset this(${chan},msg_attended_length)
+					unset this(${chan},msg)
+					
 					close $chan
 				    #puts "Done!"; 
 				   }
