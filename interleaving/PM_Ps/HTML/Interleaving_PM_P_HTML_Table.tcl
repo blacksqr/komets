@@ -282,7 +282,8 @@ method Interleaving_PM_P_HTML_Table Add_cell {pos_l_c} {
    incr i $x; incr pos
   }
  set new_row           [linsert $row $pos [list "" "" ""]]
- set this(descr_table) [lreplace $this(descr_table) $l $l $new_row]
+ # DEBUG set this(descr_table) [lreplace $this(descr_table) $l $l $new_row]
+ lset this(descr_table) $l $new_row
  
  # Send the AJAX update
  this JS_Update_edition_layout
@@ -299,7 +300,8 @@ method Interleaving_PM_P_HTML_Table Delete_cell {l_c} {
    incr i $x; incr pos
   }
  set new_line          [lreplace $row $pos $pos]
- set this(descr_table) [lreplace $this(descr_table) $l $l $new_line]
+ # DEBUG set this(descr_table) [lreplace $this(descr_table) $l $l $new_line]
+ lset this(descr_table) $l $new_line
 
  # Send the AJAX update
  this JS_Update_edition_layout
