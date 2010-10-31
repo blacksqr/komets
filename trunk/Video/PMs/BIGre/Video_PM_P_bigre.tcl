@@ -98,7 +98,15 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
 													  [this get_sample_rate] \
 													  [this get_L_infos_sound] \
 													  ]
-  }
+  } else {set texture [this get_B207_texture]
+          if {$texture != "" && $texture != "NULL"} {
+            puts "We have a Webcam for video player Video_PM_P_BIGre $objName"
+		    $this(primitives_handle) Vider
+		    $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $tx $ty]
+		    $this(primitives_handle) Info_texture $texture
+		    this Origine $this(video_x) $this(video_y)
+		   } else {puts "Try again to get the WEBCAM info..."; after 100 "[this get_LC] set_B207_texture \[[this get_visu_cam] Info_texture\]; $objName set_video_source WEBCAM $audio_canal"}
+         }
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -159,12 +167,10 @@ method Video_PM_P_BIGre Inverser_x {v} {
   }
 }
 
-#___________________________________________________________________________________________________________________________________________
-method Video_PM_P_BIGre get_visu_cam {}  {return $this(visu_cam)}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre get_B207_currrent_video_img {} {
- if {[this get_video_source] == "WEBCAM"} {return $this(visu_cam)} else {return $this(img)}
+ if {[this get_video_source] == "WEBCAM"} {return $this(primitives_handle)} else {return $this(img)}
 }
 
 
@@ -183,8 +189,9 @@ method Video_PM_P_BIGre set_translucidity {v}  {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre set_resolution {x y} {
  if {[this get_video_source] == "WEBCAM"} {
-   $this(visu_cam) set_resolution $x $y
-   $this(primitives_handle) Vider
-   $this(primitives_handle) Ajouter_contour [ProcRect 0 0 $x $y]
+   after 100 "$this(primitives_handle) Vider
+              $this(primitives_handle) Ajouter_contour \[ProcRect 0 0 $x $y\]
+              $this(primitives_handle) Info_texture [this get_B207_texture]
+			 " 
   }
 }

@@ -17,13 +17,18 @@ method Video_CFC constructor {} {
  set this(video_framerate) 0
  set this(video_nbFrames)  0
  
+ set this(B207_texture)    ""
+ set this(visu_cam)        ""
+ 
  set this(mode)            "STOP"
  
  set this(last_buffer)     NULL
+ 
+ this set_resolution 0 0
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_CFC [list mode audio_canal video_source L_infos_sound video_nbFrames video_width video_height last_buffer cb_audio nb_channels sample_rate video_framerate]
+Generate_accessors Video_CFC [list mode audio_canal video_source L_infos_sound video_nbFrames video_width video_height last_buffer cb_audio nb_channels sample_rate video_framerate B207_texture visu_cam]
 
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC set_video_source {src canal} {
@@ -76,6 +81,10 @@ method Video_CFC release_buffer  {buffer} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Video_CFC get_resolution {   } {return $this(resolution)}
+method Video_CFC set_resolution {x y} {set this(resolution) [list $x $y]}
+
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_get_Video {} {return [list {get_L_infos_sound { }} {get_video_width { }} {get_video_height { }} {get_video_source { }} {get_audio_canal {}} \
@@ -83,12 +92,16 @@ proc P_L_methodes_get_Video {} {return [list {get_L_infos_sound { }} {get_video_
 											 {get_last_buffer {}} {set_last_buffer {buffer}} \
 											 {get_video_nbFrames {}} {get_mode {}} \
 											 {get_audio_canal {}} \
+											 {get_B207_texture {}} {get_visu_cam {}} \
+											 {get_resolution {}} \
 											 {get_cb_audio {}} {get_nb_channels {}} {get_sample_rate {}} {get_video_framerate {}} \
 											 ]}
 proc P_L_methodes_set_Video {} {return [list {set_L_infos_sound {v}} {set_video_width {v}} {set_video_height {v}} {set_video_source {s audio_canal}} \
                                              {Close_video {}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} {Update_image {buffer}} \
 											 {set_video_nbFrames {v}} \
 											 {set_audio_canal {v}} \
+											 {set_B207_texture {v}} {set_visu_cam {v}} \
+											 {set_resolution {x y}} \
 											 {set_cb_audio {v}} {set_nb_channels {v}} {set_sample_rate {v}} {set_video_framerate {v}} \
 											 ]}
 

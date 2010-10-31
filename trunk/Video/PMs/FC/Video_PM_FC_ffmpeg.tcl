@@ -73,6 +73,15 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Video_PM_FC_ffmpeg set_resolution {x y} {
+ if {[this get_video_source] == "WEBCAM"} {
+   if {[catch {$this(visu_cam) set_resolution $x $y} err]} {
+     error "Error while setting the resolution in \"$objName set_resolution $x $y\""
+    }
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
  set this(is_updating) 1
  # Do we have to stop a ffmpeg stream?
@@ -89,10 +98,13 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
  if {$s == "WEBCAM"} {
    set this(ffmpeg_id) ""
    set visu_cam [Visu_Cam]; set this(visu_cam) $visu_cam
-   set texture [$visu_cam Info_texture]
-   $this(primitives_handle) Vider
-   set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
-   set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
+	   set texture [$visu_cam Info_texture]
+	   set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
+	   set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
+	   $objName prim_set_video_width  [$visu_cam get_resolution_x]
+	   $objName prim_set_video_height [$visu_cam get_resolution_y]
+	   $objName prim_set_B207_texture $texture
+	   $objName prim_set_visu_cam     $visu_cam
   } else {if {![file exists $s]} {error "Video file \"$s\" does not exists !"}
           if {$this(ffmpeg_id) != ""} {FFMPEG_Lock $this(ffmpeg_id); puts "Lock"; set unlock 1} else {set unlock 0}
           set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
