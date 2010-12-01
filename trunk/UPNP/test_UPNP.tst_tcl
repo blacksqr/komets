@@ -1,4 +1,4 @@
-cd c:/These/Projet\ Interface/COMETS/devCOMETS/Comets/
+cd $::env(ROOT_COMETS)/Comets/
 source gml_Object.tcl
 cd UPNP
 source UPNP_utils.tcl

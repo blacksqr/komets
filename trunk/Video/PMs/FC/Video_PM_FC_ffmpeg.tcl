@@ -105,9 +105,16 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 	   $objName prim_set_video_height [$visu_cam get_resolution_y]
 	   $objName prim_set_B207_texture $texture
 	   $objName prim_set_visu_cam     $visu_cam
-  } else {if {![file exists $s]} {error "Video file \"$s\" does not exists !"}
+  } else {
           if {$this(ffmpeg_id) != ""} {FFMPEG_Lock $this(ffmpeg_id); puts "Lock"; set unlock 1} else {set unlock 0}
           set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
+		  set error_message []
+		  if {$error_message != ""} {
+			 FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
+			 FFMPEG_stopAcquisition          $this(ffmpeg_id)
+			 FMPEG_Close_video_stream		 $this(ffmpeg_id)
+			 error $error_message
+			}
           
           FFMPEG_set_Synchronisation_threshold $this(ffmpeg_id) 0.11
           set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
