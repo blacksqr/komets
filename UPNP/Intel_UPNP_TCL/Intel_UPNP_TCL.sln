@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Intel_UPNP_TCL", "Intel_UPNP_TCL\Intel_UPNP_TCL.vcproj", "{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}.Debug|Win32.Build.0 = Debug|Win32
+		{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}.Release|Win32.ActiveCfg = Release|Win32
+		{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
