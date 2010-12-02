@@ -1,0 +1,13 @@
+; Intel_UPNP_TCL.def : déclare les paramètres de module pour la DLL.
+
+LIBRARY      "Intel_UPNP_TCL"
+
+EXPORTS
+    ; Les exportations explicites peuvent être placées ici
+	INTEL_UPNP_listener_start
+	INTEL_UPNP_listener_get_cmd_DeviceAdded
+	INTEL_UPNP_listener_get_cmd_DeviceRemoved
+	INTEL_UPNP_listener_set_cmd_DeviceAdded
+	INTEL_UPNP_listener_set_cmd_DeviceRemoved
+	
+	Intel_upnp_tcl_SafeInit
