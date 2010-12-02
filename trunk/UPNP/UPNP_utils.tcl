@@ -1,7 +1,5 @@
-package require udp
 package require http
 package require tdom
-package require SOAP
 package require Thread
 
 set PATH [pwd]

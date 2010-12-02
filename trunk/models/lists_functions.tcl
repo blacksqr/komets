@@ -1,5 +1,15 @@
-# Some list functions
+# Some dict procedures
+proc Generate_dict_accessors {class L_dict_name} {
+	foreach d $L_dict_name {
+		set cmd [list method get_$d {} "return \$this($d)"]; eval $cmd
+		set cmd [list method set_$d {v} "set this($d) \$v"]; eval $cmd
+		set cmd [list method get_item_of_$d {args} "dict get \$this($d) \$args"]; eval $cmd
+		set cmd [list method set_item_of_$d {args} "dict set this($d) \$args"]; eval $cmd
+		}
+}
 
+
+# Some list procedures
 #____________________________________________________________________________________
 proc Generate_List_accessor {class L_name suffixe} {
  set cmd "method $class get_$suffixe { } {return \$this($L_name)}"                  ; eval $cmd
