@@ -17,7 +17,7 @@ proc Encore_un_test_UPNP {} {
 
 package require SOAP
 
-# Adresse locationURL + controlURL
+# Adresse baseURL + controlURL
 
 ::SOAP::create UPNP_Search_for_content -action urn:schemas-upnp-org:service:ContentDirectory:1#Search -params {"ContainerID" "" SearchCriteria "" Filter "" StartingIndex ui4 RequestedCount ui4 SortCriteria ""} -name "" -proxy http://129.88.66.127:52107/_urn:schemas-upnp-org:service:ContentDirectory_control -uri "urn:schemas-upnp-org:service:ContentDirectory:1" -replyProc  my_reply_hook -name "Search"
 UPNP_Search_for_content 0 "upnp:class = object.item" "res" 0 0 ""

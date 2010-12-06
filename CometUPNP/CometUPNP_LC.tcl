@@ -10,9 +10,9 @@ method CometUPNP constructor {name descr args} {
  set this(LM_FC) ${objName}_LM_FC
  CometUPNP_LM_FC $this(LM_FC) $this(LM_FC) "The LM FC of $name"
    this Add_LM $this(LM_FC)
- set this(LM_PM) ${objName}_LM_PM
- CometUPNP_LM_PM $this(LM_PM) $this(LM_PM) "The LM PM of $name"
-   this Add_LM $this(LM_PM)
+ set this(LM_LP) ${objName}_LM_LP
+ CometUPNP_LM_LP $this(LM_LP) $this(LM_LP) "The LM PM of $name"
+   this Add_LM $this(LM_LP)
 
  eval "$objName configure $args"
  return $objName

@@ -1,0 +1,11 @@
+package require http
+package require tdom
+
+proc get_xml_from {ad {t 5000}} {
+  set token [::http::geturl $ad -timeout $t]
+  set rep [::http::data $token]
+  ::http::cleanup $token
+  
+  return $rep
+}
+
