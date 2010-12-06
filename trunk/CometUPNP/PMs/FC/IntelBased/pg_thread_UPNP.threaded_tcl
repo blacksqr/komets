@@ -22,14 +22,15 @@ proc get_xml_from {ad {t 5000}} {
 	 append UPNP_server_pg_thread_UPNP [list start 127.0.0.1 $UPNP_server_tcp_port]
 	 
 	 set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/UPNP_load_xml.threaded_tcl" r]; set UPNP_server_pg_thread [read $f]; close $f
+
+	 if {$comet_PM_FC_intelbased_server_port != 0} {
+		set UPNP_server_socket_client [socket 127.0.0.1 $comet_PM_FC_intelbased_server_port]
+		} else {set UPNP_server_socket_client ""}
 	 
 	 set UPNP_server_UPNP_thread [::thread::create]
 	 set UPNP_server_mutex       [::thread::mutex create]
 	 ::thread::send -async $UPNP_server_UPNP_thread $UPNP_server_pg_thread_UPNP
 	 
-	 if {$comet_PM_FC_intelbased_server_port != 0} {
-		set UPNP_server_socket_client [socket 127.0.0.1 $comet_PM_FC_intelbased_server_port]
-		} else {set UPNP_server_socket_client ""}
 	}
 
 	#___________________________________________________________________________________________________________________________________________
@@ -80,7 +81,7 @@ proc get_xml_from {ad {t 5000}} {
 	#___________________________________________________________________________________________________________________________________________
 	proc new_UPNP_message {msg_name} {
 	  upvar $msg_name msg
-
+	  
 	  if {[dict get $msg Alive] != 0} {
 		Device_added $msg
 	   } else {Device_removed $msg}
@@ -258,15 +259,21 @@ proc get_xml_from {ad {t 5000}} {
 	proc Device_removed {L} {
 	 set UDN [dict get $L UDN]
 	 regexp {^uuid:(.*)$} $UDN reco UDN
-	 set UDN_val [dict get $UPNP_server_L_devices $UDN]
-	 if {[dict exists $UDN_val dom_doc]} {
-	   set dom_doc [dict get $UDN_val dom_doc]
-	   $dom_doc delete
-	  }
+	 # set UDN_val [dict get $UPNP_server_L_devices $UDN]
+	 # if {[dict exists $UDN_val dom_doc]} {
+	   # set dom_doc [dict get $UDN_val dom_doc]
+	   # $dom_doc delete
+	  # }
 
-	 set UPNP_server_L_devices [dict remove $UPNP_server_L_devices $UDN]
-	 
-	 send_msg_to_comet "Device_removed $UDN"
+	 if {[dict exists $UPNP_server_L_devices $UDN]} {
+		 set new [list ]
+		 foreach {U U_val} $UPNP_server_L_devices {
+			 if {$U !=$UDN} {lappend new $U $U_val}
+			}
+		 set UPNP_server_L_devices $new
+		 send_msg_to_comet "Device_removed $UDN"
+		}
+	 # set UPNP_server_L_devices [dict remove $UPNP_server_L_devices $UDN]
 	}
 
 	

@@ -116,7 +116,6 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
  if {[info exists this($id)]} {
 	set cmd [concat [list $this($id)] $L_params]
 	if {[catch {set UPNP_res [eval $cmd]} err]} {
-	     puts "error $err"
 		 this soap_error_reply [::SOAP::dump -reply $this($id)] $CB
 		} else {this soap_reply [::SOAP::dump -reply $this($id)] $CB}
 	}
@@ -125,12 +124,12 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
 method CometUPNP_PM_FC_intelbased soap_error_reply {xml CB} {
  set doc [dom parse $xml]
 	set UPNP_res [list]
-	set root [$doc documentElement]; set ns_root [$root namespace]; puts "$root $ns_root"
+	set root [$doc documentElement]; set ns_root [$root namespace]
 	foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:Body/ns:Fault/detail/*"] {
 		 set UPNP_res [list ERROR [$res asText]]
 		 eval $CB
 		}
- #$doc delete
+ $doc delete
 }
 
 #___________________________________________________________________________________________________________________________________________
