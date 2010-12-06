@@ -63,7 +63,7 @@ Inject_code Video_PM_FC_ffmpeg go_to_time {} {
 }
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
- if {[this get_video_source] != "WEBCAM" && [this get_video_source] != ""} {
+ if {[this get_video_source] != "WEBCAM" && $this(ffmpeg_id) != "" && [this get_video_source] != ""} {
    FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
    set this(ffmpeg_frame_num) $nb
    lassign [this get_readable_video_buffer] current_video_pts buf_r
@@ -87,11 +87,12 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
  # Do we have to stop a ffmpeg stream?
  if {$this(ffmpeg_id) != ""} {
    puts "Closing video $this(ffmpeg_id)"
+   set tmp_id $this(ffmpeg_id); set this(ffmpeg_id) ""
    this Stop
    this prim_Close_video
-   FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
-   FFMPEG_stopAcquisition          $this(ffmpeg_id)
-   FFMPEG_Close_video_stream       $this(ffmpeg_id)
+   FFMPEG_Info_for_sound_Drain_all $tmp_id
+   FFMPEG_stopAcquisition          $tmp_id
+   FFMPEG_Close_video_stream       $tmp_id
    puts "End of closing"
   }
 
@@ -108,11 +109,14 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
   } else {
           if {$this(ffmpeg_id) != ""} {FFMPEG_Lock $this(ffmpeg_id); puts "Lock"; set unlock 1} else {set unlock 0}
           set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
-		  set error_message []
+		  set error_message [FFMPEG_get_error_message $this(ffmpeg_id)]
 		  if {$error_message != ""} {
-			 FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
-			 FFMPEG_stopAcquisition          $this(ffmpeg_id)
-			 FMPEG_Close_video_stream		 $this(ffmpeg_id)
+		     set tmp_id $this(ffmpeg_id); set this(ffmpeg_id) ""
+			 puts "Error with stream $tmp_id"
+			 FFMPEG_Info_for_sound_Drain_all $tmp_id
+			 FFMPEG_stopAcquisition          $tmp_id
+			 FFMPEG_Close_video_stream		 $tmp_id
+			 
 			 error $error_message
 			}
           

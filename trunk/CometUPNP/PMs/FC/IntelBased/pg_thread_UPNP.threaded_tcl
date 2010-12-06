@@ -1,0 +1,311 @@
+package require tdom
+package require Thread
+package require http
+
+proc get_xml_from {ad {t 5000}} {
+  set token [::http::geturl $ad -timeout $t]
+  set rep [::http::data $token]
+  ::http::cleanup $token
+  
+  return $rep
+}
+
+
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	proc UPNP_server {comet_PM_FC_intelbased_server_port} {
+	 set UPNP_server_tcp_server    [socket -server "New_connection " 0]
+	 set UPNP_server_tcp_port      [lindex [fconfigure $UPNP_server_tcp_server -sockname] end]
+	 
+	 set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/INTEL_UPNP_CLIENT.threaded_tcl" r]; set UPNP_server_pg_thread_UPNP [read $f]; close $f
+	 append UPNP_server_pg_thread_UPNP [list start 127.0.0.1 $UPNP_server_tcp_port]
+	 
+	 set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/UPNP_load_xml.threaded_tcl" r]; set UPNP_server_pg_thread [read $f]; close $f
+	 
+	 set UPNP_server_UPNP_thread [::thread::create]
+	 set UPNP_server_mutex       [::thread::mutex create]
+	 ::thread::send -async $UPNP_server_UPNP_thread $UPNP_server_pg_thread_UPNP
+	 
+	 if {$comet_PM_FC_intelbased_server_port != 0} {
+		set UPNP_server_socket_client [socket 127.0.0.1 $comet_PM_FC_intelbased_server_port]
+		} else {set UPNP_server_socket_client ""}
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc send_msg_to_comet {msg} {
+	  if {$UPNP_server_socket_client != ""} {
+		  puts -nonewline $UPNP_server_socket_client "[string length $msg] "
+		  puts -nonewline $UPNP_server_socket_client $msg
+		  flush $UPNP_server_socket_client
+		} else {puts "\t\t$msg"}
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc get_L_devices {} {return $UPNP_server_L_devices}
+
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	proc New_connection {sock ad port} {
+	 fconfigure $sock -blocking 0 
+	 fileevent  $sock readable [list Read_from_socket $sock]
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc Read_from_socket {sock} {
+	 append UPNP_server_sock_data [read $sock]
+	 
+	 while {1} {
+		 # Read required message length if necessary
+		 if {$UPNP_server_required_packet_length == -1} {
+			   set pos [string first " " $UPNP_server_sock_data]
+			   if {$pos > 0} {
+				 set UPNP_server_required_packet_length [string range $UPNP_server_sock_data 0 [expr $pos - 1]]
+				 set UPNP_server_sock_data              [string range $UPNP_server_sock_data [expr $pos + 1] end]
+				}
+			 }
+
+		 # Enough information to read the UPNP message ?
+		 if {$UPNP_server_required_packet_length >= 0 && [string length $UPNP_server_sock_data] >= $UPNP_server_required_packet_length} {
+			  set msg [string range $UPNP_server_sock_data 0 [expr $UPNP_server_required_packet_length - 1]]
+			  set UPNP_server_sock_data [string range $UPNP_server_sock_data $UPNP_server_required_packet_length end]
+			  set UPNP_server_required_packet_length -1
+			  
+			  new_UPNP_message msg
+			 } else {break}
+	  }
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc new_UPNP_message {msg_name} {
+	  upvar $msg_name msg
+
+	  if {[dict get $msg Alive] != 0} {
+		Device_added $msg
+	   } else {Device_removed $msg}
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	proc Device_added {L} {
+	 set UDN [dict get $L UDN]
+	 regexp {^uuid:(.*)$} $UDN reco UDN
+	 if {[dict exists $L LocationURL]} {set new_location 1} else {set new_location 0}
+	 
+	 if {$new_location && [dict exists $UPNP_server_L_devices $UDN]} {
+	   if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
+		 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $L LocationURL]} {set new_location 0}
+		}
+	   dict set UPNP_server_L_devices $UDN [dict merge [dict get $UPNP_server_L_devices $UDN] $L]
+	  } else {dict set UPNP_server_L_devices $UDN $L}
+
+	 # Thread the loading of the related XML document
+	 if {$new_location} {
+	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
+	   set_description_from_thread $UDN str_xml
+	  }
+	  
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc get_root_ad_from_UDN {UDN} {
+	 if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
+	   set rep [get_root_ad_from_locationURL [dict get $UPNP_server_L_devices $UDN LocationURL]]
+	  } else {if {[dict exists $UPNP_server_L_devices $UDN parent_UDN]} {
+				return [get_root_ad_from_UDN [dict get $UPNP_server_L_devices $UDN parent_UDN]]
+			   } else {send_msg_to_comet "ERROR in get_root_ad_from_UDN $UDN : Neither LocationURL nor parent_UDN"}
+			 }
+	  
+	 return $rep
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc get_root_ad_from_locationURL {loc} {
+	 return [string range $loc 0 [expr [string last / $loc] - 1]]
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc get_ip_ad_from_locationURL {UDN} {
+	 if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
+	   set rep [get_ip_ad_from_ad [dict get $UPNP_server_L_devices $UDN LocationURL]]
+	  } else {if {[dict exists $UPNP_server_L_devices $UDN parent_UDN]} {
+				return [get_ip_ad_from_locationURL [dict get $UPNP_server_L_devices $UDN parent_UDN]]
+			   } else {send_msg_to_comet "ERROR in get_ip_ad_from_locationURL $UDN : Neither LocationURL nor parent_UDN"}
+			 }
+	  
+	 return $rep
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc get_ip_ad_from_ad {ad} {
+		if {[regexp {^(http://[0-9\.:]*)/} $ad reco ad]} {return $ad} else {return ""}
+	}
+	
+	#___________________________________________________________________________________________________________________________________________
+	proc set_description_from_thread {UDN str_name args} {
+	 upvar $str_name str
+
+	 if {[catch {set doc [dom parse $str]} err]} {
+	   send_msg_to_comet  "ERROR parsing xml from $UDN [list $err]"
+	   return
+	  }
+	  
+	 set root [$doc documentElement]
+	 set ns   [$root namespaceURI]
+	 
+	 foreach node_device [$root selectNodes -namespaces [list ns $ns] "//ns:device"] {
+	   Add_device_from_dom $UDN $ns $node_device
+	  }
+	  
+	 $doc delete
+	}
+	 
+	#___________________________________________________________________________________________________________________________________________
+	proc Add_device_from_dom {parent_UDN ns node_device} {
+	 set node_UDN [$node_device selectNodes -namespaces [list ns $ns] "ns:UDN"]
+	 if {[llength $node_UDN] == 1} {set UDN [$node_UDN asText]} else {send_msg_to_comet "ERROR Pas d'UDN trouvé dans le noeud $node_device !!!"; return}
+
+	 regexp {^uuid:(.*)$} $UDN reco UDN
+	 
+	 if {[dict exists $UPNP_server_L_devices $UDN]} {set UDN_val [dict get $UPNP_server_L_devices $UDN]} else {set UDN_val [dict create]}
+
+	 dict set UDN_val xml_description 1
+	 dict set UDN_val parent_UDN $parent_UDN
+	 
+	 foreach att [list deviceType friendlyName modelDescription modelName modelURL URLBase presentationURL] {
+	   set node [$node_device selectNodes -namespaces [list ns $ns] "ns:$att"]
+	   if {[llength $node] == 1} {dict set UDN_val $att [$node asText]}
+	  }
+
+	 dict set UPNP_server_L_devices $UDN $UDN_val
+	 dict set UDN_val baseURL [get_root_ad_from_UDN $UDN]
+	 
+	 # Read related services
+	 set ServiceList [dict create]; set L_xml_descr_service [list]
+	 foreach service [$node_device selectNodes -namespaces [list ns $ns] "ns:serviceList/ns:service"] {
+	   set service_dict [dict create]
+	   foreach att [list serviceType serviceId SCPDURL controlURL eventSubURL] {
+		 foreach node_att [$service selectNodes -namespaces [list ns $ns] "ns:$att"] {dict set service_dict $att [$node_att asText]}
+		}
+	   lappend L_xml_descr_service $UDN [dict get $service_dict serviceId] [dict get $service_dict SCPDURL]
+	   dict set ServiceList [dict get $service_dict serviceId] $service_dict
+	  }
+	 dict set UDN_val ServiceList $ServiceList
+
+	# Update the dict of devices 
+	 dict set UPNP_server_L_devices $UDN $UDN_val
+	 
+	# Load xml description
+	 foreach {UDN service_id SCPDURL} $L_xml_descr_service {
+	   set ad [get_ip_ad_from_locationURL $UDN];
+	   if {[string index $SCPDURL 0] != "/"} {append ad "/" $SCPDURL} else {append ad $SCPDURL}
+	   set str_xml [get_xml_from $ad]
+	   set_service_description $UDN $service_id str_xml
+	  }
+
+	 # Send device description
+	 send_msg_to_comet "Device_added $UDN [dict get $UPNP_server_L_devices $UDN]"
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc set_service_description {UDN service_id data_name} {
+	 upvar $data_name data
+	 if {[catch {set doc [dom parse $data]} err]} {
+	   send_msg_to_comet "ERROR in parsing xml from $UDN [list $err $data]"
+	   return
+	  }
+	  
+	 set dict_state_variable [dict create]
+	  
+	 set root [$doc documentElement]
+	 set ns   [$root namespaceURI]
+	 
+	 
+	 # Register actions
+	 dict set UPNP_server_L_devices $UDN ServiceList $service_id actions ""
+	 foreach node_action [$root selectNodes -namespaces [list ns $ns] "//ns:action"] {
+	   set node_name [$node_action selectNodes -namespaces [list ns $ns] "ns:name"]
+	   set dict_action [dict create]
+	   foreach node_param [$node_action selectNodes -namespaces [list ns $ns] ".//ns:argument"] {
+	     set param_name [[$node_param selectNodes -namespaces [list ns $ns] "ns:name"] asText]
+		 foreach i [list direction relatedStateVariable] {
+		   dict set dict_action $param_name $i [[$node_param selectNodes -namespaces [list ns $ns] "ns:$i"] asText]
+		  }
+		}
+	   dict set UPNP_server_L_devices $UDN ServiceList $service_id actions [$node_name asText] $dict_action
+	  }
+	  
+	 # Register state variables
+	 foreach node_state_var [$root selectNodes -namespaces [list ns $ns] "//ns:stateVariable"] {
+	   set node_name  [$node_state_var selectNodes -namespaces [list ns $ns] "ns:name"]
+	   set sendEvents [$node_state_var getAttribute sendEvents yes]; set dict_state_variable [dict create sendEvents $sendEvents]
+	   set multicast  [$node_state_var getAttribute multicast  no ]; set dict_state_variable [dict create multicast  $multicast ]
+	   set defaultValue ""; set node_defaultValue [$node_state_var selectNodes -namespaces [list ns $ns] "ns:defaultValue"]
+	   if {$node_defaultValue != ""} {set defaultValue [$node_defaultValue asText]}
+	   foreach i [list name dataType] {dict set dict_state_variable $i [[$node_state_var selectNodes -namespaces [list ns $ns] "ns:$i"] asText]}
+	   set allowedValues [list]; foreach n [$node_state_var selectNodes -namespaces [list ns $ns] ".//ns:allowedValue"] {lappend allowedValues [$n asText]}
+	   dict set dict_state_variable allowedValues $allowedValues
+	   
+	   dict set UPNP_server_L_devices $UDN ServiceList $service_id stateVariables [$node_name asText] $dict_state_variable
+	  }
+	  
+	 $doc delete
+	}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc Device_removed {L} {
+	 set UDN [dict get $L UDN]
+	 regexp {^uuid:(.*)$} $UDN reco UDN
+	 set UDN_val [dict get $UPNP_server_L_devices $UDN]
+	 if {[dict exists $UDN_val dom_doc]} {
+	   set dom_doc [dict get $UDN_val dom_doc]
+	   $dom_doc delete
+	  }
+
+	 set UPNP_server_L_devices [dict remove $UPNP_server_L_devices $UDN]
+	 
+	 send_msg_to_comet "Device_removed $UDN"
+	}
+
+	
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+	set UPNP_server_L_devices [dict create]
+	set UPNP_server_required_packet_length -1
+	set UPNP_server_sock_data     ""
+	set UPNP_server_tcp_server    ""
+	set UPNP_server_tcp_port      ""
+	set UPNP_server_pg_thread     ""
+	set UPNP_server_pg_thread_UPNP ""
+	set UPNP_server_L_threads   [list]
+	set UPNP_server_UPNP_thread ""
+	set UPNP_server_mutex       ""
+	set UPNP_server_socket_client ""
+	set UPNP_server_thread_for_retrieving_xml ""
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+set cmd ""
+foreach var [list UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
+append cmd "\n"
+foreach p [list UPNP_server get_ip_ad_from_locationURL send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
+	set L_args [info args $p]
+	set body   [info body $p]
+	proc $p $L_args "$cmd $body"
+}
+
+
+proc display_infos {} {return {
+ foreach {UDN UDN_val} $UPNP_server_L_devices {
+	 puts $UDN
+	 foreach {att val} $UDN_val {
+		 puts "\t$att"
+		}
+	}
+}
+
+}

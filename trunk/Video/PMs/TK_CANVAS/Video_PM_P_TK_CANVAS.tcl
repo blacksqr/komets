@@ -93,6 +93,7 @@ method Video_PM_P_TK_CANVAS Play_audio_stream_locally {b} {
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_TK_CANVAS Open_audio_stream {} {
+ if {[this get_video_source] == ""} {return}
  if {[this get_nb_channels] == 2} {set mono_stereo [FFMPEG_FSOUND_Stereo]} else {set mono_stereo [FFMPEG_FSOUND_Mono]}
  set buf_len [expr int(2 * [this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
  set this(FMOD_audio_stream) [FFMPEG_Get_a_new_FSOUND_STREAM [this get_cb_audio] \
