@@ -31,5 +31,5 @@ method CometUPNP_CFC device_disappear {} {}
 
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_get_CometUPNP {} {return [list {get_dict_devices { }} {get_item_of_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
-proc P_L_methodes_set_CometUPNP {} {return [list {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {v}} {set_item_of_dict_devices {keys val}} ]}
+proc P_L_methodes_set_CometUPNP {} {return [list {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
 
