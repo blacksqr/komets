@@ -96,7 +96,7 @@ method CometUPNP_PM_P_tk_tree Display_action {UDN s_id a_id} {
 					   }
 			} else {if {[dict get $state_variable dataType] == "string"} {
 					  pack $f -expand 1 -fill both 
-					  set e [text ${f}._t_$param -state disabled -background "#ece9d8" -height 5 -width 5]; pack $e -fill both -expand 1 -side left
+					  set e [text ${f}._t_$param -state disabled -background "#ece9d8" -height 1 -width 3]; pack $e -fill both -expand 1 -side left
 					  set this(e_$param) [list text $e]
 					  set sb [scrollbar ${f}.sb -orient vert]; pack $sb -fill y -expand 1
 						  $e    configure -yscrollcommand "$sb set"

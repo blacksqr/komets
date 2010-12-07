@@ -161,7 +161,7 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
  puts "  End of $objName Video_PM_FC_ffmpeg::set_video_source"
  set this(is_updating) 0
 }
-Trace Video_PM_FC_ffmpeg set_video_source
+# Trace Video_PM_FC_ffmpeg set_video_source
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
