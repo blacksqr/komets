@@ -104,6 +104,8 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 	char tmp[256];
 	itoa(Alive, tmp, 10);
 	Tcl_DStringAppendElement(&cmd, "Alive"); Tcl_DStringAppendElement(&cmd, tmp);
+	itoa(Timeout, tmp, 10);
+	Tcl_DStringAppendElement(&cmd, "Timeout"); Tcl_DStringAppendElement(&cmd, tmp);
 
 	char *str_cmd = Tcl_DStringAppend(&cmd, "}", 1);
 	Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, str_cmd);  //printf("%s\n", str_cmd);

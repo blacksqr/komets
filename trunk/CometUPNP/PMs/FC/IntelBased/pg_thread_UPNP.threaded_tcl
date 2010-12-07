@@ -73,7 +73,7 @@ proc get_xml_from {ad {t 5000}} {
 			  set UPNP_server_sock_data [string range $UPNP_server_sock_data $UPNP_server_required_packet_length end]
 			  set UPNP_server_required_packet_length -1
 			  
-			  new_UPNP_message msg
+			  if {[catch {new_UPNP_message msg} err]} {send_msg_to_comet [list ERROR $err]}
 			 } else {break}
 	  }
 	}
@@ -182,6 +182,7 @@ proc get_xml_from {ad {t 5000}} {
 
 	 dict set UPNP_server_L_devices $UDN $UDN_val
 	 dict set UDN_val baseURL [get_root_ad_from_UDN $UDN]
+	 dict set UDN_val IP_port [get_ip_ad_from_locationURL $UDN]
 	 
 	 # Read related services
 	 set ServiceList [dict create]; set L_xml_descr_service [list]
@@ -259,11 +260,6 @@ proc get_xml_from {ad {t 5000}} {
 	proc Device_removed {L} {
 	 set UDN [dict get $L UDN]
 	 regexp {^uuid:(.*)$} $UDN reco UDN
-	 # set UDN_val [dict get $UPNP_server_L_devices $UDN]
-	 # if {[dict exists $UDN_val dom_doc]} {
-	   # set dom_doc [dict get $UDN_val dom_doc]
-	   # $dom_doc delete
-	  # }
 
 	 if {[dict exists $UPNP_server_L_devices $UDN]} {
 		 set new [list ]
@@ -273,7 +269,7 @@ proc get_xml_from {ad {t 5000}} {
 		 set UPNP_server_L_devices $new
 		 send_msg_to_comet "Device_removed $UDN"
 		}
-	 # set UPNP_server_L_devices [dict remove $UPNP_server_L_devices $UDN]
+
 	}
 
 	

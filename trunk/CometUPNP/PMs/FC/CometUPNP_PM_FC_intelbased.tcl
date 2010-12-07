@@ -92,9 +92,9 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
  set id ${UDN},${service},${action}
  if {![info exists this($id)]} {
-    set baseURL       [this get_item_of_dict_devices "$UDN baseURL"]
+    set IP_port       [this get_item_of_dict_devices "$UDN IP_port"]
 	set controlURL    [this get_item_of_dict_devices "$UDN ServiceList $service controlURL"]
-	set URL $baseURL
+	set URL $IP_port
 		if {[string index $URL end] != "/" && [string index $controlURL 0] != "/"} {append URL "/"}
 		append URL $controlURL
 	set prefix_action [this get_item_of_dict_devices "$UDN ServiceList $service serviceType"]
@@ -103,7 +103,7 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 		 if {[this get_item_of_dict_devices "$UDN ServiceList $service actions $action $p direction"] == "in"} {lappend L_params $p ""}
 		}
 	set this($id) ${objName}_SOAP_proxy_$id
-	::SOAP::create $this($id) -name $action -params $L_params -proxy $URL -action ${prefix_action}#$action
+	::SOAP::create $this($id) -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action
 	}
 	
  return $this($id) 
@@ -122,21 +122,20 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
 }
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased soap_error_reply {xml CB} {
- set doc [dom parse $xml]
+ if {[catch {set doc [dom parse $xml]} err]} {set UPNP_res [list ERROR $xml]; eval $CB;} else {
 	set UPNP_res [list]
 	set root [$doc documentElement]; set ns_root [$root namespace]
 	foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:Body/ns:Fault/detail/*"] {
 		 set UPNP_res [list ERROR [$res asText]]
 		 eval $CB
 		}
- $doc delete
+	$doc delete
+	}
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased soap_reply {xml CB} {
-	# puts $xml
-	
- set doc [dom parse $xml]
+ set doc [dom parse $xml]; 
 	set UPNP_res [list]
 	set root [$doc documentElement]; set ns_root [$root namespace]
 	foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:Body/*"] {
