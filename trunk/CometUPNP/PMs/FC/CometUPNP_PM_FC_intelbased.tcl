@@ -22,6 +22,11 @@ method CometUPNP_PM_FC_intelbased constructor {name descr args} {
  set cmd "source \$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/pg_thread_UPNP.threaded_tcl;\n UPNP_server $this(port_server)\n"
  ::thread::send $this(UPNP_thread) $cmd
  
+ # TCP server for eventing
+ set this(eventing_server)      [socket -server "$objName New_UPNP_eventing_connection" 0]
+ set this(eventing_server_port) [lindex [fconfigure $this(eventing_server) -sockname] end]
+ set this(IP) [this get_IP]
+ 
  # Terminate with configuration's parameters
  eval "$objName configure $args"
  return $objName
@@ -33,6 +38,108 @@ Methodes_get_LC CometUPNP_PM_FC_intelbased [P_L_methodes_get_CometUPNP] {$this(F
 
 #___________________________________________________________________________________________________________________________________________
 Generate_PM_setters CometUPNP_PM_FC_intelbased [P_L_methodes_set_CometUPNP_COMET_FC_RE]
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased get_IP {} {
+	foreach str [split [exec ipconfig] "\n"] {
+		 if {[regexp {IP.*: (.*)$} $str reco IP]} {return $IP}
+		}
+	return "127.0.0.1"
+}
+
+#___________________________________________________________________________________________________________________________________________
+#__________________________________________________________ UPNP eventing __________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
+	fconfigure $chan -blocking 0
+	fileevent  $chan readable [list $objName Eventing_msg $chan]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
+	if {[eof $chan]} {
+		 close $chan
+		} else  {set msg [read $chan]
+				 set pos_entete [string first "\n\n" $msg]
+				 set entete [string range $msg 0 $pos_entete]
+				 set xml    [string range $msg $pos_entete end]
+				 
+				 set dict_rep [dict create]
+				 foreach line [split $entete "\n"] {
+					 set pos [string first " " $line]
+					 if {$pos >= 0} {
+						 set var [string range $line 0 [expr $pos - 1]]
+						 set val [string range $line [expr $pos + 1] end]
+						 dict set dict_rep $var $val
+						}
+					}
+				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
+				 if {[dict exists $dict_rep "SID:"]} {
+					 set UUID [dict get $dict_rep "SID:"]
+					 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
+						 set CB "$CB [list $xml]"
+						 # puts "From CometUPNP_PM_FC_intelbased:\n$CB"
+						 eval $CB
+						}
+					}
+				}
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Add_eventing_CB {UDN service_id ID_subscribe CB} {
+	dict set this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe $CB
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Remove_eventing_CB {UDN service_id ID_subscribe} {
+	catch {dict unset this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe}
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
+	if {[regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
+		 if {![info exists this(UPNP_eventing_CB,${UDN},${service_id})]} {
+			 set event_ad [this get_item_of_dict_devices [list $UDN ServiceList $service_id eventSubURL]]
+			 if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
+			 
+			 set msg "SUBSCRIBE $event_ad HTTP/1.1
+TIMEOUT: Second-10000
+HOST: ${IP}:$PORT
+CALLBACK: <http://$this(IP):$this(eventing_server_port)>
+NT: upnp:event
+Content-Length: 0
+"
+			 set S [socket -async $IP $PORT]
+			 fconfigure $S -blocking 0
+			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
+			}
+			
+		 this Add_eventing_CB $UDN $service_id $ID_subscribe $CB
+		}
+}
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UDN service_id} {
+	 set str [read $S]; close $S
+	 # puts "_____________________\n$str"
+	 set dict_rep [dict create]
+	 foreach line [split $str "\n"] {
+		 set pos [string first " " $line]
+		 if {$pos >= 0} {
+			 set var [string range $line 0 [expr $pos - 1]]
+			 set val [string range $line [expr $pos + 1] end]
+			 dict set dict_rep $var $val
+			}
+		}
+	
+	 set UUID [dict get $dict_rep "SID:"]
+	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
+	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
+	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT [dict get $dict_rep "TIMEOUT:"]
+}
+# Trace CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________

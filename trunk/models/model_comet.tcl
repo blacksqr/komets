@@ -104,6 +104,14 @@ method CometPool Release_a_comet {c} {
 }
 
 #_________________________________________________________________________________________________________
+method CometPool get_singleton {class_name} {
+	if {![info exists this(singleton,$class_name)]} {
+		 set this(singleton,$class_name) [this get_a_comet $class_name]
+		}
+	return $this(singleton,$class_name)
+}
+
+#_________________________________________________________________________________________________________
 method CometPool get_a_comet {type args} {
  set rep ""
  foreach c $this(L_free) {
