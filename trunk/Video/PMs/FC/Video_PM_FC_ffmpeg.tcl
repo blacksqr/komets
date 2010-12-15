@@ -50,11 +50,13 @@ Generate_PM_setters Video_PM_FC_ffmpeg [P_L_methodes_set_Video_FC_COMET_RE]
 Inject_code Video_PM_FC_ffmpeg Play  {} {
  if {!$this(will_reupdate)} {this Update_frame}
 }
+
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg Pause {} {}
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg Stop  {} {
  this go_to_frame 0
+ set this(will_reupdate) 0
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -67,7 +69,9 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
    FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
    set this(ffmpeg_frame_num) $nb
    lassign [this get_readable_video_buffer] current_video_pts buf_r
+   FFMPEG_Lock       $this(ffmpeg_id)
    FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r
+   FFMPEG_UnLock     $this(ffmpeg_id)
    this Fill_video_pool
   }
 }

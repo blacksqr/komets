@@ -32,6 +32,7 @@ method PM_P_scale_TK get_or_create_prims {root} {
    #set max [$common_FC get_b_sup]
    scale $this(scale_name) -orient horizontal
   }
+ 
  this maj_choices
 
 # Bindings
@@ -39,16 +40,16 @@ method PM_P_scale_TK get_or_create_prims {root} {
  this set_prim_handle $L
 
 # this set_currents [$common_FC get_currents]
- this maj_choices
+ this maj_choices 1
 
  return [this set_prim_handle $L]
 }
 #___________________________________________________________________________________________________________________________________________
-method PM_P_scale_TK maj_choices        {}   {
+method PM_P_scale_TK maj_choices        {{force 0}}   {
  global $this(scale_val_varname)
 
  set scale_name $this(scale_name)
- if {[winfo exists $scale_name]} {
+ if {[winfo exists $scale_name] && ($force || [subst $$this(scale_val_varname)] != [this get_val])} {
    set $this(scale_val_varname) [this get_val]
    $scale_name configure -from [this get_b_inf] -to [this get_b_sup] \
                          -resolution [this get_step] \

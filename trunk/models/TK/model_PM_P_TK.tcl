@@ -104,6 +104,7 @@ method PM_TK Reconnect {{PMD {}}} {
    foreach p [$PM get_prim_handle] {
      eval [$PM get_cmd_deconnect]
     }
+
    set rep [this Add_prim_daughter $PM      [$PM get_prim_handle]]        
    set rep [$PM  Add_prim_mother   $objName [this get_root_for_daughters]]
   }

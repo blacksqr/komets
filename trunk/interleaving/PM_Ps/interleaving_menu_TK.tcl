@@ -83,8 +83,8 @@ method Interleaving_PM_P_menu_TK get_a_window_for {LC} {
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_menu_TK Connect_to_compatible_PM {LC} {
- set L_PM [CSS++ $objName $LC]
- if {[string equal $L_PM {}]} {
+ set L_PM [CSS++ $objName "#${LC}->PMs \\<--< $objName/"]
+ if {$L_PM == ""} {
    puts "  $objName Interleaving_PM_P_menu_TK::Connect_to_compatible_PM $LC\n    Impossible to find a PM of $LC descendant of $objName"
    return
   }
@@ -92,12 +92,18 @@ method Interleaving_PM_P_menu_TK Connect_to_compatible_PM {LC} {
  # Can we trigger an activate method?
  foreach PM $L_PM {
    set L_methods [gmlObject info methods $PM]
-   if {[lsearch $L_methods activate] >= 0} {$PM activate; return;}
+   if {[lsearch $L_methods activate] >= 0} {$PM prim_activate; return;}
   }
- # If not then just display it in a new window
- set cont_name [this get_a_window_for $LC]
-   $cont_name set_name [$LC get_name]
-   [this get_LM] Connect_PM_descendants $objName ${cont_name}_LM_LP
-   $cont_name set_daughters_R $LC
+  
+ # create a windows, connect to PM
+ set win [this get_prim_handle]._win_for_$LC
+ if {![winfo exists $win]} {
+	 toplevel $win
+	 set PM [lindex $L_PM 0]; puts "plug $PM ?"
+	 catch {destroy [$PM get_prim_handle]}
+	 $PM get_or_create_prims $win
+	 [$PM get_LM] Connect_PM_descendants $PM
+	 pack [$PM get_prim_handle] -expand 1 -fill both
+	}
 }
 
