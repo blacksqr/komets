@@ -4,7 +4,7 @@ inherit CometMediaPlayer_LM_LP Logical_presentation
 method CometMediaPlayer_LM_LP constructor {name descr args} {
  this inherited $name $descr
 # Adding some physical presentations 
- this Add_PM_factories [Generate_factories_for_PM_type [list \
+ this Add_PM_factories [Generate_factories_for_PM_type [list {CometMediaPlayer_PM_P_U_basic Ptf_ALL} \
                                                        ] $objName]
 
  eval "$objName configure $args"
@@ -16,8 +16,8 @@ Methodes_set_LC CometMediaPlayer_LM_LP [P_L_methodes_set_CometMediaPlayer] {} {$
 Methodes_get_LC CometMediaPlayer_LM_LP [P_L_methodes_get_CometMediaPlayer] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_set_CometMediaPlayer_COMET_RE {} {return [list]}
-Generate_LM_setters CometMediaPlayer_LM_LP [P_L_methodes_set_CometMediaPlayer_COMET_RE]
+proc P_L_methodes_set_CometMediaPlayer_COMET_RE_P {} {return [concat [P_L_methodes_set_CometMediaPlayer] [list ]]}
+Generate_LM_setters CometMediaPlayer_LM_LP [P_L_methodes_set_CometMediaPlayer_COMET_RE_P]
 
 #___________________________________________________________________________________________________________________________________________
 

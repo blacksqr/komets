@@ -134,9 +134,11 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 			}
 		}
 	
+	 if {![dict exists $dict_rep "SID:"]} {return}
 	 set UUID [dict get $dict_rep "SID:"]
 	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
+	 if {![dict exists $dict_rep "TIMEOUT:"]} {dict set dict_rep "TIMEOUT:" 1800}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT [dict get $dict_rep "TIMEOUT:"]
 }
 # Trace CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response
@@ -218,6 +220,10 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
+ # set S [this get_soap_proxy $UDN $service $action]
+ # ::SOAP::configure $S -command "puts "
+ # return
+ 
  this get_soap_proxy $UDN $service $action
  set id ${UDN},${service},${action}
  if {[info exists this($id)]} {
@@ -227,6 +233,8 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
 		} else {this soap_reply [::SOAP::dump -reply $this($id)] $CB}
 	}
 }
+
+
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased soap_error_reply {xml CB} {
  if {[catch {set doc [dom parse $xml]} err]} {set UPNP_res [list ERROR $xml]; eval $CB;} else {

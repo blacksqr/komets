@@ -113,7 +113,8 @@ method Parser_CSS++ Build_hierarchy {L_h_name L_flat_name index_L_flat_name nb_o
 					     if {$add_guillemets} {append VAL "\"" $e "\" "} else {append VAL $e " "}
 					     if {$e == "=="} {set add_guillemets 1} else {set add_guillemets 0}
 					    }
-					   set VAL2 [string map [list {soft_type} "\[\${obj}_cou_ptf get_soft_type\]"] $VAL]
+					   # set VAL2 [string map [list {soft_type} "\[\${obj}_cou_ptf get_soft_type\]"] $VAL]
+					   set VAL2 $VAL
 					   lappend L_h [list AXE $axe_type $VAL $VAL2]
 		              }
 	     UNION        {set L [list]; incr index_L_flat; this Build_hierarchy L L_flat index_L_flat nb_open_parenthesis nb_open_post_filter nb_go_through; 
@@ -414,8 +415,16 @@ method Parser_CSS++ Parse_AXE {L_root index VAR VAL VAL2} {
    FILTER           {set nL [list]
                      foreach C $L_root {
                        lassign $C obj in
-					   set cmd "if {$VAL2} {lappend nL \$C}"
-					   if {[catch {eval $cmd} err]} {puts "Error while evaluating the filter \"$VAL2\" for $obj\n$err"}
+					   set cmd "if {"
+					   set op ""; set VAL2_tmp $VAL2
+					   while {$VAL2_tmp != ""} {
+					     append cmd " $op "
+						 lassign $VAL2_tmp mtd comp v op VAL2_tmp
+						 append cmd "\[$obj $mtd\] $comp "
+						 if {[regexp {^[0-9]} $v]} {append cmd $v} else {append cmd "\"$v\""}
+						}
+					   append cmd "} {lappend nL \$C}"
+					   if {[catch {eval $cmd} err]} {puts "Error while evaluating the filter \"$VAL2\" for $obj\n\tVAR : $VAR\n\tVAL  : $VAL\n\tVAL2 : $VAL2\n\tcmd : $cmd\n$err"}
                       }
 					 set L_root $nL
                     }

@@ -62,6 +62,7 @@ method CometChoice_PM_P_UPNP_AV_tree get_or_create_prims {root} {
 		$this(tk_L_items) configure -yscrollcommand "$this(sb_items) set"
 		$this(sb_items)   configure -command "$this(tk_L_items) yview"
 		bind $this(tk_L_items) <<ListboxSelect>> "$objName Display_item_info \[$this(tk_L_items) curselection\]"
+		bind $this(tk_L_items) <Double-ButtonPress-1> "$objName Choose_item \[$this(tk_L_items) curselection\]"
 	 
 	 # Description of item
 	 set this(frame_item_descr) [frame $this(paned_for_tree).f_item_descr]
@@ -70,7 +71,7 @@ method CometChoice_PM_P_UPNP_AV_tree get_or_create_prims {root} {
 	 
 	 # MetaDatas
 	 this Add_MetaData PRIM_STYLE_CLASS [list $this(tree) "NAVIGATION TREE INFORMATION" $this(tk_L_items) "PARAM IN ACTION"]
-	 this Update_tree
+	 after 100 "$objName Update_tree"
 	} 
 	
  this set_root_for_daughters $this(tk_root)
@@ -264,5 +265,13 @@ method CometChoice_PM_P_UPNP_AV_tree Display_item_info {i} {
 		 $this(text_item_descr) insert end "$val\n"
 		}
 	$this(text_item_descr) configure -state disabled
-	catch {this prim_set_currents [dict get $item res]}
+	# catch {this prim_set_currents [dict get $item res]}
 }
+
+#___________________________________________________________________________________________________________________________________________
+method CometChoice_PM_P_UPNP_AV_tree Choose_item {i} {
+	if {![catch {set item [lindex $this(items,$this(current_tree_id)) $i]}]} {
+		 this prim_set_currents [dict get $item res]
+		}
+}
+

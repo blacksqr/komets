@@ -112,6 +112,7 @@ method PM_P_menu_TK Add_choosed {c} {
 #___________________________________________________________________________________________________________________________________________
 method PM_P_menu_TK set_currents       {lc} {
 global debug
+catch {
      if {$debug} {puts "$objName set_currents $lc"}
 #     if {[string equal $lc {}]} {return}
 #     set racine       [lindex    $this(primitives_handle) 1]
@@ -153,6 +154,7 @@ global debug
       set $this(var_txt_menu) {}
      } else {set $this(var_txt_menu) [$c_last get_name]
             }
+}
 }
 
 #___________________________________________________________________________________________________________________________________________

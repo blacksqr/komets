@@ -1582,7 +1582,7 @@ proc Read_string_as_css++ {str_name} {
  upvar $str_name str
 
  set letter {[a-zA-Z0-9_\$"{}]}
- set space  "\[ \n\]"
+ set space  "\[ \n\t\]"
 
  set L_rep ""
  set L [split $str "\n"]
@@ -1683,7 +1683,7 @@ proc Update_style {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
 
 #_________________________________________________________________________________________________________
 proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_rep ""}} {
- # puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $L_fct\n  - current = $current\n  - L_mapping : $L_mapping\n  -L_rep : $L_rep"
+ # puts "Update_style\n  - dsl_q   : $dsl_q\n  - dsl_css : $dsl_css\n  - fct : $L_fct\n  - current = $current\n  - L_mapping : $L_mapping\n  -L_rep : $L_rep\n  - CSS : $CSS"
 # Let's see if some CSS rules have GDD access
  if {$L_rep == ""} {set do_css 1} else {set do_css 0}
  foreach r $CSS {
@@ -1693,7 +1693,7 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
    
    #if {$do_css} {set L_rep [CSS++ cr [lindex $r 0]]}
    if {$do_css} {
-     #puts "  Parsed CSS : [lindex $r 0]"
+     # puts "  Parsed_CSS++ cr {[lindex $r 0]}"
 	 set L_rep [Parsed_CSS++ cr [lindex $r 0]]
 	 #puts "[lindex $r 0]\n$L_rep"
 	}
@@ -1702,6 +1702,7 @@ proc Update_style_parsed_CSS {dsl_q dsl_css L_fct CSS current {L_mapping ""} {L_
    
    foreach op [lindex $r 1] {
      lassign $op op_type op_fct_name val op_cond
+	 # puts "$op_type $op_fct_name $val $op_cond"
 	 #set val [lindex $op 2]
 
 	 switch $op_type {
@@ -2866,6 +2867,10 @@ method Physical_model set_L_mothers {l} {set this(L_mothers) $l; return $l}
 #_________________________________________________________________________________________________________
 method Physical_model get_cmd_placement {}  {return $this(cmd_placement)}
 method Physical_model set_cmd_placement {c} {set this(cmd_placement) $c}
+
+#_________________________________________________________________________________________________________
+method Physical_model soft_type {} {return [${objName}_cou_ptf get_soft_type]}
+
 #_________________________________________________________________________________________________________
 method Physical_model get_or_create_prims {root} {return [this get_prim_handle]}
 method Physical_model Add_prim_mother   {c Lprims {index -1}} {return 1}
