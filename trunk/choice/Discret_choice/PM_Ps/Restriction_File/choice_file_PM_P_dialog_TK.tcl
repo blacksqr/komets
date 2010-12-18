@@ -53,10 +53,11 @@ method Choice_file_PM_P_dialog_TK get_or_create_prims {root} {
 method Choice_file_PM_P_dialog_TK maj_choices        {}   {}
 
 #___________________________________________________________________________________________________________________________________________
-method Choice_file_PM_P_dialog_TK activate {} {
- if {![winfo exists $this(root_of_prim)]} {return}
+method Choice_file_PM_P_dialog_TK prim_activate {} {
+ #if {![winfo exists $this(root_of_prim)]} {return}
  set mult [expr [this get_nb_max_choices] > 1]
  set LC  [this get_LC]
  set txt [$LC get_name]
- $LC set_currents [tk_getOpenFile -title $txt -multiple $mult -parent $this(root_of_prim)]
+ # this prim_set_currents [tk_getOpenFile -title $txt -multiple $mult -parent $this(root_of_prim)]
+ this prim_set_currents [tk_getOpenFile -title $txt -multiple $mult]
 }

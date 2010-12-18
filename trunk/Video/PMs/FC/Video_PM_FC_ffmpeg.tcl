@@ -48,7 +48,12 @@ Generate_PM_setters Video_PM_FC_ffmpeg [P_L_methodes_set_Video_FC_COMET_RE]
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg Play  {} {
- if {!$this(will_reupdate)} {this Update_frame}
+ if {!$this(will_reupdate)} {
+     set ms [clock milliseconds]
+	 this set_ffmpeg_start_ms [expr round($ms - 1000 * [this get_ffmpeg_frame_num] / double($this(ffmpeg_frame_rate)) )]
+	 # puts "Reset start ms to [this get_ffmpeg_start_ms] = $ms - 1000 * [this get_ffmpeg_frame_num] / double($this(ffmpeg_frame_rate)"
+	 this Update_frame
+	}
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -66,8 +71,10 @@ Inject_code Video_PM_FC_ffmpeg go_to_time {} {
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
  if {[this get_video_source] != "WEBCAM" && $this(ffmpeg_id) != "" && [this get_video_source] != ""} {
+   set ms [clock milliseconds]
+   this set_ffmpeg_start_ms [expr round($ms - 1000 * $nb / double($this(ffmpeg_frame_rate)) )]
    FFMPEG_Info_for_sound_Drain_all $this(ffmpeg_id)
-   set this(ffmpeg_frame_num) $nb
+   set this(ffmpeg_frame_num) $nb; [this get_Common_FC] set_num_frame $nb
    lassign [this get_readable_video_buffer] current_video_pts buf_r
    FFMPEG_Lock       $this(ffmpeg_id)
    FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r
@@ -75,6 +82,7 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
    this Fill_video_pool
   }
 }
+# Trace Video_PM_FC_ffmpeg go_to_frame
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg set_resolution {x y} {
@@ -181,7 +189,7 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
  if {$force_update || $num != [this get_ffmpeg_frame_num]} {
    # get images and put them from readable buffer
    lassign [this get_readable_video_buffer] current_video_pts buf_r
-   this set_ffmpeg_frame_num        $num
+   this set_ffmpeg_frame_num        $num; [this get_Common_FC] set_num_frame $num
    this set_last_buffer             $buf_r
    this prim_Update_image           $buf_r
  

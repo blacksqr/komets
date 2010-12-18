@@ -22,7 +22,9 @@ method CometMediaPlayer_CFC is_playing { } {return $this(play)}
 method CometMediaPlayer_CFC Next     {} {}
 method CometMediaPlayer_CFC Previous {} {}
 
+method CometMediaPlayer_CFC go_to_frame {v} {}
+
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_get_CometMediaPlayer {} {return [list {get_L_medias {}} {Contains_L_medias {v}} {Index_of_L_medias {v}} {is_playing {}} {get_media_source { }} {get_audio_channel { }} {get_volume { }} ]}
-proc P_L_methodes_set_CometMediaPlayer {} {return [list {Play {v}} {Next {}} {Previous {}} {set_L_medias {L}} {Add_L_medias {L}} {Sub_L_medias {L}} {set_media_source {v}} {set_audio_channel {v}} {set_volume {v}} ]}
+proc P_L_methodes_set_CometMediaPlayer {} {return [list {go_to_frame {v}} {Play {v}} {Next {}} {Previous {}} {set_L_medias {L}} {Add_L_medias {L}} {Sub_L_medias {L}} {set_media_source {v}} {set_audio_channel {v}} {set_volume {v}} ]}
 

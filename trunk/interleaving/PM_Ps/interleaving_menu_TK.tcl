@@ -24,12 +24,10 @@ method Interleaving_PM_P_menu_TK get_or_create_prims {root} {
  #puts "  $objName : Toplevel trouvé dans $top"
 # Define the handle
  set menu_name "$top.menu_system"
- #puts "  $objName : Menu = \"$menu_name\""
- if {![winfo exists $menu_name]} {
-   menu $menu_name
-   set this(pipo_frame) "$top.pipo_frame"
-   frame $this(pipo_frame)
-  }
+ if {![winfo exists $menu_name]} {menu $menu_name}
+ set this(pipo_frame) "$top.pipo_frame_$objName"
+ if {![winfo exists $this(pipo_frame)]} {frame $this(pipo_frame)}
+ 
  if {![winfo exists $menu_name._$objName]} {
    menu $menu_name._$objName -tearoff 0
   }
@@ -49,6 +47,14 @@ Methodes_set_LC Interleaving_PM_P_menu_TK [P_L_methodes_set_CometInterleaving] {
 Methodes_get_LC Interleaving_PM_P_menu_TK [P_L_methodes_get_CometInterleaving] {}
 
 #___________________________________________________________________________________________________________________________________________
+method Interleaving_PM_P_menu_TK Update_menu_label {C tk_menu new_name} {
+	if {[winfo exists $tk_menu]} {
+		 set i [$tk_menu  index [$C get_name]]
+		 $tk_menu entryconfigure $i -label $new_name
+		} else {$C UnSubscribe_to_set_name $objName}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_menu_TK maj_interleaved_daughters {} {
  set LC [this get_LC]
  set L_comets [$LC get_out_daughters]
@@ -59,6 +65,7 @@ method Interleaving_PM_P_menu_TK maj_interleaved_daughters {} {
  foreach c [$LC get_out_daughters] {
    if {[catch "$m index \{[$c get_name]\}" res]} {
      $m add command -label [$c get_name]
+	 $c Subscribe_to_set_name $objName "$objName Update_menu_label $c $m \$n" UNIQUE
     }
    $m entryconfigure [$m index [$c get_name]] -command "$objName Connect_to_compatible_PM $c"
   }
@@ -83,6 +90,7 @@ method Interleaving_PM_P_menu_TK get_a_window_for {LC} {
 
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_menu_TK Connect_to_compatible_PM {LC} {
+ # Problem when LC is an activator ?
  set L_PM [CSS++ $objName "#${LC}->PMs \\<--< $objName/"]
  if {$L_PM == ""} {
    puts "  $objName Interleaving_PM_P_menu_TK::Connect_to_compatible_PM $LC\n    Impossible to find a PM of $LC descendant of $objName"
@@ -91,8 +99,10 @@ method Interleaving_PM_P_menu_TK Connect_to_compatible_PM {LC} {
  this maj_interleaved_daughters
  # Can we trigger an activate method?
  foreach PM $L_PM {
+   set LC [$PM get_LC]
+   if {[$LC Has_MetaData TRIGGERABLE_ITEM]} {set PM [CSS++ $objName "#$PM [$LC Val_MetaData TRIGGERABLE_ITEM]"]}
    set L_methods [gmlObject info methods $PM]
-   if {[lsearch $L_methods activate] >= 0} {$PM prim_activate; return;}
+   if {[lsearch $L_methods prim_activate] >= 0} {$PM prim_activate; return;}
   }
   
  # create a windows, connect to PM
