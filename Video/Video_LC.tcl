@@ -33,6 +33,9 @@ Methodes_set_LC CometVideo [P_L_methodes_set_Video] {$this(FC)} {$this(L_LM)}
 Methodes_get_LC CometVideo [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
+Manage_CallbackList CometVideo [list Update_image] end
+
+#___________________________________________________________________________________________________________________________________________
 Inject_code CometVideo set_video_source {
  this set_audio_canal $audio_canal
 } {}

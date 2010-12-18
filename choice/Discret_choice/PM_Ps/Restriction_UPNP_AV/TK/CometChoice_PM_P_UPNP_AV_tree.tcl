@@ -213,7 +213,7 @@ method CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from {UDN service parent
 		} else  {$this(tree) delete [$this(tree) children $tree_id]
 				}
 	if {$parent_tree_id == ""} {set this(tree_id_of,$UDN) $tree_id}
-	$this(tree) tag bind $tree_id <ButtonPress-1> [list $objName Update_items_with $tree_id]
+	$this(tree) tag bind $tree_id <ButtonPress-1> [list $objName Update_items_with [string map [list "%" "%%"] $tree_id]]
 	
 	$this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item $UDN $service $object_id \$UPNP_res"
 }
@@ -221,7 +221,7 @@ method CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from {UDN service parent
 #___________________________________________________________________________________________________________________________________________
 method CometChoice_PM_P_UPNP_AV_tree Update_item {UDN service object_id rep} {
 	if {[dict exists $rep Result]} {
-		set xml [dict get $rep Result]
+		set xml [string map [list "&" "&amp;"] [dict get $rep Result]]
 		if {[catch {set doc [dom parse $xml]} err]} {
 			 puts "Error in $objName CometChoice_PM_P_UPNP_AV_tree::Update_item $UDN $object_id\n$err\n________________________________________\n$xml"
 			} else  {set root [$doc documentElement]; set ns_root [$root namespace]

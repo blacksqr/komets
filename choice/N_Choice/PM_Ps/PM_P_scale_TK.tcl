@@ -64,17 +64,17 @@ method PM_P_scale_TK maj_choices        {{force 0}}   {
 #___________________________________________________________________________________________________________________________________________
 method PM_P_scale_TK set_b_inf {v} {
  this inherited $v
- this maj_choices
+ if {[winfo exists $this(scale_name)]} {$this(scale_name) configure -from $v}
 }
 #___________________________________________________________________________________________________________________________________________
 method PM_P_scale_TK set_b_sup {v} {
  this inherited $v
- this maj_choices
+ if {[winfo exists $this(scale_name)]} {$this(scale_name) configure -to $v}
 }
 #___________________________________________________________________________________________________________________________________________
 method PM_P_scale_TK set_step  {v} {
  this inherited $v
- this maj_choices
+ if {[winfo exists $this(scale_name)]} {$this(scale_name) configure -resolution $v}
 }
 #___________________________________________________________________________________________________________________________________________
 method PM_P_scale_TK set_val  {v} {

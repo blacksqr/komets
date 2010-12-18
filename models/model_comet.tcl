@@ -328,7 +328,7 @@ proc Manage_CallbackList {c L_m pos args} {
    eval $cmd
 # Generate the callback mechanism
    set    cmd_to_trigger "  foreach CB \$this(L_CB_$m) {\n"
-   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for $m\\n  \$err\"}\n"
+   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for \$objName $m\\n  \$err\"}\n"
    append cmd_to_trigger "   }\n"
    set cmd "method $c $m \{$L_args\} \{\n"
      if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
@@ -1105,6 +1105,7 @@ method Comet_element get_objName {} {return $objName}
 #_________________________________________________________________________________________________________
 method Comet_element get_name {}   {return $this(name)}
 method Comet_element set_name {n}  {set this(name) $n; return $n}
+Manage_CallbackList Comet_element [list set_name] begin
 
 #_________________________________________________________________________________________________________
 method Comet_element get_descr {}  {return $this(descr)}

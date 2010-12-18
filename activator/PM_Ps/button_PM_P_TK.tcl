@@ -37,7 +37,7 @@ Manage_CallbackList Activator_PM_P_button_TK Trigger_prim_activate begin
 #___________________________________________________________________________________________________________________________________________
 method Activator_PM_P_button_TK get_or_create_prims {root} {
  set this(b) "$root.tk_${objName}_button"
- if {[winfo exists $this(b)]} {} else {
+ if {![winfo exists $this(b)]} {
    button $this(b) -text [this get_text]
   }
  this set_root_for_daughters $root
