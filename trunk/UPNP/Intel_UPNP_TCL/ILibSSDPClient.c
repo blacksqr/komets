@@ -83,6 +83,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 	char* UDN = NULL;
 	int Timeout = 0;
 	int Alive = 0;
+	int info_Alive = 0;
 	int OK;
 	int rt;
 	
@@ -92,6 +93,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 		FREE(buffer);
 		return;
 	}
+	//printf("SSDP : %s\n", buffer);
 	packet = ILibParsePacketHeader(buffer,0,bytesRead);
 	
 	if(packet->Directive==NULL)
@@ -138,6 +140,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 		{
 			OK = 0;
 			rt = 0;
+			info_Alive = 0;
 			node = packet->FirstField;
 			while(node!=NULL)
 			{
@@ -162,12 +165,12 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 				{
 					if(strncasecmp(node->FieldData,"ssdp:alive",10)==0)
 					{
-						Alive = -1;
+						Alive = -1; info_Alive = 1;
 						rt = 0;
 					}
 					else
 					{
-						Alive = 0;
+						Alive = 0; info_Alive = 1;
 						OK = 0;
 					}
 				}
@@ -193,7 +196,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 				}
 				node = node->NextField;
 			}
-			if(OK!=0 || rt!=0)
+			if(OK!=0 || rt!=0 || info_Alive==1)
 			{
 				if(module->FunctionCallback!=NULL)
 				{

@@ -186,13 +186,15 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
  upvar $msg_name msg
- # puts "\tnew_UPNP_message"
+ puts "\tnew_UPNP_message"
  set UDN_val [lassign $msg cmd UDN]
  switch $cmd {
 	Device_added   {puts "\tAdd $UDN"
 					this prim_set_item_of_dict_devices $UDN $UDN_val
 				   }
-	Device_removed {this prim_remove_item_of_dict_devices $UDN}
+	Device_removed {puts "\tSub $UDN"
+				    this prim_remove_item_of_dict_devices $UDN
+				   }
 	         ERROR {puts "ERROR :\n$msg"}
 	}
 }

@@ -81,7 +81,6 @@ proc get_xml_from {ad {t 5000}} {
 	#___________________________________________________________________________________________________________________________________________
 	proc new_UPNP_message {msg_name} {
 	  upvar $msg_name msg
-	  
 	  if {[dict get $msg Alive] != 0} {
 		Device_added $msg
 	   } else {Device_removed $msg}

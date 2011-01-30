@@ -89,7 +89,10 @@ method Video_PM_FC_ffmpeg set_resolution {x y} {
  if {[this get_video_source] == "WEBCAM"} {
    if {[catch {$this(visu_cam) set_resolution $x $y} err]} {
      error "Error while setting the resolution in \"$objName set_resolution $x $y\""
-    }
+    } else {if {$x != [$this(visu_cam) L] || $y != [$this(visu_cam) H]} {
+				 [this get_Common_FC] set_resolution [$this(visu_cam) L] [$this(visu_cam) H]
+				}
+		   }
   }
 }
 
