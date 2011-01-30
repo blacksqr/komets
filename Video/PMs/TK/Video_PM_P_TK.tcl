@@ -13,7 +13,7 @@ method Video_PM_P_TK constructor {name descr args} {
     
    this set_GDD_id CT_Video_AUI_CUI_basic_B207
  
- set this(play_audio_stream)     0 
+ set this(play_audio_stream)     0
  set this(play_video_stream)     1
  
  set this(img_has_to_be_updated) 0
@@ -42,8 +42,8 @@ method Video_PM_P_TK get_or_create_prims {root} {
  set this(lab) "$root.tk_${objName}_label"
  if {![winfo exists $this(lab)]} {
    if {$this(photo) == ""} {
-     set tx [this get_video_width]
-     set ty [this get_video_height]
+     set tx [this get_video_width] ; set this(photo_tx) $tx
+     set ty [this get_video_height]; set this(photo_ty) $ty
      set this(photo) [image create photo -format "raw -max 255 -nomap 1" -width $tx -height $ty]
     }
    label $this(lab) -image $this(photo)
@@ -70,12 +70,13 @@ Inject_code Video_PM_P_TK Update_image {} {
    set buf_name buf_video_for_Video_PM_P_TK_of_[this get_LC]
    global $buf_name
    
-   set $buf_name $this(entete)
-   FFMPEG_Convert_void_to_binary_tcl_var $buffer [expr 3 * $tx * $ty] $buf_name 1
-   $this(photo) put [subst $$buf_name] -format "raw -max 255 -nomap 1"
+   Void2Photo $buffer $this(photo) $this(photo_tx) $this(photo_ty) 3
+   #set $buf_name $this(entete)
+   #FFMPEG_Convert_void_to_binary_tcl_var $buffer [expr 3 * $tx * $ty] $buf_name 1
+   #$this(photo) put [subst $$buf_name] -format "raw -max 255 -nomap 1"
   }
 }
-
+# Trace Video_PM_P_TK Update_image
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -119,6 +120,8 @@ Inject_code Video_PM_P_TK set_video_source {}  {
  if {$s != "WEBCAM"} {
    set tx [this get_video_width]
    set ty [this get_video_height]
+   set this(photo_tx) $tx
+   set this(photo_ty) $ty
 
    set    this(entete) "Magic=RAW\n"
    append this(entete) "Width=$tx\n"
@@ -139,4 +142,4 @@ Inject_code Video_PM_P_TK set_video_source {}  {
   }
 }
 
-
+Trace Video_PM_P_TK set_video_source

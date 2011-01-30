@@ -220,16 +220,19 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
                                  foreach param $params {#// Managing the parameters
                                                         append cmd $param " "}
                               append cmd "\} \{"
-                                if {[string equal $o_reference {}]} {} else {
+                                if {$o_reference != ""} {
                                   append cmd $o_reference { } $methode_name { }
                                     foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] " "}
                                   append cmd ";\n"
                                  }
                                 #// Default comportment is to call equivalent function for each element of the list attrib_L
                                 if {[llength $attrib_L]} {
-                                  append cmd {foreach LM } $attrib_L { } "\{" {$LM } $methode_name { }
-                                    foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] { }}
-                                  append cmd "\}"
+								  append cmd {foreach LM } $attrib_L { } "\{" {$LM } $methode_name { }
+								  foreach param $params {append cmd {$} [lindex [lindex $param 0] 0] { }}
+								  set mark "UPDATE_PARAMS"
+								  append cmd "\n# <${mark}>"
+								  append cmd "\n# </${mark}>\n"
+								  append cmd "\}"
                                  }
                               append cmd "\}"
                               eval $cmd

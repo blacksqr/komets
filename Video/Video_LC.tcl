@@ -37,5 +37,10 @@ Manage_CallbackList CometVideo [list Update_image] end
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code CometVideo set_video_source {
- this set_audio_canal $audio_canal
+	this set_audio_canal $audio_canal
 } {}
+
+#___________________________________________________________________________________________________________________________________________
+Add_aspect CometVideo set_resolution UPDATE_PARAMS {
+	lassign [$this(FC) get_resolution] x y
+}
