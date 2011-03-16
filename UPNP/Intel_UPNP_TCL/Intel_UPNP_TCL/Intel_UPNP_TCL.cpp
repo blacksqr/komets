@@ -69,7 +69,7 @@ DWORD WINAPI API_INTEL_UPNP_UPnPStackThreadRun(LPVOID args)
 {	//Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, "puts {ILibStartChain started}");
 	printf("ILibStartChain\n"); 
 	ILibStartChain(API_INTEL_UPNP_chain);
-	Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, "puts {ILibStartChain ended}");
+	//Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, "puts {ILibStartChain ended}");
 	printf("End of ILibStartChain\n");
 	API_INTEL_UPNP_chain = NULL;
 	return 0;

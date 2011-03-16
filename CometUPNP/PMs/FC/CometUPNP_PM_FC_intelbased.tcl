@@ -178,7 +178,7 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 		  set this(${chan},msg) [string range $this(${chan},msg) $this(${chan},msg_attended_length) end]
 		  set this(${chan},msg_attended_length) -1
 		  
-		  this new_UPNP_message msg
+		  if {[catch {this new_UPNP_message msg} err]} {puts "ERROR while receiving new message :\n\tmsg : $msg\n\terr : $err"}
 		 } else {break}
   }
 }
@@ -186,14 +186,14 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
  upvar $msg_name msg
- puts "\tnew_UPNP_message"
+ # puts "\tnew_UPNP_message"
  set UDN_val [lassign $msg cmd UDN]
  switch $cmd {
-	Device_added   {puts "\tAdd $UDN"
+	Device_added   {
 					this prim_set_item_of_dict_devices $UDN $UDN_val
 				   }
-	Device_removed {puts "\tSub $UDN"
-				    this prim_remove_item_of_dict_devices $UDN
+	Device_removed {
+				    if {[catch {this prim_remove_item_of_dict_devices $UDN} err]} {}
 				   }
 	         ERROR {puts "ERROR :\n$msg"}
 	}

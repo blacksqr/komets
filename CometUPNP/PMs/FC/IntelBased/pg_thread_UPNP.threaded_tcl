@@ -3,9 +3,25 @@ package require Thread
 package require http
 
 proc get_xml_from {ad {t 5000}} {
-  set token [::http::geturl $ad -timeout $t]
-  set rep [::http::data $token]
-  ::http::cleanup $token
+  global UPNP_server_D_device_with_pb
+  
+  if {[dict exists $UPNP_server_D_device_with_pb $ad]} {
+	 if {[dict get $UPNP_server_D_device_with_pb $ad] >= 3} {return "BLOC_CALL"}
+	}
+	
+  if {[catch {set token [::http::geturl $ad -timeout $t]} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
+																 return ""
+																}
+  switch [::http::status $token] {
+	 ok      {set rep [::http::data $token]}
+	 default {if {![dict exists $UPNP_server_D_device_with_pb $ad]} {
+				 dict set UPNP_server_D_device_with_pb $ad 1
+				} else {dict set UPNP_server_D_device_with_pb $ad [expr 1 + [dict get $UPNP_server_D_device_with_pb $ad]]
+				       }
+	          set rep "BLOC_CALL"
+			 }
+	}
+  if {[catch {::http::cleanup $token} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  pb cleaning up $token"]}
   
   return $rep
 }
@@ -49,13 +65,26 @@ proc get_xml_from {ad {t 5000}} {
 	#___________________________________________________________________________________________________________________________________________
 	#___________________________________________________________________________________________________________________________________________
 	proc New_connection {sock ad port} {
-	 fconfigure $sock -blocking 0 
-	 fileevent  $sock readable [list Read_from_socket $sock]
+	 global reading_sock_$sock 
+	 set reading_sock_$sock 0
+	 fconfigure $sock -blocking 0
+	 fileevent  $sock readable [list Read_from_socket $sock ""]
 	}
 
 	#___________________________________________________________________________________________________________________________________________
-	proc Read_from_socket {sock} {
-	 append UPNP_server_sock_data [read $sock]
+	proc Read_from_socket {sock D_msg} {
+	 global reading_sock_$sock
+	 if {[set reading_sock_$sock]} {
+	     # puts "_____________________________________________\n-> We are still dealing with messages !!!!!\n\n"
+		 incr reading_sock_$sock
+		 return
+		}
+	 set reading_sock_$sock 1
+	 if {[catch {append UPNP_server_sock_data [read $sock]} err]} {
+		 send_msg_to_comet [list ERROR $err]
+		 close $sock
+		 unset reading_sock_$sock
+		}
 	 
 	 while {1} {
 		 # Read required message length if necessary
@@ -73,23 +102,36 @@ proc get_xml_from {ad {t 5000}} {
 			  set UPNP_server_sock_data [string range $UPNP_server_sock_data $UPNP_server_required_packet_length end]
 			  set UPNP_server_required_packet_length -1
 			  
-			  if {[catch {new_UPNP_message msg} err]} {send_msg_to_comet [list ERROR $err]}
+			  dict set D_msg [dict get $msg UDN] $msg
 			 } else {break}
 	  }
+	  
+	  if {[set reading_sock_$sock] > 1} {
+	     set reading_sock_$sock 0
+		 Read_from_socket $sock $D_msg
+		} else {
+				# Call
+				dict for {UDN msg} $D_msg {
+					 if {[catch {new_UPNP_message msg} err]} {send_msg_to_comet [list ERROR $err]}
+					}
+			   }
+	  set reading_sock_$sock 0
 	}
 
 	#___________________________________________________________________________________________________________________________________________
 	proc new_UPNP_message {msg_name} {
 	  upvar $msg_name msg
 	  if {[dict get $msg Alive] != 0} {
-		Device_added $msg
-	   } else {Device_removed $msg}
+		if {[catch {Device_added $msg} err]} {send_msg_to_comet [list ERROR [list "Device_added $msg" $err]]}
+	   } else {if {[catch {Device_removed $msg} err]} {send_msg_to_comet [list ERROR [list "Device_removed $msg" $err]]}
+	          }
 	}
 
 	#___________________________________________________________________________________________________________________________________________
 	#___________________________________________________________________________________________________________________________________________
 	#___________________________________________________________________________________________________________________________________________
 	proc Device_added {L} {
+	 # puts "-> Device_added"
 	 set UDN [dict get $L UDN]
 	 regexp {^uuid:(.*)$} $UDN reco UDN
 	 if {[dict exists $L LocationURL]} {set new_location 1} else {set new_location 0}
@@ -101,12 +143,16 @@ proc get_xml_from {ad {t 5000}} {
 	   dict set UPNP_server_L_devices $UDN [dict merge [dict get $UPNP_server_L_devices $UDN] $L]
 	  } else {dict set UPNP_server_L_devices $UDN $L}
 
+	 # puts "  -> gogo thread" 
 	 # Thread the loading of the related XML document
 	 if {$new_location} {
+	   # puts "  -> new location" 
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
-	   set_description_from_thread $UDN str_xml
-	  }
-	  
+	   if {$str_xml != "BLOC_CALL"} {set_description_from_thread $UDN str_xml}
+	  } else {set ms [clock milliseconds]
+	          # puts "  -> old location" 
+	          dict set UPNP_server_L_devices $UDN last_beat $ms
+			 }
 	}
 
 	#___________________________________________________________________________________________________________________________________________
@@ -148,7 +194,7 @@ proc get_xml_from {ad {t 5000}} {
 	 upvar $str_name str
 
 	 if {[catch {set doc [dom parse $str]} err]} {
-	   send_msg_to_comet  "ERROR parsing xml from $UDN [list $err]"
+	   send_msg_to_comet  "ERROR parsing xml in set_description_from_thread from $UDN [list $err $str]"
 	   return
 	  }
 	  
@@ -160,6 +206,22 @@ proc get_xml_from {ad {t 5000}} {
 	  }
 	  
 	 $doc delete
+	}
+	
+	#___________________________________________________________________________________________________________________________________________
+	proc Is_still_alive {UDN last_ms} {
+		# puts "Is_still_alive $UDN"
+		global UPNP_server_L_devices
+		
+		set ms        [clock milliseconds]
+		set timeout   [dict get $UPNP_server_L_devices $UDN Timeout]
+		set last_beat [dict get $UPNP_server_L_devices $UDN last_beat]
+		# puts "\tms : $ms\n\ttimeout : $timeout\n\tlast_beat : $last_beat\n\tlast_ms : $last_ms"
+		if {$last_beat <= $last_ms} {
+			 # Sub the device
+			 Device_removed [dict create UDN $UDN]
+			} else {after [expr 1000*$timeout - ($ms - $last_beat)] "Is_still_alive $UDN $last_beat"
+				   }
 	}
 	 
 	#___________________________________________________________________________________________________________________________________________
@@ -196,14 +258,19 @@ proc get_xml_from {ad {t 5000}} {
 	 dict set UDN_val ServiceList $ServiceList
 
 	# Update the dict of devices 
+	 set ms [clock milliseconds]
+	 dict set UDN_val last_beat $ms
 	 dict set UPNP_server_L_devices $UDN $UDN_val
+	 if {[dict exists $UPNP_server_L_devices $UDN Timeout]} {
+		 after [expr 1000 * [dict get $UPNP_server_L_devices $UDN Timeout]] "Is_still_alive $UDN $ms"
+		}
 	 
 	# Load xml description
 	 foreach {UDN service_id SCPDURL} $L_xml_descr_service {
 	   set ad [get_ip_ad_from_locationURL $UDN];
 	   if {[string index $SCPDURL 0] != "/"} {append ad "/" $SCPDURL} else {append ad $SCPDURL}
 	   set str_xml [get_xml_from $ad]
-	   set_service_description $UDN $service_id str_xml
+	   if {$str_xml != "BLOC_CALL"} {set_service_description $UDN $service_id str_xml}
 	  }
 
 	 # Send device description
@@ -214,7 +281,7 @@ proc get_xml_from {ad {t 5000}} {
 	proc set_service_description {UDN service_id data_name} {
 	 upvar $data_name data
 	 if {[catch {set doc [dom parse $data]} err]} {
-	   send_msg_to_comet "ERROR in parsing xml from $UDN [list $err $data]"
+	   send_msg_to_comet "ERROR in parsing xml in set_service_description from $UDN [list $err $data]"
 	   return
 	  }
 	  
@@ -263,15 +330,13 @@ proc get_xml_from {ad {t 5000}} {
 	 if {[dict exists $UPNP_server_L_devices $UDN]} {
 		 set new [list ]
 		 foreach {U U_val} $UPNP_server_L_devices {
-			 if {$U !=$UDN} {lappend new $U $U_val}
+			 if {$U != $UDN} {lappend new $U $U_val}
 			}
 		 set UPNP_server_L_devices $new
 		 send_msg_to_comet "Device_removed $UDN"
 		}
-
 	}
 
-	
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -287,6 +352,8 @@ proc get_xml_from {ad {t 5000}} {
 	set UPNP_server_mutex       ""
 	set UPNP_server_socket_client ""
 	set UPNP_server_thread_for_retrieving_xml ""
+	
+	set UPNP_server_D_device_with_pb [dict create]
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -294,7 +361,7 @@ proc get_xml_from {ad {t 5000}} {
 set cmd ""
 foreach var [list UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
 append cmd "\n"
-foreach p [list UPNP_server get_ip_ad_from_locationURL send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
+foreach p [list UPNP_server get_ip_ad_from_locationURL Is_still_alive send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
 	set L_args [info args $p]
 	set body   [info body $p]
 	proc $p $L_args "$cmd $body"

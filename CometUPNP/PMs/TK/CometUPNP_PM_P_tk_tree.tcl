@@ -4,7 +4,7 @@ inherit CometUPNP_PM_P_tk_tree PM_TK
 method CometUPNP_PM_P_tk_tree constructor {name descr args} {
  this inherited $name $descr
    this set_GDD_id FUI_CometUPNP_PM_P_tk_tree
-   
+      
    set this(img_device) [image create photo -file $::env(ROOT_COMETS)/Comets/CometUPNP/PMs/icon_device2.png]
    set this(tree_id) 0
  eval "$objName configure $args"
@@ -32,6 +32,12 @@ method CometUPNP_PM_P_tk_tree get_or_create_prims {root} {
 	 foreach {UDN UDN_val} [this get_dict_devices] {
 		 this set_item_of_dict_devices $UDN $UDN_val
 		}
+		
+	 # Define the popup menu dor selecting values in devices and services descriptions
+	 global item_value_selection_in_$objName
+	 if {[winfo exists ._popupMenu_item_selection_$objName]} {destroy ._popupMenu_item_selection_$objName}
+	 set this(popupmenu) [menu ._popupMenu_item_selection_$objName]
+	 $this(popupmenu) add command -label "Copy value to clipboard" -command "clipboard clear; clipboard append \$item_value_selection_in_$objName"
 	} 
  this set_root_for_daughters $this(tk_root)
  return [this set_prim_handle $this(tk_root)]
@@ -50,7 +56,21 @@ Inject_code CometUPNP_PM_P_tk_tree set_item_of_dict_devices {} {
 		 set UDN $keys
 		 set parent_UDN [this get_item_of_dict_devices [list $UDN parent_UDN]]
 		 if {$parent_UDN != $UDN} {set parent_id $parent_UDN} else {set parent_id ""}
-		 $this(tree) insert $parent_id end -id $UDN -tags $UDN -image $this(img_device) -text [this get_item_of_dict_devices [list $UDN friendlyName]]
+		 
+		 # Search position to insert
+		 set pos_insert 0; set L_UDN_name [list]
+		 dict for {U U_descr} [this get_dict_devices] {
+			 lappend L_UDN_name [list $U [dict get $U_descr friendlyName]]
+			}
+		 set L_UDN_name [lsort -index 1 -ascii $L_UDN_name]
+		 set pos_insert [lsearch -index 0 $L_UDN_name $UDN]
+		 #insert
+		 
+		 if {[$this(tree) exists $UDN]} {$this(tree) delete $UDN}
+		 if {$parent_id != "" && ![$this(tree) exists $parent_id]} {
+			 this set_item_of_dict_devices $parent_id ""
+			}
+		 $this(tree) insert $parent_id $pos_insert -id $UDN -tags $UDN -image $this(img_device) -text [this get_item_of_dict_devices [list $UDN friendlyName]]
 		 $this(tree) tag bind $UDN <ButtonPress-1> [list $objName Display_UDN $UDN]
 		 foreach {service_id service_descr} [this get_item_of_dict_devices [list $UDN ServiceList]] {
 			 set s_id ${UDN}_$service_id 
@@ -67,12 +87,34 @@ Inject_code CometUPNP_PM_P_tk_tree set_item_of_dict_devices {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_P_tk_tree Display_UDN {UDN} {
-
+	destroy $this(f_for_widgets)
+	frame $this(f_for_widgets); pack $this(f_for_widgets) -expand 1 -fill both
+	
+	foreach e [list UDN LocationURL Timeout deviceType friendlyName modelDescription modelName modelURL presentationURL baseURL IP_port] {
+		 if {[dict exists [this get_dict_devices] $UDN $e]} {
+			 set value [dict get [this get_dict_devices] $UDN $e]
+			 set f [frame $this(f_for_widgets).f_$e]; pack $f -fill x; 
+			 set l [label ${f}._lab -anchor w  -text "$e : $value"]; pack $l -side left -expand 1 -fill x
+			 # contextual menu
+			 bind $l <3> "set item_value_selection_in_$objName \[list $value\]; tk_popup $this(popupmenu) %X %Y"
+			}
+		}
 }
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_P_tk_tree Display_service {UDN s_id} {
+	destroy $this(f_for_widgets)
+	frame $this(f_for_widgets); pack $this(f_for_widgets) -expand 1 -fill both
 
+	foreach e [list serviceType serviceId SCPDURL controlURL eventSubURL] {
+		 if {[dict exists [this get_dict_devices] $UDN ServiceList $s_id $e]} {
+			 set value [dict get [this get_dict_devices] $UDN ServiceList $s_id $e]
+			 set f [frame $this(f_for_widgets).f_$e]; pack $f -fill x; 
+			 set l [label ${f}._lab -anchor w -text "$e : $value"]; pack $l -side left -expand 1 -fill x
+			 # contextual menu
+			 bind $l <3> "set item_value_selection_in_$objName \[list $value\]; tk_popup $this(popupmenu) %X %Y"
+			}
+		}
 }
 
 #___________________________________________________________________________________________________________________________________________
