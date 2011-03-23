@@ -93,9 +93,9 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 		FREE(buffer);
 		return;
 	}
-	//printf("SSDP : %s\n", buffer);
+	//printf("SSDP (%d bytes): %s\n", bytesRead, buffer);
 	packet = ILibParsePacketHeader(buffer,0,bytesRead);
-	
+	//printf("Finish parsing...\n");
 	if(packet->Directive==NULL)
 	{
 		/* M-SEARCH Response */
@@ -135,10 +135,39 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 	}
 	else
 	{
+		/* M-SEARCH Packet */
+		if(strncasecmp(packet->Directive,"M-SEARCH",8)==0)
+		{node = packet->FirstField;
+		 while(node!=NULL)
+			{node->Field[node->FieldLength] = '\0';
+			 if(strncasecmp(node->Field,"HOST",4)==0 && node->FieldLength==4) {
+				 node->FieldData[node->FieldDataLength] = '\0';
+
+				 //printf("HOST : %s", node->FieldData);
+				}
+			 if(strncasecmp(node->Field,"MAN",3)==0 && node->FieldLength==3) {
+				 node->FieldData[node->FieldDataLength] = '\0';
+				 //printf("MAN : %s", node->FieldData);
+				}
+			 if(strncasecmp(node->Field,"MX",2)==0 && node->FieldLength==2) {
+				 node->FieldData[node->FieldDataLength] = '\0';
+				 //printf("MX : %s", node->FieldData);
+				}
+			 if(strncasecmp(node->Field,"ST",2)==0 && node->FieldLength==2) {
+				 node->FieldData[node->FieldDataLength] = '\0';
+				 Location = node->FieldData;
+				 //printf("ST : %s", node->FieldData);
+				}
+			// Next field
+			 node = node->NextField;
+			}
+
+		 module->FunctionCallback(module, "M-SEARCH", 1, Location, 0, module->Reserved);
+		}
+
 		/* Notify Packet */
 		if(strncasecmp(packet->Directive,"NOTIFY",6)==0)
-		{
-			OK = 0;
+		{	OK = 0;
 			rt = 0;
 			info_Alive = 0;
 			node = packet->FirstField;
@@ -362,7 +391,7 @@ void* ILibCreateSSDPClientModule(void *chain, char* DeviceURN, int DeviceURNLeng
 	for(i=0;i<RetVal->NumIPAddress;++i)
 	{
 		interface_addr.s_addr = RetVal->IPAddress[i];
-		printf("Send SSDP search message to %d\n", RetVal->IPAddress[i]);
+		//printf("Send SSDP search message to %d\n", RetVal->IPAddress[i]);
 		if (setsockopt(RetVal->MSEARCH_Response_Socket, IPPROTO_IP, IP_MULTICAST_IF,(char*)&interface_addr, sizeof(interface_addr)) == 0)
 		{
 			sendto(RetVal->MSEARCH_Response_Socket, buffer, bufferlength, 0, (struct sockaddr *) &dest_addr, sizeof(dest_addr));

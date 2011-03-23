@@ -17,7 +17,7 @@ extern "C" {
 
 //_______________________________________________________________________________________________________________
 Tcl_Interp        *API_INTEL_UPNP_TCL_tcl_interp;
-std::string        API_INTEL_UPNP_TCL_cmd_DeviceAdded, API_INTEL_UPNP_TCL_cmd_DeviceRemoved;
+std::string        API_INTEL_UPNP_TCL_cmd_DeviceAdded, API_INTEL_UPNP_TCL_cmd_DeviceRemoved, API_INTEL_UPNP_TCL_cmd_MSEARCH;
 void*              API_INTEL_UPNP_chain;
 
 #include "SWIG/intel_upnp_tcl_wrap.cxx"
@@ -30,23 +30,24 @@ DWORD WINAPI API_INTEL_UPNP_UPnPStackThreadRun(LPVOID args);
 //_______________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________
-const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_SearchComplete);
+const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_MSearch, const char *cmd_SearchComplete);
 
 //_______________________________________________________________________________________________________________
-const char* INTEL_UPNP_listener_start_sync(char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_SearchComplete)
-{return INTEL_UPNP_start(true, typeURI, cmd_DeviceAdded, cmd_DeviceRemoved, cmd_SearchComplete);
+const char* INTEL_UPNP_listener_start_sync(char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_MSearch, const char *cmd_SearchComplete)
+{return INTEL_UPNP_start(true, typeURI, cmd_DeviceAdded, cmd_DeviceRemoved, cmd_MSearch, cmd_SearchComplete);
 }
 
 //_______________________________________________________________________________________________________________
-const char* INTEL_UPNP_listener_start(char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_SearchComplete)
-{return INTEL_UPNP_start(false, typeURI, cmd_DeviceAdded, cmd_DeviceRemoved, cmd_SearchComplete);
+const char* INTEL_UPNP_listener_start(char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_MSearch, const char *cmd_SearchComplete)
+{return INTEL_UPNP_start(false, typeURI, cmd_DeviceAdded, cmd_DeviceRemoved, cmd_MSearch, cmd_SearchComplete);
 }
 
 //_______________________________________________________________________________________________________________
-const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_SearchComplete)
+const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_DeviceAdded, const char *cmd_DeviceRemoved, const char *cmd_MSearch, const char *cmd_SearchComplete)
 {INTEL_UPNP_listener_set_cmd_DeviceAdded  (cmd_DeviceAdded);
  INTEL_UPNP_listener_set_cmd_DeviceRemoved(cmd_DeviceRemoved);
- 
+ INTEL_UPNP_listener_set_cmd_MSEARCH      (cmd_MSearch);
+
  if(API_INTEL_UPNP_chain) {
 	 ILibStopChain(API_INTEL_UPNP_chain);
 	} 
@@ -67,10 +68,10 @@ const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_Dev
 //_______________________________________________________________________________________________________________
 DWORD WINAPI API_INTEL_UPNP_UPnPStackThreadRun(LPVOID args)
 {	//Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, "puts {ILibStartChain started}");
-	printf("ILibStartChain\n"); 
+	//printf("ILibStartChain\n"); 
 	ILibStartChain(API_INTEL_UPNP_chain);
 	//Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, "puts {ILibStartChain ended}");
-	printf("End of ILibStartChain\n");
+	//printf("End of ILibStartChain\n");
 	API_INTEL_UPNP_chain = NULL;
 	return 0;
 }
@@ -79,11 +80,12 @@ DWORD WINAPI API_INTEL_UPNP_UPnPStackThreadRun(LPVOID args)
 //_______________________________________________________________________________________________________________
 const char* INTEL_UPNP_listener_get_cmd_DeviceAdded  () {return API_INTEL_UPNP_TCL_cmd_DeviceAdded.c_str()  ;}
 const char* INTEL_UPNP_listener_get_cmd_DeviceRemoved() {return API_INTEL_UPNP_TCL_cmd_DeviceRemoved.c_str();}
+const char* INTEL_UPNP_listener_get_cmd_MSEARCH      () {return API_INTEL_UPNP_TCL_cmd_MSEARCH.c_str();}
 
 //_______________________________________________________________________________________________________________
 void INTEL_UPNP_listener_set_cmd_DeviceAdded  (const char *str) {API_INTEL_UPNP_TCL_cmd_DeviceAdded   = str;}
 void INTEL_UPNP_listener_set_cmd_DeviceRemoved(const char *str) {API_INTEL_UPNP_TCL_cmd_DeviceRemoved = str;}
- 
+void INTEL_UPNP_listener_set_cmd_MSEARCH      (const char *str) {API_INTEL_UPNP_TCL_cmd_MSEARCH   = str;}
 
 //_______________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________
@@ -92,7 +94,17 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 {Tcl_DString cmd;
  Tcl_DStringInit(&cmd);
 	if(Alive != 0) {
-		Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_DeviceAdded.c_str(), API_INTEL_UPNP_TCL_cmd_DeviceAdded.length());
+		if (strncasecmp(UDN,"M-SEARCH",8) == 0) {
+			Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_MSEARCH.c_str(), API_INTEL_UPNP_TCL_cmd_MSEARCH.length());
+			Tcl_DStringAppend(&cmd, " {", 2);
+			Tcl_DStringAppendElement(&cmd, "UDN"); Tcl_DStringAppendElement(&cmd, "M-SEARCH");
+			Tcl_DStringAppendElement(&cmd, "ST"); Tcl_DStringAppendElement(&cmd, LocationURL);
+			char *str_cmd = Tcl_DStringAppend(&cmd, "}", 1);
+			Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, str_cmd);
+			Tcl_DStringFree(&cmd);
+			return;
+		} else {Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_DeviceAdded.c_str(), API_INTEL_UPNP_TCL_cmd_DeviceAdded.length());
+			   }
 		} else	{Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_DeviceRemoved.c_str(), API_INTEL_UPNP_TCL_cmd_DeviceRemoved.length());
 				}
 	Tcl_DStringAppend(&cmd, " {", 2);

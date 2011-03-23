@@ -16,7 +16,7 @@ Methodes_set_LC CometUPNP_LM_FC [P_L_methodes_set_CometUPNP] {} {$this(L_actives
 Methodes_get_LC CometUPNP_LM_FC [P_L_methodes_get_CometUPNP] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_set_CometUPNP_COMET_FC_RE {} {return [list {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}}]}
+proc P_L_methodes_set_CometUPNP_COMET_FC_RE {} {return [list {M-SEARCH {ST}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}}]}
 Generate_LM_setters CometUPNP_LM_FC [P_L_methodes_set_CometUPNP_COMET_FC_RE]
 
 #___________________________________________________________________________________________________________________________________________

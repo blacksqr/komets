@@ -282,7 +282,7 @@ method PhysicalHTML_root Read_from_PHP {chan} {
     return
   } else {append this(${chan},msg) [read $chan]
 				  if {$this(${chan},msg_attended_length) == -1} {
-					set pos [string first " " $this(${chan}msg)]
+					set pos [string first " " $this(${chan},msg)]
 				    set this(${chan},msg_attended_length) [string range $this(${chan},msg) 0 [expr $pos - 1]]
 					set this(${chan},msg)                 [string range $this(${chan},msg) [expr $pos + 1] end]
 					#puts " Premier paquet :\n  lg : $this(${chan},msg_attended_length)\n  txt : $this(${chan},msg)"
