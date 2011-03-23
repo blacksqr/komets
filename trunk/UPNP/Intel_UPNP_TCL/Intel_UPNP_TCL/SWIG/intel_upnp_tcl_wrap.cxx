@@ -1737,6 +1737,7 @@ _wrap_INTEL_UPNP_listener_start(ClientData clientData SWIGUNUSED, Tcl_Interp *in
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  char *arg5 = (char *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -1749,9 +1750,12 @@ _wrap_INTEL_UPNP_listener_start(ClientData clientData SWIGUNUSED, Tcl_Interp *in
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  int res5 ;
+  char *buf5 = 0 ;
+  int alloc5 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:INTEL_UPNP_listener_start typeURI cmd_DeviceAdded cmd_DeviceRemoved cmd_SearchComplete ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
+  if (SWIG_GetArgs(interp, objc, objv,"ooooo:INTEL_UPNP_listener_start typeURI cmd_DeviceAdded cmd_DeviceRemoved cmd_MSearch cmd_SearchComplete ",(void *)0,(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
   res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "INTEL_UPNP_listener_start" "', argument " "1"" of type '" "char *""'");
@@ -1772,18 +1776,25 @@ _wrap_INTEL_UPNP_listener_start(ClientData clientData SWIGUNUSED, Tcl_Interp *in
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "INTEL_UPNP_listener_start" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (char *)INTEL_UPNP_listener_start(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  res5 = SWIG_AsCharPtrAndSize(objv[5], &buf5, NULL, &alloc5);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "INTEL_UPNP_listener_start" "', argument " "5"" of type '" "char const *""'");
+  }
+  arg5 = reinterpret_cast< char * >(buf5);
+  result = (char *)INTEL_UPNP_listener_start(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,(char const *)arg5);
   Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return TCL_OK;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return TCL_ERROR;
 }
 
@@ -1794,6 +1805,7 @@ _wrap_INTEL_UPNP_listener_start_sync(ClientData clientData SWIGUNUSED, Tcl_Inter
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  char *arg5 = (char *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -1806,9 +1818,12 @@ _wrap_INTEL_UPNP_listener_start_sync(ClientData clientData SWIGUNUSED, Tcl_Inter
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  int res5 ;
+  char *buf5 = 0 ;
+  int alloc5 = 0 ;
   char *result = 0 ;
   
-  if (SWIG_GetArgs(interp, objc, objv,"oooo:INTEL_UPNP_listener_start_sync typeURI cmd_DeviceAdded cmd_DeviceRemoved cmd_SearchComplete ",(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
+  if (SWIG_GetArgs(interp, objc, objv,"ooooo:INTEL_UPNP_listener_start_sync typeURI cmd_DeviceAdded cmd_DeviceRemoved cmd_MSearch cmd_SearchComplete ",(void *)0,(void *)0,(void *)0,(void *)0,(void *)0) == TCL_ERROR) SWIG_fail;
   res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "INTEL_UPNP_listener_start_sync" "', argument " "1"" of type '" "char *""'");
@@ -1829,18 +1844,25 @@ _wrap_INTEL_UPNP_listener_start_sync(ClientData clientData SWIGUNUSED, Tcl_Inter
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "INTEL_UPNP_listener_start_sync" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (char *)INTEL_UPNP_listener_start_sync(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  res5 = SWIG_AsCharPtrAndSize(objv[5], &buf5, NULL, &alloc5);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "INTEL_UPNP_listener_start_sync" "', argument " "5"" of type '" "char const *""'");
+  }
+  arg5 = reinterpret_cast< char * >(buf5);
+  result = (char *)INTEL_UPNP_listener_start_sync(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,(char const *)arg5);
   Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return TCL_OK;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  if (alloc5 == SWIG_NEWOBJ) delete[] buf5;
   return TCL_ERROR;
 }
 
@@ -1864,6 +1886,19 @@ _wrap_INTEL_UPNP_listener_get_cmd_DeviceRemoved(ClientData clientData SWIGUNUSED
   
   if (SWIG_GetArgs(interp, objc, objv,":INTEL_UPNP_listener_get_cmd_DeviceRemoved ") == TCL_ERROR) SWIG_fail;
   result = (char *)INTEL_UPNP_listener_get_cmd_DeviceRemoved();
+  Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
+  return TCL_OK;
+fail:
+  return TCL_ERROR;
+}
+
+
+SWIGINTERN int
+_wrap_INTEL_UPNP_listener_get_cmd_MSEARCH(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+  char *result = 0 ;
+  
+  if (SWIG_GetArgs(interp, objc, objv,":INTEL_UPNP_listener_get_cmd_MSEARCH ") == TCL_ERROR) SWIG_fail;
+  result = (char *)INTEL_UPNP_listener_get_cmd_MSEARCH();
   Tcl_SetObjResult(interp,SWIG_FromCharPtr((const char *)result));
   return TCL_OK;
 fail:
@@ -1917,14 +1952,39 @@ fail:
 }
 
 
+SWIGINTERN int
+_wrap_INTEL_UPNP_listener_set_cmd_MSEARCH(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  
+  if (SWIG_GetArgs(interp, objc, objv,"o:INTEL_UPNP_listener_set_cmd_MSEARCH str ",(void *)0) == TCL_ERROR) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(objv[1], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "INTEL_UPNP_listener_set_cmd_MSEARCH" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  INTEL_UPNP_listener_set_cmd_MSEARCH((char const *)arg1);
+  
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return TCL_OK;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return TCL_ERROR;
+}
+
+
 
 static swig_command_info swig_commands[] = {
     { SWIG_prefix "INTEL_UPNP_listener_start", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_start, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_start_sync", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_start_sync, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_get_cmd_DeviceAdded", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_DeviceAdded, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_get_cmd_DeviceRemoved", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_DeviceRemoved, NULL},
+    { SWIG_prefix "INTEL_UPNP_listener_get_cmd_MSEARCH", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_MSEARCH, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_set_cmd_DeviceAdded", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_set_cmd_DeviceAdded, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_set_cmd_DeviceRemoved", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_set_cmd_DeviceRemoved, NULL},
+    { SWIG_prefix "INTEL_UPNP_listener_set_cmd_MSEARCH", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_set_cmd_MSEARCH, NULL},
     {0, 0, 0}
 };
 
@@ -2253,12 +2313,12 @@ SWIGEXPORT int SWIG_init(Tcl_Interp *interp) {
   Tcl_Eval(interp, "namespace eval " SWIG_namespace " { }");
 #endif
   
-  API_INTEL_UPNP_TCL_tcl_interp = interp;
-  API_INTEL_UPNP_chain = NULL;
-
   SWIG_InitializeModule((void *) interp);
   SWIG_PropagateClientData();
   
+  API_INTEL_UPNP_TCL_tcl_interp = interp;
+  API_INTEL_UPNP_chain = NULL;
+
   for (i = 0; swig_commands[i].name; i++) {
     Tcl_CreateObjCommand(interp, (char *) swig_commands[i].name, (swig_wrapper_func) swig_commands[i].wrapper,
       swig_commands[i].clientdata, NULL);

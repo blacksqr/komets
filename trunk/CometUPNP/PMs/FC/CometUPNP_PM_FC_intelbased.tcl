@@ -195,6 +195,9 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 	Device_removed {
 				    if {[catch {this prim_remove_item_of_dict_devices $UDN} err]} {}
 				   }
+    M-SEARCH       {
+					this prim_M-SEARCH $UDN
+				   }
 	         ERROR {puts "ERROR :\n$msg"}
 	}
 }
@@ -203,18 +206,22 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
  set id ${UDN},${service},${action}
  if {![info exists this($id)]} {
-    set IP_port       [this get_item_of_dict_devices "$UDN IP_port"]
 	set controlURL    [this get_item_of_dict_devices "$UDN ServiceList $service controlURL"]
-	set URL $IP_port
-		if {[string index $URL end] != "/" && [string index $controlURL 0] != "/"} {append URL "/"}
-		append URL $controlURL
+	if {[string index $controlURL 0] != "/"} {
+		 set URL [this get_item_of_dict_devices "$UDN baseURL"]
+		} else {set URL [this get_item_of_dict_devices "$UDN IP_port"]
+			   }
+	if {[string index $URL end] != "/" && [string index $controlURL 0] != "/"} {append URL "/"}
+	append URL $controlURL
+
 	set prefix_action [this get_item_of_dict_devices "$UDN ServiceList $service serviceType"]
 	set L_params [list]
 	foreach p [this get_children_attributes "$UDN ServiceList $service actions $action"] {
 		 if {[this get_item_of_dict_devices "$UDN ServiceList $service actions $action $p direction"] == "in"} {lappend L_params $p ""}
 		}
+	# puts "::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params {$L_params} -proxy $URL -uri $prefix_action -action ${prefix_action}#$action"
+	::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action
 	set this($id) ${objName}_SOAP_proxy_$id
-	::SOAP::create $this($id) -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action
 	}
 	
  return $this($id) 
