@@ -53,7 +53,7 @@ method CometUPNP_PM_FC_intelbased get_IP {} {
 #__________________________________________________________ UPNP eventing __________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
-	fconfigure $chan -blocking 0
+	fconfigure $chan -blocking 0 -encoding utf-8
 	fileevent  $chan readable [list $objName Eventing_msg $chan]
 }
 
@@ -198,7 +198,7 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
     M-SEARCH       {
 					this prim_M-SEARCH $UDN
 				   }
-	         ERROR {puts "ERROR :\n$msg"}
+	         ERROR {puts "ERROR from UPNP :\n$msg"}
 	}
 }
 

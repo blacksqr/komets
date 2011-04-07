@@ -32,7 +32,17 @@ method CometMediaPlayer constructor {name descr args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method CometMediaPlayer dispose {} {this inherited}
+method CometMediaPlayer dispose {} {
+	$this(C_choice_media) UnSubscribe_to_set_currents $objName 
+	$this(C_list_medias)  UnSubscribe_to_set_currents $objName
+	$this(C_Video)        UnSubscribe_to_Update_image $objName
+
+	$this(C_Video)        dispose
+	$this(C_list_medias)  dispose
+	$this(C_choice_media) dispose
+	
+	this inherited
+}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________

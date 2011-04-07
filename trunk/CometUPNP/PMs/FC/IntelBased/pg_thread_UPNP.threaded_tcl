@@ -9,11 +9,14 @@ proc get_xml_from {ad {t 5000}} {
 	 if {[dict get $UPNP_server_D_device_with_pb $ad] >= 3} {return "BLOC_CALL"}
 	}
 	
-  if {[catch {set token [::http::geturl $ad -timeout $t]} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
+	#
+  if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
 																 return ""
 																}
   switch [::http::status $token] {
-	 ok      {set rep [::http::data $token]}
+	 ok      {set rep [::http::data $token]
+			  if {![regexp {^[ \t\n]*<\?xml} $rep]} {set rep [string range $rep [string first "<?xml" $rep] end-4]}
+			 }
 	 default {if {![dict exists $UPNP_server_D_device_with_pb $ad]} {
 				 dict set UPNP_server_D_device_with_pb $ad 1
 				} else {dict set UPNP_server_D_device_with_pb $ad [expr 1 + [dict get $UPNP_server_D_device_with_pb $ad]]
@@ -26,6 +29,16 @@ proc get_xml_from {ad {t 5000}} {
   return $rep
 }
 
+
+proc http_callback {sock token} {
+    upvar #0 $token state
+    # Access socket, and state as a Tcl array
+    fconfigure $sock -encoding utf-8
+    set data [read $sock]; set nbytes [string length $data]
+	# puts "Received $nbytes bytes :\n$data"
+	append state(body) $data
+    return $nbytes
+}
 
 	#___________________________________________________________________________________________________________________________________________
 	#___________________________________________________________________________________________________________________________________________
@@ -141,15 +154,23 @@ proc get_xml_from {ad {t 5000}} {
 	 
 	 if {$new_location && [dict exists $UPNP_server_L_devices $UDN]} {
 	   if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
-		 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $L LocationURL]} {set new_location 0}
+		 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $L LocationURL]} {
+			set new_location 0
+			} else  {if {[dict get $UPNP_server_L_devices $UDN got_device_description] != "ERROR"} {set new_location 0}
+					}
 		}
 	   dict set UPNP_server_L_devices $UDN [dict merge [dict get $UPNP_server_L_devices $UDN] $L]
-	  } else {dict set UPNP_server_L_devices $UDN $L}
+	  } else {dict set UPNP_server_L_devices $UDN $L
+			  dict set UPNP_server_L_devices $UDN got_device_description "WIP"
+			 }
 
 	 # Thread the loading of the related XML document
 	 if {$new_location} {
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
-	   if {$str_xml != "BLOC_CALL"} {set_description_from_thread $UDN str_xml}
+	   if {$str_xml != "BLOC_CALL"} {
+			dict set UPNP_server_L_devices $UDN got_device_description "DONE"
+			set_description_from_thread $UDN str_xml
+		   } else {dict set UPNP_server_L_devices $UDN got_device_description "ERROR"}
 	  } else {set ms [clock milliseconds]
 	          dict set UPNP_server_L_devices $UDN last_beat $ms
 			 }
@@ -262,7 +283,7 @@ proc get_xml_from {ad {t 5000}} {
 	 # Read related services
 	 set ServiceList [dict create]; set L_xml_descr_service [list]
 	 foreach service [$node_device selectNodes -namespaces [list ns $ns] "ns:serviceList/ns:service"] {
-	   set service_dict [dict create]
+	   set service_dict [dict create]; dict set service_dict actions ""
 	   foreach att [list serviceType serviceId SCPDURL controlURL eventSubURL] {
 		 foreach node_att [$service selectNodes -namespaces [list ns $ns] "ns:$att"] {dict set service_dict $att [$node_att asText]}
 		}
