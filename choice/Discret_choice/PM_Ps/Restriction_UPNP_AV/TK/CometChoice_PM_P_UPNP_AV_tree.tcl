@@ -72,7 +72,7 @@ method CometChoice_PM_P_UPNP_AV_tree get_or_create_prims {root} {
 	 # MetaDatas
 	 this Add_MetaData PRIM_STYLE_CLASS [list $this(tree) "NAVIGATION TREE INFORMATION" $this(tk_L_items) "PARAM IN ACTION"]
 	 after 100 "$objName Update_tree"
-	} 
+	}
 	
  this set_root_for_daughters $this(tk_root)
  return [this set_prim_handle $this(tk_root)]
@@ -217,7 +217,7 @@ method CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from {UDN service parent
 	
 	$this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item $UDN $service $object_id \$UPNP_res"
 }
-
+Trace CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from
 #___________________________________________________________________________________________________________________________________________
 method CometChoice_PM_P_UPNP_AV_tree Update_item {UDN service object_id rep} {
 	if {[dict exists $rep Result]} {
@@ -243,7 +243,7 @@ method CometChoice_PM_P_UPNP_AV_tree Update_item {UDN service object_id rep} {
 					}
 		}
 }
-
+# Trace CometChoice_PM_P_UPNP_AV_tree Update_item
 #___________________________________________________________________________________________________________________________________________
 method CometChoice_PM_P_UPNP_AV_tree Update_items_with {tree_id} {
 	set this(current_tree_id) $tree_id
