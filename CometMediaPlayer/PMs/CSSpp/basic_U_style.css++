@@ -1,0 +1,5 @@
+#$current[soft_type == TCL_TK] {
+  FCT_Eval: puts "U : coucou de $obj";
+  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CometMediaPlayer/PMs/CSSpp/basic_U_TK_style.css++";
+}
+
