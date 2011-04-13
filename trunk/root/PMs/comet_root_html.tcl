@@ -459,7 +459,7 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
    this Render_JS rep $this(marker) "    "
  append rep "  " {</head>}	"\n"
 
- append rep "  " {<body onMouseDown="">}	"\n"
+ append rep "  " {<body onMouseDown="" onmousemove="" onmouseup="">}	"\n"
  this Render_daughters rep "$dec  "
  
  if {![this get_html_compatibility_strict_mode]} {
