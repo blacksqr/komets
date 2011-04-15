@@ -164,8 +164,10 @@ method PhysicalHTML_root Send_global_info {chan} {
 
  set txt [read $chan]
 
- set    rep "\n"
- append rep {<html>} "\n"
+ set    rep ""
+ append rep {<?xml version="1.0" encoding="UTF-8"?>} "\n"
+ append rep {<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">} "\n"
+ append rep {<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">} "\n"
  append rep "  " {<head>} "\n"
  append rep "  " "  " {<title>} [this get_name] {</title>} "\n"
  append rep "  " "  " {<style type="text/css">} "\n"
@@ -184,14 +186,14 @@ method PhysicalHTML_root Send_global_info {chan} {
 	 set PM   [lindex $i 1]
      if {[gmlObject info exists object $PM]} {
        set LC   [$PM get_LC]
-       append rep "        " {<input type="radio" name="Comet_port" value="} $port {" />} "[$LC get_name] : [$LC get_descr]" <br> "\n"
+       append rep "        " {<input type="radio" name="Comet_port" value="} $port {" />} "[$LC get_name] : [$LC get_descr]" <br/> "\n"
 	   lappend new_L $i
 	  }
     }
    set class(L_server_ports) $new_L
 
    append rep "      " {</div>} "\n"
-   append rep "      " {<br><input type="submit" VALUE="GO !" />} "\n"
+   append rep "      " {<br/><input type="submit" VALUE="GO !" />} "\n"
  append rep "  " "  " {</form>} "\n"
  append rep "  " {</body>} "\n"
  append rep </html> "\n"
@@ -441,15 +443,18 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
   }
 
  #puts "  Render classic"
- set    rep "\n"
+ set    rep ""
  append rep {<?xml version="1.0" encoding="UTF-8"?>} "\n"
- append rep {<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">}
- append rep {<html>} "\n"
+ append rep {<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">} "\n"
+ append rep {<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">} "\n"
  append rep "  " {<head>} "\n"
 
  #append rep {<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />} "\n"
- append rep {<meta http-equiv="Content-Type" content="application/x-www-form-urlencoded; charset=UTF-8; Accept-Language: en,fr;" />} "\n"
+# append rep {<meta http-equiv="Content-Type" content="application/x-www-form-urlencoded; charset=UTF-8; Accept-Language: en,fr;" />} "\n"
+ append rep {<meta http-equiv="Content-Type" content="application/xhtml+xml" />} "\n"
 
+ 
+ 
  append rep "  " "  " {<title>} [this get_name] {</title>} "\n"
  append rep "  " "  " {<style id="} CSS_$objName {" type="text/css">} "\n"
  append rep "  " "  " "  " [this Apply_style] "\n"
@@ -463,8 +468,8 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  this Render_daughters rep "$dec  "
  
  if {![this get_html_compatibility_strict_mode]} {
-	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
-	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
+	 append rep "  " "  " {<p id="p_debug" style="display:block;"></p>}
+	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:block; width:100%; height:100px;"></textarea>}
 	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"
