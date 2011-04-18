@@ -28,6 +28,7 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
  
  append strm $dec "<div [this Style_class]>\n"
     # append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/svg/jquery.svg.min.js\"></script>\n"
+	append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/geometry2Dbasics.js\"></script>\n"
 	append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/COMET_SVG_utilities.js\"></script>\n"
 	# viewBox=\"0 0 640 480\" preserveAspectRatio=\"xMidYMid slice\" style=\"border: solid black; width: 100%; height: 100%;\"
 	append strm $dec "<svg id=\"${objName}_canvas\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"800px\" height=\"600px\" style=\"\">\n"
