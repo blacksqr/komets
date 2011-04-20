@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <device>
+		<deviceType>urn:comets:device:root:1</deviceType>
+		<friendlyName>Comet root cr : Comet root</friendlyName>
+		<manufacturer>PRIMA</manufacturer>
+		<manufacturerURL>http://iihm.imag.fr/demeure</manufacturerURL>
+		<modelDescription>NO DESCRIPTION</modelDescription>
+		<modelName>Automatically-Generated COMET Device</modelName>
+		<modelNumber>COMET v1</modelNumber>
+		<UDN>8d1f2a60-08cf-8c4e-a4a4-2c5d3511a86b</UDN>
+		<serviceList>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service::1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:8d1f2a60-08cf-8c4e-a4a4-2c5d3511a86b:cr</serviceId>
+				<SCPDURL>__scpd_cr.xml</SCPDURL>
+				<controlURL>__control_cr</controlURL>
+				<eventSubURL>__event_cr</eventSubURL>
+			</service>
+		</serviceList>
+   </device>
+</root>
+
