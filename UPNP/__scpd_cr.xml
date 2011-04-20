@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+  <specVersion> <!-- UPnP version 1.0 -->
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <actionList>
+  		<action>
+			<name>Stop_Enlight</name>
+			<argumentList>
+				<argument>
+					<name>Result</name>
+					<direction>out</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
+			<name>Enlight</name>
+			<argumentList>
+				<argument>
+					<name>L</name>
+					<direction>in</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+				<argument>
+					<name>Result</name>
+					<direction>out</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+	</actionList>
+	<serviceStateTable>
+	<stateVariable sendEvents="no">
+         <name>var_str</name>
+         <dataType>string</dataType>
+      </stateVariable>
+   </serviceStateTable>
+</scpd>
+
