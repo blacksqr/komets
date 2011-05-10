@@ -246,7 +246,7 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased soap_error_reply {xml CB} {
- if {[catch {set doc [dom parse $xml]} err]} {set UPNP_res [list ERROR $xml]; eval $CB;} else {
+ if {[catch {set doc [dom parse $xml]} err]} {set UPNP_res [list ERROR "$xml\n_____\n$err"]; eval $CB;} else {
 	set UPNP_res [list]
 	set root [$doc documentElement]; set ns_root [$root namespace]
 	foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:Body/ns:Fault/detail/*"] {

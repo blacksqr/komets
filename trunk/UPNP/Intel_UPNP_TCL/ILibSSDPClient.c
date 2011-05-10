@@ -93,9 +93,9 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 		FREE(buffer);
 		return;
 	}
-	//printf("SSDP (%d bytes): %s\n", bytesRead, buffer);
+	printf("SSDP (%d bytes): %s\n", bytesRead, buffer);
 	packet = ILibParsePacketHeader(buffer,0,bytesRead);
-	//printf("Finish parsing...\n");
+	printf("Finish parsing...\n");
 	if(packet->Directive==NULL)
 	{
 		/* M-SEARCH Response */
