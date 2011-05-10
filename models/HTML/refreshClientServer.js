@@ -92,7 +92,7 @@ function refreshClientServer() {
 		
 		// On enregistre la version du client et de son ip
 		outputVer[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
-		
+		outputVer['js_update'] = 'true';
 		// RÃ©cupÃ©ration de la version serveur 
 		$.ajax({
 			type: "POST",
@@ -114,6 +114,7 @@ function refreshClientServer() {
 				} /*else*/
 					if((i+i_tmp) >= 1) {output['Comet_port'] = $("#Comet_port").val();
 								   output[$("#Version_value").attr("name")] = $("#IP_client").val() + " "+ $("#Version_value").val();
+								   output['js_update'] = 'true';
 								   if(forcing_send) {forcing_send = false;}
 						           $.ajax({
 										type: "POST",
@@ -128,7 +129,7 @@ function refreshClientServer() {
 																	                 $('#Ajax_Raw').text("Received : \n" + msg);
 																					} catch(err) { 
 																			                 $('#Ajax_Raw').css('display', 'block');
-																							 $('#Ajax_Raw').text("Erreur in 2\n" + msg + "\n");
+																							 $('#Ajax_Raw').text("Erreur in 2\n" + msg + "\n____________________________\n" + err);
 																							 //alert("ERREUR\n" + msg + "___________");
 																						   }
 																		       }
@@ -149,7 +150,7 @@ function refreshClientServer() {
 		    },
 			error: function(err){
 			    mutex = false;
-				//alert("ProblÃ¨me de rÃ©ception des mises Ã  jour serveur\n\n"+err);
+				$('#Ajax_Raw').text("Error whith server\n\n" + err);
 			}
 		});
 	}

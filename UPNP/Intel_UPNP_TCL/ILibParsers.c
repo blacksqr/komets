@@ -1039,9 +1039,9 @@ struct packetheader* ILibParsePacketHeader(char* buffer, int offset, int length)
 	f = p->FirstResult;
 	StartLine = (struct parser_result*)ILibParseString(f->data,0,f->datalength," ",1);
 	HeaderLine = f->NextResult;
-	if(memcmp(StartLine->FirstResult->data,
-	"HTTP/",
-	5)==0)
+	
+	if( StartLine->FirstResult->datalength >= 5
+	  &&(memcmp(StartLine->FirstResult->data, "HTTP/", 5)==0) )
 	{
 		/* Response Packet */
 		p = (struct parser_result*)ILibParseString(StartLine->FirstResult->data,
@@ -1069,9 +1069,9 @@ struct packetheader* ILibParsePacketHeader(char* buffer, int offset, int length)
 		RetVal->DirectiveObjLength = StartLine->FirstResult->NextResult->datalength;
 		RetVal->StatusCode = -1;
 		p = (struct parser_result*)ILibParseString(StartLine->LastResult->data,
-		0,
-		StartLine->LastResult->datalength,
-		"/",1);
+					0,
+					StartLine->LastResult->datalength,
+					"/",1);
 		RetVal->Version = p->LastResult->data;
 		RetVal->VersionLength = p->LastResult->datalength;
 		ILibDestructParserResults(p);

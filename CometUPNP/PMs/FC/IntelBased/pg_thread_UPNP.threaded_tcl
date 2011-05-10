@@ -93,7 +93,7 @@ proc http_callback {sock token} {
 		}
 	 set reading_sock_$sock 1
 	 if {[catch {append UPNP_server_sock_data [read $sock]} err]} {
-		 send_msg_to_comet [list ERROR $err]
+		 send_msg_to_comet [list ERROR "append UPNP_server_sock_data \[read \$sock\]" $err]
 		 close $sock
 		 unset reading_sock_$sock
 		}
@@ -169,7 +169,7 @@ proc http_callback {sock token} {
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
 	   if {$str_xml != "BLOC_CALL"} {
 			dict set UPNP_server_L_devices $UDN got_device_description "DONE"
-			set_description_from_thread $UDN str_xml
+			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR [list "set_description_from_thread\n\tUDN : $UDN\n\tstr_xml : $str_xml" $err]]}
 		   } else {dict set UPNP_server_L_devices $UDN got_device_description "ERROR"}
 	  } else {set ms [clock milliseconds]
 	          dict set UPNP_server_L_devices $UDN last_beat $ms
