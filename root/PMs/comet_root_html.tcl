@@ -65,12 +65,12 @@ Generate_List_accessor PhysicalHTML_root L_js_files_link                        
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code PhysicalHTML_root set_L_js_files_link {} {
- set this(L_js_files_link) [Liste_to_set] $this(L_js_files_link)
+ set this(L_js_files_link) [Liste_to_set $this(L_js_files_link)]
 }
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code PhysicalHTML_root Add_L_js_files_link {} {
- set this(L_js_files_link) [Liste_to_set] $this(L_js_files_link)
+ set this(L_js_files_link) [Liste_to_set $this(L_js_files_link)]
 }
 
 #___________________________________________________________________________________________________________________________________________

@@ -29,7 +29,7 @@ method Container_PM_P_HTML_to_SVG get_last_marker {} {return $class(last_marker)
 method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
- append strm $dec "<div [this Style_class]>\n"
+ append strm $dec "<div [this Style_class] oncontextmenu=\"return false;\">\n"
     # append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./Comets/models/HTML/jquery/svg/jquery.svg.min.js\"></script>\n"
 	append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/geometry2Dbasics.js\"></script>\n"
 	append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\" src=\"./src_js/COMET_SVG_utilities.js\"></script>\n"
@@ -38,7 +38,6 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
 	append strm $dec "<g id=\"${objName}_canvas_g_root\" transform=\"\">\n"	
 		this Render_daughters strm "$dec  "
 	append strm $dec "</g>\n"
-	append strm $dec "<rect id=\"${objName}_debug_rect\" width=\"5\" height=\"5\"/>\n"
 	append strm $dec "</svg>\n"
  append strm $dec "</div>\n"
 }

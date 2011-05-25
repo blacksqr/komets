@@ -98,7 +98,7 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 			Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_MSEARCH.c_str(), API_INTEL_UPNP_TCL_cmd_MSEARCH.length());
 			Tcl_DStringAppend(&cmd, " {", 2);
 			Tcl_DStringAppendElement(&cmd, "UDN"); Tcl_DStringAppendElement(&cmd, "M-SEARCH");
-			Tcl_DStringAppendElement(&cmd, "ST"); Tcl_DStringAppendElement(&cmd, LocationURL);
+			Tcl_DStringAppendElement(&cmd, "ST" ); Tcl_DStringAppendElement(&cmd, LocationURL);
 			char *str_cmd = Tcl_DStringAppend(&cmd, "}", 1);
 			Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, str_cmd);
 			Tcl_DStringFree(&cmd);
