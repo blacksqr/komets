@@ -215,7 +215,7 @@ method CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from {UDN service parent
 	if {$parent_tree_id == ""} {set this(tree_id_of,$UDN) $tree_id}
 	$this(tree) tag bind $tree_id <ButtonPress-1> [list $objName Update_items_with [string map [list "%" "%%"] $tree_id]]
 	
-	$this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item $UDN $service $object_id \$UPNP_res"
+	$this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item {$UDN} {$service} {$object_id} \$UPNP_res"
 }
 Trace CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from
 #___________________________________________________________________________________________________________________________________________

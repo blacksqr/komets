@@ -1,0 +1,54 @@
+#$current {
+	FCT_Eval: puts "CometInstantMessenger->TK : coucou de $obj";
+}
+
+#$current(CONTAINER.ROOT) {
+	GDD_fct: Implem(Container_CUI_window);
+}
+
+#$current(CONTAINER.CONTROLS > GOTO) {
+	FCT_set_cmd_placement: pack $p -expand 1 -fill x -side top;
+}
+
+#$current(CONTAINER.CONTROLS > (PREVIOUS, NEXT, PLAY)) {
+	FCT_Eval: puts "\tcontrol $obj";
+	FCT_set_cmd_placement: pack $p -expand 0 -fill x -side left;
+}
+
+#$current(CONTAINER.CONTROLS > VOLUME) {
+	FCT_set_cmd_placement: pack $p -expand 1 -fill x -side left;
+}
+
+#$current(CONTAINER.CONTROLS) {
+	FCT_Eval: puts "\tControls : $obj";
+	FCT_Reconnect: ;
+}
+
+#$current(CONTAINER.PLAYLIST) {
+	GDD_fct: Implem(Container_CUI_window);
+}
+
+#$current(INTERLEAVING.COMMANDS.FILE) {
+	GDD_fct: Implem(Interleaving_CUI_Menu);
+}
+
+#$current(LIST.MEDIAS) {
+	GDD_fct: Implem(Choice_CUI_list);
+}
+
+#$current(CONTAINER.UPNP CHOICE.NEW.MEDIA) {
+	FCT_Eval : puts "UPNP Choice media done by $obj";
+	GDD_fct: Implem(CUI_Choice_UPNP_AV_basic);
+	FCT_Eval : puts "UPNP Choice media NOW done by $obj";
+}
+
+#$current(CONTAINER.FILE CHOICE.NEW.MEDIA) {
+	FCT_Eval : puts "FILE Choice media done by $obj";
+	GDD_fct: Implem(ChoiceFiles_CUI_standard_system);
+	FCT_Eval : puts "FILE Choice media NOW done by $obj";
+}
+
+#$current(PLAYER.VIDEO) {
+	FCT_Play_audio_stream_locally: 1;
+}
+
