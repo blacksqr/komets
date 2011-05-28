@@ -30,6 +30,8 @@ method CometUPNP_CFC device_appear    {} {}
 method CometUPNP_CFC device_disappear {} {}
 method CometUPNP_CFC M-SEARCH         {ST} {}
 
+method CometUPNP_CFC Do_a_SSDP_M-SEARCH {} {}
+
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_CFC Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
 }
@@ -73,5 +75,5 @@ method CometUPNP_CFC Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT
 
 #___________________________________________________________________________________________________________________________________________
 proc P_L_methodes_get_CometUPNP {} {return [list {Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT}} {get_dict_devices { }} {get_item_of_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
-proc P_L_methodes_set_CometUPNP {} {return [list {M-SEARCH {ST}} {Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB}} {Remove_eventing_CB {UDN service_id ID_subscribe}} {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
+proc P_L_methodes_set_CometUPNP {} {return [list {Do_a_SSDP_M-SEARCH {}} {M-SEARCH {ST}} {Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB}} {Remove_eventing_CB {UDN service_id ID_subscribe}} {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
 

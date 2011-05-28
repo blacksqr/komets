@@ -1,6 +1,7 @@
 package require tdom
 package require Thread
 package require http
+package require udp
 
 proc get_xml_from {ad {t 5000}} {
   global UPNP_server_D_device_with_pb
@@ -47,6 +48,13 @@ proc http_callback {sock token} {
 	 set UPNP_server_tcp_server    [socket -server "New_connection " 0]
 	 set UPNP_server_tcp_port      [lindex [fconfigure $UPNP_server_tcp_server -sockname] end]
 	 
+	 # Set up the UDP socket
+	 set UPNP_server_UDP [udp_open]
+	 fconfigure $UPNP_server_UDP -buffering none -blocking 0 -encoding "utf-8"
+	 fconfigure $UPNP_server_UDP -mcastadd 239.255.255.250 -remote [list 239.255.255.250 1900] 
+	 fileevent  $UPNP_server_UDP readable "if {\[catch {receive_from_udp \$UPNP_server_UDP} err\]} {send_msg_to_comet \[list ERROR SSDP \$err\]}"
+
+	 
 	 set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/INTEL_UPNP_CLIENT.threaded_tcl" r]; set UPNP_server_pg_thread_UPNP [read $f]; close $f
 	 append UPNP_server_pg_thread_UPNP [list start 127.0.0.1 $UPNP_server_tcp_port]
 	 
@@ -58,12 +66,43 @@ proc http_callback {sock token} {
 	 
 	 set UPNP_server_UPNP_thread [::thread::create]
 	 set UPNP_server_mutex       [::thread::mutex create]
-	 ::thread::send -async $UPNP_server_UPNP_thread $UPNP_server_pg_thread_UPNP
-	 
+	 ::thread::send $UPNP_server_UPNP_thread -async $UPNP_server_pg_thread_UPNP
 	}
 
 	#___________________________________________________________________________________________________________________________________________
+	proc receive_from_udp {sock} {
+		 set msg [read $sock]
+			 # puts msg
+			 if {$msg != ""} {
+				 set L_lines [lassign [split $msg "\n"] entete]
+				 # puts $entete
+				 if {$entete == "HTTP/1.1 200 OK"} {
+					 foreach line $L_lines {
+						 if {$line == ""} {continue}
+						 set pos  [string first ":" $line]
+						 set att  [string range $line 0 [expr $pos - 1]]
+						 set [string toupper $att] [string trim [string range $line [expr $pos + 1] end]]
+						 # puts [list set [string toupper $att] [string trim [string range $line [expr $pos + 1] end]]]
+						}
+					 regexp {^uuid\:(.*)\:\:.*$} $USN reco USN
+					 regexp {^max\-age\=(.*)$} ${CACHE-CONTROL} reco TIMEOUT
+					 if {[catch {set msg [dict create UDN $USN LocationURL $LOCATION Alive -1 Timeout $TIMEOUT]; new_UPNP_message msg} err]} {
+						 send_msg_to_comet [list ERROR "Error while setting UPNP message" $err]
+						}
+					}
+				}
+		}
+
+	#___________________________________________________________________________________________________________________________________________
+	proc MSEARCH {} {
+		 global UPNP_server_UDP
+		 puts -nonewline $UPNP_server_UDP "M-SEARCH * HTTP/1.1\nMX: 10\nST: ssdp:all\nHOST: 239.255.255.250:1900\nMAN: \"ssdp:discover\"\n\n"
+		 flush $UPNP_server_UDP
+		}
+		
+	#___________________________________________________________________________________________________________________________________________
 	proc send_msg_to_comet {msg} {
+	  global UPNP_server_UDP
 	  if {$UPNP_server_socket_client != ""} {
 		  puts -nonewline $UPNP_server_socket_client "[string length $msg] "
 		  puts -nonewline $UPNP_server_socket_client $msg
@@ -392,15 +431,17 @@ proc http_callback {sock token} {
 	set UPNP_server_socket_client ""
 	set UPNP_server_thread_for_retrieving_xml ""
 	
+	set UPNP_server_UDP ""
+	
 	set UPNP_server_D_device_with_pb [dict create]
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 set cmd ""
-foreach var [list UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
+foreach var [list UPNP_server_UDP UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
 append cmd "\n"
-foreach p [list UPNP_server get_ip_ad_from_locationURL Is_still_alive send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
+foreach p [list MSEARCH UPNP_server receive_from_udp get_ip_ad_from_locationURL Is_still_alive send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
 	set L_args [info args $p]
 	set body   [info body $p]
 	proc $p $L_args "$cmd $body"

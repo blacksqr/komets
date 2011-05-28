@@ -91,17 +91,20 @@ void INTEL_UPNP_listener_set_cmd_MSEARCH      (const char *str) {API_INTEL_UPNP_
 //_______________________________________________________________________________________________________________
 //_______________________________________________________________________________________________________________
 void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationURL, int Timeout,void *cp)
-{Tcl_DString cmd;
+{if(UDN == NULL) {return;}
+ Tcl_DString cmd;
  Tcl_DStringInit(&cmd);
 	if(Alive != 0) {
 		if (strncasecmp(UDN,"M-SEARCH",8) == 0) {
+			//printf("MSEARCH CB ... ");
 			Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_MSEARCH.c_str(), API_INTEL_UPNP_TCL_cmd_MSEARCH.length());
 			Tcl_DStringAppend(&cmd, " {", 2);
 			Tcl_DStringAppendElement(&cmd, "UDN"); Tcl_DStringAppendElement(&cmd, "M-SEARCH");
-			Tcl_DStringAppendElement(&cmd, "ST" ); Tcl_DStringAppendElement(&cmd, LocationURL);
+			Tcl_DStringAppendElement(&cmd, "ST" ); if(LocationURL) {Tcl_DStringAppendElement(&cmd, LocationURL);} else {Tcl_DStringAppendElement(&cmd, "");}
 			char *str_cmd = Tcl_DStringAppend(&cmd, "}", 1);
 			Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, str_cmd);
 			Tcl_DStringFree(&cmd);
+			//printf("DONE!\n");
 			return;
 		} else {Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_DeviceAdded.c_str(), API_INTEL_UPNP_TCL_cmd_DeviceAdded.length());
 			   }
@@ -110,7 +113,7 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 	Tcl_DStringAppend(&cmd, " {", 2);
 	Tcl_DStringAppendElement(&cmd, "UDN"); Tcl_DStringAppendElement(&cmd, UDN);
 	if (Alive != 0) {
-		Tcl_DStringAppendElement(&cmd, "LocationURL"); Tcl_DStringAppendElement(&cmd, LocationURL);
+		Tcl_DStringAppendElement(&cmd, "LocationURL"); if(LocationURL) {Tcl_DStringAppendElement(&cmd, LocationURL);} else {Tcl_DStringAppendElement(&cmd, "");}
 		}
 
 	char tmp[256];
