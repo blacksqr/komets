@@ -32,8 +32,15 @@ method CometUPNP_PM_P_tk_tree get_or_create_prims {root} {
 	 foreach {UDN UDN_val} [this get_dict_devices] {
 		 this set_item_of_dict_devices $UDN $UDN_val
 		}
+
+	 # Define the popup menu for UPNP devices
+	 if {[winfo exists ._popupMenu_UPNP_$objName]} {destroy ._popupMenu_UPNP_$objName}
+	 set this(UPNP_popupmenu) [menu ._popupMenu_UPNP_$objName]
+	 $this(UPNP_popupmenu) add command -label "M-SEARCH" -command [list $objName prim_Do_a_SSDP_M-SEARCH]
+	 
+	 bind $this(tree) <3> "tk_popup $this(UPNP_popupmenu) %X %Y"
 		
-	 # Define the popup menu dor selecting values in devices and services descriptions
+	 # Define the popup menu for selecting values in devices and services descriptions
 	 global item_value_selection_in_$objName
 	 if {[winfo exists ._popupMenu_item_selection_$objName]} {destroy ._popupMenu_item_selection_$objName}
 	 set this(popupmenu) [menu ._popupMenu_item_selection_$objName]
@@ -58,13 +65,13 @@ Inject_code CometUPNP_PM_P_tk_tree set_item_of_dict_devices {} {
 		 if {$parent_UDN != $UDN} {set parent_id $parent_UDN} else {set parent_id ""}
 		 
 		 # Search position to insert
-		 set pos_insert 0; set L_UDN_name [list]
-		 dict for {U U_descr} [this get_dict_devices] {
-			 lappend L_UDN_name [list $U [dict get $U_descr friendlyName]]
+		 set pos_insert 0; set L_UDN_name [list [list $UDN [this get_item_of_dict_devices [list $UDN friendlyName]]]]
+		 foreach U [$this(tree) children ""] {
+			 lappend L_UDN_name [list $U [this get_item_of_dict_devices [list $U friendlyName]]]
 			}
+		 
 		 set L_UDN_name [lsort -index 1 -ascii $L_UDN_name]
 		 set pos_insert [lsearch -index 0 $L_UDN_name $UDN]
-		 #insert
 		 
 		 if {[$this(tree) exists $UDN]} {$this(tree) delete $UDN}
 		 if {$parent_id != "" && ![$this(tree) exists $parent_id]} {
