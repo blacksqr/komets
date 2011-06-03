@@ -1728,6 +1728,61 @@ SWIG_FromCharPtr(const char *cptr)
   return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
 }
 
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_long SWIG_TCL_DECL_ARGS_2(Tcl_Obj *obj, unsigned long *val) {
+  long v;
+  if (Tcl_GetLongFromObj(0,obj, &v) == TCL_OK) {
+    if (v >= 0) {
+      if (val) *val = (unsigned long) v;
+      return SWIG_OK;
+    }
+    /* If v is negative, then this could be a negative number, or an
+       unsigned value which doesn't fit in a signed long, so try to
+       get it as a string so we can distinguish these cases. */
+  }
+  {
+    int len = 0;
+    const char *nptr = Tcl_GetStringFromObj(obj, &len);
+    if (nptr && len > 0) {
+      char *endptr;
+      unsigned long v;
+      if (*nptr == '-') return SWIG_OverflowError;
+      errno = 0;
+      v = strtoul(nptr, &endptr,0);
+      if (nptr[0] == '\0' || *endptr != '\0')
+	return SWIG_TypeError;
+      if (v == ULONG_MAX && errno == ERANGE) {
+	errno = 0;
+	return SWIG_OverflowError;
+      } else {
+	if (*endptr == '\0') {
+	  if (val) *val = v;
+	  return SWIG_OK;
+	}
+      }
+    }
+  }
+  
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_int SWIG_TCL_DECL_ARGS_2(Tcl_Obj * obj, unsigned int *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long SWIG_TCL_CALL_ARGS_2(obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UINT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned int >(v);
+    }
+  }  
+  return res;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1868,6 +1923,37 @@ fail:
 
 
 SWIGINTERN int
+_wrap_Start_socket_client_command(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+  unsigned int arg1 ;
+  unsigned int val1 ;
+  int ecode1 = 0 ;
+  
+  if (SWIG_GetArgs(interp, objc, objv,"o:Start_socket_client_command port ",(void *)0) == TCL_ERROR) SWIG_fail;
+  ecode1 = SWIG_AsVal_unsigned_SS_int SWIG_TCL_CALL_ARGS_2(objv[1], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "Start_socket_client_command" "', argument " "1"" of type '" "unsigned int""'");
+  } 
+  arg1 = static_cast< unsigned int >(val1);
+  Start_socket_client_command(arg1);
+  
+  return TCL_OK;
+fail:
+  return TCL_ERROR;
+}
+
+
+SWIGINTERN int
+_wrap_INTEL_UPNP_Call_MSEARCH(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
+  if (SWIG_GetArgs(interp, objc, objv,":INTEL_UPNP_Call_MSEARCH ") == TCL_ERROR) SWIG_fail;
+  INTEL_UPNP_Call_MSEARCH();
+  
+  return TCL_OK;
+fail:
+  return TCL_ERROR;
+}
+
+
+SWIGINTERN int
 _wrap_INTEL_UPNP_listener_get_cmd_DeviceAdded(ClientData clientData SWIGUNUSED, Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]) {
   char *result = 0 ;
   
@@ -1979,6 +2065,8 @@ fail:
 static swig_command_info swig_commands[] = {
     { SWIG_prefix "INTEL_UPNP_listener_start", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_start, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_start_sync", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_start_sync, NULL},
+    { SWIG_prefix "Start_socket_client_command", (swig_wrapper_func) _wrap_Start_socket_client_command, NULL},
+    { SWIG_prefix "INTEL_UPNP_Call_MSEARCH", (swig_wrapper_func) _wrap_INTEL_UPNP_Call_MSEARCH, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_get_cmd_DeviceAdded", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_DeviceAdded, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_get_cmd_DeviceRemoved", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_DeviceRemoved, NULL},
     { SWIG_prefix "INTEL_UPNP_listener_get_cmd_MSEARCH", (swig_wrapper_func) _wrap_INTEL_UPNP_listener_get_cmd_MSEARCH, NULL},
@@ -2317,7 +2405,7 @@ SWIGEXPORT int SWIG_init(Tcl_Interp *interp) {
   SWIG_PropagateClientData();
   
   API_INTEL_UPNP_TCL_tcl_interp = interp;
-  API_INTEL_UPNP_chain = NULL;
+  API_INTEL_UPNP_chain          = NULL;
 
   for (i = 0; swig_commands[i].name; i++) {
     Tcl_CreateObjCommand(interp, (char *) swig_commands[i].name, (swig_wrapper_func) swig_commands[i].wrapper,

@@ -15,6 +15,7 @@ proc Device_removed {s L} {
 
 proc start {ip port} {
  set socket [socket $ip $port]
+ #INTEL_UPNP_listener_start "upnp:rootdevice" "Device_added $socket " "Device_removed $socket " "Device_added $socket " ""
  INTEL_UPNP_listener_start_sync "upnp:rootdevice" "Device_added $socket " "Device_removed $socket " "Device_added $socket " ""
 }
 

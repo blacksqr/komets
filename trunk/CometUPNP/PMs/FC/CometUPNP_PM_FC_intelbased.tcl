@@ -5,6 +5,10 @@
 #___________________________________________________________________________________________________________________________________________
 inherit CometUPNP_PM_FC_intelbased Physical_model
 
+proc CometUPNP_PM_FC_intelbased__Thread_error {id err} {
+	puts "Error in thread $id :\n$err"
+}
+
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased constructor {name descr args} {
  this inherited $name $descr
@@ -19,14 +23,18 @@ method CometUPNP_PM_FC_intelbased constructor {name descr args} {
       
  # Create a new thread and load a UPNP_server inside it
  set this(UPNP_thread) [::thread::create]
+ ::thread::errorproc $this(UPNP_thread)
  set cmd "source \$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/pg_thread_UPNP.threaded_tcl;\n UPNP_server $this(port_server)\n"
  ::thread::send $this(UPNP_thread) $cmd
+ 
+ # Server port will be send by the thread once runned
+ set this(UPNP_server_port) 0
  
  # TCP server for eventing
  set this(eventing_server)      [socket -server "$objName New_UPNP_eventing_connection" 0]
  set this(eventing_server_port) [lindex [fconfigure $this(eventing_server) -sockname] end]
  set this(IP) [this get_IP]
- 
+  
  # Terminate with configuration's parameters
  eval "$objName configure $args"
  return $objName
@@ -51,7 +59,14 @@ method CometUPNP_PM_FC_intelbased get_IP {} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Do_a_SSDP_M-SEARCH {} {
-	::thread::send $this(UPNP_thread) -async "MSEARCH\n"
+	# ::thread::send $this(UPNP_thread) "MSEARCH\n"
+	if {$this(UPNP_server_port) != 0} {
+		 set s [socket 127.0.0.1 $this(UPNP_server_port)]
+		 fconfigure $s -encoding utf-8
+		 set msg "CALL MSEARCH"
+		 puts $s "[string length $msg] $msg"
+		 close $s
+		}
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -157,7 +172,7 @@ method CometUPNP_PM_FC_intelbased New_connection {chan ad num} {
  fconfigure $chan -blocking 0
    set this(${chan},msg) ""
    set this(${chan},msg_attended_length) -1
- fileevent $chan readable "$objName Read_data $chan"
+ fileevent $chan readable "if {\[catch {$objName Read_data $chan} err\]} {puts \"Error reading from socket in $objName :\n\$err\"}"
  # fileevent $chan readable "P $chan"
 
 }
@@ -191,19 +206,20 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
  upvar $msg_name msg
- # puts "\tnew_UPNP_message"
+ # puts "\tnew_UPNP_message : $msg"; return
  set UDN_val [lassign $msg cmd UDN]
  switch $cmd {
-	Device_added   {
-					this prim_set_item_of_dict_devices $UDN $UDN_val
-				   }
-	Device_removed {
-				    if {[catch {this prim_remove_item_of_dict_devices $UDN} err]} {}
-				   }
-    M-SEARCH       {
-					this prim_M-SEARCH $UDN
-				   }
-	         ERROR {puts "ERROR from UPNP :\n$msg"}
+	Device_added     {
+					  this prim_set_item_of_dict_devices $UDN $UDN_val
+				     }
+	Device_removed   {
+				      if {[catch {this prim_remove_item_of_dict_devices $UDN} err]} {}
+				     }
+    M-SEARCH         {
+					  this prim_M-SEARCH $UDN
+				     }
+    UPNP_server_port {set this(UPNP_server_port) $UDN; puts "\n____________________________________________________________________\nUPNP_server_port : $this(UPNP_server_port)"}
+	         ERROR   {puts "ERROR from UPNP :\n$msg"}
 	}
 }
 
