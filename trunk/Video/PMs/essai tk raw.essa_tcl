@@ -1,0 +1,57 @@
+load "" tk
+package require Img
+package require img::raw
+
+cd c:/These/Projet\ Interface/bigre
+load FFMPEG_for_tcl.dll
+ffmpeg_init
+
+set video_stream      [FFMPEG_Open_video_stream "c:/Alexandre/Videos/U96_LoveReligion.flv"]
+set video_buffer_size [FFMPEG_startAcquisition $video_stream]
+set video_buffer      [FFMPEG_Get_a_buffer $video_buffer_size]
+
+set tx                [FFMPEG_Width  $video_stream]
+set ty                [FFMPEG_Height $video_stream]
+
+
+FFMPEG_getImageNr $video_stream 200 $video_buffer
+
+set    buffer_ptr "Magic=RAW\n"
+append buffer_ptr "Width=$tx\n"
+append buffer_ptr "Height=$ty\n"
+append buffer_ptr "NumChan=3\n"
+append buffer_ptr "ByteOrder=Intel\n"
+append buffer_ptr "ScanOrder=TopDown\n"
+append buffer_ptr "PixelType=byte\n"
+FFMPEG_Convert_void_to_binary_tcl_var $video_buffer $video_buffer_size buffer_ptr 1
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+set photo [image create photo -format "raw -max 255 -nomap 1" -width $tx -height $ty]
+$photo put $buffer_ptr -format "raw"
+
+label .l -image $photo
+pack .l
+
+#___________________________________________________________________________________________________________________________________________
+proc Next_frame {video_stream tx ty video_buffer_size video_buffer photo} {
+ global buffer_ptr
+ 
+ FFMPEG_getImage $video_stream $video_buffer
+ 
+ set    buffer_ptr "Magic=RAW\n"
+ append buffer_ptr "Width=$tx\n"
+ append buffer_ptr "Height=$ty\n"
+ append buffer_ptr "NumChan=3\n"
+ append buffer_ptr "ByteOrder=Intel\n"
+ append buffer_ptr "ScanOrder=TopDown\n"
+ append buffer_ptr "PixelType=byte\n"
+ 
+ FFMPEG_Convert_void_to_binary_tcl_var $video_buffer $video_buffer_size buffer_ptr 1
+ 
+ $photo put $buffer_ptr -format "raw -max 255 -nomap 1"
+}
+
+puts {Next_frame $video_stream $tx $ty $video_buffer_size $video_buffer $photo}
+
