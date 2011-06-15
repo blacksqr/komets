@@ -231,7 +231,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 				}
 				node = node->NextField;
 			}
-			if( (OK!=0 || rt!=0 || info_Alive==1) && UDN && Location)
+			if( (OK!=0 || rt!=0) && info_Alive==1 && UDN && ((Location != NULL) || (Alive == 0)))
 			{	//printf("\tCallback...\n");
 				if(module->FunctionCallback!=NULL)
 				{
@@ -282,32 +282,70 @@ void ILibSSDP_IPAddressListChanged(void *SSDPToken)
 	struct SSDPClientModule *RetVal = (struct SSDPClientModule*)SSDPToken;
 	int i;
 	struct sockaddr_in dest_addr;
-	
 	struct ip_mreq mreq;
 	char* buffer;
 	int bufferlength;
 	struct in_addr interface_addr;
+	printf("1-");
+	
+	// <ALEX DEBUG>
+	struct sockaddr_in addr;
+	int ra = 1;
+	memset((char *)&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	addr.sin_port = htons(UPNP_PORT);
+	// </ALEX DEBUG>
 	
 	dest_addr.sin_family = AF_INET;
 	dest_addr.sin_addr.s_addr = inet_addr(UPNP_GROUP);
 	dest_addr.sin_port = htons(UPNP_PORT);
 	
+	printf("2-");
 	for(i=0;i<RetVal->NumIPAddress;++i)
 	{
 		mreq.imr_multiaddr.s_addr = inet_addr(UPNP_GROUP);
 		mreq.imr_interface.s_addr = RetVal->IPAddress[i];
 		if (setsockopt(RetVal->SSDPListenSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP,(char*)&mreq, sizeof(mreq)) < 0)
-		{
+		{printf("Error?-");
 		}
 		
 	}
-	
+	printf("3-");
 	buffer = (char*)MALLOC(105+RetVal->DeviceURNLength);
 	bufferlength = sprintf(buffer,"M-SEARCH * HTTP/1.1\r\nMX: 3\r\nST: %s\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\n\r\n",RetVal->DeviceURN);
 	
+	printf("4-");
 	FREE(RetVal->IPAddress);
 	RetVal->NumIPAddress = ILibGetLocalIPAddressList(&(RetVal->IPAddress));
-	
+
+	// <ALEX DEBUG>
+	int err;
+	if ( (err = setsockopt(RetVal->SSDPListenSocket, SOL_SOCKET, SO_REUSEADDR,(char*)&ra, sizeof(ra))) < 0)
+	{
+		DEBUGSTATEMENT(printf("Setting SockOpt SO_REUSEADDR failed\r\n"));
+		exit(1);
+	}
+	/*if ( (err = bind(RetVal->SSDPListenSocket, (struct sockaddr *) &(addr), sizeof(addr))) < 0)
+	{
+		printf("SSDPListenSocket bind\n");
+		switch(err) {
+			case WSANOTINITIALISED : printf("WSANOTINITIALISED\n"); break;
+			case WSAENETDOWN : printf("WSAENETDOWN\n"); break;
+			case WSAEACCES : printf("WSAEACCES\n"); break;
+			case WSAEADDRINUSE : printf("WSAEADDRINUSE\n"); break;
+			case WSAEADDRNOTAVAIL : printf("WSAEADDRNOTAVAIL\n"); break;
+			case WSAEFAULT : printf("WSAEFAULT\n"); break;
+			case WSAEINPROGRESS : printf("WSAEINPROGRESS\n"); break;
+			case WSAEINVAL : printf("WSAEINVAL\n"); break;
+			case WSAENOBUFS : printf("WSAENOBUFS\n"); break;
+			case WSAENOTSOCK : printf("WSAENOTSOCK\n"); break;
+			default: printf("Unknown error %d\n", err);
+			}
+		exit(1);
+	}*/
+	// </ALEX DEBUG>
+	printf("5-");
 	for(i=0;i<RetVal->NumIPAddress;++i)
 	{
 		interface_addr.s_addr = RetVal->IPAddress[i];
@@ -316,9 +354,10 @@ void ILibSSDP_IPAddressListChanged(void *SSDPToken)
 			sendto(RetVal->MSEARCH_Response_Socket, buffer, bufferlength, 0, (struct sockaddr *) &dest_addr, sizeof(dest_addr));
 		}
 	}
-	
+	printf("6\n");
 	FREE(buffer);
 }
+
 void* ILibCreateSSDPClientModule(void *chain, char* DeviceURN, int DeviceURNLength, void (*CallbackPtr)(void *sender, char* UDN, int Alive, char* LocationURL, int Timeout, void *user),void *user)
 {
 	int i;
@@ -345,8 +384,8 @@ void* ILibCreateSSDPClientModule(void *chain, char* DeviceURN, int DeviceURNLeng
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_port = htons(UPNP_PORT);	
 	
-	RetVal->Destroy = &ILibSSDPClientModule_Destroy;
-	RetVal->PreSelect = &ILibSSDPClientModule_PreSelect;
+	RetVal->Destroy    = &ILibSSDPClientModule_Destroy;
+	RetVal->PreSelect  = &ILibSSDPClientModule_PreSelect;
 	RetVal->PostSelect = &ILibSSDPClientModule_PostSelect;
 	
 	RetVal->Reserved = user;

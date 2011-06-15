@@ -79,6 +79,26 @@ method PM_SVG SVG_Origine {coords} {
 Manage_CallbackList PM_SVG SVG_Origine end
 
 #___________________________________________________________________________________________________________________________________________
+method PM_SVG Generate_windows_descr {id x y width height border_width str_svg_name str_js_name} {
+	upvar $str_svg_name str_svg
+	upvar $str_js_name  str_js
+	
+	append str_svg "<g id=\"${id}\">"
+	append str_svg   "<clipPath id=\"Clip_$id\"><rect id=\"Clip_rect_$id\" x=\"0\" y=\"0\" width=\"$width\" height=\"$height\" /></clipPath>"
+	append str_svg   "<g id=\"BG_root_$id\">"
+	append str_svg     "<rect id=\"BG_border_$id\" fill=\"green\" x=\"-$border_width\" y=\"-$border_width\" rx=\"$border_width\" ry=\"$border_width\" width=\"[expr $width + 2*$border_width]\" height=\"[expr $height + 2*$border_width]\" />"
+	append str_svg     "<rect id=\"BG_rect_$id\"   fill=\"yellow\" x=\"0\" y=\"0\" width=\"$width\" height=\"$height\" />"
+	append str_svg   "</g>"
+	append str_svg   "<g id=\"root_for_daughters_${id}\" clip-path=\"url(#Clip_${id})\"></g>"
+	append str_svg "</g>"
+	
+	append str_js  "Draggable('${id}', \['BG_border_${id}'\], null, null, null);"
+	append str_js  "Register_node_id_SVG_zoom_onwheel('${id}');"
+	
+	return [dict create id $id clipPath Clip_$id Clip_rect Clip_rect_$id BG_border BG_border_$id BG_rect BG_rect_$id root_for_daughters root_for_daughters_${id}]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
  if {$direct_mode == 1  &&  $L_drag_element == $this(L_draggable)} {return ""}
  
@@ -89,32 +109,7 @@ method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
  
  set this(L_draggable) $L_drag_element 
  foreach n $this(L_draggable) {
- 	 # append cmd "var ${n}_dx = 0;\n"
-	 # append cmd "var ${n}_dy = 0;\n"
-	 # append cmd "var ${n}_str_dCTM = '';\n"
 	 append cmd "document.getElementById('$n').setAttribute('onmousedown', \"COMET_SVG_start_drag('${SVG_group}', '${n}', evt);\");"
-	 
-	 # append cmd "\$('#$n').draggable({start : function(event, ui){\n"
-	   # append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
-	   # append cmd "   var coord = convert_coord_from_page_to_node(event.pageX,event.pageY,drag_obj.parentNode);\n"
-	   # append cmd "   ${n}_dx = coord\['x'\];\n"
-	   # append cmd "   ${n}_dy = coord\['y'\];\n"
-	   # append cmd "   var ma_matrice = drag_obj.getCTM();\n"
-	   # append cmd "   var dCTM = drag_obj.parentNode.getCTM().inverse().mMultiply(ma_matrice);\n"
-	   # append cmd {   } ${n}_ {str_dCTM = "matrix("+dCTM.a+","+dCTM.b+","+dCTM.c+","+dCTM.d+","+dCTM.e+","+dCTM.f+")";} "\n"
-	   # append cmd "   drag_obj.setAttribute(\"transform\", ${n}_str_dCTM);\n"
-	 # append cmd "},drag : function(event, ui){\n"
-	   # append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
-	   # append cmd "   var coord = convert_coord_from_page_to_node(event.pageX,event.pageY,drag_obj.parentNode);\n"
-	   # append cmd "   var tx = coord\['x'\] - ${n}_dx;\n"
-	   # append cmd "   var ty = coord\['y'\] - ${n}_dy;\n"
-	   # append cmd {   drag_obj.setAttribute("transform", } ${n}_ {str_dCTM + ' translate(' + tx + ', ' + ty +')');} "\n"
-	 # append cmd "},stop : function(event, ui){\n"
-	   # append cmd "   var drag_obj = \$(\"#${SVG_group}\").get(0);\n"
-	   # append cmd "   var ma_matrice = drag_obj.getCTM();\n"
-	   # append cmd "   var ma_matrice = drag_obj.parentNode.getCTM().inverse().mMultiply(ma_matrice);\n"
-	   # append cmd "   addOutput_proc_val(\"${objName}__XXX__SVG_Origine\", ma_matrice.e + ' ' + ma_matrice.f,true);\n"
-	 # append cmd "}});\n"
  }
  
  if {$direct_mode == 1} {
