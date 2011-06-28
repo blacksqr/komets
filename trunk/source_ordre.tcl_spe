@@ -63,7 +63,8 @@ cd ..
 
 eval [source_recusrif]
 cd ..
-cd GDD
-  eval [source_recusrif]
-cd ..
-cd Comets
+if {[info exists ::env(GDD)]} {
+	cd $::env(GDD)
+	eval [source_recusrif]
+} else { puts stderr "Install GDD 'svn co https://graphedesdescriptions.googlecode.com/svn/trunk/' and set up the environement variable GDD" ; return -errorCode 1} 
+if {[info exists ::env(ROOT_COMETS)]} {cd $::env(ROOT_COMETS)/Comets/} else { puts stderr "Install devComets  'svn co https://devcomets.googlecode.com/svn/trunk/' and set up the environement variable ROOT_COMETS, then install Comets (mandatory name of the directory) in a repertory inside devcomets https://komets.googlecode.com/svn/trunk/"  }
