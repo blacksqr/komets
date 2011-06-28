@@ -1,5 +1,11 @@
-package require uuid
-package require udp
+if {[catch {package require uuid} err]} {
+	exec teacup install uuid 
+	package require uuid
+}
+if {[catch {package require  udp} err]} {
+	exec teacup install  udp 
+	package require  udp
+}
 package require tdom
 
 #___________________________________________________________________________________________________________________________________________
