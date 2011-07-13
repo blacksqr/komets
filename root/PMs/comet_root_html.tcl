@@ -481,7 +481,11 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
 	 append rep "  " "  " "  " {<input type="hidden" value="" name="pipo_button" />} "\n"
 	 append rep "  " "  " {</form>} "\n"
   }
+ append rep "<object id=\"tuio\" type=\"application/x-tuio\">TUIO plugin FAILED to load</object>\n"
  append rep "  " {</body>} "\n"
+ 
+ append rep "<script language=\"Javascript\" src=\"Comets/root/PMs/magictouch.js\"></script>\n"
+ 
  append rep </html> "\n"
 }
 

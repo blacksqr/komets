@@ -46,6 +46,7 @@ method Container_PM_P_HTML_to_SVG Render {strm_name {dec {}}} {
 method Container_PM_P_HTML_to_SVG Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
  
+ append strm "init_draggable();\n"
  this Render_daughters_post_JS strm $dec
 }
 
