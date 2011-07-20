@@ -79,9 +79,11 @@ var tuio = {
     // Some properties
     // See http://dvcs.w3.org/hg/webevents/raw-file/tip/touchevents.html
     data.identifier = sid;
-    data.pageX = window.innerWidth * x;
-    data.pageY = window.innerHeight * y;
+    data.pageX  = window.innerWidth  * x;
+    data.pageY  = window.innerHeight * y;
     data.target = document.elementFromPoint(data.pageX, data.pageY);
+    data.pageX += window.pageXOffset;
+    data.pageY += window.pageYOffset;
 	// console.log('Touch target ' + data.target + '(' + data.target.getAttribute('id') + ') from point ' + data.pageX + ' ; ' + data.pageY);
 
 		switch (type) {
