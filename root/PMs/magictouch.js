@@ -3,6 +3,12 @@
 //  http://dvcs.w3.org/hg/webevents/raw-file/tip/touchevents.html
 // TODO: support more of the touch API: touch{enter, leave, cancel}
 var tuio = {
+	Pipo_TouchList: function(L) {
+		 this.Tab = L;
+		 this.length = L.length;
+		 this.item = function(i) {return this.Tab[i];}
+		 this.push = function(e) {return this.Tab.push(e);}
+		},
 	cursors: [],
 
   // Data structure for associating cursors with objects
@@ -32,8 +38,8 @@ var tuio = {
     // Attach basic touch lists
     evt.touches = this.cursors;
     // Get targetTouches on the event for the element
-    evt.targetTouches = this._get_target_touches(touch.target);
-    evt.changedTouches = [touch];
+    evt.targetTouches  = this._get_target_touches(touch.target);
+    evt.changedTouches = new this.Pipo_TouchList( [touch] );
     // Attach custom attrs to the event
     for (var attr in attrs) {
       if (attrs.hasOwnProperty(attr)) {
@@ -51,7 +57,7 @@ var tuio = {
   },
 
   _get_target_touches: function(element) {
-    var targetTouches = [];
+    var targetTouches = new this.Pipo_TouchList([]);
     for (var i = 0; i < this.cursors.length; i++) {
       var touch = this.cursors[i];
       if (touch.target == element) {
