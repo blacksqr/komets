@@ -59,7 +59,7 @@ proc http_callback {sock token} {
 	 # fileevent  $UPNP_server_UDP readable "if {\[catch {receive_from_udp \$UPNP_server_UDP} err\]} {send_msg_to_comet \[list ERROR SSDP \$err\]}"
 	 
 	 set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/INTEL_UPNP_CLIENT.threaded_tcl" r]; set UPNP_server_pg_thread_UPNP [read $f]; close $f
-	 append UPNP_server_pg_thread_UPNP "Start_socket_client_command $UPNP_server_command_port\n"
+	 append UPNP_server_pg_thread_UPNP "\nStart_socket_client_command $UPNP_server_command_port\n"
 	 append UPNP_server_pg_thread_UPNP "start 127.0.0.1 $UPNP_server_tcp_port\n"
 	 
 	 # set f [open "$::env(ROOT_COMETS)/Comets/CometUPNP/PMs/FC/IntelBased/UPNP_load_xml.threaded_tcl" r]; set UPNP_server_pg_thread [read $f]; close $f
@@ -137,7 +137,7 @@ proc http_callback {sock token} {
 	#___________________________________________________________________________________________________________________________________________
 	set reading_sock 0
 	proc New_connection {sock ad port} {
-	 global reading_sock_$sock 
+	 global reading_sock_$sock; global data_sock_$sock
 	 set reading_sock_$sock 0; set data_sock_$sock ""
 	 fconfigure $sock -blocking 0
 	 fileevent  $sock readable "if {\[catch {Read_from_socket $sock} err\]} {send_msg_to_comet \[list ERROR {Read_from_socket} \$err\]}"
