@@ -216,10 +216,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\UDN_generator.cpp"
-				>
-			</File>
 			<Filter
 				Name="Intel"
 				>
