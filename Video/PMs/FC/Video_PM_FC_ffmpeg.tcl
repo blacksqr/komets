@@ -68,6 +68,7 @@ Inject_code Video_PM_FC_ffmpeg Stop  {} {
 Inject_code Video_PM_FC_ffmpeg go_to_time {} {
  this go_to_frame [expr int($t * [this get_video_nbFrames])]
 }
+
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
  if {[this get_video_source] != "WEBCAM" && $this(ffmpeg_id) != "" && [this get_video_source] != ""} {
@@ -147,6 +148,8 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  set this(ffmpeg_numFrames)  [FFMPEG_numFrames    $this(ffmpeg_id)]
           set this(ffmpeg_frame_rate) [FFMPEG_getFramerate $this(ffmpeg_id)]
 		  
+		  puts "Info video:\n\tffmpeg_numFrames : $this(ffmpeg_numFrames)\n\tffmpeg_frame_rate : $this(ffmpeg_frame_rate)"
+		  
          # Sound
           set sample_rate [FFMPEG_Sound_sample_rate $this(ffmpeg_id)]
           set cb_audio    [Get_FFMPEG_FMOD_Stream_Info_audio]
@@ -168,12 +171,12 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  this go_to_frame 0
 		  
 		  if {$unlock} {puts "UnLock"; FFMPEG_UnLock $this(ffmpeg_id)}
-          puts "Info audio (Video_PM_P_BIGre $objName):\n  - Sample rate : $sample_rate"
+          puts "Info audio (Video_PM_P_BIGre $objName):\n\tbuf_len : $buf_len\n\tframerate : [FFMPEG_getFramerate $this(ffmpeg_id)]\n\tSample rate : $sample_rate\n\tnb channels : [FFMPEG_Nb_channels $this(ffmpeg_id)]\n\tcb_audio : $cb_audio\n\tnb frames : [FFMPEG_get_nb_total_video_frames $this(ffmpeg_id)]\n\tbuffer size : [FFMPEG_Audio_buffer_size $this(ffmpeg_id)]"
 		  this Update_frame 1
 		  
          }
 		 
- puts "  End of $objName Video_PM_FC_ffmpeg::set_video_source"
+ # puts "  End of $objName Video_PM_FC_ffmpeg::set_video_source"
  set this(is_updating) 0
 }
 # Trace Video_PM_FC_ffmpeg set_video_source
@@ -214,6 +217,7 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
    set this(will_reupdate) 1
   } else {set this(will_reupdate) 0}
 }
+# Trace Video_PM_FC_ffmpeg Update_frame
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -227,7 +231,9 @@ method Video_PM_FC_ffmpeg Init_Pool_video_buffer {nb} {
  set this(Pool_video_buffers) [list]
  
  for {set i 0} {$i < $nb} {incr i} {
-   lappend this(Pool_video_buffers) [list 0 [FFMPEG_Get_a_buffer $this(video_buffer_size)]]
+   set buf [FFMPEG_Get_a_buffer $this(video_buffer_size)]
+   # puts "\tbuffer : $buf"
+   lappend this(Pool_video_buffers) [list 0 $buf]
   }
   
  set this(nb_video_buffers)           $nb

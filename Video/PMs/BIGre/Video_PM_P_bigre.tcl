@@ -89,15 +89,17 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
    this Origine $this(video_x) $this(video_y)
    
    # Audio with Fmod
-   if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
    set buf_len [expr int(2 * [this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
-   set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
-                                                      $audio_canal \
-													  $buf_len \
-													  [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] \
-													  [this get_sample_rate] \
-													  [this get_L_infos_sound] \
-													  ]
+   if {$buf_len > 0} {
+		   if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
+		   set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
+															  $audio_canal \
+															  $buf_len \
+															  [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] \
+															  [this get_sample_rate] \
+															  [this get_L_infos_sound] \
+															  ]
+		}
   } else {set texture [this get_B207_texture]
           if {$texture != "" && $texture != "NULL"} {
             puts "We have a Webcam for video player Video_PM_P_BIGre $objName"
