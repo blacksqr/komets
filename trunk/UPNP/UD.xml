@@ -4,7 +4,7 @@
       <major>1</major>
       <minor>0</minor>
    </specVersion>
-	<URLBase>http://129.88.66.127/Comets/UPNP/</URLBase>
+	<URLBase>http://194.199.23.176/Comets/UPNP/</URLBase>
 	<device>
 		<deviceType>urn:schemas-upnp-org:device:Sample:1</deviceType>
 		<friendlyName>Comet proxy</friendlyName>
@@ -13,26 +13,26 @@
 		<modelDescription>Proxy used to access COMETs</modelDescription>
 		<modelName>Automatically-Generated COMET Device</modelName>
 		<modelNumber>COMET v1</modelNumber>
-		<presentationURL>http://129.88.66.127/index.php</presentationURL>
-		<UDN>uuid:fa0b24c4-02c5-8942-875c-185f3811516e</UDN>
+		<presentationURL>http://194.199.23.176/index.php</presentationURL>
+		<UDN>uuid:ec8bfedb-c20b-4863-715a-15f84878c01a</UDN>
 		<serviceList>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:cr:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:fa0b24c4-02c5-8942-875c-185f3811516e:cr</serviceId>
+				<serviceId>urn:upnp-org:serviceId:ec8bfedb-c20b-4863-715a-15f84878c01a:cr</serviceId>
 				<SCPDURL>__scpd_cr.xml</SCPDURL>
 				<controlURL>__control_cr.php</controlURL>
 				<eventSubURL>__event_cr</eventSubURL>
 			</service>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:CPool_COMET_1:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:fa0b24c4-02c5-8942-875c-185f3811516e:CPool_COMET_1</serviceId>
+				<serviceId>urn:upnp-org:serviceId:ec8bfedb-c20b-4863-715a-15f84878c01a:CPool_COMET_1</serviceId>
 				<SCPDURL>__scpd_CPool_COMET_1.xml</SCPDURL>
 				<controlURL>__control_CPool_COMET_1.php</controlURL>
 				<eventSubURL>__event_CPool_COMET_1</eventSubURL>
 			</service>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:CV:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:fa0b24c4-02c5-8942-875c-185f3811516e:CV</serviceId>
+				<serviceId>urn:upnp-org:serviceId:ec8bfedb-c20b-4863-715a-15f84878c01a:CV</serviceId>
 				<SCPDURL>__scpd_CV.xml</SCPDURL>
 				<controlURL>__control_CV.php</controlURL>
 				<eventSubURL>__event_CV</eventSubURL>

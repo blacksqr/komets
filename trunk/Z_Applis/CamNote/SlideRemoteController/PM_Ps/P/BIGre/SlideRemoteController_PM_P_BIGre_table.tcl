@@ -1,6 +1,6 @@
 inherit SlideRemoteController_PM_P_BIGre_table PM_BIGre
 
-if {[file exists [get_B207_files_root]]} {source [get_B207_files_root]test_fisheyes.tcl}
+if {[file exists [get_B207_files_root]]} {source [get_B207_files_root]/test_fisheyes.tcl}
 # ccn_speaker_telec_PM_P_3 Substitute_by_PM_type SlideRemoteController_PM_P_BIGre_table
 
 #___________________________________________________________________________________________________________________________________________
