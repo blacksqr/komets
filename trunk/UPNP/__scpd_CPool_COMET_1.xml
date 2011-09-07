@@ -81,6 +81,16 @@
 			</argumentList>
 		</action>
 		<action>
+			<name>Do_a_SSDP_M-SEARCH</name>
+			<argumentList>
+				<argument>
+					<name>Result</name>
+					<direction>out</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
 			<name>M-SEARCH</name>
 			<argumentList>
 				<argument>

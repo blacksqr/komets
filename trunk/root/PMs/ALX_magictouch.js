@@ -2,6 +2,11 @@
 // Trying to be compatible with
 //  http://dvcs.w3.org/hg/webevents/raw-file/tip/touchevents.html
 // TODO: support more of the touch API: touch{enter, leave, cancel}
+
+// Updated by Alexandre Demeure
+// real coordinates (in case of page scroll
+// simulation of the touch datastructure
+
 var tuio = {
 	Pipo_TouchList: function(L) {
 		 this.Tab = L;
