@@ -1,5 +1,5 @@
 set P [pwd]
-cd $::env(ROOT_COMETS)/Comets/UPNP/Intel_UPNP_TCL/Debug
+cd $::env(ROOT_COMETS)/Comets/UPNP/Intel_UPNP_TCL/Release
 load Intel_UPNP_TCL.dll
 cd $P
 

@@ -116,7 +116,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				AdditionalIncludeDirectories="C:\Tcl\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;USE_TCL_STUBS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -133,8 +134,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="tclstub85.lib WSock32.Lib $(NOINHERIT)"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\Tcl\lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
