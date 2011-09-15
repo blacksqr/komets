@@ -159,7 +159,10 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 				}
 			 if(strncasecmp(node->Field,"ST",2)==0 && node->FieldLength==2) {
 				 node->FieldData[node->FieldDataLength] = '\0';
-				 Location = node->FieldData;
+				 //Location = node->FieldData;
+				 Location = (char*)MALLOC(node->FieldDataLength+1);
+				 memcpy(Location,node->FieldData,node->FieldDataLength);
+				 Location[node->FieldDataLength] = '\0';
 				 printf("ST : %s ...", node->FieldData);
 				}
 			// Next field
@@ -240,7 +243,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 			}
 		}
 	}
-	printf("Juste before FREE\n");
+	printf("Juste before FREE(Location)\n");
 	if(Location!=NULL) {FREE(Location);}
 	printf("Juste before ILibDestructPacket\n");
 	ILibDestructPacket(packet);
