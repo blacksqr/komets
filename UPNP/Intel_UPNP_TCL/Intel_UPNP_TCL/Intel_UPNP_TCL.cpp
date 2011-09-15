@@ -200,13 +200,13 @@ void INTEL_UPNP_listener_set_cmd_MSEARCH      (const char *str) {API_INTEL_UPNP_
 //_______________________________________________________________________________________________________________
 void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationURL, int Timeout,void *cp)
 {if(UDN == NULL) {return;}
- printf("IN-");
+ // printf("IN-");
 
  Tcl_DString cmd;
  Tcl_DStringInit(&cmd);
 	if(Alive != 0) {
 		if (strncasecmp(UDN,"M-SEARCH",8) == 0) {
-			printf("MSEARCH CB ... ");
+			// printf("MSEARCH CB ... ");
 			Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_MSEARCH.c_str(), API_INTEL_UPNP_TCL_cmd_MSEARCH.length());
 			Tcl_DStringAppend(&cmd, " {", 2);
 			Tcl_DStringAppendElement(&cmd, "UDN"); Tcl_DStringAppendElement(&cmd, "M-SEARCH");
@@ -242,6 +242,6 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 
  Tcl_DStringFree(&cmd);
 
- printf("-OUT\n");
+ // printf("-OUT\n");
 }
 
