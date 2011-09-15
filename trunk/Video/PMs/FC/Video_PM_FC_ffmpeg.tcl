@@ -4,6 +4,19 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Video_PM_FC_ffmpeg Physical_model
+#___________________________________________________________________________________________________________________________________________
+proc Video_PM_FC_ffmpeg__Delayed_load_of_FF_MPEG {} {
+   if {![info exists class(ffmpeg_init_OK)]} {
+     if {[catch "load {[get_B207_files_root]FFMPEG_for_TCL.dll}" err]} {
+       error "ERROR while trying to reload FFMPEG library:\n$err"
+      } else {ffmpeg_init
+	          FFMPEG_FSOUND_Init
+	          global Video_PM_FC_ffmpeg
+			  set Video_PM_FC_ffmpeg(ffmpeg_init_OK) 1
+			  puts stderr "FFMPEG_for_TCL now post loaded :)"
+	         }
+    }
+}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg constructor {name descr args} {
@@ -14,7 +27,8 @@ method Video_PM_FC_ffmpeg constructor {name descr args} {
    set this(is_updating) 0
    if {![info exists class(ffmpeg_init_OK)]} {
      if {[catch "load {[get_B207_files_root]FFMPEG_for_TCL.dll}" err]} {
-       error "ERROR while loading FFMPEG library:\n$err"
+       puts stderr "ERROR while loading FFMPEG library:\n$err"
+	   after 1000 Video_PM_FC_ffmpeg__Delayed_load_of_FF_MPEG
       } else {ffmpeg_init
 	          FFMPEG_FSOUND_Init
 	          set class(ffmpeg_init_OK) 1
