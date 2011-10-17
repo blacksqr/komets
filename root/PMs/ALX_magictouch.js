@@ -13,6 +13,7 @@ var tuio = {
 		 this.length = L.length;
 		 this.item = function(i) {return this.Tab[i];}
 		 this.push = function(e) {return this.Tab.push(e);}
+		 this.setTarget = function(i, n) {return this.Tab[i].target = n;}
 		},
 	cursors: [],
 
@@ -21,6 +22,12 @@ var tuio = {
 
   _touchstart:    function(touch) {
     // Create a touchstart event
+	// Compute touch target
+	//touch.target = null;
+	var node = touch.currentTarget;
+	// while(node != null && node.ontouchstart == undefined && ) {
+		 // node = node.parentNode;
+		// }
     this._create_event('touchstart', touch, {});
   },
 
@@ -74,7 +81,7 @@ var tuio = {
 
 	// Callback from the main event handler
 	callback: function(type, sid, fid, x, y, angle) {
-    //console.log('callback type: ' + type + ' sid: ' + sid + ' fid: ' + fid);
+    // console.log('callback type: ' + type + ' sid: ' + sid + ' fid: ' + fid);
 		var data;
 
 		if (type !== 3) {
@@ -92,7 +99,7 @@ var tuio = {
     data.identifier = sid;
     data.pageX  = window.innerWidth  * x;
     data.pageY  = window.innerHeight * y;
-    data.target = document.elementFromPoint(data.pageX, data.pageY);
+    data.currentTarget = data.target = document.elementFromPoint(data.pageX, data.pageY);
     data.pageX += window.pageXOffset;
     data.pageY += window.pageYOffset;
 	// console.log('Touch target ' + data.target + '(' + data.target.getAttribute('id') + ') from point ' + data.pageX + ' ; ' + data.pageY);

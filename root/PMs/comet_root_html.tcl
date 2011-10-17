@@ -116,12 +116,13 @@ method PhysicalHTML_root Render_JS {strm_name mark {dec {}}} {
  
  #append strm $dec "<link type=\"text/css\" href=\"./Comets/models/HTML/jquery/css/smoothness/jquery-ui-1.7.1.custom.css\" rel=\"stylesheet\" />\n"
  
- append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n"
+ append strm $dec "<script language=\"JavaScript\" type=\"text/javascript\">\n" {<![CDATA[}
    this Render_daughters_JS strm $mark $dec
    append strm $dec "\$(document).ready(function() {\n"
      this Render_post_JS strm "$dec    "
    append strm $dec "  });"
- append strm $dec "</script>\n"
+   
+ append strm $dec {]]>} "</script>\n"
 }
 #___________________________________________________________________________________________________________________________________________
 Generate_accessors PhysicalHTML_root [list CSS PHP_page]
