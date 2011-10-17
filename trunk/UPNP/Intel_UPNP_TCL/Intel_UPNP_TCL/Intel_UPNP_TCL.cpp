@@ -213,11 +213,11 @@ void INTEL_UPNP_new_message(void *sender, char* UDN, int Alive, char* LocationUR
 			Tcl_DStringAppendElement(&cmd, "ST" ); if(LocationURL) {Tcl_DStringAppendElement(&cmd, LocationURL);} else {Tcl_DStringAppendElement(&cmd, "");}
 			char *str_cmd = Tcl_DStringAppend(&cmd, "}", 1);
 			
-			printf("-> %s", str_cmd);
+			// printf("-> %s", str_cmd);
 			Tcl_Eval(API_INTEL_UPNP_TCL_tcl_interp, str_cmd);
 			
 			Tcl_DStringFree(&cmd);
-			printf("-OUT MSEARCH\n");
+			// printf("-OUT MSEARCH\n");
 			return;
 		} else {Tcl_DStringAppend(&cmd, API_INTEL_UPNP_TCL_cmd_DeviceAdded.c_str(), API_INTEL_UPNP_TCL_cmd_DeviceAdded.length());
 			   }

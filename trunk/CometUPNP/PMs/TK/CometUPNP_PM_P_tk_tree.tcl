@@ -61,13 +61,22 @@ Generate_PM_setters CometUPNP_PM_P_tk_tree [P_L_methodes_set_CometUPNP_COMET_RE_
 Inject_code CometUPNP_PM_P_tk_tree set_item_of_dict_devices {} {
 	if {[winfo exists $this(tk_root)]} {
 		 set UDN $keys
-		 set parent_UDN [this get_item_of_dict_devices [list $UDN parent_UDN]]
+		 if {[catch {set parent_UDN [this get_item_of_dict_devices [list $UDN parent_UDN]]} err]} {
+			 puts stderr "In $objName CometUPNP_PM_P_tk_tree::set_item_of_dict_devices, parent_UDN problem with UDN : $UDN"
+			 puts stderr "err : $err\n"
+			 set parent_UDN ""
+			 return;
+			}
 		 if {$parent_UDN != $UDN} {set parent_id $parent_UDN} else {set parent_id ""}
 		 
 		 # Search position to insert
-		 set pos_insert 0; set L_UDN_name [list [list $UDN [this get_item_of_dict_devices [list $UDN friendlyName]]]]
+		 set pos_insert 0
+		 if {[catch {set L_UDN_name [list [list $UDN [string tolower [this get_item_of_dict_devices [list $UDN friendlyName]]]]]} err]} {
+			 puts stderr "In $objName CometUPNP_PM_P_tk_tree::set_item_of_dict_devices :\n\tdevice $UDN has no friendly name?\n\t err : $err"
+			 return
+			}
 		 foreach U [$this(tree) children ""] {
-			 lappend L_UDN_name [list $U [this get_item_of_dict_devices [list $U friendlyName]]]
+			 lappend L_UDN_name [list $U [string tolower [this get_item_of_dict_devices [list $U friendlyName]]]]
 			}
 		 
 		 set L_UDN_name [lsort -index 1 -ascii $L_UDN_name]
@@ -75,7 +84,8 @@ Inject_code CometUPNP_PM_P_tk_tree set_item_of_dict_devices {} {
 		 
 		 if {[$this(tree) exists $UDN]} {$this(tree) delete $UDN}
 		 if {$parent_id != "" && ![$this(tree) exists $parent_id]} {
-			 this set_item_of_dict_devices $parent_id ""
+			 puts stderr "\t$objName CometUPNP_PM_P_tk_tree::set_item_of_dict_devices :The device $parent_id does not exist yet...?"
+			 return
 			}
 		 $this(tree) insert $parent_id $pos_insert -id $UDN -tags $UDN -image $this(img_device) -text [this get_item_of_dict_devices [list $UDN friendlyName]]
 		 $this(tree) tag bind $UDN <ButtonPress-1> [list $objName Display_UDN $UDN]

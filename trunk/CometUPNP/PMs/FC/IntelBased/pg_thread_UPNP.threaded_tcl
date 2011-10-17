@@ -3,7 +3,7 @@ package require Thread
 package require http
 package require udp
 
-proc get_xml_from {ad {t 5000}} {
+proc get_xml_from {ad {t 1000}} {
   global UPNP_server_D_device_with_pb
   
   if {[dict exists $UPNP_server_D_device_with_pb $ad]} {
@@ -11,9 +11,11 @@ proc get_xml_from {ad {t 5000}} {
 	}
 	
 	#
-  if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
-																 return ""
-																}
+  if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {
+		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
+		 return "BLOC_CALL"
+		}
+		
   switch [::http::status $token] {
 	 ok      {set rep [::http::data $token]
 			  if {![regexp {^[ \t\n]*<\?xml} $rep]} {set rep [string range $rep [string first "<?xml" $rep] end-4]}
@@ -172,7 +174,18 @@ proc http_callback {sock token} {
 			  set cmd             [string range [set data_sock_$sock] 0 [expr $cmd_length - 1]]
 			  set data_sock_$sock [string range [set data_sock_$sock] $cmd_length end]
 			  # Add command to the pool
-			  Process_messages $cmd
+			  if {!$UPNP_server_going_to_process_messages} {
+					 Process_messages $cmd
+					} else {if {0 && [lassign [is_an_update_message $cmd] UDN]} {
+								 send_msg_to_comet [list INFOS "     ShortCut update of $UDN !"]
+								 new_UPNP_message cmd 
+								} else {
+										if {$reading_sock == 1} {
+											 lappend UPNP_server_L_messages $cmd
+											} else {lappend UPNP_server_L_messages_2 $cmd}
+										Process_L_messages
+									   }
+						   }
 			 } else {break}
 		}
 
@@ -186,25 +199,116 @@ proc http_callback {sock token} {
 	 incr reading_sock -1
 	}
 	
+	set last_Process_recall 0
+	#___________________________________________________________________________________________________________________________________________
+	proc Process_L_messages {} {
+		 global reading_sock
+		 global last_Process_recall
+		 if {$reading_sock >= 1} {
+			 set ms [clock milliseconds]
+			 if {!$UPNP_server_going_to_process_messages || $ms - $last_Process_recall > 500} {
+				 after 500 Process_L_messages
+				 set last_Process_recall $ms
+				 set UPNP_server_going_to_process_messages 1
+				 # send_msg_to_comet [list INFOS "reading_sock, retry Process_L_messages in 500 ms"]
+				}
+			 return
+			}
+		
+		 incr reading_sock  2
+		 set UPNP_server_going_to_process_messages 0
+
+		 # send_msg_to_comet [list INFOS Process_L_messages contains [llength $UPNP_server_L_messages] messages]
+		 if {[catch {
+					 set new_L [list]
+					 foreach msg $UPNP_server_L_messages {
+						 set msg_processed 0
+						 # Finds messages related to still registered devices
+						 lassign [is_a_new_location $msg] UDN new_location
+						 if {!$new_location && $UDN != ""} {
+							 # Is the description of this UDN still loaded?
+							 if {[dict exists $UPNP_server_L_devices $UDN got_device_description]} {
+								 if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "DONE"} {
+									 # Process now !
+									 Really_Process_messages $msg
+									 # send_msg_to_comet [list INFOS "    Update $UDN"]
+									 set msg_processed 1
+									}
+								}
+							}
+						 
+						 if {!$msg_processed} {lappend new_L $msg}
+						}
+						
+					  # Process messages while they are not too much time costly
+					  set UPNP_server_L_messages $new_L
+					  if {[llength $UPNP_server_L_messages]} {
+						 set UPNP_server_L_messages [lassign $UPNP_server_L_messages msg]
+						 set ms [clock milliseconds]; set total_ms 0
+						 while {$msg != "" && $total_ms < 5000} {
+							 set ms2 [clock milliseconds]
+							 Really_Process_messages $msg
+							 if {[dict exists $msg UDN]} {set UDN [dict get $msg UDN]} else {set UDN ""}
+							 set UPNP_server_L_messages [lassign $UPNP_server_L_messages msg]
+							 incr total_ms [expr $ms2 - $ms]
+							 # send_msg_to_comet [list INFOS "    Really_Process_messages ($UDN last [expr $ms2 - $ms]) of the list ([llength $UPNP_server_L_messages] left)"]
+							 set ms $ms2
+							}
+							
+						 set UPNP_server_L_messages   [concat $UPNP_server_L_messages $UPNP_server_L_messages_2]
+						 set UPNP_server_L_messages_2 [list]
+						 if {[llength $UPNP_server_L_messages]} {
+							 # send_msg_to_comet [list INFOS "     Wait 50 ms before processing the other messages"]
+							 after 50 Process_L_messages
+							}
+							
+						} else {set UPNP_server_going_to_process_messages 0
+								set UPNP_server_L_messages $UPNP_server_L_messages_2
+								set UPNP_server_L_messages_2 [list]
+								if {[llength $UPNP_server_L_messages]} {
+									 # send_msg_to_comet [list INFOS "     restart with [llength $UPNP_server_L_messages] others messages ..."]
+									 if {!$UPNP_server_going_to_process_messages} {after 50 Process_L_messages}
+									}
+							   }
+				  
+			 # send_msg_to_comet [list INFOS "After Process_L_messages" $UPNP_server_L_messages]
+			} err]} {send_msg_to_comet [list ERROR "During Process_L_messages" $err]}
+		  incr reading_sock  -2
+		}
 	
 	#___________________________________________________________________________________________________________________________________________
 	proc Process_messages {msg} {
 		global reading_sock
 		if {$reading_sock > 1} {
-			 after 200 [list Process_messages $msg]
-			} else  {incr reading_sock  2
-					 lappend UPNP_server_sock_data $msg
-					 foreach cmd $UPNP_server_sock_data {
-						 if {[lindex $cmd 0] == "CALL"} {
-							 if {[catch {eval [lindex $cmd 1]}  err]} {send_msg_to_comet [list ERROR "Process_messages with command CALL:\n$cmd" $err]}
-							} else {
-									# puts $msg
-								    if {[catch {new_UPNP_message cmd} err]} {send_msg_to_comet [list ERROR "Process_messages with command:\n$cmd" $err]}
-								   }
-						}
-					 set UPNP_server_sock_data [list]
-					 incr reading_sock -2
+			 lappend UPNP_server_L_messages $msg
+			 if {!$UPNP_server_going_to_process_messages} {
+				 if {!$UPNP_server_going_to_process_messages} {
+					 # send_msg_to_comet [list INFOS "Wait 50 ms before processing"]
+					 after 50 Process_L_messages
 					}
+				}
+			 # after 200 [list Process_messages $msg]
+			 
+			} else  {Really_Process_messages $msg
+					}
+	}
+	
+	#___________________________________________________________________________________________________________________________________________
+	proc Really_Process_messages {msg} {
+			 global reading_sock
+			 incr reading_sock  2
+			 set cmd $msg
+			 # lappend UPNP_server_sock_data $msg
+			 # foreach cmd $UPNP_server_sock_data {
+				 if {[lindex $cmd 0] == "CALL"} {
+					 if {[catch {eval [lindex $cmd 1]}  err]} {send_msg_to_comet [list ERROR "Process_messages with command CALL:\n$cmd" $err]}
+					} else {
+							# puts $msg
+							if {[catch {new_UPNP_message cmd} err]} {send_msg_to_comet [list ERROR "Process_messages with command:\n$cmd" $err]}
+						   }
+				# }
+			 set UPNP_server_sock_data [list]
+			 incr reading_sock -2
 	}
 
 	#___________________________________________________________________________________________________________________________________________
@@ -224,32 +328,56 @@ proc http_callback {sock token} {
 	}
 
 	#___________________________________________________________________________________________________________________________________________
+	proc is_an_update_message {msg} {
+		 set UDN [dict get $msg UDN]
+		 regexp {^uuid:(.*)$} $UDN reco UDN
+		 if {[dict exists $msg Alive] && [dict exists $UPNP_server_L_devices $UDN got_device_description]} {
+			 if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "DONE"} {return [list $UDN 1]}
+			}
+		 return [list "" 0]
+		}
+		
 	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	#___________________________________________________________________________________________________________________________________________
+	proc is_a_new_location {msg} {
+		 set UDN ""
+		 set UDN [dict get $msg UDN]
+		 regexp {^uuid:(.*)$} $UDN reco UDN
+		 if {[dict exists $msg LocationURL]} {set new_location 1} else {set new_location 0}
+		 
+		 if {$UDN == ""} {return [list "" 0]}
+		 
+		 if {$new_location && [dict exists $UPNP_server_L_devices $UDN]} {
+		   if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
+			 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $msg LocationURL]} {
+				set new_location 0
+				} else  {if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "ERROR"} {set new_location 0}
+						}
+			}
+		  } 
+
+		 return [list $UDN $new_location]
+	}
+	
 	#___________________________________________________________________________________________________________________________________________
 	proc Device_added {L} {
-	 set UDN [dict get $L UDN]
-	 regexp {^uuid:(.*)$} $UDN reco UDN
-	 if {[dict exists $L LocationURL]} {set new_location 1} else {set new_location 0}
-	 
+	 lassign [is_a_new_location $L] UDN new_location
 	 if {$new_location && [dict exists $UPNP_server_L_devices $UDN]} {
-	   if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
-		 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $L LocationURL]} {
-			set new_location 0
-			} else  {if {[dict get $UPNP_server_L_devices $UDN got_device_description] != "ERROR"} {set new_location 0}
-					}
-		}
-	   dict set UPNP_server_L_devices $UDN [dict merge [dict get $UPNP_server_L_devices $UDN] $L]
-	  } else {dict set UPNP_server_L_devices $UDN $L
-			  dict set UPNP_server_L_devices $UDN got_device_description "WIP"
-			 }
-
+		 dict set UPNP_server_L_devices $UDN [dict merge [dict get $UPNP_server_L_devices $UDN] $L]
+		} else {dict set UPNP_server_L_devices $UDN $L
+				dict set UPNP_server_L_devices $UDN got_device_description "WIP"
+			   }
+		
 	 # Thread the loading of the related XML document
 	 if {$new_location} {
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
 	   if {$str_xml != "BLOC_CALL"} {
 			dict set UPNP_server_L_devices $UDN got_device_description "DONE"
 			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR set_description_from_thread $err]}
-		   } else {dict set UPNP_server_L_devices $UDN got_device_description "ERROR"}
+		   } else {dict set   UPNP_server_L_devices $UDN got_device_description "ERROR"
+				   # dict unset UPNP_server_L_devices $UDN
+				  }
 	  } else {set ms [clock milliseconds]
 	          dict set UPNP_server_L_devices $UDN last_beat $ms
 			 }
@@ -328,14 +456,16 @@ proc http_callback {sock token} {
 	proc Is_still_alive {UDN last_ms} {
 		global UPNP_server_L_devices
 		
-		set ms        [clock milliseconds]
-		set timeout   [dict get $UPNP_server_L_devices $UDN Timeout]
-		set last_beat [dict get $UPNP_server_L_devices $UDN last_beat]
-		if {$last_beat <= $last_ms} {
-			 # Sub the device
-			 Device_removed [dict create UDN $UDN]
-			} else {after [expr 1000*$timeout - ($ms - $last_beat)] "Is_still_alive $UDN $last_beat"
-				   }
+		if {[dict exists $UPNP_server_L_devices $UDN Timeout] && [dict exists $UPNP_server_L_devices $UDN last_beat]} {
+			set ms        [clock milliseconds]
+			set timeout   [dict get $UPNP_server_L_devices $UDN Timeout]
+			set last_beat [dict get $UPNP_server_L_devices $UDN last_beat]
+			if {$last_beat <= $last_ms} {
+				 # Sub the device
+				 Device_removed [dict create UDN $UDN]
+				} else {after [expr 1000*$timeout - ($ms - $last_beat)] "Is_still_alive $UDN $last_beat"
+					   }
+			}
 	}
 	 
 	#___________________________________________________________________________________________________________________________________________
@@ -387,12 +517,17 @@ proc http_callback {sock token} {
 			} else {set ad [get_ip_ad_from_locationURL $UDN];
 					append ad $SCPDURL
 				   }
+	   dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "WIP"
 	   set str_xml [get_xml_from $ad]
 	   if {$str_xml != "BLOC_CALL"} {
-			 if {[catch {set_service_description $UDN $service_id str_xml} err]} {
-				 send_msg_to_comet [list ERROR "set_service_description $UDN $service_id str_xml" $err]
-				}
-			}
+			 if {[catch {set res_set_descr [set_service_description $UDN $service_id str_xml]} err]} {
+				 send_msg_to_comet [list ERROR "set_service_description $UDN $service_id str_xml\n\tstr_xml : $str_xml" $err]
+				} else {if {$res_set_descr == 0} {
+							 send_msg_to_comet [list INFOS "Retry to get the description : " $str_xml]
+							 dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
+							} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "DONE"}
+					   }
+			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"}
 	  }
 
 	 # Send device description
@@ -403,8 +538,8 @@ proc http_callback {sock token} {
 	proc set_service_description {UDN service_id data_name} {
 	 upvar $data_name data
 	 if {[catch {set doc [dom parse $data]} err]} {
-	   send_msg_to_comet [list ERROR "in parsing xml in set_service_description from $UDN"  $err $data]
-	   return
+	   send_msg_to_comet [list ERROR "in parsing xml in set_service_description from $UDN -> $service_id : \n\t data : $data"  $err $data]
+	   return 0
 	  }
 	  
 	 set dict_state_variable [dict create]
@@ -419,9 +554,9 @@ proc http_callback {sock token} {
 	   set node_name [$node_action selectNodes -namespaces [list ns $ns] "ns:name | name"]
 	   set dict_action [dict create]
 	   foreach node_param [$node_action selectNodes -namespaces [list ns $ns] ".//ns:argument | .//argument"] {
-	     set param_name [[$node_param selectNodes -namespaces [list ns $ns] "ns:name | name"] asText]
+	     set param_name [string trim [[$node_param selectNodes -namespaces [list ns $ns] "ns:name | name"] asText]]
 		 foreach i [list direction relatedStateVariable] {
-		   dict set dict_action $param_name $i [[$node_param selectNodes -namespaces [list ns $ns] "ns:$i | $i"] asText]
+		   dict set dict_action $param_name $i [string trim [[$node_param selectNodes -namespaces [list ns $ns] "ns:$i | $i"] asText]]
 		  }
 		}
 	   dict set UPNP_server_L_devices $UDN ServiceList $service_id actions [$node_name asText] $dict_action
@@ -433,15 +568,17 @@ proc http_callback {sock token} {
 	   set sendEvents [$node_state_var getAttribute sendEvents yes]; set dict_state_variable [dict create sendEvents $sendEvents]
 	   set multicast  [$node_state_var getAttribute multicast  no ]; set dict_state_variable [dict create multicast  $multicast ]
 	   set defaultValue ""; set node_defaultValue [$node_state_var selectNodes -namespaces [list ns $ns] "ns:defaultValue | defaultValue"]
-	   if {$node_defaultValue != ""} {set defaultValue [$node_defaultValue asText]}
-	   foreach i [list name dataType] {dict set dict_state_variable $i [[$node_state_var selectNodes -namespaces [list ns $ns] "ns:$i | $i"] asText]}
-	   set allowedValues [list]; foreach n [$node_state_var selectNodes -namespaces [list ns $ns] ".//ns:allowedValue | .//allowedValue"] {lappend allowedValues [$n asText]}
+	   if {$node_defaultValue != ""} {set defaultValue [string trim [$node_defaultValue asText]]}
+	   foreach i [list name dataType] {dict set dict_state_variable $i [string trim [[$node_state_var selectNodes -namespaces [list ns $ns] "ns:$i | $i"] asText]]}
+	   set allowedValues [list]; foreach n [$node_state_var selectNodes -namespaces [list ns $ns] ".//ns:allowedValue | .//allowedValue"] {lappend allowedValues [string trim [$n asText]]}
 	   dict set dict_state_variable allowedValues $allowedValues
 	   
-	   dict set UPNP_server_L_devices $UDN ServiceList $service_id stateVariables [$node_name asText] $dict_state_variable
+	   dict set UPNP_server_L_devices $UDN ServiceList $service_id stateVariables [string trim [$node_name asText]] $dict_state_variable
 	  }
 	  
 	 $doc delete
+	 
+	 return 1
 	}
 
 	#___________________________________________________________________________________________________________________________________________
@@ -475,6 +612,10 @@ proc http_callback {sock token} {
 	set UPNP_server_socket_client ""
 	set UPNP_server_thread_for_retrieving_xml ""
 	
+	set UPNP_server_L_messages   [list]
+	set UPNP_server_L_messages_2 [list]
+	set UPNP_server_going_to_process_messages 0
+	
 	set UPNP_server_UDP ""
 	
 	set UPNP_server_D_device_with_pb [dict create]
@@ -485,9 +626,9 @@ proc http_callback {sock token} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 set cmd ""
-foreach var [list UPNP_server_tcp_command UPNP_server_command_port UPNP_server_is_processing_messages UPNP_server_UDP UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
+foreach var [list UPNP_server_going_to_process_messages UPNP_server_L_messages UPNP_server_L_messages_2 UPNP_server_tcp_command UPNP_server_command_port UPNP_server_is_processing_messages UPNP_server_UDP UPNP_server_L_devices UPNP_server_thread_for_retrieving_xml UPNP_server_required_packet_length UPNP_server_sock_data UPNP_server_tcp_server UPNP_server_tcp_port UPNP_server_pg_thread UPNP_server_pg_thread_UPNP UPNP_server_L_threads UPNP_server_UPNP_thread UPNP_server_mutex UPNP_server_socket_client] {append cmd "global $var; "}
 append cmd "\n"
-foreach p [list MSEARCH Process_messages UPNP_server receive_from_udp get_ip_ad_from_locationURL Is_still_alive send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
+foreach p [list is_an_update_message Really_Process_messages is_a_new_location Process_L_messages MSEARCH Process_messages UPNP_server receive_from_udp get_ip_ad_from_locationURL Is_still_alive send_msg_to_comet get_L_devices New_connection Read_from_socket new_UPNP_message Device_added get_root_ad_from_UDN get_root_ad_from_locationURL set_description_from_thread Add_device_from_dom set_service_description Device_removed ] {
 	set L_args [info args $p]
 	set body   [info body $p]
 	proc $p $L_args "$cmd $body"

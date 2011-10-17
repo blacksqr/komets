@@ -198,7 +198,7 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 		  set this(${chan},msg) [string range $this(${chan},msg) $this(${chan},msg_attended_length) end]
 		  set this(${chan},msg_attended_length) -1
 		  
-		  if {[catch {this new_UPNP_message msg} err]} {puts "ERROR while receiving new message :\n\tmsg : $msg\n\terr : $err"}
+		  if {[catch {this new_UPNP_message msg} err]} {puts stderr "ERROR while receiving new message :\n\tmsg : \$msg\n\terr : $err\n______stack:\n$::errorInfo"}
 		 } else {break}
   }
 }
@@ -219,7 +219,8 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 					  this prim_M-SEARCH $UDN
 				     }
     UPNP_server_port {set this(UPNP_server_port) $UDN; puts "\n____________________________________________________________________\nUPNP_server_port : $this(UPNP_server_port)"}
-	         ERROR   {puts "ERROR from UPNP :\n$msg"}
+	         ERROR   {puts stderr "ERROR from UPNP :\n$msg"}
+			 INFOS	 {puts "UPNP $msg"}
 	}
 }
 
