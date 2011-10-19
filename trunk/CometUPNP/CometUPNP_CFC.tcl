@@ -33,12 +33,12 @@ method CometUPNP_CFC M-SEARCH         {ST} {}
 method CometUPNP_CFC Do_a_SSDP_M-SEARCH {} {}
 
 #___________________________________________________________________________________________________________________________________________
-method CometUPNP_CFC Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
-}
+method CometUPNP_CFC Subscribe_to_UPNP_events   {UDN service_id ID_subscribe CB} {}
+method CometUPNP_CFC UnSubscribe_to_UPNP_events {UDN service_id ID_subscribe}    {}
 
 #___________________________________________________________________________________________________________________________________________
-method CometUPNP_CFC Remove_eventing_CB {UDN service_id ID_subscribe} {
-}
+method CometUPNP_CFC Add_eventing_CB    {UDN service_id ID_subscribe CB} {}
+method CometUPNP_CFC Remove_eventing_CB {UDN service_id ID_subscribe}    {}
 
 #___________________________________________________________________________________________________________________________________________
 proc P_CometUPNP_CFC__eval_cond {D D_name L_var cond} {
@@ -74,6 +74,20 @@ method CometUPNP_CFC Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT
 }
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_get_CometUPNP {} {return [list {Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT}} {get_dict_devices { }} {get_item_of_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
-proc P_L_methodes_set_CometUPNP {} {return [list {Do_a_SSDP_M-SEARCH {}} {M-SEARCH {ST}} {Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB}} {Remove_eventing_CB {UDN service_id ID_subscribe}} {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
+method CometUPNP_CFC CometUPNP_Read_variable_from_xml {str_xml str_var} {
+ set rep ""
+ set doc [dom parse [string trim $str_xml]]
+	set root [$doc documentElement]; set ns_root [$root namespace]
+	foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:property/$str_var"] {
+		 set rep [$res text]
+		}
+ $doc delete
+ 
+ return $rep
+}
+
+
+#___________________________________________________________________________________________________________________________________________
+proc P_L_methodes_get_CometUPNP {} {return [list {CometUPNP_Read_variable_from_xml {str_xml str_var}} {Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT}} {get_dict_devices { }} {get_item_of_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
+proc P_L_methodes_set_CometUPNP {} {return [list {Do_a_SSDP_M-SEARCH {}} {M-SEARCH {ST}} {UnSubscribe_to_UPNP_events {UDN service_id ID_subscribe}} {Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB}} {Remove_eventing_CB {UDN service_id ID_subscribe}} {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
 

@@ -118,6 +118,26 @@ method CometUPNP_PM_FC_intelbased Remove_eventing_CB {UDN service_id ID_subscrib
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased UnSubscribe_to_UPNP_events {UDN service_id ID_subscribe} {
+	if {[regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
+		 this Remove_eventing_CB $UDN $service_id $ID_subscribe
+		 if {![info exists this(UPNP_eventing_CB,${UDN},${service_id})]} {
+			 set event_ad [this get_item_of_dict_devices [list $UDN ServiceList $service_id eventSubURL]]
+			 if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
+			 
+			 set msg "UNSUBSCRIBE $event_ad HTTP/1.1
+HOST: ${IP}:$PORT
+SID: [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) UUID]
+Content-Length: 0
+"
+			 set S [socket -async $IP $PORT]
+			 fconfigure $S -blocking 0
+			 fileevent $S writable "puts $S [list $msg]; close $S;"
+			}
+		}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
 	if {[regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
 		 if {![info exists this(UPNP_eventing_CB,${UDN},${service_id})]} {
@@ -160,8 +180,12 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
 	 if {![dict exists $dict_rep "TIMEOUT:"]} {dict set dict_rep "TIMEOUT:" 1800}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT [dict get $dict_rep "TIMEOUT:"]
+	 
+	 # Launch a timer to subscribe again...
+	 after [expr [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT]*1000 - 10000] [list puts "RESUBSCRIBE IS NEEDED FOR $UDN $service_id"]
 }
 # Trace CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response
+
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -228,6 +252,7 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
  set id ${UDN},${service},${action}
  if {![info exists this($id)]} {
+	set this($id) ${objName}_SOAP_proxy_$id
 	set controlURL    [this get_item_of_dict_devices "$UDN ServiceList $service controlURL"]
 	if {[string index $controlURL 0] != "/"} {
 		 set URL [this get_item_of_dict_devices "$UDN baseURL"]
@@ -237,31 +262,44 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 	append URL $controlURL
 
 	set prefix_action [this get_item_of_dict_devices "$UDN ServiceList $service serviceType"]
-	set L_params [list]
+	set L_params [list]; set this(L_out_params_$this($id)) [list]
 	foreach p [this get_children_attributes "$UDN ServiceList $service actions $action"] {
-		 if {[this get_item_of_dict_devices "$UDN ServiceList $service actions $action $p direction"] == "in"} {lappend L_params $p ""}
+		 if {[this get_item_of_dict_devices "$UDN ServiceList $service actions $action $p direction"] == "in"} {lappend L_params $p ""} else {lappend this(L_out_params_$this($id)) $p}
 		}
 	# puts "::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params {$L_params} -proxy $URL -uri $prefix_action -action ${prefix_action}#$action"
-	::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action
-	set this($id) ${objName}_SOAP_proxy_$id
+	::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action -command [list $objName soap_asynchronous_reply $this($id)]
 	}
 	
  return $this($id) 
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased soap_asynchronous_reply {soap_proxy_id data} {
+	if {[catch {set soap_rep [::SOAP::dump -reply $soap_proxy_id]} err]} {puts stderr "Error reading SOAP answer"} else {
+		 if {[catch [list $objName soap_reply $soap_rep $this(CB_for_$soap_proxy_id)] err]} {puts stderr "Error with $objName soap_reply \[::SOAP::dump -reply $soap_proxy_id\] [list $this(CB_for_$soap_proxy_id)]\n\terr : $err"}
+		}
+	unset this(CB_for_$soap_proxy_id)
+}
+# Trace CometUPNP_PM_FC_intelbased soap_asynchronous_reply
+
+#___________________________________________________________________________________________________________________________________________
 Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
  # set S [this get_soap_proxy $UDN $service $action]
  # ::SOAP::configure $S -command "puts "
  # return
- 
- this get_soap_proxy $UDN $service $action
  set id ${UDN},${service},${action}
+ this get_soap_proxy $UDN $service $action
+
  if {[info exists this($id)]} {
+	if {[info exists this(CB_for_$this($id))]} {return}
 	set cmd [concat [list $this($id)] $L_params]
+	set this(CB_for_$this($id)) $CB
 	if {[catch {set UPNP_res [eval $cmd]} err]} {
+		 unset this(CB_for_$this($id))
 		 this soap_error_reply [::SOAP::dump -reply $this($id)] $CB
-		} else {this soap_reply [::SOAP::dump -reply $this($id)] $CB}
+		} else {
+				# this soap_reply [::SOAP::dump -reply $this($id)] $CB
+			   }
 	}
 }
 
@@ -290,6 +328,6 @@ method CometUPNP_PM_FC_intelbased soap_reply {xml CB} {
 		}
  $doc delete
  
- eval $CB
+ if {[catch {eval $CB} err]} {puts stderr "Error in the CB of the soap action:\n\t CB : $CB\n\txml : $xml\n\terr : $err"}
 }
-
+# Trace CometUPNP_PM_FC_intelbased soap_reply
