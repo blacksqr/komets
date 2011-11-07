@@ -3,7 +3,7 @@ package require Thread
 package require http
 package require udp
 
-proc get_xml_from {ad {t 1000}} {
+proc get_xml_from {ad {t 2000}} {
   global UPNP_server_D_device_with_pb
   
   if {[dict exists $UPNP_server_D_device_with_pb $ad]} {
@@ -373,10 +373,9 @@ proc http_callback {sock token} {
 	 if {$new_location} {
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
 	   if {$str_xml != "BLOC_CALL"} {
-			dict set UPNP_server_L_devices $UDN got_device_description "DONE"
-			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR set_description_from_thread $err]}
+			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR set_description_from_thread $err]} else {dict set UPNP_server_L_devices $UDN got_device_description "DONE"}
 		   } else {dict set   UPNP_server_L_devices $UDN got_device_description "ERROR"
-				   # dict unset UPNP_server_L_devices $UDN
+				   # send_msg_to_comet [list INFOS "BLOC_CALL during get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]"]
 				  }
 	  } else {set ms [clock milliseconds]
 	          dict set UPNP_server_L_devices $UDN last_beat $ms
@@ -445,11 +444,14 @@ proc http_callback {sock token} {
 	 set root [$doc documentElement]
 	 set ns   [$root namespaceURI]
 	 
+	 set an_error_occured 0
 	 foreach node_device [$root selectNodes -namespaces [list ns $ns] "//ns:device | //device"] {
-	   Add_device_from_dom $UDN $ns $node_device
+	   if {[catch {Add_device_from_dom $UDN $ns $node_device} err]} {set an_error_occured 1}
 	  }
 	  
 	 $doc delete
+	 
+	 if {$an_error_occured} {error "Error in set_description_from_thread $UDN"}
 	}
 	
 	#___________________________________________________________________________________________________________________________________________
@@ -510,6 +512,7 @@ proc http_callback {sock token} {
 		}
 	 
 	# Load xml description
+	 set an_error_occured 0
 	 foreach {UDN service_id SCPDURL} $L_xml_descr_service {
 	   if {[string index $SCPDURL 0] != "/"} {
 			 set ad [get_root_ad_from_UDN $UDN]
@@ -522,16 +525,21 @@ proc http_callback {sock token} {
 	   if {$str_xml != "BLOC_CALL"} {
 			 if {[catch {set res_set_descr [set_service_description $UDN $service_id str_xml]} err]} {
 				 send_msg_to_comet [list ERROR "set_service_description $UDN $service_id str_xml\n\tstr_xml : $str_xml" $err]
+				 set an_error_occured 1
 				} else {if {$res_set_descr == 0} {
 							 send_msg_to_comet [list INFOS "Retry to get the description : " $str_xml]
 							 dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
 							} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "DONE"}
 					   }
-			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"}
+			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
+				    send_msg_to_comet [list INFOS "Error accessing $ad"]
+					set set an_error_occured 1
+				   }
 	  }
 
 	 # Send device description
 	 send_msg_to_comet "Device_added $UDN [dict get $UPNP_server_L_devices $UDN]"
+	 if {$an_error_occured} {error "Error occured in Add_device_from_dom for device $node_UDN"}
 	}
 
 	#___________________________________________________________________________________________________________________________________________

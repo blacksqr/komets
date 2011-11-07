@@ -46,24 +46,10 @@
 <relation id="GDD_specialization_Choice_Color_CUI_Choice_Color_CUI_gfx" set_L_source_nodes="Choice_Color_CUI_gfx" set_L_dest_nodes="Choice_Color_CUI" set_type="GDD_specialization"></relation>
 <relation id="GDD_concretization_Choice_Color_AUI_Choice_Color_CUI" set_L_source_nodes="Choice_Color_CUI" set_L_dest_nodes="Choice_Color_AUI" set_type="GDD_concretization"></relation>
 <relation id="GDD_concretization_Choice_Color_Choice_Color_AUI" set_L_source_nodes="Choice_Color_AUI" set_L_dest_nodes="Choice_Color" set_type="GDD_concretization"></relation>
-<node id="CT_Choice_UPNP_AV" set_type="GDD_C&amp;T" set_descriptions="" set_ptf="*">
-</node>
-<node id="AUI_Choice_UPNP_AV" set_type="GDD_AUI" set_descriptions="" set_ptf="*">
-</node>
-<node id="CUI_Choice_UPNP_AV" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
-</node>
-<node id="CUI_Choice_UPNP_AV_basic" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
-</node>
-<node id="FUI_Choice_UPNP_AV_basic" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_TK">
-<factory id="CometChoice_PM_P_UPNP_AV_tree"></factory>
-</node>
-<relation id="CUI_Choice_UPNP_AV_basic_rel_GDD_implementation_for_FUI_Choice_UPNP_AV_basic" set_L_source_nodes="FUI_Choice_UPNP_AV_basic" set_L_dest_nodes="CUI_Choice_UPNP_AV_basic" set_type="GDD_implementation"></relation>
-<relation id="CUI_Choice_UPNP_AV_rel_GDD_specialization_for_CUI_Choice_UPNP_AV_basic" set_L_source_nodes="CUI_Choice_UPNP_AV_basic" set_L_dest_nodes="CUI_Choice_UPNP_AV" set_type="GDD_specialization"></relation>
-<relation id="AUI_Choice_UPNP_AV_rel_GDD_concretization_for_CUI_Choice_UPNP_AV" set_L_source_nodes="CUI_Choice_UPNP_AV" set_L_dest_nodes="AUI_Choice_UPNP_AV" set_type="GDD_concretization"></relation>
-<relation id="CT_Choice_UPNP_AV_rel_GDD_concretization_for_AUI_Choice_UPNP_AV" set_L_source_nodes="AUI_Choice_UPNP_AV" set_L_dest_nodes="CT_Choice_UPNP_AV" set_type="GDD_concretization"></relation>
-<relation id="Choice_Restriction" set_L_source_nodes="ChoiceMonth SimpleChoice ChoiceFiles Choice_Color CT_Choice_UPNP_AV" set_L_dest_nodes="Choice" set_type="GDD_restriction"></relation>
+<relation id="Choice_Restriction" set_L_source_nodes="ChoiceMonth SimpleChoice ChoiceFiles Choice_Color" set_L_dest_nodes="Choice" set_type="GDD_restriction"></relation>
 <node id="ChoiceAccumulator" set_type="GDD_C&amp;T" set_descriptions="Accumulator choice" set_ptf="*">
 </node>
+<relation id="ChoiceAccumulator_Unchoosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
 <node id="ChoiceInterleavedMarkers" set_type="GDD_C&amp;T" set_descriptions="Choice done by interleaved markers" set_ptf="*">
 </node>
 <node id="Marker" set_type="GDD_C&amp;T" set_descriptions="Marker" set_ptf="*">
@@ -158,7 +144,7 @@
 <relation id="GDD_implementation_Marker_simple_CUI_CheckBox_Marker_simple_CheckBox_TK" set_L_source_nodes="Marker_simple_CheckBox_TK Marker_simple_CUI_CheckBox_HTML" set_L_dest_nodes="Marker_simple_CUI_CheckBox" set_type="GDD_implementation"></relation>
 <node id="Marker_simple_CUI_vocal" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
 </node>
-<node id="Marker_simple_CUI_vocal_S207" set_type="GDD_FUI" set_descriptions="" set_ptf="*">
+<node id="Marker_simple_CUI_vocal_S207" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_ALX_TXT">
 <factory id="Marker_PM_P_ALX_TXT"></factory>
 </node>
 <relation id="GDD_implementation_Marker_simple_CUI_vocal_Marker_simple_CUI_vocal_S207" set_L_source_nodes="Marker_simple_CUI_vocal_S207" set_L_dest_nodes="Marker_simple_CUI_vocal" set_type="GDD_implementation"></relation>
@@ -172,6 +158,8 @@
 <relation id="ChoiceInterleavedMarkers_Markers" set_L_source_nodes="ChoiceInterleavedMarkers" set_L_dest_nodes="Marker" set_type="GDD_encapsulation"></relation>
 <node id="Interleaving" set_type="GDD_C&amp;T" set_descriptions="Interleaving" set_ptf="*">
 <factory id="CometInterleaving"></factory>
+<attribut id="MAGELLAN__REORDER" name=""></attribut>
+<attribut id="MAGELLAN__FLOAT" name=""></attribut>
 </node>
 <node id="Interleaving_AUI" set_type="GDD_AUI" set_descriptions="Dialog model for interleaving" set_ptf="*">
 </node>
@@ -179,6 +167,10 @@
 </node>
 <node id="Container" set_type="GDD_C&amp;T" set_descriptions="Container" set_ptf="*">
 <factory id="CometContainer"></factory>
+<attribut id="MAGELLAN__Border" name=""></attribut>
+<attribut id="MAGELLAN__Column" name=""></attribut>
+<attribut id="MAGELLAN__REORDER" name=""></attribut>
+<attribut id="MAGELLAN__FLOAT" name=""></attribut>
 </node>
 <relation id="Container_to_AUI" set_L_source_nodes="Container_AUI" set_L_dest_nodes="Container" set_type="GDD_concretization"></relation>
 <node id="Container_CUI_frame" set_type="GDD_CUI" set_descriptions="Container CUI frame" set_ptf="*">
@@ -193,6 +185,8 @@
 </node>
 <node id="Container_Maskable_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Container_PM_P_HideShow_HTML"></factory>
+<attribut id="MAGELLAN__BG" name="header"></attribut>
+<attribut id="MAGELLAN__BG" name="content"></attribut>
 </node>
 <node id="Container_Maskable_CUI" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
 </node>
@@ -234,6 +228,8 @@
 </node>
 <node id="Container_CUI_frame_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Container_PM_P_HTML"></factory>
+<attribut id="MAGELLAN__Border" name=""></attribut>
+<attribut id="MAGELLAN__Column" name=""></attribut>
 </node>
 <relation id="Container_frame_CUI_to_FUI" set_L_source_nodes="Container_CUI_frame_TK Container_CUI_frame_BIGre Container_CUI_frame_HTML" set_L_dest_nodes="Container_CUI_frame" set_type="GDD_implementation"></relation>
 <relation id="GDD_composition_Container_deroulable_AUI_Container_AUI" set_L_source_nodes="Container_AUI Container_CUI_frame" set_L_dest_nodes="Container_deroulable_AUI" set_type="GDD_composition"></relation>
@@ -271,6 +267,14 @@
 </node>
 <node id="MatricialInterleaving" set_type="GDD_CUI" set_descriptions="Matricial interleaving" set_ptf="*">
 </node>
+<node id="CUI_Interleaving_Table" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
+</node>
+<node id="FUI_HTML_Interleaving_Table" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_pipotronic">
+<factory id="Interleaving_PM_P_HTML_Table"></factory>
+<factory id=""></factory>
+</node>
+<relation id="CUI_Interleaving_Table_rel_GDD_implementation_for_FUI_HTML_Interleaving_Table" set_L_source_nodes="FUI_HTML_Interleaving_Table" set_L_dest_nodes="CUI_Interleaving_Table" set_type="GDD_implementation"></relation>
+<relation id="MatricialInterleaving_rel_GDD_specialization_for_CUI_Interleaving_Table" set_L_source_nodes="CUI_Interleaving_Table" set_L_dest_nodes="MatricialInterleaving" set_type="GDD_specialization"></relation>
 <node id="LinearInterleaving" set_type="GDD_CUI" set_descriptions="Linear interleaving" set_ptf="*">
 </node>
 <node id="MagneticList_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
@@ -278,6 +282,7 @@
 </node>
 <node id="Interleaving_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Interleaving_PM_P_HTML"></factory>
+<attribut id="MAGELLAN__Border" name=""></attribut>
 </node>
 <node id="LinearInterleaving_B207" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_BIGre">
 <factory id="CometInterleaving_PM_P_line_BIGre"></factory>
@@ -293,17 +298,8 @@
 <relation id="InterleavingAUI_to_NoNav" set_L_source_nodes="Interleaving_AUI_NoNav" set_L_dest_nodes="Interleaving_AUI" set_type="GDD_specialization"></relation>
 <node id="Interleaving_AUI_Nav" set_type="GDD_AUI" set_descriptions="Interleaving with navigation" set_ptf="*">
 </node>
-<node id="Interleaving_AUI_Sequence" set_type="GDD_AUI" set_descriptions="Interleaving shwing subspace in sequence" set_ptf="*">
-</node>
-<node id="ComboMenu" set_type="GDD_CUI" set_descriptions="Combo menu" set_ptf="*">
-</node>
-<node id="ScrollListInterleaving" set_type="GDD_CUI" set_descriptions="Scroll list ListBox" set_ptf="*">
-</node>
-<node id="ScrollableMonospaceInterleaving" set_type="GDD_CUI" set_descriptions="Scrollable monospace ListBox" set_ptf="*">
-</node>
 <node id="Interleaving_AUI_MonoSPace" set_type="GDD_AUI" set_descriptions="Interleaving showing one subspace at a time" set_ptf="*">
 </node>
-<relation id="NoNav_to_MonoSpace" set_L_source_nodes="Interleaving_AUI_MonoSPace" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
 <node id="Interleaving_AUI_Menu" set_type="GDD_AUI" set_descriptions="" set_ptf="*">
 </node>
 <node id="Interleaving_CUI_Menu" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
@@ -314,16 +310,33 @@
 <node id="Interleaving_CUI_Menu_FUI_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Interleaving_PM_P_HTML_menu"></factory>
 </node>
-<node id="FUI_Interleaving_Menu_TK" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_TK">
-<factory id="Interleaving_PM_P_menu_TK"></factory>
-</node>
-<relation id="GDD_implementation_Interleaving_CUI_Menu_Interleaving_FUI_Menu_B207" set_L_source_nodes="Interleaving_FUI_Menu_B207 Interleaving_CUI_Menu_FUI_HTML FUI_Interleaving_Menu_TK" set_L_dest_nodes="Interleaving_CUI_Menu" set_type="GDD_implementation"></relation>
-<relation id="Interleaving_CUI_Menu_rel_GDD_concretization_for_" set_L_source_nodes="" set_L_dest_nodes="Interleaving_CUI_Menu" set_type="GDD_concretization"></relation>
+<relation id="GDD_implementation_Interleaving_CUI_Menu_Interleaving_FUI_Menu_B207" set_L_source_nodes="Interleaving_FUI_Menu_B207 Interleaving_CUI_Menu_FUI_HTML" set_L_dest_nodes="Interleaving_CUI_Menu" set_type="GDD_implementation"></relation>
 <relation id="GDD_concretization_Interleaving_AUI_Menu_Interleaving_CUI_Menu" set_L_source_nodes="Interleaving_CUI_Menu" set_L_dest_nodes="Interleaving_AUI_Menu" set_type="GDD_concretization"></relation>
 <relation id="GDD_specialization_Interleaving_AUI_MonoSPace_Interleaving_AUI_Menu" set_L_source_nodes="Interleaving_AUI_Menu" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_specialization"></relation>
-<relation id="MonoSpace_to_CUI" set_L_source_nodes="ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_concretization"></relation>
+<node id="ScrollableMonospaceInterleaving" set_type="GDD_CUI" set_descriptions="Scrollable monospace ListBox" set_ptf="*">
+</node>
+<node id="ScrollListInterleaving" set_type="GDD_CUI" set_descriptions="Scroll list ListBox" set_ptf="*">
+</node>
+<node id="ComboMenu" set_type="GDD_CUI" set_descriptions="Combo menu" set_ptf="*">
+</node>
+<node id="Interleaving_AUI_Sequence" set_type="GDD_AUI" set_descriptions="Interleaving shwing subspace in sequence" set_ptf="*">
+</node>
+<relation id="NoNav_to_Sequence" set_L_source_nodes="Interleaving_AUI_Sequence" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
+<relation id="Sequence_to_CUI" set_L_source_nodes="ComboMenu ScrollListInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequence" set_type="GDD_concretization"></relation>
+<node id="Interleaving_AUI_Sequential" set_type="GDD_AUI" set_descriptions="Interleaving showing subspace sequentialy" set_ptf="*">
+</node>
+<relation id="NoNav_to_Sequential" set_L_source_nodes="Interleaving_AUI_Sequential" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
+<relation id="Sequential_to_CUI" set_L_source_nodes="ScrollListInterleaving ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequential" set_type="GDD_concretization"></relation>
 <node id="ScrollableMonospaceInterleaving_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
 <factory id="Interleaving_PM_P_MenuHorizontal_HTML"></factory>
+<attribut id="MAGELLAN__BG" name="tabs"></attribut>
+<attribut id="MAGELLAN__BG" name="selected"></attribut>
+<attribut id="MAGELLAN__BG" name="header"></attribut>
+<attribut id="MAGELLAN__BG" name="content"></attribut>
+<attribut id="MAGELLAN__Border" name="tabs"></attribut>
+<attribut id="MAGELLAN__Border" name="selected"></attribut>
+<attribut id="MAGELLAN__Border" name="header"></attribut>
+<attribut id="MAGELLAN__Border" name="content"></attribut>
 </node>
 <node id="ScrollableMonospaceInterleaving_TK" set_type="GDD_FUI" set_descriptions="Scrollable monospace ListBox in TK" set_ptf="Ptf_TK">
 <factory id="Interleaving_PM_P_nav_mono_TK_menu"></factory>
@@ -341,13 +354,34 @@
 <factory id="Interleaving_PM_P_B207_deployable"></factory>
 </node>
 <relation id="GDD_implementation_ScrollableMonospaceInterleaving_Deployable_ScrollableMonospaceInterleaving_Deployable_B207" set_L_source_nodes="ScrollableMonospaceInterleaving_Deployable_B207" set_L_dest_nodes="ScrollableMonospaceInterleaving_Deployable" set_type="GDD_implementation"></relation>
-<relation id="GDD_specialization_ScrollableMonospaceInterleaving_ScrollableMonospaceInterleaving_menu" set_L_source_nodes="ScrollableMonospaceInterleaving_menu ScrollableMonospaceInterleaving_Deployable" set_L_dest_nodes="ScrollableMonospaceInterleaving" set_type="GDD_specialization"></relation>
-<node id="Interleaving_AUI_Sequential" set_type="GDD_AUI" set_descriptions="Interleaving showing subspace sequentialy" set_ptf="*">
+<node id="Interleaving_HTML_accordion" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
 </node>
-<relation id="NoNav_to_Sequential" set_L_source_nodes="Interleaving_AUI_Sequential" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
-<relation id="Sequential_to_CUI" set_L_source_nodes="ScrollListInterleaving ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequential" set_type="GDD_concretization"></relation>
-<relation id="Sequence_to_CUI" set_L_source_nodes="ComboMenu ScrollListInterleaving" set_L_dest_nodes="Interleaving_AUI_Sequence" set_type="GDD_concretization"></relation>
-<relation id="NoNav_to_Sequence" set_L_source_nodes="Interleaving_AUI_Sequence" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
+<node id="FUI_Interleaving_HTML_accordion" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
+<factory id="Interleaving_PM_P_accordion_HTML"></factory>
+<attribut id="MAGELLAN__BG" name="active"></attribut>
+<attribut id="MAGELLAN__BG" name="inactive"></attribut>
+<attribut id="MAGELLAN__BG" name="content"></attribut>
+<attribut id="MAGELLAN__Border" name="active"></attribut>
+<attribut id="MAGELLAN__Border" name="inactive"></attribut>
+<attribut id="MAGELLAN__Border" name="content"></attribut>
+</node>
+<relation id="Interleaving_HTML_accordion_rel_GDD_implementation_for_FUI_Interleaving_HTML_accordion" set_L_source_nodes="FUI_Interleaving_HTML_accordion" set_L_dest_nodes="Interleaving_HTML_accordion" set_type="GDD_implementation"></relation>
+<node id="CUI_Interleaving_Tabs" set_type="GDD_CUI" set_descriptions="" set_ptf="*">
+</node>
+<node id="FUI_Interleaving_Tabs_TK" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_TK">
+<factory id="Interleaving_PM_P_nav_mono_TK_menu"></factory>
+</node>
+<node id="FUI_Interleaving_Tabs_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="Ptf_HTML">
+<factory id="Interleaving_PM_P_MenuHorizontal_HTML"></factory>
+<attribut id="MAGELLAN__BG" name="tabs"></attribut>
+<attribut id="MAGELLAN__BG" name="selected"></attribut>
+<attribut id="MAGELLAN__BG" name="header"></attribut>
+<attribut id="MAGELLAN__BG" name="content"></attribut>
+</node>
+<relation id="CUI_Interleaving_Tabs_rel_GDD_implementation_for_FUI_Interleaving_Tabs" set_L_source_nodes="FUI_Interleaving_Tabs_TK FUI_Interleaving_Tabs_HTML" set_L_dest_nodes="CUI_Interleaving_Tabs" set_type="GDD_implementation"></relation>
+<relation id="GDD_specialization_ScrollableMonospaceInterleaving_ScrollableMonospaceInterleaving_menu" set_L_source_nodes="ScrollableMonospaceInterleaving_menu ScrollableMonospaceInterleaving_Deployable Interleaving_HTML_accordion CUI_Interleaving_Tabs" set_L_dest_nodes="ScrollableMonospaceInterleaving" set_type="GDD_specialization"></relation>
+<relation id="MonoSpace_to_CUI" set_L_source_nodes="ScrollableMonospaceInterleaving" set_L_dest_nodes="Interleaving_AUI_MonoSPace" set_type="GDD_concretization"></relation>
+<relation id="NoNav_to_MonoSpace" set_L_source_nodes="Interleaving_AUI_MonoSPace" set_L_dest_nodes="Interleaving_AUI_Nav" set_type="GDD_specialization"></relation>
 <relation id="InterleavingAUI_to_Nav" set_L_source_nodes="Interleaving_AUI_Nav" set_L_dest_nodes="Interleaving_AUI" set_type="GDD_specialization"></relation>
 <relation id="Interleaving_to_AUI" set_L_source_nodes="Interleaving_AUI" set_L_dest_nodes="Interleaving" set_type="GDD_concretization"></relation>
 <relation id="ChoiceInterleavedMarkers_Interleaving" set_L_source_nodes="ChoiceInterleavedMarkers" set_L_dest_nodes="Interleaving" set_type="GDD_encapsulation"></relation>
@@ -366,7 +400,6 @@
 <relation id="ChoiceInterleavedMarkers_to_FUI" set_L_source_nodes="ChoiceInterleavingMarkersTK Choice_InterleavedMarkers_HTML ChoiceInterleavedMarkers_U ChoiceInterleavingMarkers_S207" set_L_dest_nodes="ChoiceInterleavedMarkers" set_type="GDD_implementation"></relation>
 <relation id="ChoiceSpecialization" set_L_source_nodes="ChoiceAccumulator ChoiceInterleavedMarkers" set_L_dest_nodes="Choice" set_type="GDD_specialization"></relation>
 <relation id="ChoiceAccumulator_Choosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
-<relation id="ChoiceAccumulator_Unchoosed" set_L_source_nodes="ChoiceAccumulator" set_L_dest_nodes="Choice" set_type="GDD_encapsulation"></relation>
 <node id="ChoiceWithExtend" set_type="GDD_C&amp;T" set_descriptions="Choice among an extendable set" set_ptf="*">
 </node>
 <node id="Specifyer" set_type="GDD_C&amp;T" set_descriptions="Textual Specifyer" set_ptf="*">
@@ -878,4 +911,10 @@
 <relation id="GDD_concretization_Avatar_Helper_AUI_Avatar_Helper_CUI" set_L_source_nodes="Avatar_Helper_CUI" set_L_dest_nodes="Avatar_Helper_AUI" set_type="GDD_concretization"></relation>
 <relation id="GDD_concretization_Avatar_Helper_Avatar_Helper_AUI" set_L_source_nodes="Avatar_Helper_AUI" set_L_dest_nodes="Avatar_Helper" set_type="GDD_concretization"></relation>
 <relation id="IS_Restriction" set_L_source_nodes="Choice Marker Interleaving Container Specifyer N_controller TextDisplay Clock CT_Activator N_Choice CT_CometViewer CT_OkCancel CT_CSS_Meta_IHM CT_Hierarchy CT_Image CT_Log CT_Comet_Root CT_Sequence CT_CamNote Avatar_Helper" set_L_dest_nodes="IS_root" set_type="GDD_restriction"></relation>
+<node id="IS_root_HTML" set_type="GDD_FUI" set_descriptions="" set_ptf="*">
+<attribut id="MAGELLAN__BG" name="core"></attribut>
+<attribut id="MAGELLAN__WIDTH" name="core"></attribut>
+<attribut id="MAGELLAN__HEIGHT" name="core"></attribut>
+</node>
+<relation id="IS_root_rel_GDD_implementation_for_IS_root_HTML" set_L_source_nodes="IS_root_HTML" set_L_dest_nodes="IS_root" set_type="GDD_implementation"></relation>
 </GDD>

@@ -74,6 +74,23 @@ method UPNP_device New_connection {sock ad port} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method UPNP_device Process_result {mtd ns_res res} {
+	set doc [dom createDocument doc]
+	set root [$doc createElementNS s Envelope]
+		$root setAttribute xmlns         "http://schemas.xmlsoap.org/soap/envelope/"
+		$root setAttribute encodingStyle "http://schemas.xmlsoap.org/soap/encoding/"
+		set n_body [$doc createElement Body]; $root appendChild $n_body
+			set n_mtd [$doc createElement $mtd]; $n_body appendChild $n_mtd
+				$n_mtd setAttribute xmlns $ns_res
+				set n_result [$doc createElement Result]; $n_mtd appendChild $n_result
+					$n_result appendChild [$doc createTextNode $res]
+	set rep [$root asXML]
+	$doc delete
+	
+	return $rep
+}
+
+#___________________________________________________________________________________________________________________________________________
 method UPNP_device Read_from_socket {sock} {
 	if {[eof $sock]} {close $sock; return}
 	append this(data_$sock) [read $sock]
@@ -100,32 +117,18 @@ method UPNP_device Read_from_socket {sock} {
 				 set cmd [list $this(comet_$sock) $mtd]
 				 set ns_res [$res namespace]
 				 foreach n_att [$res selectNodes -namespace [list ns $ns_root rns $ns_res] "//ns:Body/rns:$mtd/*"] {
-					 puts "\tatt : [$n_att asList]"
+					 # puts "\tatt : [$n_att asList]"
 					 lappend cmd [$n_att asText]
 					}
 				}
 			 $doc delete
-			 # puts "eval $cmd"
 			 if {[catch {set eval_res [eval $cmd]} err]} {
 			     set eval_res "Error in UPNP device $objName while evaluating a SOAP action:\n\tSOAP action : $cmd\n\terr : $err"
 				}
 			 
 			 # Send back result
-			 set doc [dom createDocument doc]
-			 set root [$doc createElementNS s Envelope]
-				$root setAttribute xmlns         "http://schemas.xmlsoap.org/soap/envelope/"
-				$root setAttribute encodingStyle "http://schemas.xmlsoap.org/soap/encoding/"
-				set n_body [$doc createElement Body]; $root appendChild $n_body
-					set n_mtd [$doc createElement $mtd]; $n_body appendChild $n_mtd
-						$n_mtd setAttribute xmlns $ns_res
-						set n_result [$doc createElement Result]; $n_mtd appendChild $n_result
-							$n_result appendChild [$doc createTextNode $eval_res]
-
-			 puts $sock [$root asXML]
-			 $doc delete
-			 # puts $sock $str_res
-			 # puts "Send\n$str_res"
-			 # Clean
+			 puts $sock [this Process_result $mtd $ns_res $eval_res]
+			 
 			 close $sock
 			}
 		}
@@ -302,4 +305,67 @@ method UPNP_device Generate_control_description_for_comet {C} {
 }
 
 
+#___________________________________________________________________________________________________________________________________________
+#_________________________________________________ Generate a device based on descriptions _________________________________________________
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device Generate_device_description_from_xml_file {f_name L_control_mappings} {
+	set f [open $f_name r]; set str_xml [read $f]; close $f
+	dom parse $str_xml doc
+	$doc documentElement root; set ns_root [$root namespace]
+		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:UDN"]; set p [$n parentNode]; $p removeChild $n
+			set n [$doc createElementNS $ns_root UDN]
+			set t [$doc createTextNode uuid:$this(uuid)]; $n appendChild $t
+			$p appendChild $n
+		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:URLBase"]; set p [$n parentNode]; $p removeChild $n
+			set n [$doc createElementNS $ns_root URLBase]
+			set t [$doc createTextNode "http://$class(ip)/Comets/UPNP/"]; $n appendChild $t
+			$p appendChild $n
+		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:controlURL"] {
+			 set val [$n asText]
+			 puts "controlURL : $val"
+			 set pos [lsearch $L_control_mappings $val]
+			 if {$pos >= 0} {
+				 puts "\ton node $n"
+				 [$n childNodes] nodeValue [lindex $L_control_mappings [expr $pos+1]]
+				 puts "\tnow value is : [$n asText]"
+				}
+			}
+		# Write the new file
+		set f [open $::env(ROOT_COMETS)/Comets/UPNP/${objName}.xml w]
+			fconfigure $f -encoding utf-8
+			puts $f {<?xml version="1.0" encoding="utf-8"?>}
+			puts $f [$doc asXML]
+		close $f
+	$doc delete
+	
+	set this(description_ready) 1
+}
+
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device Generate_control_description_for_service {C} {
+	set str "<?php\n"
+	
+	# Generate a PHP page that will contact COMETs and return results for a SOAP action
+	append str {$found_SOAP = false; $size = -1;} "\n\$entete = \"\";\n"
+	append str {foreach (getallheaders() as $name => $value) } "{\n"
+	append str "\tif (strtoupper(\$name) == \"SOAPACTION\") {\$found_SOAP = true;}\n"
+	append str "\t\$entete .= \$name . \" : \" . \$value . \"\\n<br/>\";\n"
+	append str "}\n\n"
+	append str "if (\$found_SOAP) {\n"
+	append str "\t\$data = file_get_contents(\"php://input\");\n"
+	append str "\t\$fp = fsockopen(\"$class(ip)\", $this(tcp_server_port), \$errno, \$errstr, 10);\n"
+	append str "\tfwrite(\$fp, \"[string length $C] $C \");\n"
+	append str "\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
+	append str "\tfwrite(\$fp, \$data); flush(); \n"
+	append str "\t\$out = \"\";\n"
+	append str "\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
+	append str "\techo \$out;\n"
+	append str "\tfclose(\$fp);\n" 
+	append str "} else {echo \"No SOAP action found in the headers\n<br/>\" . \$entete;}\n"
+		
+	# Finish the string
+	append str "?>\n"
+	
+	return $str
+}
 
