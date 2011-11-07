@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+    <specVersion>
+        <major>1</major>
+        <minor>0</minor>
+    </specVersion>
+    <device>
+        <deviceType>urn:schemas-upnp-org:device:WCompNetProbeDevice:1</deviceType>
+        <friendlyName>Pipo WCompNetProbe_Weaver1_0</friendlyName>
+        <manufacturer>I3S Rainbow</manufacturer>
+        <manufacturerURL>https://www.wcomp.fr/</manufacturerURL>
+        <modelDescription>UPnP Device for WComp functional interface</modelDescription>
+        <modelName>SharpWComp-3.0 Container</modelName>
+        <modelNumber>3.0.0.1054 on CLR 2.0.50727.3625</modelNumber>
+        <serviceList>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:AddAA:1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:AddAA</serviceId>
+                <SCPDURL>AddAA_scpd.xml</SCPDURL>
+                <controlURL>__control_PIPO_UPNP_WCOMP_AddAA.php</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:AddAA_event</eventSubURL>
+            </service>
+            <service>
+                <serviceType>urn:schemas-upnp-org:service:SelectAA:1</serviceType>
+                <serviceId>urn:upnp-org:serviceId:SelectAA</serviceId>
+                <SCPDURL>SelectAA_scpd.xml</SCPDURL>
+                <controlURL>__control_PIPO_UPNP_WCOMP_SelectAA.php</controlURL>
+                <eventSubURL>_urn:upnp-org:serviceId:SelectAA_event</eventSubURL>
+            </service>
+        </serviceList>
+        <UDN>uuid:b602d087-7741-4581-5bab-1fa0b2e92ec1</UDN>
+        <URLBase>http://130.190.29.206/Comets/UPNP/</URLBase>
+    </device>
+</root>
+
