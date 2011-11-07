@@ -179,7 +179,9 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
 	 if {![dict exists $dict_rep "TIMEOUT:"]} {dict set dict_rep "TIMEOUT:" 1800}
-	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT [dict get $dict_rep "TIMEOUT:"]
+	 set TIMEOUT [dict get $dict_rep "TIMEOUT:"]
+		regexp {^Second-(.*)$} $TIMEOUT reco TIMEOUT
+	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT $TIMEOUT
 	 
 	 # Launch a timer to subscribe again...
 	 after [expr [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT]*1000 - 10000] [list puts "RESUBSCRIBE IS NEEDED FOR $UDN $service_id"]
@@ -328,6 +330,6 @@ method CometUPNP_PM_FC_intelbased soap_reply {xml CB} {
 		}
  $doc delete
  
- if {[catch {eval $CB} err]} {puts stderr "Error in the CB of the soap action:\n\t CB : $CB\n\txml : $xml\n\terr : $err"}
+ if {[catch {eval $CB} err]} {puts stderr "Error in the CB of the soap action:\n\t CB : $CB\n\tUPNP_res : $UPNP_res\n\txml : $xml\n\terr : $err"}
 }
 # Trace CometUPNP_PM_FC_intelbased soap_reply

@@ -6,6 +6,46 @@
   </specVersion>
   <actionList>
   		<action>
+			<name>get_service_having_variable</name>
+			<argumentList>
+				<argument>
+					<name>UDN</name>
+					<direction>in</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+				<argument>
+					<name>var_name</name>
+					<direction>in</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+				<argument>
+					<name>Result</name>
+					<direction>out</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
+			<name>CometUPNP_Read_variable_from_xml</name>
+			<argumentList>
+				<argument>
+					<name>str_xml</name>
+					<direction>in</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+				<argument>
+					<name>str_var</name>
+					<direction>in</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+				<argument>
+					<name>Result</name>
+					<direction>out</direction>
+					<relatedStateVariable>var_str</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
 			<name>Search_UDN_service_action</name>
 			<argumentList>
 				<argument>
