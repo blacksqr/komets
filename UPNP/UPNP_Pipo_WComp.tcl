@@ -41,6 +41,11 @@ method Pipo_WComp soap_call {UDN service_id action L_params CB} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Pipo_WComp get_metadata {UDN} {
+	return [dict get $this(dico_UDN_metadata) $UDN]
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Pipo_WComp New_UPNP_device {k v} {
 	if {[llength $k] == 1} {
 		 set rep [$this(CU) Search_UDN_service_action [list {UDN} "\$UDN == \"$k\""] \
@@ -178,16 +183,14 @@ method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 	set this(MultiInput_for_$rule_name) [dict create]
 	foreach {UDN var_name} $L_UDN_var_name {
-		 if {$UDN == ""} {continue}
-		 set service_id [$this(CU) get_service_having_variable $UDN $var_name]
 		 dict set this(MultiInput_for_$rule_name) $var_name defined 0
-		 dict set this(MultiInput_for_$rule_name) $var_name service $service_id
 		}
 
 	foreach {UDN var_name} $L_UDN_var_name {
 		 if {$UDN == ""} {continue}
 		 set service_id [$this(CU) get_service_having_variable $UDN $var_name]
 		 if {$service_id != ""} {
+			 dict set this(MultiInput_for_$rule_name) $var_name service $service_id
 			 if {[catch {$this(CU) Subscribe_to_UPNP_events $UDN $service_id $rule_name [list $objName MultiInput_Trigger_CB_after_event $rule_name $var_name $D_vars $CB]} err]} {
 				 puts stderr "Error during subscription in OnEvents $rule_name :\n\tUDN : $UDN\n\tservice : $service_id\n\terr : $err"
 				}
@@ -224,7 +227,9 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars C
 				  puts "\tVariable $var is not defined..."
 				  set CB_processable 0
 				  break
-				 } else {set $var [dict get $var_descr value]}
+				 } else {set $var [dict get $var_descr value]
+						 puts "$var = [dict get $var_descr value]"
+						}
 			}
 		 
 		 # Trigger Callback?
