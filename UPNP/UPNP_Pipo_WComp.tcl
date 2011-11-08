@@ -62,7 +62,8 @@ method Pipo_WComp Add_device_and_metadata {UDN UPNP_res} {
 	set D_metadata [dict create]
 	foreach varval [split $metadata "&"] {
 		 lassign [split $varval "="] var val
-		 dict set D_metadata [string trim $var] [string trim $val]
+		 set L_val [list]; foreach v [split $val ","] {lappend L_val [string trim $v]}
+		 dict set D_metadata [string trim $var] $L_val
 		}
 	dict set this(dico_UDN_metadata) $UDN $D_metadata
 	
@@ -95,7 +96,8 @@ method Pipo_WComp get_L_UDN_having_metadata {metadata} {
 	set D_metadata [dict create]
 	foreach varval [split $metadata "&"] {
 		 lassign [split $varval "="] var val
-		 dict set D_metadata [string trim $var] [string trim $val]
+		 set L_val [list]; foreach v [split $val ","] {lappend L_val [string trim $v]}
+		 dict set D_metadata [string trim $var] $L_val
 		}
 	return [this get_L_UDN_having_D_metadata $D_metadata]
 }
@@ -108,7 +110,9 @@ method Pipo_WComp get_L_UDN_having_D_metadata {D_metadata} {
 		 set has_metadatas 1
 		 dict for {var val} $D_metadata {
 			 if {![dict exists $DM $var]} {set has_metadatas 0; break;}
-			 if {[dict get $DM $var] != $val} {set has_metadatas 0; break;}
+			 # Take care of possible multiple values for metadata
+			 # puts [list [dict get $DM $var] != [Liste_Intersection [dict get $DM $var] $val]]
+			 if {$val != [Liste_Intersection $val [dict get $DM $var]]} {set has_metadatas 0; break;}
 			}
 		 if {$has_metadatas} {lappend L_rep $UDN}
 		}
