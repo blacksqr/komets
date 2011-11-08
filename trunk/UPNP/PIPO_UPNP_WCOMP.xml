@@ -28,8 +28,8 @@
                 <eventSubURL>_urn:upnp-org:serviceId:SelectAA_event</eventSubURL>
             </service>
         </serviceList>
-        <UDN>uuid:b602d087-7741-4581-5bab-1fa0b2e92ec1</UDN>
-        <URLBase>http://130.190.29.206/Comets/UPNP/</URLBase>
+        <UDN>uuid:47e0e8f6-96d4-4f3a-437a-ac7038a006cc</UDN>
+        <URLBase>http://130.190.31.182/Comets/UPNP/</URLBase>
     </device>
 </root>
 

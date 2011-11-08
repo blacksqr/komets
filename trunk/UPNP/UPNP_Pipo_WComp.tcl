@@ -178,12 +178,18 @@ method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 		 set service_id [$this(CU) get_service_having_variable $UDN $var_name]
 		 dict set this(MultiInput_for_$rule_name) $var_name defined 0
 		 dict set this(MultiInput_for_$rule_name) $var_name service $service_id
+		}
+
+	foreach {UDN var_name} $L_UDN_var_name {
+		 if {$UDN == ""} {continue}
+		 set service_id [$this(CU) get_service_having_variable $UDN $var_name]
 		 if {$service_id != ""} {
 			 if {[catch {$this(CU) Subscribe_to_UPNP_events $UDN $service_id $rule_name [list $objName MultiInput_Trigger_CB_after_event $rule_name $var_name $D_vars $CB]} err]} {
 				 puts stderr "Error during subscription in OnEvents $rule_name :\n\tUDN : $UDN\n\tservice : $service_id\n\terr : $err"
 				}
 			}
 		}
+			
 }
 # Trace Pipo_WComp OnEvents
 #___________________________________________________________________________________________________________________________________________
