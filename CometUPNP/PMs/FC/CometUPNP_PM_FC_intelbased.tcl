@@ -98,11 +98,13 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
 				 if {[dict exists $dict_rep "SID:"]} {
 					 set UUID [dict get $dict_rep "SID:"]
-					 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
-						 set CB "$CB [list $xml]"
-						 # puts "From CometUPNP_PM_FC_intelbased:\n$CB"
-						 eval $CB
-						}
+					 if {[info exists this($this(index_of_UUID,$UUID))]} {
+						 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
+							 set CB "$CB [list $xml]"
+							 # puts "From CometUPNP_PM_FC_intelbased:\n$CB"
+							 eval $CB
+							}
+						} else {puts "Variable do not exist for this($this(index_of_UUID,$UUID))"}
 					}
 				}
 }
