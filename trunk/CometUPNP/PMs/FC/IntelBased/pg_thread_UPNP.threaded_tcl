@@ -438,19 +438,17 @@ proc http_callback {sock token} {
 
 	 if {[catch {set doc [dom parse $str]} err]} {
 	   send_msg_to_comet  "ERROR parsing xml in set_description_from_thread from $UDN [list $err $str]"
-	   return
-	  }
-	  
-	 set root [$doc documentElement]
-	 set ns   [$root namespaceURI]
-	 
-	 set an_error_occured 0
-	 foreach node_device [$root selectNodes -namespaces [list ns $ns] "//ns:device | //device"] {
-	   if {[catch {Add_device_from_dom $UDN $ns $node_device} err]} {set an_error_occured 1}
-	  }
-	  
-	 $doc delete
-	 
+	   set an_error_occured 1
+	  } else {set root [$doc documentElement]
+			  set ns   [$root namespaceURI]
+			 
+			  set an_error_occured 0
+			  foreach node_device [$root selectNodes -namespaces [list ns $ns] "//ns:device | //device"] {
+				if {[catch {Add_device_from_dom $UDN $ns $node_device} err]} {set an_error_occured 1}
+			   }
+			  
+			  $doc delete
+			 }
 	 if {$an_error_occured} {error "Error in set_description_from_thread $UDN"}
 	}
 	

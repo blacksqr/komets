@@ -131,7 +131,7 @@ method Pipo_WComp AddAA {str} {
 	dict set this(D_rules) $rule_name $D_rule
 	this Apply_rule $rule_name
 }
-Trace Pipo_WComp AddAA
+# Trace Pipo_WComp AddAA
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp Apply_rule {rule_name} {
@@ -150,7 +150,7 @@ method Pipo_WComp SelectAA {str} {
 	lassign $str rule_name is_selected
 	if {[catch {dict set this(D_rules) $rule_name is_selected $is_selected} err]} {puts stderr "Error while selecting an AA : \n\t$objName SelectAA [list $str]\n\terr : $err"}
 }
-Trace Pipo_WComp SelectAA
+# Trace Pipo_WComp SelectAA
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
@@ -228,7 +228,6 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars C
 				  set CB_processable 0
 				  break
 				 } else {set $var [dict get $var_descr value]
-						 puts "$var = [dict get $var_descr value]"
 						}
 			}
 		 
