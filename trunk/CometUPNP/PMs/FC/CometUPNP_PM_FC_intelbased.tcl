@@ -85,6 +85,7 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 		 close $chan
 		} else  {append this(upnp_eventing_msg_from_$chan) [read $chan]
 				 set msg $this(upnp_eventing_msg_from_$chan)
+				 # puts "UPNP event:\n$msg\n_______________________________"
 				 set pos_entete [string first "\n\n" $msg]
 				 if {$pos_entete < 0} {return}
 				 set entete [string range $msg 0 $pos_entete]
@@ -119,7 +120,7 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 							}
 						} else {puts "Variable do not exist for this($this(index_of_UUID,$UUID))"}
 					} else {puts "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
-				 close $chan
+				 # close $chan
 				}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
@@ -269,6 +270,16 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
  set id ${UDN},${service},${action}
+ 
+ # Get the closest service for this UDN
+ dict for {s s_val} [this get_item_of_dict_devices "$UDN ServiceList"] {
+	 if {[string first $service $s] == 0} {
+		 # puts "Service renamed from $service to $s"
+		 set service $s
+		 break;
+		}
+	}
+
  if {![info exists this($id)]} {
 	set this($id) ${objName}_SOAP_proxy_$id
 	set controlURL    [this get_item_of_dict_devices "$UDN ServiceList $service controlURL"]
