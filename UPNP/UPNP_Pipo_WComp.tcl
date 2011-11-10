@@ -167,7 +167,7 @@ method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 	# Create variables packed inside the event notification
 	if {[catch {set doc [dom parse [string trim $event]]} err]} {puts stderr "Error parsing the UPNP event in objName Trigger_CB_after_event:\n\trule_name : $rule_name\n\tD_vars : $D_vars\n\tCB : $CB\n\tevent : $event"} else {
 		 set root [$doc documentElement]; set ns_root [$root namespace]
-		 foreach p [$root selectNodes -namespace [list ns $ns_root] "//ns:property/*"] {
+		 foreach p [$root selectNodes -namespace [list ns $ns_root] "//ns:property/* | //property/*"] {
 			 set [$p nodeName] [$p asText]
 			 if {[$p nodeName] == $var_name} {set found_var_name 1}
 			}
@@ -175,7 +175,7 @@ method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 		}
 	if {$found_var_name} {
 		 if {[catch {eval $CB} err]} {puts stderr "Error inside the callback of $rule_name :\n\terr : $err"}
-		}
+		} else {puts stderr "No var \"$var_name\" found in event:\n$event"}
 }
 # Trace Pipo_WComp Trigger_CB_after_event
 
