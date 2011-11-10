@@ -74,15 +74,19 @@ method CometUPNP_PM_FC_intelbased Do_a_SSDP_M-SEARCH {} {
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
 	fconfigure $chan -blocking 0 -encoding utf-8
+	set this(upnp_eventing_msg_from_$chan) ""
 	fileevent  $chan readable [list $objName Eventing_msg $chan]
 }
-
+# Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 	if {[eof $chan]} {
+		 unset this(upnp_eventing_msg_from_$chan)
 		 close $chan
-		} else  {set msg [read $chan]
+		} else  {append this(upnp_eventing_msg_from_$chan) [read $chan]
+				 set msg $this(upnp_eventing_msg_from_$chan)
 				 set pos_entete [string first "\n\n" $msg]
+				 if {$pos_entete < 0} {return}
 				 set entete [string range $msg 0 $pos_entete]
 				 set xml    [string range $msg $pos_entete end]
 				 
@@ -95,6 +99,15 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 						 dict set dict_rep $var $val
 						}
 					}
+				 # Is there a message Content-Length?
+				 if {[dict exists $dict_rep "Content-Length:"]} {
+					 # If the xml message does not contain enough byte, cancel...
+					 if {[string bytelength $xml] < ([dict get $dict_rep "Content-Length:"]-3)} {
+						 puts stderr "not enough bytes in the UPNP message ([dict get $dict_rep Content-Length:] needed), we have [string bytelength $xml] bytes :\n$xml"
+						 return
+						}
+					}
+				 
 				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
 				 if {[dict exists $dict_rep "SID:"]} {
 					 set UUID [dict get $dict_rep "SID:"]
@@ -105,10 +118,11 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 							 eval $CB
 							}
 						} else {puts "Variable do not exist for this($this(index_of_UUID,$UUID))"}
-					}
+					} else {puts "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
+				 close $chan
 				}
 }
-
+# Trace CometUPNP_PM_FC_intelbased Eventing_msg 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Add_eventing_CB {UDN service_id ID_subscribe CB} {
 	dict set this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe $CB
@@ -176,7 +190,7 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 			}
 		}
 	
-	 if {![dict exists $dict_rep "SID:"]} {return}
+	 if {![dict exists $dict_rep "SID:"]} {puts stderr "No SID given by the device for the subscription..."; return}
 	 set UUID [dict get $dict_rep "SID:"]
 	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
