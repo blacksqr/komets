@@ -28,7 +28,7 @@
                 <eventSubURL>__event_PIPO_UPNP_WCOMP_SelectAA.php</eventSubURL>
             </service>
         </serviceList>
-        <UDN>uuid:73402639-2e92-493e-7398-c1e05ac8130c</UDN>
+        <UDN>uuid:384e090f-9f96-4716-566d-ce1e7ee454e7</UDN>
         <URLBase>http://130.190.28.166/Comets/UPNP/</URLBase>
     </device>
 </root>

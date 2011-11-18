@@ -50,7 +50,7 @@ method Pipo_WComp constructor {t} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Pipo_WComp soap_call {UDN action L_params CB} {
+method Pipo_WComp soap_call {UDN action {L_params {}} {CB {}}} {
 	set service_id [$this(CU) get_service_having_action $UDN $action]
 	if {[catch {$this(CU) soap_call $UDN $service_id $action $L_params $CB} err]} {
 		 puts stderr "Error calling soap action inside $objName soap_call :\n\tUDN : $UDN\n\tservice_id : $service_id\n\taction : $action\n\tL_params : $L_params\n\tCB : $CB\n\terr : $err"

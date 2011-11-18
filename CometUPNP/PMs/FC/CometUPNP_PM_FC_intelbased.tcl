@@ -179,7 +179,7 @@ CALLBACK: <http://$this(IP):$this(eventing_server_port)>
 NT: upnp:event
 Content-Length: 0
 "
-			 puts "Subscribe message:\n$msg"
+			 # puts "Subscribe message:\n$msg"
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
