@@ -14,25 +14,25 @@
 		<modelName>Automatically-Generated COMET Device</modelName>
 		<modelNumber>COMET v1</modelNumber>
 		<presentationURL>http://130.190.28.166/index.php</presentationURL>
-		<UDN>uuid:39221b43-7f4f-409e-53f3-3cebc38d31f9</UDN>
+		<UDN>uuid:43204260-bf12-47b0-471f-96d74fa4ea89</UDN>
 		<serviceList>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:cr:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:39221b43-7f4f-409e-53f3-3cebc38d31f9:cr</serviceId>
+				<serviceId>urn:upnp-org:serviceId:43204260-bf12-47b0-471f-96d74fa4ea89:cr</serviceId>
 				<SCPDURL>__scpd_cr.xml</SCPDURL>
 				<controlURL>__control_cr.php</controlURL>
 				<eventSubURL>__event_cr</eventSubURL>
 			</service>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:CPool_COMET_1:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:39221b43-7f4f-409e-53f3-3cebc38d31f9:CPool_COMET_1</serviceId>
+				<serviceId>urn:upnp-org:serviceId:43204260-bf12-47b0-471f-96d74fa4ea89:CPool_COMET_1</serviceId>
 				<SCPDURL>__scpd_CPool_COMET_1.xml</SCPDURL>
 				<controlURL>__control_CPool_COMET_1.php</controlURL>
 				<eventSubURL>__event_CPool_COMET_1</eventSubURL>
 			</service>
 			<service>
 				<serviceType>urn:schemas-upnp-org:service:CV:1</serviceType>
-				<serviceId>urn:upnp-org:serviceId:39221b43-7f4f-409e-53f3-3cebc38d31f9:CV</serviceId>
+				<serviceId>urn:upnp-org:serviceId:43204260-bf12-47b0-471f-96d74fa4ea89:CV</serviceId>
 				<SCPDURL>__scpd_CV.xml</SCPDURL>
 				<controlURL>__control_CV.php</controlURL>
 				<eventSubURL>__event_CV</eventSubURL>

@@ -8,7 +8,7 @@ foreach (getallheaders() as $name => $value) {
 
 if ($found_SOAP) {
 	$data = file_get_contents("php://input");
-	$fp = fsockopen("130.190.28.166", 3316, $errno, $errstr, 10);
+	$fp = fsockopen("130.190.28.166", 2737, $errno, $errstr, 10);
 	fwrite($fp, "2 cr ");
 	fwrite($fp, strlen( utf8_decode($data))); fwrite($fp, " "); 
 	fwrite($fp, $data); flush(); 
