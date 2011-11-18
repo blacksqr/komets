@@ -77,7 +77,7 @@ method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
 	set this(upnp_eventing_msg_from_$chan) ""
 	fileevent  $chan readable [list $objName Eventing_msg $chan]
 }
-Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
+# Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 	if {[eof $chan]} {
@@ -118,12 +118,12 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 							 # puts "From CometUPNP_PM_FC_intelbased:\n$CB"
 							 eval $CB
 							}
-						} else {puts "Variable do not exist for this($this(index_of_UUID,$UUID))"}
-					} else {puts "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
+						} else {puts stderr "Variable do not exist for this($this(index_of_UUID,$UUID))"}
+					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
 				 # close $chan
 				}
 }
-Trace CometUPNP_PM_FC_intelbased Eventing_msg 
+# Trace CometUPNP_PM_FC_intelbased Eventing_msg 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Add_eventing_CB {UDN service_id ID_subscribe CB} {
 	dict set this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe $CB
