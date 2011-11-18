@@ -14,6 +14,7 @@ package require tdom
 method UPNP_device constructor {timeout} {
 	set this(timeout)      $timeout
 	set this(uuid)         [::uuid::uuid generate]
+	set this(D_events)     [dict create]	
 	
 	if {![info exists class(ip)]} {set class(ip)          [regexp -inline {\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}} [exec ipconfig] ]}
 	
@@ -26,10 +27,16 @@ method UPNP_device constructor {timeout} {
 	set this(tcp_server)      [socket -server "$objName New_connection " 0]
 	set this(tcp_server_port) [lindex [fconfigure $this(tcp_server) -sockname] end]
 
+	# Open TCP server for EVENT management
+	set this(Event_tcp_server)      [socket -server "$objName New_Event_connection " 0]
+	set this(Event_tcp_server_port) [lindex [fconfigure $this(Event_tcp_server) -sockname] end]
+
+
 	set this(C_UPNP)          [CPool get_singleton CometUPNP]
 	$this(C_UPNP) Subscribe_to_M-SEARCH $objName [list $objName Received_M-SEARCH]
 	
 	set this(description_ready) 0
+	
 }
 
 
@@ -66,6 +73,111 @@ method UPNP_device Received_M-SEARCH {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method UPNP_device Emit_event {service L_var_val} {
+	if {[dict exists $this(D_events) $service]} {
+		 dict for {uuid D_CB} [dict get $this(D_events) $service] {
+			 set CALLBACK [lindex [dict get $D_CB CALLBACK] 0]
+			 if {$CALLBACK == ""} {continue}
+			 
+			 set    content ""
+			 append content {<?xml version="1.0" encoding="utf-8"?>} "\n"
+			 append content {<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">} "\n"
+			 foreach {var val} $L_var_val {
+				 append content {<e:property>} "\n"
+				 append content "<${var}>" {<![CDATA[} $val {]]>} "</${var}>\n"
+				 append content {</e:property>} "\n"
+				}
+			 append content  {</e:propertyset>} "\n"
+			 
+			 set    entete "NOTIFY $CALLBACK HTTP/1.1\n"
+			 append entete "NTS:  upnp:propchange\n"
+			 append entete "NT:  upnp:event\n"
+			 append entete "CONNECTION:  close\n"
+			 append entete "SEQ:  [dict get $D_CB SEQ]\n"
+			 append entete "CONTENT-TYPE:  text/xml\n"
+			 append entete "SID:  $uuid\n"
+			 append entete "HOST:  [dict get $D_CB IP]:[dict get $D_CB PORT]\n"
+			 append entete "Content-Length: [string bytelength $content]\n\n"
+			 
+			 set sock [socket [dict get $D_CB IP] [dict get $D_CB PORT]]
+				fconfigure $sock -encoding utf-8
+				# puts "Send event : $entete$content"
+				puts -nonewline $sock $entete$content; close $sock
+			 
+			 # update SEQ
+			 dict set this(D_events) $service $uuid SEQ [expr 1+[dict get $D_CB SEQ]]
+			}
+		}
+}
+# Trace UPNP_device Emit_event
+
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device New_Event_connection {sock ad port} {
+	global reading_sock_$sock 
+	set this(data_$sock) ""; set this(size_$sock) -1
+	fconfigure $sock -blocking 0 -encoding utf-8 -translation {lf crlf}
+	fileevent  $sock readable [list $objName Read_Event_Subscription_from_socket $sock]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device Read_Event_Subscription_from_socket {sock} {
+	if {[eof $sock]} {close $sock; return}
+	append this(data_$sock) [read $sock]
+	if {$this(size_$sock) == -1} {
+		 set pos  [string first " " $this(data_$sock)]
+		 set pos2 [string first " " $this(data_$sock) [expr $pos + 1]]
+		 set pos3 [string first " " $this(data_$sock) [expr $pos2 + 1]]
+		 if {$pos != -1 && $pos2 != -1 && $pos3 != -1} {
+			 set size_comet_name   [string range $this(data_$sock) 0 [expr $pos - 1]]
+			 set this(service_$sock) [string range $this(data_$sock) [expr $pos + 1] [expr $pos2 - 1]]
+			 set this(size_$sock)  [string range $this(data_$sock) [expr $pos2 + 1] [expr $pos3 - 1]]
+			 set this(data_$sock)  [string range $this(data_$sock) [expr $pos3 + 1] end]
+		    }
+		}
+	
+	# puts "Event Received?________________\n$this(data_$sock)\n_______________________________________"
+	
+	# puts "Waiting $this(size_$sock) bytes, received [string length $this(data_$sock)] bytes.\n$this(data_$sock)"
+	if {$this(size_$sock) != -1 && [string length $this(data_$sock)] >= $this(size_$sock)} {
+		 # puts "$objName Read_Event_Subscription_from_socket:______________\n$this(data_$sock)\n_____________________________________________________"
+		 foreach line [split $this(data_$sock) "\n"] {
+			 set pos_: [string first ":" $line]
+			 if {${pos_:} >= 0} {
+				 set var_name [string trim [string range $line 0 [expr ${pos_:} - 1]]]
+				 set val      [string trim [string range $line [expr ${pos_:} + 1] end]]
+				 set [string toupper $var_name] $val
+				}
+			}
+		 # How long is the subscription time in seconds?
+		 regexp {^ *Second\-(.*)$} $TIMEOUT reco TIMEOUT
+		 
+		 # Get the callback, register it and send back an identifier
+		 if {![info exists SID]} {set uuid [::uuid::uuid generate]} else {set uuid $SID}
+		 if {[info exists CALLBACK]} {
+			 # puts "\tCALLBACK: $CALLBACK"
+			 regexp {^< *(.*) *>$} $CALLBACK reco CALLBACK
+			 set L [list]; foreach CB [split $CALLBACK ","] {lappend L [string trim $CB]}; set CALLBACK $L
+			 dict set this(D_events) $this(service_$sock) $uuid CALLBACK $CALLBACK
+			 set CALLBACK [lindex $CALLBACK 0]
+			 if {[regexp {^http://(.*)$} $CALLBACK reco IP_PORT]} {
+				 set pos [string first $IP_PORT "/"]; if {$pos == -1} {set pos end} else {incr pos -1}
+				 lassign [split [string range $IP_PORT 0 $pos] ":"] IP PORT
+				 if {$PORT == ""} {set PORT 80}
+				 dict set this(D_events) $this(service_$sock) $uuid IP   $IP
+				 dict set this(D_events) $this(service_$sock) $uuid PORT $PORT
+				 dict set this(D_events) $this(service_$sock) $uuid SEQ  0
+				}
+			}
+		 dict set this(D_events) $this(service_$sock) $uuid TIMEOUT  $TIMEOUT
+		 
+		 set rep "SID: $uuid
+TIMEOUT: Second-$TIMEOUT"
+		 puts $sock $rep
+		 close $sock
+		}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method UPNP_device New_connection {sock ad port} {
 	global reading_sock_$sock 
 	set this(data_$sock) ""; set this(size_$sock) -1
@@ -89,6 +201,27 @@ method UPNP_device Process_result {mtd ns_res res} {
 	
 	return $rep
 }
+
+
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device Process_L_result {mtd ns_res L_res} {
+	set doc [dom createDocument doc]
+	set root [$doc createElementNS s Envelope]
+		$root setAttribute xmlns         "http://schemas.xmlsoap.org/soap/envelope/"
+		$root setAttribute encodingStyle "http://schemas.xmlsoap.org/soap/encoding/"
+		set n_body [$doc createElement Body]; $root appendChild $n_body
+			set n_mtd [$doc createElement $mtd]; $n_body appendChild $n_mtd
+				$n_mtd setAttribute xmlns $ns_res
+				foreach {res_var res_val} $L_res {
+					 set n_result [$doc createElement $res_var]; $n_mtd appendChild $n_result
+					 $n_result appendChild [$doc createTextNode $res_val]
+					}
+	set rep [$root asXML]
+	$doc delete
+	
+	return $rep
+}
+
 
 #___________________________________________________________________________________________________________________________________________
 method UPNP_device Read_from_socket {sock} {
@@ -277,6 +410,35 @@ method UPNP_device Generate_service_description_for_comet {C} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method UPNP_device Generate_event_description_for_service {C} {
+	set str "<?php\n"
+	
+	# Generate a PHP page that will contact COMETs and return results for a SOAP action
+	append str {$found_CALLBACK = false; $found_SID = false; $size = -1;} "\n\$entete = \"\";\n"
+	append str {foreach (getallheaders() as $name => $value) } "{\n"
+	append str "\tif (strtoupper(\$name) == \"CALLBACK\") {\$found_CALLBACK = true;}\n"
+	append str "\tif (strtoupper(\$name) == \"SID\") {\$found_SID = true;}\n"
+	append str "\t\$entete .= \$name . \" : \" . \$value . \"\\n\";\n"
+	append str "}\n\n"
+	append str "if (\$found_CALLBACK || \$found_SID) {\n"
+	append str "\t\$data = \$entete;\n"
+	append str "\t\$fp = fsockopen(\"$class(ip)\", $this(Event_tcp_server_port), \$errno, \$errstr, 10);\n"
+	append str "\tfwrite(\$fp, \"[string length $C] $C \");\n"
+	append str "\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
+	append str "\tfwrite(\$fp, \$data); fflush(\$fp);\n"
+	append str "\t\$out = \"\";\n"
+	append str "\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
+	append str "\tforeach(explode(\"\\n\", \$out) AS  \$i => \$entt) {header(\$entt);}\n"
+	append str "\tfclose(\$fp); flush();\n" 
+	append str "} else {echo \"No event CALLBACK nor SID found in the headers\n<br/>\" . \$entete;}\n"
+		
+	# Finish the string
+	append str "?>"
+	
+	return $str
+}
+
+#___________________________________________________________________________________________________________________________________________
 method UPNP_device Generate_control_description_for_comet {C} {
 	set str "<?php\n"
 	
@@ -308,7 +470,7 @@ method UPNP_device Generate_control_description_for_comet {C} {
 #___________________________________________________________________________________________________________________________________________
 #_________________________________________________ Generate a device based on descriptions _________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method UPNP_device Generate_device_description_from_xml_file {f_name L_control_mappings} {
+method UPNP_device Generate_device_description_from_xml_file {f_name L_control_mappings L_event_mappings} {
 	set f [open $f_name r]; set str_xml [read $f]; close $f
 	dom parse $str_xml doc
 	$doc documentElement root; set ns_root [$root namespace]
@@ -327,6 +489,16 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 			 if {$pos >= 0} {
 				 puts "\ton node $n"
 				 [$n childNodes] nodeValue [lindex $L_control_mappings [expr $pos+1]]
+				 puts "\tnow value is : [$n asText]"
+				}
+			}
+		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:eventSubURL"] {
+			 set val [$n asText]
+			 puts "eventURL : $val"
+			 set pos [lsearch $L_event_mappings $val]
+			 if {$pos >= 0} {
+				 puts "\ton node $n"
+				 [$n childNodes] nodeValue [lindex $L_event_mappings [expr $pos+1]]
 				 puts "\tnow value is : [$n asText]"
 				}
 			}

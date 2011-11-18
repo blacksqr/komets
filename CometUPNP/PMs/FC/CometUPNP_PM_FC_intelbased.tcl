@@ -77,7 +77,7 @@ method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
 	set this(upnp_eventing_msg_from_$chan) ""
 	fileevent  $chan readable [list $objName Eventing_msg $chan]
 }
-# Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
+Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 	if {[eof $chan]} {
@@ -96,7 +96,7 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 					 set pos [string first " " $line]
 					 if {$pos >= 0} {
 						 set var [string range $line 0 [expr $pos - 1]]
-						 set val [string range $line [expr $pos + 1] end]
+						 set val [string trim [string range $line [expr $pos + 1] end]]
 						 dict set dict_rep $var $val
 						}
 					}
@@ -123,7 +123,7 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 				 # close $chan
 				}
 }
-# Trace CometUPNP_PM_FC_intelbased Eventing_msg 
+Trace CometUPNP_PM_FC_intelbased Eventing_msg 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Add_eventing_CB {UDN service_id ID_subscribe CB} {
 	dict set this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe $CB
@@ -156,10 +156,21 @@ Content-Length: 0
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
-	if {[regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
+	if {![regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
+		 if {![regexp {^http://(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP]} {puts stderr "No port specified in $objName Subscribe_to_UPNP_events $UDN"; return;}
+		 set PORT 80
+		}
+	if {[info exists PORT]} {
 		 if {![info exists this(UPNP_eventing_CB,${UDN},${service_id})]} {
 			 set event_ad [this get_item_of_dict_devices [list $UDN ServiceList $service_id eventSubURL]]
-			 if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
+			 if {![catch {set baseURL [this get_item_of_dict_devices [list $UDN baseURL]]}]} {
+				 set pos [string first "/" $baseURL 7]
+				 if {$pos >= 0} {
+					 if {[string index $baseURL end] != "/" && [string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
+					 set event_ad [string range $baseURL $pos end]$event_ad
+					} else {if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}}
+				} else {if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
+					   }
 			 
 			 set msg "SUBSCRIBE $event_ad HTTP/1.1
 TIMEOUT: Second-10000
@@ -168,6 +179,7 @@ CALLBACK: <http://$this(IP):$this(eventing_server_port)>
 NT: upnp:event
 Content-Length: 0
 "
+			 puts "Subscribe message:\n$msg"
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
@@ -176,6 +188,7 @@ Content-Length: 0
 		 this Add_eventing_CB $UDN $service_id $ID_subscribe $CB
 		}
 }
+# Trace CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UDN service_id} {
@@ -191,7 +204,7 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 			}
 		}
 	
-	 if {![dict exists $dict_rep "SID:"]} {puts stderr "No SID given by the device for the subscription..."; return}
+	 if {![dict exists $dict_rep "SID:"]} {puts stderr "No SID given by the device for the subscription...$str\n"; return}
 	 set UUID [dict get $dict_rep "SID:"]
 	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
