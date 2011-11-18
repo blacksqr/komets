@@ -18,18 +18,18 @@
                 <serviceId>urn:upnp-org:serviceId:AddAA</serviceId>
                 <SCPDURL>AddAA_scpd.xml</SCPDURL>
                 <controlURL>__control_PIPO_UPNP_WCOMP_AddAA.php</controlURL>
-                <eventSubURL>_urn:upnp-org:serviceId:AddAA_event</eventSubURL>
+                <eventSubURL>__event_PIPO_UPNP_WCOMP_AddAA.php</eventSubURL>
             </service>
             <service>
                 <serviceType>urn:schemas-upnp-org:service:SelectAA:1</serviceType>
                 <serviceId>urn:upnp-org:serviceId:SelectAA</serviceId>
                 <SCPDURL>SelectAA_scpd.xml</SCPDURL>
                 <controlURL>__control_PIPO_UPNP_WCOMP_SelectAA.php</controlURL>
-                <eventSubURL>_urn:upnp-org:serviceId:SelectAA_event</eventSubURL>
+                <eventSubURL>__event_PIPO_UPNP_WCOMP_SelectAA.php</eventSubURL>
             </service>
         </serviceList>
-        <UDN>uuid:48981871-a978-45a6-4ea6-861346a4696c</UDN>
-        <URLBase>http://129.88.66.127/Comets/UPNP/</URLBase>
+        <UDN>uuid:73402639-2e92-493e-7398-c1e05ac8130c</UDN>
+        <URLBase>http://130.190.28.166/Comets/UPNP/</URLBase>
     </device>
 </root>
 

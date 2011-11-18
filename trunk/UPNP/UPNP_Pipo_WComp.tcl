@@ -14,9 +14,24 @@ method Pipo_WComp constructor {t} {
 		fconfigure $f -encoding utf-8
 		puts $f $str_srv
 		close $f
-	 this Generate_device_description_from_xml_file $::env(ROOT_COMETS)/Comets/UPNP/__scpd_PIPOWCOMP.xml [list _urn:upnp-org:serviceId:AddAA_control    __control_${objName}_AddAA.php \
-																						   _urn:upnp-org:serviceId:SelectAA_control __control_${objName}_SelectAA.php \
-																					 ]
+	# Events...
+	 set str_srv [this Generate_event_description_for_service urn:upnp-org:serviceId:AddAA]
+	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__event_${objName}_AddAA.php w]
+		fconfigure $f -encoding utf-8
+		puts $f $str_srv
+		close $f
+	 set str_srv [this Generate_event_description_for_service urn:upnp-org:serviceId:SelectAA]
+	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__event_${objName}_SelectAA.php w]
+		fconfigure $f -encoding utf-8
+		puts $f $str_srv
+		close $f
+	
+	 this Generate_device_description_from_xml_file $::env(ROOT_COMETS)/Comets/UPNP/__scpd_PIPOWCOMP.xml [list \
+																							  _urn:upnp-org:serviceId:AddAA_control    __control_${objName}_AddAA.php \
+																						      _urn:upnp-org:serviceId:SelectAA_control __control_${objName}_SelectAA.php \
+																					 ]	[list _urn:upnp-org:serviceId:AddAA_event    __event_${objName}_AddAA.php \
+																							  _urn:upnp-org:serviceId:SelectAA_event __event_${objName}_SelectAA.php \
+																						]
 	# Part related to the UPNP metadatas
 	set this(CU) [CPool get_singleton CometUPNP]
 	set this(dico_UDN_metadata) [dict create]
@@ -31,6 +46,7 @@ method Pipo_WComp constructor {t} {
 		# An action is a TCL programm
 		set this(D_rules) [dict create]
 		
+	this send_heartbeat
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -54,7 +70,7 @@ method Pipo_WComp New_UPNP_device {k v} {
 											 [list "" {$D_name == "GetMetadata"}]	]
 		 if {[llength $rep]} {
 			 # Call the GetMetadata action
-			 this soap_call $k "urn:upnp-org:serviceId:Metadata" "GetMetadata" [list] "$objName Add_device_and_metadata [list $k] \$UPNP_res"
+			 $this(CU) soap_call $k "urn:upnp-org:serviceId:Metadata" "GetMetadata" [list] "$objName Add_device_and_metadata [list $k] \$UPNP_res"
 			}
 		}
 }
@@ -97,6 +113,7 @@ method Pipo_WComp Process_result {mtd ns_res res} {
 	return $rep
 }
 
+
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp get_L_UDN_having_metadata {metadata} {
 	set D_metadata [dict create]
@@ -127,7 +144,9 @@ method Pipo_WComp get_L_UDN_having_D_metadata {D_metadata} {
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp AddAA {str} {
-	lassign $str rule_name D_rule
+	regexp "^.*\nadvice *(.*) *\\(.*\\) *: *\n(.*)\$" $str reco rule_name str
+	puts "New AA:\n\tname : $rule_name\n\tstr : [string trim $str]"
+	set D_rule [eval $str] 
 	dict set D_rule is_selected 0
 	dict set this(D_rules) $rule_name $D_rule
 	this Apply_rule $rule_name
