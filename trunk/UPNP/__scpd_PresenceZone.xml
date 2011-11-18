@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <URLBase>http://192.168.62.128:8888</URLBase>
+  <device>
+    <deviceType>urn:schemas-upnp-orgevice:light:1</deviceType>
+    <friendlyName>Virtual Presence Zone</friendlyName>
+    <manufacturer>man</manufacturer>
+    <manufacturerURL>manURL</manufacturerURL>
+    <modelDescription>descr</modelDescription>
+    <modelName>name</modelName>
+    <modelNumber>number</modelNumber>
+    <modelURL>mURL</modelURL>
+    <serialNumber>serial</serialNumber>
+    <UDN>uuid:fb9e473a-f276-4930-b511-376d61dd0a3e</UDN>
+    <serviceList>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:HouseStatus:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:HouseStatus</serviceId>
+        <SCPDURL>service_HouseStatus.xml</SCPDURL>
+        <controlURL>/upnp/fb9e473a-f276-4930-b511-376d61dd0a3e</controlURL>
+        <eventSubURL>/upnp/Event/fb9e473a-f276-4930-b511-376d61dd0a3e:HouseStatus</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+        <SCPDURL>service_Metadata.xml</SCPDURL>
+        <controlURL>/upnp/fb9e473a-f276-4930-b511-376d61dd0a3e</controlURL>
+        <eventSubURL>/upnp/Event/fb9e473a-f276-4930-b511-376d61dd0a3e:Meta-data</eventSubURL>
+        <serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+      </service>
+    </serviceList>
+  </device>
+</root>
