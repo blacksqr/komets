@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+  <serviceStateTable>
+    <stateVariable sendEvents="yes">
+      <name>OccupancyState</name>
+      <dataType>string</dataType>
+      <defaultValue>Indeterminate</defaultValue>
+      <allowedValueList>
+        <allowedValue>Occupied</allowedValue>
+        <allowedValue>Unoccupied</allowedValue>
+        <allowedValue>Indeterminate</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+  </serviceStateTable>
+  <actionList>
+    <action>
+      <name>GetOccupancyState</name>
+      <argumentList>
+        <argument>
+          <name>CurrentOccupancyState</name>
+          <direction>out</direction>
+          <relatedStateVariable>
+          OccupancyState</relatedStateVariable>
+          <retval />
+        </argument>
+      </argumentList>
+    </action>
+  </actionList>
+</scpd>
