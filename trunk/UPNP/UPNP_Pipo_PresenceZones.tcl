@@ -39,6 +39,14 @@ method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method Pipo_UPNP_PresenceZones Read_Event_Subscription_from_socket {sock} {
+	set service_subscribed [this inherited $sock]
+	switch $service_subscribed {
+		 urn:upnp-org:serviceId:HouseStatus {this Emit_event $service_subscribed [list OccupancyState $this(OccupancyState)]}
+		}
+}
+
+#___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_PresenceZones Process_result {mtd ns_res L_res} {
 	return [this Process_L_result $mtd $ns_res $L_res]
 }

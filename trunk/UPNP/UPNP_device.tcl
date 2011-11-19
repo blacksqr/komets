@@ -135,6 +135,7 @@ method UPNP_device Read_Event_Subscription_from_socket {sock} {
 		    }
 		}
 	
+	set service_subscribed ""
 	# puts "Event Received?________________\n$this(data_$sock)\n_______________________________________"
 	
 	# puts "Waiting $this(size_$sock) bytes, received [string length $this(data_$sock)] bytes.\n$this(data_$sock)"
@@ -167,6 +168,7 @@ method UPNP_device Read_Event_Subscription_from_socket {sock} {
 				 dict set this(D_events) $this(service_$sock) $uuid PORT $PORT
 				 dict set this(D_events) $this(service_$sock) $uuid SEQ  0
 				}
+			 set service_subscribed $this(service_$sock)
 			}
 		 dict set this(D_events) $this(service_$sock) $uuid TIMEOUT  $TIMEOUT
 		 
@@ -175,6 +177,8 @@ TIMEOUT: Second-$TIMEOUT"
 		 puts $sock $rep
 		 close $sock
 		}
+		
+	return $service_subscribed
 }
 
 #___________________________________________________________________________________________________________________________________________
