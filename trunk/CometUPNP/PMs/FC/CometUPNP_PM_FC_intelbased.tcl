@@ -95,32 +95,32 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 				 foreach line [split $entete "\n"] {
 					 set pos [string first " " $line]
 					 if {$pos >= 0} {
-						 set var [string range $line 0 [expr $pos - 1]]
+						 set var [string toupper [string trim [string range $line 0 [expr $pos - 1]]]]
 						 set val [string trim [string range $line [expr $pos + 1] end]]
 						 dict set dict_rep $var $val
 						}
 					}
 				 # Is there a message Content-Length?
-				 if {[dict exists $dict_rep "Content-Length:"]} {
+				 if {[dict exists $dict_rep "CONTENT-LENGTH:"]} {
 					 # If the xml message does not contain enough byte, cancel...
-					 if {[string bytelength $xml] < ([dict get $dict_rep "Content-Length:"]-3)} {
-						 puts stderr "not enough bytes in the UPNP message ([dict get $dict_rep Content-Length:] needed), we have [string bytelength $xml] bytes :\n$xml"
+					 if {[string bytelength $xml] < ([dict get $dict_rep "CONTENT-LENGTH:"]-3)} {
+						 puts stderr "not enough bytes in the UPNP message ([dict get $dict_rep CONTENT-LENGTH:] needed), we have [string bytelength $xml] bytes :\n$xml"
 						 return
-						}
-					}
+						} 
+					} 
 				 
 				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
 				 if {[dict exists $dict_rep "SID:"]} {
 					 set UUID [dict get $dict_rep "SID:"]
 					 if {[info exists this($this(index_of_UUID,$UUID))]} {
+						 # puts "dict : [dict get $this($this(index_of_UUID,$UUID)) CB]"
 						 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
 							 set CB "$CB [list $xml]"
-							 # puts "From CometUPNP_PM_FC_intelbased:\n$CB"
 							 eval $CB
 							}
 						} else {puts stderr "Variable do not exist for this($this(index_of_UUID,$UUID))"}
 					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
-				 # close $chan
+				 close $chan
 				}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
