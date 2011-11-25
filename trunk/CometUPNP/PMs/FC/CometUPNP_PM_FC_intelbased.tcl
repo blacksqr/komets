@@ -167,7 +167,9 @@ method CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events {UDN service_id ID_su
 				 set pos [string first "/" $baseURL 7]
 				 if {$pos >= 0} {
 					 if {[string index $baseURL end] != "/" && [string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
-					 set event_ad [string range $baseURL $pos end]$event_ad
+					 if {[string first [string range $baseURL [expr $pos + 1] end] $event_ad] >= 0} {
+						 set event_ad $event_ad
+						} else {set event_ad [string range $baseURL $pos end]$event_ad}
 					} else {if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}}
 				} else {if {[string index $event_ad 0] != "/"} {set event_ad "/$event_ad"}
 					   }
@@ -179,7 +181,7 @@ CALLBACK: <http://$this(IP):$this(eventing_server_port)>
 NT: upnp:event
 Content-Length: 0
 "
-			 # puts "Subscribe message:\n$msg"
+			 puts "Subscribe message to $IP $PORT:\n$msg"
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
@@ -198,13 +200,16 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 	 foreach line [split $str "\n"] {
 		 set pos [string first " " $line]
 		 if {$pos >= 0} {
-			 set var [string range $line 0 [expr $pos - 1]]
+			 set var [string toupper [string range $line 0 [expr $pos - 1]]]
 			 set val [string range $line [expr $pos + 1] end]
 			 dict set dict_rep $var $val
 			}
 		}
 	
-	 if {![dict exists $dict_rep "SID:"]} {puts stderr "No SID given by the device for the subscription...$str\n"; return}
+	 if {![dict exists $dict_rep "SID:"]} {
+		 puts stderr "No SID given by the device for the subscription...\n$str\n"
+		 return
+		}
 	 set UUID [dict get $dict_rep "SID:"]
 	 set this(index_of_UUID,$UUID) UPNP_eventing_CB,${UDN},${service_id}
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) UUID    $UUID
