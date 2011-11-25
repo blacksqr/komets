@@ -12,7 +12,7 @@ proc get_xml_from {ad {t 2000}} {
 	
 	#
   if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {
-		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem" $err]
+		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" $err]
 		 return "BLOC_CALL"
 		}
 		
@@ -36,10 +36,42 @@ proc get_xml_from {ad {t 2000}} {
 proc http_callback {sock token} {
     upvar #0 $token state
     # Access socket, and state as a Tcl array
-    fconfigure $sock -encoding utf-8
-    set data [read $sock]; set nbytes [string length $data]
+    fconfigure $sock -encoding utf-8 -translation {lf crlf}
+	# Chunked transfert?
+	array set meta $state(meta)
+	set data [read $sock]; set nbytes [string bytelength $data]
+	
+	if {0} {
+		 # $meta(Transfer-Encoding) == "chunked"
+		 # Some data left?
+		 if {![info exist state(data_left)]} {set state(data_left) ""}
+		 set data $state(data_left)$data
+		 puts "incoming data:\n$data\n________________________________________________"
+		 # Parse...
+		 set pos 0
+		 while {1} {
+			 set pos [string first "\n" $data]
+			 if {$pos == -1} {break;}
+			 set pos_start [expr $pos + 1]
+			 set size_line [string range $data 0 [expr $pos - 1]]
+			 regexp {^([0-9A-Fa-f]*)} $size_line reco size
+			 puts "size_line : $size_line\nsize : $size"
+				# if {[set pos_size [string first "\;" $size_line]] != -1} {
+					 # set size [string range $size_line 0 [expr $pos_size - 1]]
+					# } else {set size $size_line}
+			 # Enough data to read?
+			 set pos_end [expr $pos_start + $size]
+			 if {$pos_end > [string bytelength $data]} {break}
+			 
+			 append state(body) [string range $data $pos_start [expr $pos_end - 1]]
+			 # update data
+			 set data [string range $data $pos_end end]
+			}
+		 # update data left
+		 set state(data_left) [string range $data $pos end]
+		} else {append state(body) $data}
+
 	# puts "Received $nbytes bytes :\n$data"
-	append state(body) $data
     return $nbytes
 }
 
