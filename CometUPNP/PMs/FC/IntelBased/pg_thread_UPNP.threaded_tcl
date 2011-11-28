@@ -12,7 +12,7 @@ proc get_xml_from {ad {t 2000}} {
 	
 	#
   if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {
-		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" $err]
+		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" [string range $err 0 64]]
 		 return "BLOC_CALL"
 		}
 		
@@ -41,12 +41,11 @@ proc http_callback {sock token} {
 	array set meta $state(meta)
 	set data [read $sock]; set nbytes [string bytelength $data]
 	
-	if {0} {
-		 # $meta(Transfer-Encoding) == "chunked"
+	if {[info exists meta(Transfer-Encoding)] && $meta(Transfer-Encoding) == "chunked"} {
 		 # Some data left?
 		 if {![info exist state(data_left)]} {set state(data_left) ""}
 		 set data $state(data_left)$data
-		 puts "incoming data:\n$data\n________________________________________________"
+		 puts "incoming data:\n[string range $data 0 ]\n________________________________________________"
 		 # Parse...
 		 set pos 0
 		 while {1} {
