@@ -53,9 +53,9 @@ proc http_callback {sock token} {
 		 while {1} {
 			 set pos [string first "\n" $data 1]
 			 if {$pos == -1} {break;}
-			 set pos_start [expr $pos + 1]
+			 set pos_start [expr $pos + 1]; while {[string index $data $pos_start] == "\n"} {incr pos_start}
 			 set size_line [string range $data 0 [expr $pos - 1]]
-			 regexp {^([0-9A-Fa-f]*)} $size_line reco size
+			 regexp "^\n*(\[0-9A-Fa-f\]*)" $size_line reco size
 			 if {$size == ""} {send_msg_to_comet [list INFOS "size is empty string"]; break}
 			 send_msg_to_comet [list INFOS "size hex : $size"]
 			 set size [expr "0x$size"]
