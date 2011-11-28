@@ -73,7 +73,7 @@ proc http_callback {sock token} {
 			}
 		 # update data left
 		 set state(data_left) [string range $data $pos end]
-		 send_msg_to_comet [list INFOS "data_left : $state(data_left)"]
+		 send_msg_to_comet [list INFOS "data_left : [string range $state(data_left) 0 60] ..."]
 		} else {append state(body) $data}
 
 	# puts "Received $nbytes bytes :\n$data"
