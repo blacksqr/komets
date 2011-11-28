@@ -45,7 +45,7 @@ proc http_callback {sock token} {
 		 # Some data left?
 		 if {![info exist state(data_left)]} {set state(data_left) ""}
 		 set data $state(data_left)$data
-		 puts "incoming data:\n[string range $data 0 ]\n________________________________________________"
+		 puts "incoming data:\n[string range $data 0 60]\n________________________________________________"
 		 # Parse...
 		 set pos 0
 		 while {1} {
