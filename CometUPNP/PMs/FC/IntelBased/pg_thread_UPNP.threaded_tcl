@@ -55,7 +55,7 @@ proc http_callback {sock token} {
 			 set size_line [string range $data 0 [expr $pos - 1]]
 			 regexp {^([0-9A-Fa-f]*)} $size_line reco size
 			 if {$size == ""} {break}
-			 # puts "size hex : $size"
+			 send_msg_to_comet [list INFOS "size hex : $size"]
 			 set size [expr "0x$size"]
 			 # puts "size_line : $size_line\nsize : $size"
 				# if {[set pos_size [string first "\;" $size_line]] != -1} {
@@ -71,6 +71,7 @@ proc http_callback {sock token} {
 			}
 		 # update data left
 		 set state(data_left) [string range $data $pos end]
+		 send_msg_to_comet [list INFOS "data_left : $state(data_left)"]
 		} else {append state(body) $data}
 
 	# puts "Received $nbytes bytes :\n$data"
