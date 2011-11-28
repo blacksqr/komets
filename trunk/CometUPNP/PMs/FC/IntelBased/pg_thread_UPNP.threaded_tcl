@@ -36,7 +36,7 @@ proc get_xml_from {ad {t 2000}} {
 proc http_callback {sock token} {
     upvar #0 $token state
     # Access socket, and state as a Tcl array
-    fconfigure $sock -encoding utf-8 -translation {crlf lf}
+    fconfigure $sock -encoding utf-8 -translation {lf crlf}
 	# Chunked transfert?
 	array set meta $state(meta)
 	set data [read $sock]; set nbytes [string bytelength $data]
@@ -54,7 +54,7 @@ proc http_callback {sock token} {
 			 set pos_start [expr $pos + 1]
 			 set size_line [string range $data 0 [expr $pos - 1]]
 			 regexp {^([0-9A-Fa-f]*)} $size_line reco size
-			 if {$size == ""} {break}
+			 if {$size == ""} {send_msg_to_comet [list INFOS "size is empty string"]; break}
 			 send_msg_to_comet [list INFOS "size hex : $size"]
 			 set size [expr "0x$size"]
 			 # puts "size_line : $size_line\nsize : $size"
