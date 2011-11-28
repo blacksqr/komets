@@ -45,7 +45,7 @@ proc http_callback {sock token} {
 		 # Some data left?
 		 if {![info exist state(data_left)]} {set state(data_left) ""}
 		 set data $state(data_left)$data
-		 puts "incoming data:\n[string range $data 0 60]\n________________________________________________"
+		 # puts "incoming data:\n[string range $data 0 60]\n________________________________________________"
 		 # Parse...
 		 set pos 0
 		 while {1} {
@@ -55,7 +55,7 @@ proc http_callback {sock token} {
 			 set size_line [string range $data 0 [expr $pos - 1]]
 			 regexp {^([0-9A-Fa-f]*)} $size_line reco size
 			 set size [expr 0x$size]
-			 puts "size_line : $size_line\nsize : $size"
+			 # puts "size_line : $size_line\nsize : $size"
 				# if {[set pos_size [string first "\;" $size_line]] != -1} {
 					 # set size [string range $size_line 0 [expr $pos_size - 1]]
 					# } else {set size $size_line}
