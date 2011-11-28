@@ -36,7 +36,7 @@ proc get_xml_from {ad {t 2000}} {
 proc http_callback {sock token} {
     upvar #0 $token state
     # Access socket, and state as a Tcl array
-    fconfigure $sock -encoding utf-8 -translation {lf crlf}
+    fconfigure $sock -encoding utf-8 -translation {crlf lf}
 	# Chunked transfert?
 	array set meta $state(meta)
 	set data [read $sock]; set nbytes [string bytelength $data]
