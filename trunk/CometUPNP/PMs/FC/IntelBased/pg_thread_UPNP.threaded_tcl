@@ -51,7 +51,7 @@ proc http_callback {sock token} {
 		 # Parse...
 		 set pos 0
 		 while {1} {
-			 set pos [string first "\n" $data]
+			 set pos [string first "\n" $data 1]
 			 if {$pos == -1} {break;}
 			 set pos_start [expr $pos + 1]
 			 set size_line [string range $data 0 [expr $pos - 1]]
@@ -72,7 +72,7 @@ proc http_callback {sock token} {
 			 set data [string range $data [expr $pos_end + 1] end]
 			}
 		 # update data left
-		 set state(data_left) [string range $data $pos end]
+		 set state(data_left) [string range $data [expr $pos_end + 1] end]
 		 send_msg_to_comet [list INFOS "data_left : [string range $state(data_left) 0 60] ..."]
 		} else {append state(body) $data}
 
