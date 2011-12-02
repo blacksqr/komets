@@ -1,0 +1,31 @@
+<root>
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType>urn:schemas-upnp-org:device:ProxyZonePlayer:1</deviceType>
+    <friendlyName>Proxy for a sonos</friendlyName>
+    <manufacturer>LIG</manufacturer>
+    <manufacturerURL>http://iihm.imag.fr/demeure</manufacturerURL>
+    <modelNumber>Proxy for ZP90</modelNumber>
+    <modelDescription>Proxy for Sonos ZonePlayer 90</modelDescription>
+    <modelName>Proxy for Sonos ZonePlayer 90</modelName>
+    <modelURL>http://www.sonos.com/products/zoneplayers/ZP90</modelURL>
+    <softwareVersion>15.4-44250</softwareVersion>
+    <UDN>uuid:RINCON_000E5823924C01400</UDN>
+    <minCompatibleVersion>13.0-00000</minCompatibleVersion>
+	<UDN>Bob</UDN>
+	<URLBase>http://...</URLBase>
+
+    <serviceList>
+          <service>
+            <serviceType>urn:schemas-upnp-org:service:proxysonos:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:proxysonos</serviceId>
+            <controlURL>controlURL_access</controlURL>
+            <eventSubURL>eventlURL_access</eventSubURL>
+            <SCPDURL>SonosMediaRendererCtrlDescription.xml</SCPDURL>
+          </service>
+    </serviceList>
+  </device>
+</root>
