@@ -7,12 +7,19 @@ proc get_xml_from {ad {t 2000}} {
   global UPNP_server_D_device_with_pb
   
   if {[dict exists $UPNP_server_D_device_with_pb $ad]} {
-	 if {[dict get $UPNP_server_D_device_with_pb $ad] >= 3} {return "BLOC_CALL"}
-	}
-	
+	 if {[dict get $UPNP_server_D_device_with_pb $ad] >= 3} {
+	     # send_msg_to_comet [list INFOS "Already try 3 or more times to load xml from $ad"]
+		 return "BLOC_CALL"
+		} else {
+				send_msg_to_comet [list INFOS "Try #[dict exists $UPNP_server_D_device_with_pb $ad] to get xml from $ad"]
+			   }
+	} else {dict set UPNP_server_D_device_with_pb $ad 0}
+
+  set nb_problems [dict get $UPNP_server_D_device_with_pb $ad]
 	#
   if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {
 		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" [string range $err 0 64]]
+		 dict set UPNP_server_D_device_with_pb $ad [expr 1 + $nb_problems]
 		 return "BLOC_CALL"
 		}
 		
@@ -20,11 +27,9 @@ proc get_xml_from {ad {t 2000}} {
 	 ok      {set rep [::http::data $token]
 			  if {![regexp {^[ \t\n]*<\?xml} $rep]} {set rep [string range $rep [string first "<?xml" $rep] end-4]}
 			 }
-	 default {if {![dict exists $UPNP_server_D_device_with_pb $ad]} {
-				 dict set UPNP_server_D_device_with_pb $ad 1
-				} else {dict set UPNP_server_D_device_with_pb $ad [expr 1 + [dict get $UPNP_server_D_device_with_pb $ad]]
-				       }
-	          set rep "BLOC_CALL"
+	 default {dict set UPNP_server_D_device_with_pb $ad [expr 1 + $nb_problems]
+	          send_msg_to_comet [list INFOS "HTTP STATUS pb in get_xml_from $ad  :  connection problem\nstatus : [::http::status $token]\n::http::geturl $ad -timeout $t -handler http_callback\n" [string range $err 0 64]]
+			  set rep "BLOC_CALL"
 			 }
 	}
   if {[catch {::http::cleanup $token} err]} {send_msg_to_comet [list ERROR "get_xml_from $ad  :  pb cleaning up $token"]}
@@ -36,7 +41,7 @@ proc get_xml_from {ad {t 2000}} {
 proc http_callback {sock token} {
     upvar #0 $token state
     # Access socket, and state as a Tcl array
-    fconfigure $sock -encoding utf-8 
+    fconfigure $sock -encoding binary 
 	# fconfigure $sock -encoding utf-8 -translation {lf crlf}
 	
 	# Chunked transfert?
@@ -49,32 +54,39 @@ proc http_callback {sock token} {
 		 set data $state(data_left)$data
 		 # puts "incoming data:\n[string range $data 0 60]\n________________________________________________"
 		 # Parse...
-		 set pos 0; set pos_end 0
+		 set pos 0; set pos_start 0; set pos_end end
+		 # send_msg_to_comet [list INFOS "<Reading datas> : [string bytelength $data] bytes including [string bytelength $state(data_left)] previous bytes"]
 		 while {1} {
+			 set original_pos 0
+			 # send_msg_to_comet [list INFOS "\toriginal_pos : $original_pos / [string bytelength $data] | $pos_start -> $pos_end"]
 			 set pos [string first "\n" $data 1]
 			 if {$pos == -1} {break;}
-			 set pos_start [expr $pos + 1]; while {[string index $data $pos_start] == "\n"} {incr pos_start}
+			 set pos_start [expr $pos + 1]; if {[string index $data $pos_start] == "\n"} {incr pos_start}
 			 set size_line [string range $data 0 [expr $pos - 1]]
 			 regexp "^\n*(\[0-9A-Fa-f\]*)" $size_line reco size
-			 if {$size == ""} {send_msg_to_comet [list INFOS "size is empty string"]; break}
-			 send_msg_to_comet [list INFOS "size hex : $size"]
+			 if {$size == ""} {
+				 # send_msg_to_comet [list INFOS "size is empty string : [string range $data 0 10]"]
+				 break
+				}
+			 # send_msg_to_comet [list INFOS "size hex : $size"]
 			 set size [expr "0x$size"]
-			 # puts "size_line : $size_line\nsize : $size"
-				# if {[set pos_size [string first "\;" $size_line]] != -1} {
-					 # set size [string range $size_line 0 [expr $pos_size - 1]]
-					# } else {set size $size_line}
 			 # Enough data to read?
 			 set pos_end [expr $pos_start + $size]
-			 if {$pos_end > [string bytelength $data]} {break}
+			 if {$pos_end > [string bytelength $data]} {
+				 # send_msg_to_comet [list INFOS "not enough bytes left (from $pos_start to $pos_end having [string bytelength $data] bytes of data (start from $original_pos )\n$data"];
+				 set pos_end $original_pos;
+				 break
+				}
 			 
-			 append state(body) [string range $data $pos_start [expr $pos_end - 1]]
+			 append state(body) [encoding convertfrom utf-8 [string range $data $pos_start [expr $pos_end - 1]]]
 			 # update data
-			 set data [string range $data [expr $pos_end + 1] end]
+			 incr pos_end
+			 set data [string range $data $pos_end end]
 			}
 		 # update data left
-		 set state(data_left) [string range $data [expr $pos_end + 1] end]
-		 send_msg_to_comet [list INFOS "data_left : [string range $state(data_left) 0 60] ..."]
-		} else {append state(body) $data}
+		 set state(data_left) [string range $data $pos_end end]
+		 # send_msg_to_comet [list INFOS "data_left : [string range $state(data_left) 0 60] ..."]
+		} else {append state(body) [encoding convertfrom utf-8 $data]}
 
 	# puts "Received $nbytes bytes :\n$data"
     return $nbytes
@@ -388,11 +400,11 @@ proc http_callback {sock token} {
 		 if {$new_location && [dict exists $UPNP_server_L_devices $UDN]} {
 		   if {[dict exists $UPNP_server_L_devices $UDN LocationURL]} {
 			 if {[dict get $UPNP_server_L_devices $UDN LocationURL] == [dict get $msg LocationURL]} {
-				set new_location 0
-				} else  {if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "ERROR"} {set new_location 0}
+				 if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "DONE"} {set new_location 0}
+				} else  {if {[dict get $UPNP_server_L_devices $UDN got_device_description] == "ERROR"} {set new_location 1}
 						}
 			}
-		  } 
+		  }
 
 		 return [list $UDN $new_location]
 	}
@@ -410,12 +422,13 @@ proc http_callback {sock token} {
 	 if {$new_location} {
 	   set str_xml [get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]]
 	   if {$str_xml != "BLOC_CALL"} {
-			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR set_description_from_thread $err]} else {dict set UPNP_server_L_devices $UDN got_device_description "DONE"}
+			if {[catch {set_description_from_thread $UDN str_xml} err]} {send_msg_to_comet [list ERROR "set_description_from_thread from [dict get $UPNP_server_L_devices $UDN LocationURL]" $err]} else {dict set UPNP_server_L_devices $UDN got_device_description "DONE"}
 		   } else {dict set   UPNP_server_L_devices $UDN got_device_description "ERROR"
 				   # send_msg_to_comet [list INFOS "BLOC_CALL during get_xml_from [dict get $UPNP_server_L_devices $UDN LocationURL]"]
 				  }
 	  } else {set ms [clock milliseconds]
 	          dict set UPNP_server_L_devices $UDN last_beat $ms
+			  dict set UPNP_server_L_devices $UDN got_device_description "DONE"
 			 }
 	}
 
@@ -470,23 +483,30 @@ proc http_callback {sock token} {
 	}
 	
 	#___________________________________________________________________________________________________________________________________________
+	set nb_set_description_from_thread 0
 	proc set_description_from_thread {UDN str_name args} {
+	 global nb_set_description_from_thread
+	 incr nb_set_description_from_thread
+	 if {$nb_set_description_from_thread > 1} {
+		 send_msg_to_comet  [list ERROR "We try to download more than one file at a time"]
+		}
 	 upvar $str_name str
 
 	 if {[catch {set doc [dom parse $str]} err]} {
-	   send_msg_to_comet  "ERROR parsing xml in set_description_from_thread from $UDN [list $err $str]"
+	   send_msg_to_comet  [list ERROR "parsing xml in set_description_from_thread from $UDN" $err $str]
 	   set an_error_occured 1
 	  } else {set root [$doc documentElement]
 			  set ns   [$root namespaceURI]
 			 
 			  set an_error_occured 0
 			  foreach node_device [$root selectNodes -namespaces [list ns $ns] "//ns:device | //device"] {
-				if {[catch {Add_device_from_dom $UDN $ns $node_device} err]} {set an_error_occured 1}
+				if {[catch {Add_device_from_dom $UDN $ns $node_device} err]} {set an_error_occured 1; set err "ERROR in Add_device_from_dom $UDN $ns $node_device\n$err"}
 			   }
 			  
 			  $doc delete
 			 }
-	 if {$an_error_occured} {error "Error in set_description_from_thread $UDN"}
+	 incr nb_set_description_from_thread -1
+	 if {$an_error_occured} {error "Error in set_description_from_thread $UDN:\t$err"}
 	}
 	
 	#___________________________________________________________________________________________________________________________________________
@@ -568,13 +588,13 @@ proc http_callback {sock token} {
 					   }
 			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
 				    send_msg_to_comet [list INFOS "Error accessing $ad"]
-					set set an_error_occured 1
+					set an_error_occured 1
 				   }
 	  }
 
 	 # Send device description
 	 send_msg_to_comet "Device_added $UDN [dict get $UPNP_server_L_devices $UDN]"
-	 if {$an_error_occured} {error "Error occured in Add_device_from_dom for device $node_UDN"}
+	 if {$an_error_occured} {error "Error occured in Add_device_from_dom for device $node_UDN : \n[$node_UDN asXML]"}
 	}
 
 	#___________________________________________________________________________________________________________________________________________

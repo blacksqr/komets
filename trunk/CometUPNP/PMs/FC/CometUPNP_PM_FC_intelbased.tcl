@@ -117,10 +117,13 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 						 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
 							 set CB "$CB [list $xml]"
 							 eval $CB
+							 # XXX DEBUG
+							 close $chan
+							 # /XXX
 							}
 						} else {puts stderr "Variable do not exist for this($this(index_of_UUID,$UUID))"}
 					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
-				 close $chan
+				 # close $chan
 				}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
@@ -259,7 +262,7 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 		  set this(${chan},msg) [string range $this(${chan},msg) $this(${chan},msg_attended_length) end]
 		  set this(${chan},msg_attended_length) -1
 		  
-		  if {[catch {this new_UPNP_message msg} err]} {puts stderr "ERROR while receiving new message :\n\tmsg : \$msg\n\terr : $err\n______stack:\n$::errorInfo"}
+		  if {[catch {this new_UPNP_message msg} err]} {puts stderr "ERROR while receiving new message :\n\tmsg : $msg\n\terr : $err\n______stack:\n$::errorInfo"}
 		 } else {break}
   }
 }
