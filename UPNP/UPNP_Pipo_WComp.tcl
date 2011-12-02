@@ -33,6 +33,7 @@ method Pipo_WComp constructor {t} {
 																							  _urn:upnp-org:serviceId:SelectAA_event __event_${objName}_SelectAA.php \
 																						]
 	# Part related to the UPNP metadatas
+	set this(is_metadata_calling) 0
 	set this(CU) [CPool get_singleton CometUPNP]
 	set this(dico_UDN_metadata) [dict create]
 	$this(CU) Subscribe_to_set_item_of_dict_devices $objName "$objName New_UPNP_device \$keys \$val"
@@ -70,7 +71,12 @@ method Pipo_WComp New_UPNP_device {k v} {
 											 [list "" {$D_name == "GetMetadata"}]	]
 		 if {[llength $rep]} {
 			 # Call the GetMetadata action
-			 $this(CU) soap_call $k "urn:upnp-org:serviceId:Metadata" "GetMetadata" [list] "$objName Add_device_and_metadata [list $k] \$UPNP_res"
+			 set this(is_metadata_calling) 0
+			 if {$this(is_metadata_calling)} {
+				 after 100 [list $objName New_UPNP_device $k $v]
+				} else {set this(is_metadata_calling) 1
+						$this(CU) soap_call $k "urn:upnp-org:serviceId:Metadata" "GetMetadata" [list] "$objName Add_device_and_metadata [list $k] \$UPNP_res"
+					   }
 			}
 		}
 }
@@ -80,7 +86,7 @@ method Pipo_WComp Add_device_and_metadata {UDN UPNP_res} {
 	set metadata ""
 	if {[dict exists $UPNP_res  ReturnValue]} {set metadata [dict get $UPNP_res  ReturnValue]}
 	if {[dict exists $UPNP_res _ReturnValue]} {set metadata [dict get $UPNP_res _ReturnValue]}
-	if {$metadata == ""} {return}
+	if {$metadata == ""} {set this(is_metadata_calling) 0; return}
 	set D_metadata [dict create]
 	foreach varval [split $metadata "&"] {
 		 lassign [split $varval "="] var val
@@ -88,6 +94,7 @@ method Pipo_WComp Add_device_and_metadata {UDN UPNP_res} {
 		 dict set D_metadata [string trim $var] $L_val
 		}
 	dict set this(dico_UDN_metadata) $UDN $D_metadata
+	puts "$UDN : $D_metadata"
 	
 	# Check wether this UDN is part of a AA rule condition or not...if yes, apply the AA rule
 	dict for {rule_name rule_val} $this(D_rules) {
@@ -96,6 +103,8 @@ method Pipo_WComp Add_device_and_metadata {UDN UPNP_res} {
 			 if {[lsearch $L_UDN $UDN] >= 0} {this Apply_rule $rule_name}
 			}
 		}
+	
+	set this(is_metadata_calling) 0
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -182,6 +191,7 @@ method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
 # Trace Pipo_WComp OnEvent
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
+	if {![dict exists $this(D_rules) $rule_name]} {return}
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}
 	# Create variables packed inside the event notification
@@ -221,6 +231,8 @@ method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 # Trace Pipo_WComp OnEvents
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars CB event} {
+	if {![dict get $this(D_rules) $rule_name]} {return}
+
 	# Set the value upcoming inside the dictionnary
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}

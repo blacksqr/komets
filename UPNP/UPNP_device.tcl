@@ -99,10 +99,13 @@ method UPNP_device Emit_event {service L_var_val} {
 			 append entete "HOST:  [dict get $D_CB IP]:[dict get $D_CB PORT]\n"
 			 append entete "Content-Length: [string bytelength $content]\n\n"
 			 
-			 set sock [socket [dict get $D_CB IP] [dict get $D_CB PORT]]
-				fconfigure $sock -encoding utf-8
-				# puts "Send event : $entete$content"
-				puts -nonewline $sock $entete$content; close $sock
+			 if {[catch {set sock [socket [dict get $D_CB IP] [dict get $D_CB PORT]]} err]} {
+				 puts stderr "Error with socket connection [list socket [dict get $D_CB IP] [dict get $D_CB PORT]]"
+				} else {fconfigure $sock -encoding utf-8
+						# puts "Send event : $entete$content"
+						puts -nonewline $sock $entete$content
+						close $sock
+					   }
 			 
 			 # update SEQ
 			 dict set this(D_events) $service $uuid SEQ [expr 1+[dict get $D_CB SEQ]]
@@ -426,14 +429,15 @@ method UPNP_device Generate_event_description_for_service {C} {
 	append str "}\n\n"
 	append str "if (\$found_CALLBACK || \$found_SID) {\n"
 	append str "\t\$data = \$entete;\n"
-	append str "\t\$fp = fsockopen(\"$class(ip)\", $this(Event_tcp_server_port), \$errno, \$errstr, 10);\n"
-	append str "\tfwrite(\$fp, \"[string length $C] $C \");\n"
-	append str "\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
-	append str "\tfwrite(\$fp, \$data); fflush(\$fp);\n"
-	append str "\t\$out = \"\";\n"
-	append str "\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
-	append str "\tforeach(explode(\"\\n\", \$out) AS  \$i => \$entt) {header(\$entt);}\n"
-	append str "\tfclose(\$fp); flush();\n" 
+	append str "\tif(\$fp = fsockopen(\"$class(ip)\", $this(Event_tcp_server_port), \$errno, \$errstr, 10)) {\n"
+	append str "\t\tfwrite(\$fp, \"[string length $C] $C \");\n"
+	append str "\t\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
+	append str "\t\tfwrite(\$fp, \$data); fflush(\$fp);\n"
+	append str "\t\t\$out = \"\";\n"
+	append str "\t\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
+	append str "\t\tforeach(explode(\"\\n\", \$out) AS  \$i => \$entt) {header(\$entt);}\n"
+	append str "\t\tfclose(\$fp); flush();\n" 
+	append str "\t}\n" 
 	append str "} else {echo \"No event CALLBACK nor SID found in the headers\n<br/>\" . \$entete;}\n"
 		
 	# Finish the string
@@ -454,14 +458,15 @@ method UPNP_device Generate_control_description_for_comet {C} {
 	append str "}\n\n"
 	append str "if (\$found_SOAP) {\n"
 	append str "\t\$data = file_get_contents(\"php://input\");\n"
-	append str "\t\$fp = fsockopen(\"$class(ip)\", $this(tcp_server_port), \$errno, \$errstr, 10);\n"
-	append str "\tfwrite(\$fp, \"[string length $C] $C \");\n"
-	append str "\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
-	append str "\tfwrite(\$fp, \$data); flush(); \n"
-	append str "\t\$out = \"\";\n"
-	append str "\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
-	append str "\techo \$out;\n"
-	append str "\tfclose(\$fp);\n" 
+	append str "\tif(\$fp = fsockopen(\"$class(ip)\", $this(tcp_server_port), \$errno, \$errstr, 10)) {\n"
+	append str "\t\tfwrite(\$fp, \"[string length $C] $C \");\n"
+	append str "\t\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
+	append str "\t\tfwrite(\$fp, \$data); flush(); \n"
+	append str "\t\t\$out = \"\";\n"
+	append str "\t\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
+	append str "\t\techo \$out;\n"
+	append str "\t\tfclose(\$fp);\n" 
+	append str "\t}\n" 
 	append str "} else {echo \"No SOAP action found in the headers\n<br/>\" . \$entete;}\n"
 		
 	# Finish the string
@@ -529,14 +534,15 @@ method UPNP_device Generate_control_description_for_service {C} {
 	append str "}\n\n"
 	append str "if (\$found_SOAP) {\n"
 	append str "\t\$data = file_get_contents(\"php://input\");\n"
-	append str "\t\$fp = fsockopen(\"$class(ip)\", $this(tcp_server_port), \$errno, \$errstr, 10);\n"
-	append str "\tfwrite(\$fp, \"[string length $C] $C \");\n"
-	append str "\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
-	append str "\tfwrite(\$fp, \$data); flush(); \n"
-	append str "\t\$out = \"\";\n"
-	append str "\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
-	append str "\techo \$out;\n"
-	append str "\tfclose(\$fp);\n" 
+	append str "\tif(\$fp = fsockopen(\"$class(ip)\", $this(tcp_server_port), \$errno, \$errstr, 10)) {\n"
+	append str "\t\tfwrite(\$fp, \"[string length $C] $C \");\n"
+	append str "\t\tfwrite(\$fp, strlen( utf8_decode(\$data))); fwrite(\$fp, \" \"); \n"
+	append str "\t\tfwrite(\$fp, \$data); flush(); \n"
+	append str "\t\t\$out = \"\";\n"
+	append str "\t\twhile (!feof(\$fp)) {\$out .= fread(\$fp, 8192);}\n"
+	append str "\t\techo \$out;\n"
+	append str "\t\tfclose(\$fp);\n"
+	append str "\t}\n"
 	append str "} else {echo \"No SOAP action found in the headers\n<br/>\" . \$entete;}\n"
 		
 	# Finish the string

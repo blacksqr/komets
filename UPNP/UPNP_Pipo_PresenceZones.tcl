@@ -35,7 +35,7 @@ method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata} {
 	$canvas bind $this(poly_id) <ButtonPress> "$objName Switch_OccupancyState"
 	
 	
-	this send_heartbeat
+	after 100 [list $objName send_heartbeat]
 }
 
 #___________________________________________________________________________________________________________________________________________
