@@ -3,13 +3,17 @@ if {[info exists interpretor_DSL_comet_interface]} {} else {
  }
 
 proc Aide_nom {v re} {
- if {[catch "$v auzlidgfsd" res]} {
-   if {[regexp {wrong method "auzlidgfsd": should be (.*) or unknown$} $res reco L]} {
-     set L [string map {, ""} $L]
-     foreach e $L {
-       if {[regexp $re $e]} {puts $e}
-      }
-    }
+ if {[gmlObject info exists object $v]} {
+	 set L_classes [gmlObject info classes $v]
+	} else {if {[gmlObject info exists class $v]} {
+				 set L_classes [concat $v [gmlObject info classes $v]]
+				} else {error "There is no object nor class names $v."}
+		   }
+ foreach c $L_classes {
+   puts "Class $c :"
+   foreach m [gmlObject info methods $c] {
+	 if {[regexp $re $m]} {catch {puts "\t$m {[gmlObject info arglist $c $m]}"}}
+	}
   }
 }
 

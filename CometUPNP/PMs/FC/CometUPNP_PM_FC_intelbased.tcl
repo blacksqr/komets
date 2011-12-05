@@ -75,15 +75,15 @@ method CometUPNP_PM_FC_intelbased Do_a_SSDP_M-SEARCH {} {
 method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
 	fconfigure $chan -blocking 0 -encoding utf-8
 	set this(upnp_eventing_msg_from_$chan) ""
-	fileevent  $chan readable [list $objName Eventing_msg $chan]
+	fileevent  $chan readable [list $objName Eventing_msg $chan 1]
 }
 # Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
 #___________________________________________________________________________________________________________________________________________
-method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
+method CometUPNP_PM_FC_intelbased Eventing_msg {chan read_chan} {
 	if {[eof $chan]} {
 		 unset this(upnp_eventing_msg_from_$chan)
-		 close $chan
-		} else  {append this(upnp_eventing_msg_from_$chan) [read $chan]
+		 catch {close $chan}
+		} else  {if {$read_chan} {append this(upnp_eventing_msg_from_$chan) [read $chan]}
 				 set msg $this(upnp_eventing_msg_from_$chan)
 				 # puts "UPNP event:\n$msg\n_______________________________"
 				 set pos_entete [string first "\n\n" $msg]
@@ -109,24 +109,29 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan} {
 						} 
 					} 
 				 
-				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
+				 puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
 				 if {[dict exists $dict_rep "SID:"]} {
 					 set UUID [dict get $dict_rep "SID:"]
-					 if {[info exists this($this(index_of_UUID,$UUID))]} {
+					 if {[info exists this(index_of_UUID,$UUID)] && [info exists this($this(index_of_UUID,$UUID))]} {
 						 # puts "dict : [dict get $this($this(index_of_UUID,$UUID)) CB]"
 						 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
+							 # puts $CB
 							 set CB "$CB [list $xml]"
 							 eval $CB
-							 # XXX DEBUG
-							 close $chan
-							 # /XXX
 							}
-						} else {puts stderr "Variable do not exist for this($this(index_of_UUID,$UUID))"}
+						} else {puts stderr "Variable do not exist for $UUID, let's retry just after we get the SID?"
+							    after idle "$objName Eventing_msg $chan 1"
+							   }
 					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
-				 # close $chan
+				 catch {close $chan}
 				}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased get_eventing_CB {UDN service_id} {
+	return [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) CB]
+}
+
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Add_eventing_CB {UDN service_id ID_subscribe CB} {
 	dict set this(UPNP_eventing_CB,${UDN},${service_id}) CB $ID_subscribe $CB
@@ -184,7 +189,7 @@ CALLBACK: <http://$this(IP):$this(eventing_server_port)>
 NT: upnp:event
 Content-Length: 0
 "
-			 puts "Subscribe message to $IP $PORT:\n$msg"
+			 # puts "Subscribe message to $IP $PORT:\n$msg"
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
@@ -302,6 +307,7 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 	}
 
  if {![info exists this($id)]} {
+	set this(isSOAP_Available_${UDN}_${service}_$action) 1
 	set this($id) ${objName}_SOAP_proxy_$id
 	set controlURL    [this get_item_of_dict_devices "$UDN ServiceList $service controlURL"]
 	if {[string index $controlURL 0] != "/"} {
@@ -325,10 +331,17 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased soap_asynchronous_reply {soap_proxy_id data} {
+	set obj $objName; regexp {^\:\:(.*)$} $obj reco obj
 	if {[catch {set soap_rep [::SOAP::dump -reply $soap_proxy_id]} err]} {puts stderr "Error reading SOAP answer"} else {
-		 if {[catch [list $objName soap_reply $soap_rep $this(CB_for_$soap_proxy_id)] err]} {puts stderr "Error with $objName soap_reply \[::SOAP::dump -reply $soap_proxy_id\] [list $this(CB_for_$soap_proxy_id)]\n\terr : $err"}
+		 # puts [list $obj soap_reply]
+		 if {[catch [list $obj soap_reply $soap_rep $this(CB_for_$soap_proxy_id)] err]} {puts stderr "Error with $obj soap_reply \[::SOAP::dump -reply $soap_proxy_id\] [list $this(CB_for_$soap_proxy_id)]\n\terr : $err"}
 		}
 	unset this(CB_for_$soap_proxy_id)
+	if {$this(next_call_for_$soap_proxy_id) != ""} {
+		 # puts "Post call in $obj of $this(next_call_for_$soap_proxy_id)"
+		 set cmd [concat $obj soap_call $this(next_call_for_$soap_proxy_id)]
+		 if {[catch $cmd err]} {puts "Error while recalling soap action:\n\tcmd : $cmd:\n\terr : $err"}
+		}
 }
 # Trace CometUPNP_PM_FC_intelbased soap_asynchronous_reply
 
@@ -341,7 +354,11 @@ Inject_code CometUPNP_PM_FC_intelbased soap_call {} {
  this get_soap_proxy $UDN $service $action
 
  if {[info exists this($id)]} {
-	if {[info exists this(CB_for_$this($id))]} {return}
+	if {[info exists this(CB_for_$this($id))]} {
+		 # Prepare a next call
+		 set this(next_call_for_$this($id)) [list $UDN $service $action $L_params $CB]
+		 return
+		} else {set this(next_call_for_$this($id)) ""}
 	set cmd [concat [list $this($id)] $L_params]
 	set this(CB_for_$this($id)) $CB
 	if {[catch {set UPNP_res [eval $cmd]} err]} {

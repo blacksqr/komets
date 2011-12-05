@@ -76,6 +76,7 @@ method UPNP_device Received_M-SEARCH {} {
 method UPNP_device Emit_event {service L_var_val} {
 	if {[dict exists $this(D_events) $service]} {
 		 dict for {uuid D_CB} [dict get $this(D_events) $service] {
+			 if {![dict exists $D_CB CALLBACK]} {continue}
 			 set CALLBACK [lindex [dict get $D_CB CALLBACK] 0]
 			 if {$CALLBACK == ""} {continue}
 			 
@@ -268,9 +269,8 @@ method UPNP_device Read_from_socket {sock} {
 			 
 			 # Send back result
 			 puts $sock [this Process_result $mtd $ns_res $eval_res]
-			 
-			 close $sock
 			}
+		 close $sock
 		}
 }
 
