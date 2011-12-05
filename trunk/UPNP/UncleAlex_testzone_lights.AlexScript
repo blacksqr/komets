@@ -1,0 +1,11 @@
+
+advice ContextSet_1_AA_2_Uncle_AlexTemp():
+dict create condition [dict create temperatureObservable virtual=false&type=temperatureObservable temperatureDisplay virtual=false&type=temperatureDisplay ] action {
+	this OnEvent Uncle_AlexTemp $temperatureObservable CurTemp {
+		 puts "Uncle_AlexTemp";
+		 foreach L $temperatureDisplay {
+			 puts " TempDisplay to $CurTemp: $L"
+			 this soap_call $L SetValue [list $CurTemp]
+			}
+		} $D_vars}
+
