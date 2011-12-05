@@ -37,6 +37,9 @@ method Pipo_WComp constructor {t} {
 	set this(CU) [CPool get_singleton CometUPNP]
 	set this(dico_UDN_metadata) [dict create]
 	$this(CU) Subscribe_to_set_item_of_dict_devices $objName "$objName New_UPNP_device \$keys \$val"
+	# Subscribe to device removing
+	$this(CU) Subscribe_to_remove_item_of_dict_devices $objName "$objName Remove_UPNP_device \$UDN"
+	
 	dict for {k v} [$this(CU) get_dict_devices] {
 		 if {[catch {this New_UPNP_device $k $v} err]} {puts stderr "Problem adding a device registered in the CometUPNP (UDN is $k):\n$err"}
 		}
@@ -61,6 +64,11 @@ method Pipo_WComp soap_call {UDN action {L_params {}} {CB {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp get_metadata {UDN} {
 	return [dict get $this(dico_UDN_metadata) $UDN]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Pipo_WComp Remove_UPNP_device {UDN} {
+	if {[catch {dict unset this(dico_UDN_metadata) $UDN} err)]} {puts stderr "Problem removing the device $UDN :\n$err"}
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -96,15 +104,22 @@ method Pipo_WComp Add_device_and_metadata {UDN UPNP_res} {
 	dict set this(dico_UDN_metadata) $UDN $D_metadata
 	puts "$UDN : $D_metadata"
 	
+	# Update rules
+	this Update_rules $UDN
+	
+	set this(is_metadata_calling) 0
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Pipo_WComp Update_rules {UDN} {
 	# Check wether this UDN is part of a AA rule condition or not...if yes, apply the AA rule
 	dict for {rule_name rule_val} $this(D_rules) {
+		 if {![dict exists $rule_val condition]} {continue}
 		 dict for {var val} [dict get $rule_val condition] {
 			 set L_UDN [this get_L_UDN_having_metadata $val]
 			 if {[lsearch $L_UDN $UDN] >= 0} {this Apply_rule $rule_name}
 			}
 		}
-	
-	set this(is_metadata_calling) 0
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -150,10 +165,16 @@ method Pipo_WComp get_L_UDN_having_D_metadata {D_metadata} {
 		}
 	return $L_rep
 }
+Trace Pipo_WComp get_L_UDN_having_D_metadata
+#___________________________________________________________________________________________________________________________________________
+method Pipo_WComp AddAA_from_file {f_name} {
+	set f [open $f_name r]; set str [read $f]; close $f
+	return [this AddAA $str]
+}
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp AddAA {str} {
-	regexp "^.*\nadvice *(.*) *\\(.*\\) *: *\n(.*)\$" $str reco rule_name str
+	regexp "^.*\nadvice *ContextSet_\[0-9\]*_AA_\[0-9\]*_(.*) *\\(.*\\) *: *\n(.*)\$" $str reco rule_name str
 	puts "New AA:\n\tname : $rule_name\n\tstr : [string trim $str]"
 	set D_rule [eval $str] 
 	dict set D_rule is_selected 0
@@ -177,6 +198,7 @@ method Pipo_WComp Apply_rule {rule_name} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp SelectAA {str} {
 	lassign $str rule_name is_selected
+	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)$} $rule_name reco rule_name
 	if {[catch {dict set this(D_rules) $rule_name is_selected $is_selected} err]} {puts stderr "Error while selecting an AA : \n\t$objName SelectAA [list $str]\n\terr : $err"}
 }
 # Trace Pipo_WComp SelectAA
@@ -191,7 +213,7 @@ method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
 # Trace Pipo_WComp OnEvent
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
-	if {![dict exists $this(D_rules) $rule_name]} {return}
+	if {![dict exists $this(D_rules) $rule_name]} {puts stderr "No rule named $rule_name"; return}
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}
 	# Create variables packed inside the event notification

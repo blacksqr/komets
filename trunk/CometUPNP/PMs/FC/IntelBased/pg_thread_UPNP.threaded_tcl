@@ -3,7 +3,7 @@ package require Thread
 package require http
 package require udp
 
-proc get_xml_from {ad {t 2000}} {
+proc get_xml_from {ad {t 5000}} {
   global UPNP_server_D_device_with_pb
   
   if {[dict exists $UPNP_server_D_device_with_pb $ad]} {
@@ -11,7 +11,7 @@ proc get_xml_from {ad {t 2000}} {
 	     # send_msg_to_comet [list INFOS "Already try 3 or more times to load xml from $ad"]
 		 return "BLOC_CALL"
 		} else {
-				send_msg_to_comet [list INFOS "Try #[dict exists $UPNP_server_D_device_with_pb $ad] to get xml from $ad"]
+				send_msg_to_comet [list INFOS "Retry #[expr 1 + [dict get $UPNP_server_D_device_with_pb $ad]] to get xml from $ad"]
 			   }
 	} else {dict set UPNP_server_D_device_with_pb $ad 0}
 
@@ -587,14 +587,14 @@ proc http_callback {sock token} {
 							} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "DONE"}
 					   }
 			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
-				    send_msg_to_comet [list INFOS "Error accessing $ad"]
+				    send_msg_to_comet [list INFOS "Error accessing $service_id at $ad"]
 					set an_error_occured 1
 				   }
 	  }
 
 	 # Send device description
 	 send_msg_to_comet "Device_added $UDN [dict get $UPNP_server_L_devices $UDN]"
-	 if {$an_error_occured} {error "Error occured in Add_device_from_dom for device $node_UDN : \n[$node_UDN asXML]"}
+	 if {$an_error_occured} {error "Error occured in Add_device_from_dom for device $node_UDN"}
 	}
 
 	#___________________________________________________________________________________________________________________________________________
@@ -649,6 +649,7 @@ proc http_callback {sock token} {
 	 set UDN [dict get $L UDN]
 	 regexp {^uuid:(.*)$} $UDN reco UDN
 
+	 send_msg_to_comet [list INFOS "Device_removed $L"]
 	 if {[dict exists $UPNP_server_L_devices $UDN]} {
 		 set new [list ]
 		 foreach {U U_val} $UPNP_server_L_devices {
