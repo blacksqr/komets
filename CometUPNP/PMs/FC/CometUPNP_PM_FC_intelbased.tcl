@@ -51,10 +51,12 @@ Generate_PM_setters CometUPNP_PM_FC_intelbased [P_L_methodes_set_CometUPNP_COMET
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased get_IP {} {
+	set rep "127.0.0.1"
 	foreach str [split [exec ipconfig] "\n"] {
-		 if {[regexp {IP.*: (.*)$} $str reco IP]} {return $IP}
+		 if {[regexp {IPv4.*: (.*)$} $str reco IP]} {return $IP}
+		 if {[regexp {IP.*: (.*)$}   $str reco IP]} {set rep $IP}
 		}
-	return "127.0.0.1"
+	return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -189,7 +191,7 @@ CALLBACK: <http://$this(IP):$this(eventing_server_port)>
 NT: upnp:event
 Content-Length: 0
 "
-			 # puts "Subscribe message to $IP $PORT:\n$msg"
+			 puts "Subscribe message to $IP $PORT:\n$msg"
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
