@@ -94,7 +94,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 		FREE(buffer);
 		return;
 	}
-	// printf("SSDP (%d bytes) ", bytesRead, buffer);
+	//printf("SSDP (%d bytes):\n%s\n", bytesRead, buffer);
 	packet = ILibParsePacketHeader(buffer,0,bytesRead);
 	// printf("Finish parsing...\n");
 	if(packet == NULL) {FREE(buffer); return;}
@@ -174,7 +174,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 
 		/* Notify Packet */
 		if(strncasecmp(packet->Directive,"NOTIFY",6)==0)
-		{	// printf("On a un NOTIFY...\n");
+		{	//printf("On a un NOTIFY...\n");
 			OK = 0;
 			rt = 0;
 			info_Alive = 0;
@@ -183,7 +183,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 			{
 				node->Field[node->FieldLength] = '\0';
 				if(node->FieldLength==2 && strncasecmp(node->Field,"NT",2)==0 )
-				{   // printf("\tNT...\n");
+				{   //printf("\tNT...\n");
 					node->FieldData[node->FieldDataLength] = '\0';
 					if(strncasecmp(node->FieldData,module->DeviceURN,module->DeviceURNLength)==0)
 					{
@@ -194,38 +194,38 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 						rt = -1;
 					}
 					else
-					{
+					{	//printf("\t!Break...NOTIFY is not about the device...\n");
 						break;
 					}
 				}
 				if(node->FieldLength==3 && strncasecmp(node->Field,"NTS",3)==0)
-				{	// printf("\tNTS...\n");
+				{   //printf("\tNTS...\n");
 					if(strncasecmp(node->FieldData,"ssdp:alive",10)==0)
 					{
 						Alive = -1; info_Alive = 1;
-						rt = 0;
+						//rt = 0;
 					}
 					else
 					{
 						Alive = 0; info_Alive = 1;
-						OK = 0;
+						//OK = 0;
 					}
 				}
 				if(node->FieldLength==3 && strncasecmp(node->Field,"USN",3)==0)
-				{	// printf("\tUSN...\n");
+				{	//printf("\tUSN...\n");
 					pnode = ILibParseString(node->FieldData, 0, node->FieldDataLength, "::", 2);
 					pnode->FirstResult->data[pnode->FirstResult->datalength] = '\0';
 					UDN = pnode->FirstResult->data+5;
 					ILibDestructParserResults(pnode);
 				}
 				if(node->FieldLength==8 && strncasecmp(node->Field,"LOCATION",8)==0)
-				{	// printf("\tLOCATION...\n");
+				{	//printf("\tLOCATION...\n");
 					Location = (char*)MALLOC(node->FieldDataLength+1);
 					memcpy(Location,node->FieldData,node->FieldDataLength);
 					Location[node->FieldDataLength] = '\0';
 				}
 				if(node->FieldLength==13 && strncasecmp(node->Field,"CACHE-CONTROL",13)==0)
-				{	// printf("\tCACHE-CONTROL...\n");
+				{	//printf("\tCACHE-CONTROL...\n");
 					pnode = ILibParseString(node->FieldData, 0, node->FieldDataLength, "=", 1);
 					pnode->LastResult->data[pnode->LastResult->datalength] = '\0';
 					Timeout = atoi(pnode->LastResult->data);
@@ -234,7 +234,7 @@ void ILibReadSSDP(SOCKET ReadSocket, struct SSDPClientModule *module)
 				node = node->NextField;
 			}
 			if( (OK!=0 || rt!=0) && info_Alive==1 && UDN && ((Location != NULL) || (Alive == 0)))
-			{	// printf("\tCallback...\n");
+			{	//printf("\tCallback...\n");
 				if(module->FunctionCallback!=NULL)
 				{
 					module->FunctionCallback(module,UDN,Alive,Location,Timeout,module->Reserved);

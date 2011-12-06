@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Intel_UPNP_TCL", "Intel_UPNP_TCL\Intel_UPNP_TCL.vcproj", "{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Intel_UPNP_TCL", "Intel_UPNP_TCL\Intel_UPNP_TCL.vcxproj", "{84D1DCEA-4C72-4BBF-9DE9-4F7005C3301B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
