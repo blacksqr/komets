@@ -6,6 +6,7 @@ proc Generate_dict_accessors {class L_dict_name} {
 		set cmd "method $class get_item_of_$d {keys} {eval \"dict get \\\$this($d) \$keys\"}"; eval $cmd
 		set cmd "method $class set_item_of_$d {keys val} {eval \"dict set this($d) \$keys \\\$val\"}"  ; eval $cmd
 		set cmd "method $class remove_item_of_$d {key} {set this($d) \[dict remove \$this($d) \$key\]}"; eval $cmd
+		set cmd "method $class has_item_$d {keys} {return \[eval \"dict exists \\\$this($d) \$keys\"\]}"; eval $cmd
 		}
 }
 
