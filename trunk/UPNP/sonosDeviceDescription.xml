@@ -3,7 +3,9 @@
     <major>1</major>
     <minor>0</minor>
   </specVersion>
+  <URLBase>http://...</URLBase>
   <device>
+    <UDN>Bob</UDN>
     <deviceType>urn:schemas-upnp-org:device:ProxyZonePlayer:1</deviceType>
     <friendlyName>Proxy for a sonos</friendlyName>
     <manufacturer>LIG</manufacturer>
@@ -13,11 +15,7 @@
     <modelName>Proxy for Sonos ZonePlayer 90</modelName>
     <modelURL>http://www.sonos.com/products/zoneplayers/ZP90</modelURL>
     <softwareVersion>15.4-44250</softwareVersion>
-    <UDN>uuid:RINCON_000E5823924C01400</UDN>
     <minCompatibleVersion>13.0-00000</minCompatibleVersion>
-	<UDN>Bob</UDN>
-	<URLBase>http://...</URLBase>
-
     <serviceList>
           <service>
             <serviceType>urn:schemas-upnp-org:service:proxysonos:1</serviceType>
@@ -26,6 +24,13 @@
             <eventSubURL>eventlURL_access</eventSubURL>
             <SCPDURL>SonosMediaRendererCtrlDescription.xml</SCPDURL>
           </service>
+		  <service>
+			<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+			<SCPDURL>service_Metadata.xml</SCPDURL>
+			<controlURL>/upnp/fb9e473a-f276-4930-b511-376d61dd0a3e</controlURL>
+			<eventSubURL>/upnp/Event/fb9e473a-f276-4930-b511-376d61dd0a3e:Meta-data</eventSubURL>
+			<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+		  </service>
     </serviceList>
   </device>
 </root>

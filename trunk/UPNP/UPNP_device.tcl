@@ -250,7 +250,7 @@ method UPNP_device Read_from_socket {sock} {
 	# puts "Waiting $this(size_$sock) bytes, received [string length $this(data_$sock)] bytes.\n$this(data_$sock)"
 	if {$this(size_$sock) != -1 && [string length $this(data_$sock)] >= $this(size_$sock)} {
 		 # Interpret command and send back result
-		 if {[catch {set doc [dom parse $this(data_$sock)]} err]} {puts "Error parsing xml :\n$err\n_____\n$this(data_$sock)"} else {
+		 if {[catch {set doc [dom parse $this(data_$sock)]} err]} {puts stderr "Error parsing xml :\n$err\n_____\n$this(data_$sock)"} else {
 			set root [$doc documentElement]; set ns_root [$root namespace]
 			foreach res [$root selectNodes -namespace [list ns $ns_root] "//ns:Body/*"] {
 				 set mtd [lindex [$res asList] 0]
@@ -483,15 +483,15 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 	set f [open $f_name r]; set str_xml [read $f]; close $f
 	dom parse $str_xml doc
 	$doc documentElement root; set ns_root [$root namespace]
-		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:UDN"]; set p [$n parentNode]; $p removeChild $n
+		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:UDN | //UDN"]; set p [$n parentNode]; $p removeChild $n
 			set n [$doc createElementNS $ns_root UDN]
 			set t [$doc createTextNode uuid:$this(uuid)]; $n appendChild $t
 			$p appendChild $n
-		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:URLBase"]; set p [$n parentNode]; $p removeChild $n
+		set n [$root selectNodes -namespace [list ns $ns_root] "//ns:URLBase | //URLBase"]; set p [$n parentNode]; $p removeChild $n
 			set n [$doc createElementNS $ns_root URLBase]
 			set t [$doc createTextNode "http://$class(ip)/Comets/UPNP/"]; $n appendChild $t
 			$p appendChild $n
-		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:controlURL"] {
+		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:controlURL | //controlURL"] {
 			 set val [$n asText]
 			 puts "controlURL : $val"
 			 set pos [lsearch $L_control_mappings $val]
@@ -501,7 +501,7 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 				 puts "\tnow value is : [$n asText]"
 				}
 			}
-		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:eventSubURL"] {
+		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:eventSubURL | //eventSubURL"] {
 			 set val [$n asText]
 			 puts "eventURL : $val"
 			 set pos [lsearch $L_event_mappings $val]

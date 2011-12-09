@@ -197,11 +197,12 @@ method Pipo_WComp Apply_rule {rule_name} {
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp SelectAA {str} {
-	lassign $str rule_name is_selected
-	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)$} $rule_name reco rule_name
+	set rule_name $str  
+	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)|([0-1])$} $rule_name reco rule_name is_selected
+	puts "\t$rule_name is_selected $is_selected"
 	if {[catch {dict set this(D_rules) $rule_name is_selected $is_selected} err]} {puts stderr "Error while selecting an AA : \n\t$objName SelectAA [list $str]\n\terr : $err"}
 }
-# Trace Pipo_WComp SelectAA
+Trace Pipo_WComp SelectAA
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
@@ -214,6 +215,8 @@ method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 	if {![dict exists $this(D_rules) $rule_name]} {puts stderr "No rule named $rule_name"; return}
+	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {puts "Rule $rule_name is not selected...bypass"; return}
+	
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}
 	# Create variables packed inside the event notification
@@ -253,7 +256,8 @@ method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 # Trace Pipo_WComp OnEvents
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars CB event} {
-	if {![dict get $this(D_rules) $rule_name]} {return}
+	if {![dict exists $this(D_rules) $rule_name]} {return}
+	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {puts "Rule $rule_name is not selected...bypass"; return}
 
 	# Set the value upcoming inside the dictionnary
 	set found_var_name 0
@@ -262,7 +266,7 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars C
 	# Create variables packed inside the event notification
 	if {[catch {set doc [dom parse [string trim $event]]} err]} {puts stderr "Error parsing the UPNP event in objName Trigger_CB_after_event:\n\trule_name : $rule_name\n\tD_vars : $D_vars\n\tCB : $CB\n\tevent : $event"} else {
 		 set root [$doc documentElement]; set ns_root [$root namespace]
-		 foreach p [$root selectNodes -namespace [list ns $ns_root] "//ns:property/*"] {
+		 foreach p [$root selectNodes -namespace [list ns $ns_root] "//ns:property/* | //property/*"] {
 			 set [$p nodeName] [$p asText]
 			 if {[$p nodeName] == $var_name} {
 				 set found_var_name 1

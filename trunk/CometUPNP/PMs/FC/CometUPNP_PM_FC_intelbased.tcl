@@ -82,7 +82,7 @@ method CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection {chan ip port} {
 # Trace CometUPNP_PM_FC_intelbased New_UPNP_eventing_connection
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Eventing_msg {chan read_chan} {
-	if {[eof $chan]} {
+	if {[catch {if {[eof $chan]} {
 		 unset this(upnp_eventing_msg_from_$chan)
 		 catch {close $chan}
 		} else  {if {$read_chan} {append this(upnp_eventing_msg_from_$chan) [read $chan]}
@@ -127,6 +127,8 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan read_chan} {
 					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
 				 catch {close $chan}
 				}
+				
+	} err]} {puts stderr "Error while reading chan $chan :\n\terr : $err"}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
 #___________________________________________________________________________________________________________________________________________
