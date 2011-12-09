@@ -6,8 +6,9 @@
   </specVersion>
   <URLBase>http://192.168.62.128:8888</URLBase>
   <device>
+    <UDN>uuid:fb9e473a-f276-4930-b511-376d61dd0a3e</UDN>
     <deviceType>urn:schemas-upnp-orgevice:light:1</deviceType>
-    <friendlyName>Virtual Presence Zone</friendlyName>
+    <friendlyName>Pipo Presence Zone</friendlyName>
     <manufacturer>man</manufacturer>
     <manufacturerURL>manURL</manufacturerURL>
     <modelDescription>descr</modelDescription>
@@ -15,7 +16,6 @@
     <modelNumber>number</modelNumber>
     <modelURL>mURL</modelURL>
     <serialNumber>serial</serialNumber>
-    <UDN>uuid:fb9e473a-f276-4930-b511-376d61dd0a3e</UDN>
     <serviceList>
       <service>
         <serviceType>urn:schemas-upnp-org:service:HouseStatus:1</serviceType>

@@ -4,7 +4,9 @@
       <major>1</major>
       <minor>0</minor>
    </specVersion>
+  <URLBase>http://129.88.66.127/Comets/UPNP/</URLBase>
    <device>
+	  <UDN>uuid:4988da1f-7989-4212-8525-45a5120a8cad</UDN>
       <deviceType>urn:schemas-upnp-org:device:WCompNetProbeDevice:1</deviceType>
       <friendlyName>Pipo WCompNetProbe_Weaver1_0</friendlyName>
       <manufacturer>I3S Rainbow</manufacturer>
@@ -12,8 +14,6 @@
       <modelDescription>UPnP Device for WComp functional interface</modelDescription>
       <modelName>SharpWComp-3.0 Container</modelName>
       <modelNumber>3.0.0.1054 on CLR 2.0.50727.3625</modelNumber>
-      <UDN>uuid:4988da1f-7989-4212-8525-45a5120a8cad</UDN>
-	  <URLBase>http://129.88.66.127/Comets/UPNP/</URLBase>
       <serviceList>
          <service>
             <serviceType>urn:schemas-upnp-org:service:AddAA:1</serviceType>

@@ -6,6 +6,7 @@ method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
 	this inherited $t
 	set this(metadata)          $metadata
 	set this(UDN_of_the_target) $UDN_of_the_target
+	set this(CurrentMute)       0
 
 	# Part related to the UPNP device
 	 set str_srv [this Generate_control_description_for_service $objName]
@@ -13,7 +14,11 @@ method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
 		fconfigure $f -encoding utf-8
 		puts $f $str_srv
 		close $f
-		
+	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__control_${objName}_Metadata.php w]
+		fconfigure $f -encoding utf-8
+		puts $f $str_srv
+		close $f
+
 	# Events...
 	 set str_srv [this Generate_event_description_for_service urn:upnp-org:serviceId:proxysonos]
 	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__event_${objName}_proxySonos.php w]
@@ -23,6 +28,7 @@ method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
 	
 	 this Generate_device_description_from_xml_file $::env(ROOT_COMETS)/Comets/UPNP/sonosDeviceDescription.xml [list \
 																							  controlURL_access  __control_${objName}_proxySonos.php \
+																							  /upnp/fb9e473a-f276-4930-b511-376d61dd0a3e    __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_access    __event_${objName}_proxySonos.php \
 																						]
 																						
@@ -50,94 +56,37 @@ method Proxy_UPNP_Sonos GetMetadata {args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Proxy_UPNP_Sonos GetOccupancyState {args} {
-	return [list CurrentOccupancyState $this(OccupancyState)]
+method Proxy_UPNP_Sonos GetMute {args} {
+	# <name>InstanceID</name>
+	# <direction>in</direction>
+	# <name>Channel</name>
+	# <direction>in</direction>
+	lassign $args InstanceID Channel
+	return [list CurrentMute $this(CurrentMute)]
 }
-
-      # <name>GetMute</name>
-      # <argumentList>
-        # <argument>
+Trace Proxy_UPNP_Sonos GetMute
+#___________________________________________________________________________________________________________________________________________
+method Proxy_UPNP_Sonos SetMute {args} {
+	# <name>InstanceID</name>
+	# <direction>in</direction>
+	# <name>Channel</name>
+	# <direction>in</direction>
+	# <name>DesiredMute</name>
+	# <direction>in</direction>
+	lassign $args InstanceID Channel DesiredMute
+	return [list ]
+}
+Trace Proxy_UPNP_Sonos SetMute
+#___________________________________________________________________________________________________________________________________________
+method Proxy_UPNP_Sonos SetVolume {args} {
           # <name>InstanceID</name>
           # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_InstanceID</relatedStateVariable>
-        # </argument>
-        # <argument>
           # <name>Channel</name>
           # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_MuteChannel</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>CurrentMute</name>
-          # <direction>out</direction>
-          # <relatedStateVariable>Mute</relatedStateVariable>
-        # </argument>
-      # </argumentList>
-    # </action>
-    # <action>
-      # <name>SetMute</name>
-      # <argumentList>
-        # <argument>
-          # <name>InstanceID</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_InstanceID</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>Channel</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_MuteChannel</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>DesiredMute</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>Mute</relatedStateVariable>
-        # </argument>
-      # </argumentList>
-    # </action>
-    # <action>
-      # <name>GetVolume</name>
-      # <argumentList>
-        # <argument>
-          # <name>InstanceID</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_InstanceID</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>Channel</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_Channel</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>CurrentVolume</name>
-          # <direction>out</direction>
-          # <relatedStateVariable>Volume</relatedStateVariable>
-        # </argument>
-      # </argumentList>
-    # </action>
-    # <action>
-      # <name>SetVolume</name>
-      # <argumentList>
-        # <argument>
-          # <name>InstanceID</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_InstanceID</relatedStateVariable>
-        # </argument>
-        # <argument>
-          # <name>Channel</name>
-          # <direction>in</direction>
-          # <relatedStateVariable>
-          # A_ARG_TYPE_Channel</relatedStateVariable>
-        # </argument>
-        # <argument>
           # <name>DesiredVolume</name>
           # <direction>in</direction>
-          # <relatedStateVariable>Volume</relatedStateVariable>
-        # </argument>
-      # </argumentList>
-    # </action>
+		  lassign $args InstanceID Channel DesiredVolume
+		  return [list ]
+}
+Trace Proxy_UPNP_Sonos SetVolume
+
