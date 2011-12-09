@@ -7,6 +7,8 @@ method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
 	set this(metadata)          $metadata
 	set this(UDN_of_the_target) $UDN_of_the_target
 	set this(CurrentMute)       0
+	
+	set this(CU) [CPool get_singleton CometUPNP]
 
 	# Part related to the UPNP device
 	 set str_srv [this Generate_control_description_for_service $objName]
@@ -74,9 +76,27 @@ method Proxy_UPNP_Sonos SetMute {args} {
 	# <name>DesiredMute</name>
 	# <direction>in</direction>
 	lassign $args InstanceID Channel DesiredMute
+	if {[$this(CU) has_item_dict_devices $this(UDN_of_the_target)]} {
+		 puts "\t[list $this(CU) soap_call $this(UDN_of_the_target) urn:upnp-org:serviceId:proxysonos SetMute $args {}]"
+		 $this(CU) soap_call $this(UDN_of_the_target)_MR urn:upnp-org:serviceId:RenderingControl SetMute $args ""
+		}
 	return [list ]
 }
 Trace Proxy_UPNP_Sonos SetMute
+
+#___________________________________________________________________________________________________________________________________________
+method Proxy_UPNP_Sonos GetVolume {args} {
+          # <name>InstanceID</name>
+          # <direction>in</direction>
+          # <name>Channel</name>
+          # <direction>in</direction>
+          # <name>CurrentVolume</name>
+          # <direction>out</direction>
+		  lassign $args InstanceID Channel
+		  return [list ]
+}
+Trace Proxy_UPNP_Sonos GetVolume
+
 #___________________________________________________________________________________________________________________________________________
 method Proxy_UPNP_Sonos SetVolume {args} {
           # <name>InstanceID</name>
@@ -86,6 +106,10 @@ method Proxy_UPNP_Sonos SetVolume {args} {
           # <name>DesiredVolume</name>
           # <direction>in</direction>
 		  lassign $args InstanceID Channel DesiredVolume
+		  if {[$this(CU) has_item_dict_devices $this(UDN_of_the_target)]} {
+			 puts "\tCalling the original SONOS...SetVolume"
+			 $this(CU) soap_call $this(UDN_of_the_target)_MR urn:upnp-org:serviceId:RenderingControl SetVolume $args ""
+			}
 		  return [list ]
 }
 Trace Proxy_UPNP_Sonos SetVolume

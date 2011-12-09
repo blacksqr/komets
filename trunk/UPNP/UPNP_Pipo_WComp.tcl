@@ -177,7 +177,7 @@ method Pipo_WComp AddAA {str} {
 	regexp "^.*\nadvice *ContextSet_\[0-9\]*_AA_\[0-9\]*_(.*) *\\(.*\\) *: *\n(.*)\$" $str reco rule_name str
 	puts "New AA:\n\tname : $rule_name\n\tstr : [string trim $str]"
 	set D_rule [eval $str] 
-	dict set D_rule is_selected 0
+	dict set D_rule is_selected 1
 	dict set this(D_rules) $rule_name $D_rule
 	this Apply_rule $rule_name
 }
@@ -198,7 +198,7 @@ method Pipo_WComp Apply_rule {rule_name} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp SelectAA {str} {
 	set rule_name $str  
-	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)|([0-1])$} $rule_name reco rule_name is_selected
+	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)\|([0-1])$} $rule_name reco rule_name is_selected
 	puts "\t$rule_name is_selected $is_selected"
 	if {[catch {dict set this(D_rules) $rule_name is_selected $is_selected} err]} {puts stderr "Error while selecting an AA : \n\t$objName SelectAA [list $str]\n\terr : $err"}
 }

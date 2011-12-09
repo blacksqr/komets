@@ -16,7 +16,7 @@ method UPNP_device constructor {timeout} {
 	set this(uuid)         [::uuid::uuid generate]
 	set this(D_events)     [dict create]	
 	
-	if {![info exists class(ip)]} {set class(ip)          [regexp -inline {\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}} [exec ipconfig] ]}
+	if {![info exists class(ip)]} {set class(ip) [this get_IP]}
 	
 	set this(udp_sock)     [udp_open]
 	fconfigure $this(udp_sock) -buffering none -blocking 0
@@ -39,6 +39,15 @@ method UPNP_device constructor {timeout} {
 	
 }
 
+#___________________________________________________________________________________________________________________________________________
+method UPNP_device get_IP {} {
+	set rep "127.0.0.1"
+	foreach str [split [exec ipconfig] "\n"] {
+		 if {[regexp {IPv4.*: (.*)$} $str reco IP]} {return $IP}
+		 if {[regexp {IP.*: (.*)$}   $str reco IP]} {set rep $IP}
+		}
+	return $rep
+}
 
 #___________________________________________________________________________________________________________________________________________
 method UPNP_device dispose {} {
@@ -220,10 +229,13 @@ method UPNP_device Process_L_result {mtd ns_res L_res} {
 		set n_body [$doc createElement Body]; $root appendChild $n_body
 			set n_mtd [$doc createElement $mtd]; $n_body appendChild $n_mtd
 				$n_mtd setAttribute xmlns $ns_res
+				if {[catch {
 				foreach {res_var res_val} $L_res {
-					 set n_result [$doc createElement $res_var]; $n_mtd appendChild $n_result
-					 $n_result appendChild [$doc createTextNode $res_val]
+					 if {[catch {set n_result [$doc createElement $res_var]; $n_mtd appendChild $n_result
+								 $n_result appendChild [$doc createTextNode $res_val]
+								} err]} {puts stderr "Error during the generation of te UPNP device answer:\n\tdevice : $objName\n\tres_var : $res_var\n\tres_val : $res_val"}
 					}
+				} err]} {puts stderr "Error in the foreach of UPNP result arguments:\n\tL_res : $L_res"}
 	set rep [$root asXML]
 	$doc delete
 	

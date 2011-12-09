@@ -11,7 +11,7 @@ Generate_dict_accessors CometUPNP_CFC dict_devices
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_CFC get_devices_UDN  {} {
  set L [list]
- foreach {u v} $this(dict_devices) {lappend L $u}
+ dict for {u v} $this(dict_devices) {lappend L $u}
  return $L
 }
 
@@ -110,6 +110,6 @@ method CometUPNP_CFC CometUPNP_Read_variable_from_xml {str_xml str_var} {
 
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_get_CometUPNP {} {return [list {get_service_having_action {UDN action_name}} {get_service_having_variable {UDN var_name}} {CometUPNP_Read_variable_from_xml {str_xml str_var}} {Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT}} {get_dict_devices { }} {get_item_of_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
+proc P_L_methodes_get_CometUPNP {} {return [list {get_service_having_action {UDN action_name}} {get_service_having_variable {UDN var_name}} {CometUPNP_Read_variable_from_xml {str_xml str_var}} {Search_UDN_service_action {L_cond_UDN L_cond_SRV L_cond_ACT}} {get_dict_devices { }} {get_item_of_dict_devices {keys}} {has_item_dict_devices {keys}} {get_devices_UDN {}} {get_children_attributes {keys}} ]}
 proc P_L_methodes_set_CometUPNP {} {return [list {Do_a_SSDP_M-SEARCH {}} {M-SEARCH {ST}} {UnSubscribe_to_UPNP_events {UDN service_id ID_subscribe}} {Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB}} {Remove_eventing_CB {UDN service_id ID_subscribe}} {soap_call {UDN service action L_params CB}} {set_dict_devices {v}} {remove_item_of_dict_devices {UDN}} {set_item_of_dict_devices {keys val}} ]}
 
