@@ -327,10 +327,18 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 		 if {[this get_item_of_dict_devices "$UDN ServiceList $service actions $action $p direction"] == "in"} {lappend L_params $p ""} else {lappend this(L_out_params_$this($id)) $p}
 		}
 	# puts "::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params {$L_params} -proxy $URL -uri $prefix_action -action ${prefix_action}#$action"
-	::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params $L_params -proxy $URL -uri $prefix_action -action ${prefix_action}#$action -command [list $objName soap_asynchronous_reply $this($id)]
+	::SOAP::create ${objName}_SOAP_proxy_$id -name $action -params $L_params -proxy $URL -uri $prefix_action -parseProc CometUPNP_PM_FC_intelbased__SOAP_ParseProc -action ${prefix_action}#$action -command [list $objName soap_asynchronous_reply $this($id)]
 	}
 	
  return $this($id) 
+}
+
+proc CometUPNP_PM_FC_intelbased__SOAP_ParseProc {procVarName xml} {
+	if {[catch {set rep [SOAP::parse_soap_response $procVarName $xml]} err]} {
+		 puts stderr "Error while parsing SOAP respons: $err"
+		 set rep ""
+		}
+	return $rep
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -340,7 +348,7 @@ method CometUPNP_PM_FC_intelbased soap_asynchronous_reply {soap_proxy_id data} {
 		 # puts [list $obj soap_reply]
 		 if {[catch [list $obj soap_reply $soap_rep $this(CB_for_$soap_proxy_id)] err]} {puts stderr "Error with $obj soap_reply \[::SOAP::dump -reply $soap_proxy_id\] [list $this(CB_for_$soap_proxy_id)]\n\terr : $err"}
 		}
-	unset this(CB_for_$soap_proxy_id)
+	catch {unset this(CB_for_$soap_proxy_id)}
 	if {$this(next_call_for_$soap_proxy_id) != ""} {
 		 # puts "Post call in $obj of $this(next_call_for_$soap_proxy_id)"
 		 set cmd [concat $obj soap_call $this(next_call_for_$soap_proxy_id)]
