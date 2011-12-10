@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase>http://130.190.29.219/Comets/UPNP/</URLBase>
+   <device>
+      <deviceType>urn:schemas-upnp-org:device:DimmableLight:1</deviceType>
+      <friendlyName>Pipo Light</friendlyName>
+      <manufacturer>Uncle Alex</manufacturer>
+      <manufacturerURL>http://opentools.homeip.net</manufacturerURL>
+      <modelDescription>Software Emulated Light Bulb</modelDescription>
+      <modelName>Network Light Bulb</modelName>
+      <modelNumber>XPC-L1</modelNumber>
+      <modelURL>http://opentools.homeip.net/</modelURL>
+      <UDN>uuid:507bbf5f-24a8-403c-91ce-92e8082df4e3</UDN>
+      <serviceList>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:Dimming:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:Dimming</serviceId>
+            <SCPDURL>__scpd__Dimming.xml</SCPDURL>
+            <controlURL>controlURL_Dimming.php</controlURL>
+            <eventSubURL>eventURL_Dimming.php</eventSubURL>
+         </service>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:SwitchPower:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:SwitchPower</serviceId>
+            <SCPDURL>__scpd__SwitchPower.xml</SCPDURL>
+            <controlURL>controlURL_SwitchPower.php</controlURL>
+            <eventSubURL>eventURL_SwitchPower.php</eventSubURL>
+         </service>
+      </serviceList>
+   </device>
+</root>
