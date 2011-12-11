@@ -327,7 +327,7 @@ void ILibSSDP_IPAddressListChanged(void *SSDPToken)
 	int err;
 	if ( (err = setsockopt(RetVal->SSDPListenSocket, SOL_SOCKET, SO_REUSEADDR,(char*)&ra, sizeof(ra))) < 0)
 	{
-		DEBUGSTATEMENT(printf("Setting SockOpt SO_REUSEADDR failed\r\n"));
+		printf("Setting SockOpt SO_REUSEADDR failed\r\n");
 		exit(1);
 	}
 	/*if ( (err = bind(RetVal->SSDPListenSocket, (struct sockaddr *) &(addr), sizeof(addr))) < 0)
@@ -410,12 +410,12 @@ void* ILibCreateSSDPClientModule(void *chain, char* DeviceURN, int DeviceURNLeng
 	}
 	if (setsockopt(RetVal->SSDPListenSocket, SOL_SOCKET, SO_REUSEADDR,(char*)&ra, sizeof(ra)) < 0)
 	{
-		DEBUGSTATEMENT(printf("Setting SockOpt SO_REUSEADDR failed\r\n"));
+		printf("Setting SockOpt SO_REUSEADDR failed\r\n");
 		exit(1);
 	}
 	if (bind(RetVal->SSDPListenSocket, (struct sockaddr *) &(addr), sizeof(addr)) < 0)
 	{
-		printf("SSDPListenSocket bind");
+		printf("SSDPListenSocket bind\n");
 		exit(1);
 	}
 	
@@ -425,7 +425,7 @@ void* ILibCreateSSDPClientModule(void *chain, char* DeviceURN, int DeviceURNLeng
 		mreq.imr_interface.s_addr = RetVal->IPAddress[i];
 		if (setsockopt(RetVal->SSDPListenSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP,(char*)&mreq, sizeof(mreq)) < 0)
 		{
-			printf("SSDPListenSocket setsockopt mreq");
+			printf("SSDPListenSocket setsockopt mreq\n");
 			exit(1);
 		}
 		

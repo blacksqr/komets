@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase>http://192.168.1.1:6049</URLBase>
+   <device>
+      <deviceType>urn:schemas-upnp-org:device:Shutter:1</deviceType>
+      <friendlyName>Pipo Volet</friendlyName>
+      <manufacturer>SIRLAN Technologies</manufacturer>
+      <manufacturerURL>http://www.sirlan.com</manufacturerURL>
+      <modelNumber>1.0</modelNumber>
+      <modelURL>http://www.sirlan.com</modelURL>
+      <UDN>uuid:00fffed5-0b88-c701-00ff-fed50b88c701</UDN>
+      <serviceList>
+		 <service>
+			<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+			<SCPDURL>service_Metadata.xml</SCPDURL>
+			<controlURL>controlURL_MetaData</controlURL>
+			<eventSubURL></eventSubURL>
+			<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+		 </service>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:TwoWayMotionMotor:1</serviceType>
+            <SCPDURL>__scpd__TwoWayMotionMotor.xml</SCPDURL>
+            <controlURL>controlURL_Volet</controlURL>
+            <eventSubURL>eventURL_Volet</eventSubURL>
+            <serviceId>urn:upnp-org:serviceId:TwoWayMotionMotor</serviceId>
+         </service>
+      </serviceList>
+      <modelName>Generic Light</modelName>
+      <modelDescription>Pipo Volet</modelDescription>
+   </device>
+</root>

@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_PresenceZones UPNP_device
-method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata} {
+method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata {mode_simulation Wizard}} {
 	this inherited $t
 	set this(metadata)       $metadata
 	set this(OccupancyState) Indeterminate
@@ -32,7 +32,12 @@ method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata} {
 	# Graphic part polygons in the canvas
 	set this(canvas) $canvas
 	eval "set this(poly_id) \[$canvas create polygon $coords -fill grey\]"
-	$canvas bind $this(poly_id) <ButtonPress> "$objName Switch_OccupancyState"
+	switch $mode_simulation {
+		 Wizard 	{$canvas bind $this(poly_id) <ButtonPress> "$objName Switch_OccupancyState"
+					}
+		 Simulation {
+					}
+		}
 	
 	
 	after 100 [list $objName send_heartbeat]
@@ -49,6 +54,24 @@ method Pipo_UPNP_PresenceZones Read_Event_Subscription_from_socket {sock} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_PresenceZones Process_result {mtd ns_res L_res} {
 	return [this Process_L_result $mtd $ns_res $L_res]
+}
+
+
+#___________________________________________________________________________________________________________________________________________
+method Pipo_UPNP_PresenceZones set_Occupied {b} {
+	set L [list Unoccupied Occupied]
+	set C [list red green]
+	set this(OccupancyState) [lindex $L $b]
+	this Emit_event urn:upnp-org:serviceId:HouseStatus [list OccupancyState $this(OccupancyState)]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Pipo_UPNP_PresenceZones Simulation_OccupancyState_at {x y} {
+	if {[lsearch [$this(canvas) find overlapping $x $y $x $y] $this(poly_id)] >= 0} {
+		 set b 1
+		} else {set b 0}
+
+	this set_Occupied $b
 }
 
 #___________________________________________________________________________________________________________________________________________

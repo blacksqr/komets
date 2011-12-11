@@ -20,16 +20,23 @@
             <serviceType>urn:schemas-upnp-org:service:Dimming:1</serviceType>
             <serviceId>urn:upnp-org:serviceId:Dimming</serviceId>
             <SCPDURL>__scpd__Dimming.xml</SCPDURL>
-            <controlURL>controlURL_Dimming.php</controlURL>
-            <eventSubURL>eventURL_Dimming.php</eventSubURL>
+            <controlURL>controlURL_Dimming</controlURL>
+            <eventSubURL>eventURL_Dimming</eventSubURL>
          </service>
          <service>
             <serviceType>urn:schemas-upnp-org:service:SwitchPower:1</serviceType>
             <serviceId>urn:upnp-org:serviceId:SwitchPower</serviceId>
             <SCPDURL>__scpd__SwitchPower.xml</SCPDURL>
-            <controlURL>controlURL_SwitchPower.php</controlURL>
-            <eventSubURL>eventURL_SwitchPower.php</eventSubURL>
+            <controlURL>controlURL_SwitchPower</controlURL>
+            <eventSubURL>eventURL_SwitchPower</eventSubURL>
          </service>
+		 <service>
+			<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+			<SCPDURL>service_Metadata.xml</SCPDURL>
+			<controlURL>controlURL_MetaData</controlURL>
+			<eventSubURL></eventSubURL>
+			<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+		 </service>
       </serviceList>
    </device>
 </root>

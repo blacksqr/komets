@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<URLBase>http://192.168.1.1:6049</URLBase>
+	<device>
+		<deviceType>urn:schemas-upnp-org:device:TempDisplay:1</deviceType>
+		<UDN>uuid:5a9a0d33-887b-0e5a-0000-00004b5304b7</UDN>
+		<friendlyName>TempDisplay Device</friendlyName>
+		<manufacturer>Environement Simulator</manufacturer>
+		<serviceList>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:TempService:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:TemperatureDisplay</serviceId>
+				<controlURL>controlURL_TemperatureDisplay</controlURL>
+				<eventSubURL>eventURL_TemperatureDisplay</eventSubURL>
+				<SCPDURL>__scpd__TemperatureDisplay.xml</SCPDURL>
+			</service>
+			 <service>
+				<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+				<SCPDURL>service_Metadata.xml</SCPDURL>
+				<controlURL>controlURL_MetaData</controlURL>
+				<eventSubURL></eventSubURL>
+				<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+			 </service>
+			</serviceList>
+	</device>
+</root>
