@@ -8,7 +8,7 @@
 	<device>
 		<deviceType>urn:schemas-upnp-org:device:TempDisplay:1</deviceType>
 		<UDN>uuid:5a9a0d33-887b-0e5a-0000-00004b5304b7</UDN>
-		<friendlyName>TempDisplay Device</friendlyName>
+		<friendlyName>Pipo TempDisplay Device</friendlyName>
 		<manufacturer>Environement Simulator</manufacturer>
 		<serviceList>
 			<service>

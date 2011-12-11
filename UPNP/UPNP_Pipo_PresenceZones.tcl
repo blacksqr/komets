@@ -61,8 +61,11 @@ method Pipo_UPNP_PresenceZones Process_result {mtd ns_res L_res} {
 method Pipo_UPNP_PresenceZones set_Occupied {b} {
 	set L [list Unoccupied Occupied]
 	set C [list red green]
-	set this(OccupancyState) [lindex $L $b]
-	this Emit_event urn:upnp-org:serviceId:HouseStatus [list OccupancyState $this(OccupancyState)]
+	if {$this(OccupancyState) != [lindex $L $b]} {
+		 set this(OccupancyState) [lindex $L $b]
+		 $this(canvas) itemconfigure $this(poly_id) -fill [lindex $C $b]
+		 this Emit_event urn:upnp-org:serviceId:HouseStatus [list OccupancyState $this(OccupancyState)]
+		}
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -73,6 +76,7 @@ method Pipo_UPNP_PresenceZones Simulation_OccupancyState_at {x y} {
 
 	this set_Occupied $b
 }
+# Trace Pipo_UPNP_PresenceZones Simulation_OccupancyState_at
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_PresenceZones Switch_OccupancyState {} {
