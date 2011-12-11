@@ -1,6 +1,6 @@
 
 advice ContextSet_1_AA_2_Uncle_AlexTemp():
-dict create condition [dict create temperatureObservable virtual=false&type=temperatureObservable temperatureDisplay virtual=false&type=temperatureDisplay ] action {
+dict create condition [dict create temperatureObservable virtual=true&type=temperatureObservable temperatureDisplay virtual=true&type=temperatureDisplay ] action {
 	this OnEvent Uncle_AlexTemp $temperatureObservable CurTemp {
 		 puts "Uncle_AlexTemp";
 		 foreach L $temperatureDisplay {

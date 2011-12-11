@@ -2,14 +2,14 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_TemperatureDisplay UPNP_device
-method Pipo_UPNP_TemperatureDisplay constructor {t metadata canvas x1 y1 x2 y2} {
+method Pipo_UPNP_TemperatureDisplay constructor {t metadata canvas x y} {
 	this inherited $t
 	set this(metadata)    $metadata
 	set this(temperature) 12
 	
 	set this(canvas)     $canvas
-		$this(canvas) create rect $x1 $y1 $x2 $y2 -fill #777 -tags [list $objName Pipo_UPNP_TemperatureDisplay TemperatureDisplay]
-		
+		$this(canvas) create rect $x $y $x $y -fill white -tags [list $objName rect_$objName]
+		$this(canvas) create text $x $y -anchor nw -justify left -text $this(temperature) -tags [list $objName text_$objName Pipo_UPNP_TemperatureDisplay TemperatureDisplay]
 	# Part related to the UPNP device
 	 set str_srv [this Generate_control_description_for_service $objName]
 	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__control_${objName}_TemperatureDisplay.php w]
@@ -74,4 +74,7 @@ method Pipo_UPNP_TemperatureDisplay SetValue {args} {
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_TemperatureDisplay update_presentation {} {
+	$this(canvas) itemconfigure text_$objName -text $this(temperature)
+	lassign [$this(canvas) bbox text_$objName] x1 y1 x2 y2
+	$this(canvas) coords rect_$objName [expr $x1 - 2] [expr $y1 - 2] [expr $x2 + 2] [expr $y2 + 2]
 }

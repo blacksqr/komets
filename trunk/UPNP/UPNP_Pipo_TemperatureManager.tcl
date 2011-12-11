@@ -1,7 +1,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit Pipo_UPNP_TemperatureManager UPNP_device
+inherit Pipo_UPNP_TemperatureManager UPNP_device 
 method Pipo_UPNP_TemperatureManager constructor {t metadata {dt_temperature_change 1000}} {
 	this inherited $t
 	set this(metadata)   $metadata
@@ -29,9 +29,9 @@ method Pipo_UPNP_TemperatureManager constructor {t metadata {dt_temperature_chan
 		close $f
 	
 	 this Generate_device_description_from_xml_file $::env(ROOT_COMETS)/Comets/UPNP/__device__TemperatureManager.xml [list \
-																							  controlURL_TemperatureManager     __control_${objName}_TemperatureManager.php \
-																							  controlURL_MetaData  __control_${objName}_Metadata.php \
-																					 ]	[list eventURL_TemperatureManager       __event_${objName}_TemperatureManager.php \
+																							  controlURL_TemperatureManagement  __control_${objName}_TemperatureManager.php \
+																							  controlURL_MetaData               __control_${objName}_Metadata.php \
+																					 ]	[list eventURL_TemperatureManagement    __event_${objName}_TemperatureManager.php \
 																						]
 																						
 
@@ -74,19 +74,17 @@ method Pipo_UPNP_TemperatureManager GetTargetTemp  {args} {
 method Pipo_UPNP_TemperatureManager SetTargetTemp {args} {
 	set this(TargetTemp) $args
 	# this Emit_event urn:upnp-org:serviceId:TempManagerService [list TargetTemp $this(TargetTemp)]
-	this update_temperature
+	if {!$this(is_going_to_update)} {this update_temperature}
 }
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_TemperatureManager update_temperature {} {
-	if {$this(is_going_to_update)} {return}
-	
 	set this(is_going_to_update) 1
 	set t $this(CurTemp)
 	if {$this(CurTemp) < $this(TargetTemp)} {incr this(CurTemp)}
 	if {$this(CurTemp) > $this(TargetTemp)} {incr this(CurTemp) -1}
 	if {$t != $this(CurTemp)} {
 		 this Emit_event urn:upnp-org:serviceId:TempManagerService [list CurTemp $this(CurTemp)]
-		 after this(dt_temperature_change) "$objName update_temperature"
+		 after $this(dt_temperature_change) "$objName update_temperature"
 		} else {set this(is_going_to_update) 0}
 }
