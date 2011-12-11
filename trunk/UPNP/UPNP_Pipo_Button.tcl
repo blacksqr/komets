@@ -5,7 +5,7 @@ inherit Pipo_UPNP_Button UPNP_device
 method Pipo_UPNP_Button constructor {t metadata canvas x y {r 15}} {
 	this inherited $t
 	set this(metadata)     $metadata
-	set this(state_button) 0
+	set this(state_button) 1
 	
 	set this(canvas)     $canvas
 		$this(canvas) create rect [expr $x - $r] [expr $y - $r] [expr $x + $r] [expr $y + $r] -fill #777 -tags [list $objName Pipo_UPNP_Button Button]
@@ -69,6 +69,8 @@ method Pipo_UPNP_Button GetValue {args} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_Button PressButton {} {
 	set this(state_button) [expr 1 - $this(state_button)]
+	set this(state_button) 0
 	this Emit_event urn:upnp-org:serviceId:Button [list Value $this(state_button)]
+	set this(state_button) 1
 }
 # Trace Pipo_UPNP_Button PressButton
