@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<actionList>
+		<action>
+			<name>GetValue</name>
+			<argumentList>
+				<argument>
+					<name>Value</name>
+					<direction>out</direction>
+					<relatedStateVariable>Value</relatedStateVariable>
+					<retval/>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
+			<name>SetValue</name>
+			<argumentList>
+				<argument>
+					<name>Value</name>
+					<direction>in</direction>
+					<relatedStateVariable>Value</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+	</actionList>
+	<serviceStateTable>
+		<stateVariable sendEvents="yes">
+			<name>Value</name>
+			<dataType>i4</dataType>
+			<defaultValue>12</defaultValue>
+		</stateVariable>
+	</serviceStateTable>
+</scpd>

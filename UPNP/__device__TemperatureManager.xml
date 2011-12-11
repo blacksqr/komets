@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<URLBase>http://192.168.1.1:6049</URLBase>
+	<device>
+		<deviceType>urn:schemas-upnp-org:device:TempManager:1</deviceType>
+		<UDN>uuid:5a9a0d33-887b-0e5a-ffff-ffffa0a61c4d</UDN>
+		<friendlyName>Pipo TempManager Device</friendlyName>
+		<manufacturer>Environement Simulator</manufacturer>
+		<serviceList>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+				<SCPDURL>service_Metadata.xml</SCPDURL>
+				<controlURL>controlURL_MetaData</controlURL>
+				<eventSubURL/>
+				<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+			</service>
+			<service>
+				<serviceType>urn:schemas-upnp-org:service:TempManagerService:1</serviceType>
+				<serviceId>urn:upnp-org:serviceId:TempManagerService</serviceId>
+				<controlURL>controlURL_TemperatureManagement</controlURL>
+				<eventSubURL>eventURL_TemperatureManagement</eventSubURL>
+				<SCPDURL>__scpd__TemperatureManager.xml</SCPDURL>
+			</service>
+		</serviceList>
+	</device>
+</root>

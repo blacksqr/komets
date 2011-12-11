@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <actionList>
+      <action>
+         <name>GetValue</name>
+         <argumentList>
+            <argument>
+               <name>RetValue</name>
+               <direction>out</direction>
+               <relatedStateVariable>Value</relatedStateVariable>
+            </argument>
+         </argumentList>
+      </action>
+   </actionList>
+   <serviceStateTable>
+      <stateVariable sendEvents="yes">
+         <name>Value</name>
+         <dataType>boolean</dataType>
+      </stateVariable>
+   </serviceStateTable>
+</scpd>

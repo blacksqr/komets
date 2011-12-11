@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+	<specVersion>
+		<major>1</major>
+		<minor>0</minor>
+	</specVersion>
+	<actionList>
+		<action>
+			<name>GetCurTemp</name>
+			<argumentList>
+				<argument>
+					<name>CurTemp</name>
+					<direction>out</direction>
+					<relatedStateVariable>CurTemp</relatedStateVariable>
+					<retval/>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
+			<name>GetTargetTemp</name>
+			<argumentList>
+				<argument>
+					<name>TargetTemp</name>
+					<direction>out</direction>
+					<relatedStateVariable>TargetTemp</relatedStateVariable>
+					<retval/>
+				</argument>
+			</argumentList>
+		</action>
+		<action>
+			<name>SetTargetTemp</name>
+			<argumentList>
+				<argument>
+					<name>TargetTemp</name>
+					<direction>in</direction>
+					<relatedStateVariable>TargetTemp</relatedStateVariable>
+				</argument>
+			</argumentList>
+		</action>
+	</actionList>
+	<serviceStateTable>
+		<stateVariable sendEvents="yes">
+			<name>TargetTemp</name>
+			<dataType>i4</dataType>
+			<defaultValue>12</defaultValue>
+		</stateVariable>
+		<stateVariable sendEvents="yes">
+			<name>CurTemp</name>
+			<dataType>i4</dataType>
+			<defaultValue>12</defaultValue>
+		</stateVariable>
+	</serviceStateTable>
+</scpd>

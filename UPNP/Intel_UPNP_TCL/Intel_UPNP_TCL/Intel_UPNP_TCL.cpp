@@ -65,7 +65,7 @@ const char* INTEL_UPNP_start(const bool sync, char *typeURI, const char *cmd_Dev
 											    , typeURI, std::strlen(typeURI)
 											    , &INTEL_UPNP_new_message, NULL );
 
- char *reserved = new char[10];
+ char *reserved = new char[10]; 
  if (sync) {API_INTEL_UPNP_UPnPStackThreadRun(NULL);
  } else {CreateThread(NULL,0,&API_INTEL_UPNP_UPnPStackThreadRun,NULL,0,NULL);
 		}

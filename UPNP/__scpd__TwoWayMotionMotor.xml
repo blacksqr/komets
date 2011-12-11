@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scpd xmlns="urn:schemas-upnp-org:service-1-0">
+   <serviceStateTable>
+      <stateVariable sendEvents="yes">
+         <name>Position</name>
+         <sendEventsAttribute>yes</sendEventsAttribute>
+         <dataType>string</dataType>
+         <defaultValue>Stopped</defaultValue>
+         <allowedValueList>
+            <allowedValue>Opened</allowedValue>
+            <allowedValue>Closed</allowedValue>
+            <allowedValue>Stopped</allowedValue>
+         </allowedValueList>
+      </stateVariable>
+   </serviceStateTable>
+   <actionList>
+      <action>
+         <name>Open</name>
+         <argumentList></argumentList>
+      </action>
+      <action>
+         <name>Close</name>
+         <argumentList></argumentList>
+      </action>
+      <action>
+         <name>Stop</name>
+         <argumentList></argumentList>
+      </action>
+      <action>
+         <name>SetPosition</name>
+         <argumentList>
+            <argument>
+               <name>NewPosition</name>
+               <direction>in</direction>
+               <relatedStateVariable>Position</relatedStateVariable>
+            </argument>
+         </argumentList>
+      </action>
+   </actionList>
+</scpd>

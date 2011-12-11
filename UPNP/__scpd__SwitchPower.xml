@@ -6,66 +6,44 @@
    </specVersion>
    <actionList>
       <action>
-         <name>GetLoadLevelStatus</name>
+         <name>GetStatus</name>
          <argumentList>
             <argument>
-               <name>RetLoadLevelStatus</name>
+               <name>ResultStatus</name>
                <direction>out</direction>
-               <relatedStateVariable>LoadLevelStatus</relatedStateVariable>
+               <relatedStateVariable>Status</relatedStateVariable>
             </argument>
          </argumentList>
       </action>
       <action>
-         <name>GetLoadLevelTarget</name>
+         <name>GetTarget</name>
          <argumentList>
             <argument>
-               <name>NewLoadLevelTarget</name>
+               <name>newTargetValue</name>
                <direction>out</direction>
-               <relatedStateVariable>LoadLevelTarget</relatedStateVariable>
+               <relatedStateVariable>Target</relatedStateVariable>
             </argument>
          </argumentList>
       </action>
       <action>
-         <name>GetMinLevel</name>
+         <name>SetTarget</name>
          <argumentList>
             <argument>
-               <name>MinLevel</name>
-               <direction>out</direction>
-               <relatedStateVariable>MinLevel</relatedStateVariable>
-            </argument>
-         </argumentList>
-      </action>
-      <action>
-         <name>SetLoadLevelTarget</name>
-         <argumentList>
-            <argument>
-               <name>NewLoadLevelTarget</name>
+               <name>newTargetValue</name>
                <direction>in</direction>
-               <relatedStateVariable>LoadLevelTarget</relatedStateVariable>
+               <relatedStateVariable>Target</relatedStateVariable>
             </argument>
          </argumentList>
       </action>
    </actionList>
    <serviceStateTable>
       <stateVariable sendEvents="yes">
-         <name>LoadLevelStatus</name>
-         <dataType>ui1</dataType>
-         <allowedValueRange>
-            <minimum>0</minimum>
-            <maximum>100</maximum>
-         </allowedValueRange>
+         <name>Status</name>
+         <dataType>boolean</dataType>
       </stateVariable>
       <stateVariable sendEvents="no">
-         <name>MinLevel</name>
-         <dataType>ui1</dataType>
-      </stateVariable>
-      <stateVariable sendEvents="no">
-         <name>LoadLevelTarget</name>
-         <dataType>ui1</dataType>
-         <allowedValueRange>
-            <minimum>0</minimum>
-            <maximum>100</maximum>
-         </allowedValueRange>
+         <name>Target</name>
+         <dataType>boolean</dataType>
       </stateVariable>
    </serviceStateTable>
 </scpd>

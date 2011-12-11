@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase>http://192.168.1.1:6025</URLBase>
+   <device>
+      <deviceType>urn:schemas-upnp-org:device:Button:1</deviceType>
+      <friendlyName>Pipo Button</friendlyName>
+      <manufacturer>SIRLAN Technologies</manufacturer>
+      <manufacturerURL>http://www.sirlan.com</manufacturerURL>
+      <modelNumber>1.0</modelNumber>
+      <modelURL>http://www.sirlan.com</modelURL>
+      <UDN>uuid:00fffe98-95c7-aa01-00ff-fe9895c7aa01</UDN>
+      <serviceList>
+		 <service>
+			<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+			<SCPDURL>service_Metadata.xml</SCPDURL>
+			<controlURL>controlURL_MetaData</controlURL>
+			<eventSubURL></eventSubURL>
+			<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+		 </service>
+         <service>
+            <serviceType>urn:schemas-multicom-com:service:Button:1</serviceType>
+            <SCPDURL>__scpd__Button.xml</SCPDURL>
+            <controlURL>controlURL_Button</controlURL>
+            <eventSubURL>eventURL_Button</eventSubURL>
+            <serviceId>urn:upnp-org:serviceId:Button</serviceId>
+         </service>
+      </serviceList>
+      <modelName>Pipo Button</modelName>
+      <modelDescription>Pipo generic button device</modelDescription>
+   </device>
+</root>
