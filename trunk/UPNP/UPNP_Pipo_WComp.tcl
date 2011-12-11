@@ -177,7 +177,7 @@ method Pipo_WComp AddAA {str} {
 	regexp "^.*\nadvice *ContextSet_\[0-9\]*_AA_\[0-9\]*_(.*) *\\(.*\\) *: *\n(.*)\$" $str reco rule_name str
 	puts "New AA:\n\tname : $rule_name\n\tstr : [string trim $str]"
 	set D_rule [eval $str] 
-	dict set D_rule is_selected 1
+	dict set D_rule is_selected 0
 	dict set this(D_rules) $rule_name $D_rule
 	this Apply_rule $rule_name
 }
