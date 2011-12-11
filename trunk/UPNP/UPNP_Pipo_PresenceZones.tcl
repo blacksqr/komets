@@ -32,6 +32,7 @@ method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata {mode_simul
 	# Graphic part polygons in the canvas
 	set this(canvas) $canvas
 	eval "set this(poly_id) \[$canvas create polygon $coords -fill grey\]"
+	set this(mode_simulation) $mode_simulation
 	switch $mode_simulation {
 		 Wizard 	{$canvas bind $this(poly_id) <ButtonPress> "$objName Switch_OccupancyState"
 					}
@@ -70,6 +71,7 @@ method Pipo_UPNP_PresenceZones set_Occupied {b} {
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_PresenceZones Simulation_OccupancyState_at {x y} {
+	if {$this(mode_simulation) != "Simulation"} {return}
 	if {[lsearch [$this(canvas) find overlapping $x $y $x $y] $this(poly_id)] >= 0} {
 		 set b 1
 		} else {set b 0}
