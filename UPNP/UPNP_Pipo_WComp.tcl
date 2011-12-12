@@ -263,7 +263,10 @@ method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 	if {![dict exists $this(D_rules) $rule_name]} {return}
-	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {puts "Rule $rule_name is not selected...bypass"; return}
+	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {
+		 # puts "Rule $rule_name is not selected...bypass"; 
+		 return
+		}
 
 	# Set the value upcoming inside the dictionnary
 	set found_var_name 0
