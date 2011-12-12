@@ -21,8 +21,8 @@ method UPNP_device constructor {timeout} {
 	set this(udp_sock)     [udp_open]
 	fconfigure $this(udp_sock) -buffering none -blocking 0
 	fconfigure $this(udp_sock) -mcastadd "239.255.255.250" -remote [list "239.255.255.250" 1900]
-	# fconfigure $this(udp_sock) -encoding utf-8 -translation {lf crlf}
-	fconfigure $this(udp_sock) -encoding utf-8
+	fconfigure $this(udp_sock) -encoding utf-8 -translation {lf crlf}
+	# fconfigure $this(udp_sock) -encoding utf-8
 	
 	# Open TCP server for SOAP actions management
 	set this(tcp_server)      [socket -server "$objName New_connection " 0]
@@ -64,6 +64,7 @@ USN: $USN
 NT: $NT
 Content-Length: 0\n\n"
 		 puts -nonewline $this(udp_sock) $msg
+		 flush $this(udp_sock)
 		}
 
 	# Unsubscribe from Comet UPNP
@@ -306,6 +307,7 @@ CACHE-CONTROL: max-age=$this(timeout)
 Content-Length: 0\n\n"
 
 		puts -nonewline $this(udp_sock) $msg
+		flush $this(udp_sock)
 	}
 	}
 	
