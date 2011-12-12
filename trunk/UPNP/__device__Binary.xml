@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <URLBase>http://192.168.1.1:6062</URLBase>
+   <device>
+      <deviceType>urn:schemas-upnp-org:device:BinaryLight:1</deviceType>
+      <friendlyName>Domus device: Prise Commandee 8</friendlyName>
+      <manufacturer>SIRLAN Technologies</manufacturer>
+      <manufacturerURL>http://www.sirlan.com</manufacturerURL>
+      <modelNumber>1.0</modelNumber>
+      <modelURL>http://www.sirlan.com</modelURL>
+      <UDN>uuid:00fffeb8-53ba-7601-00ff-feb853ba7601</UDN>
+      <serviceList>
+		 <service>
+			<serviceType>urn:schemas-upnp-org:service:Meta-data:1</serviceType>
+			<SCPDURL>service_Metadata.xml</SCPDURL>
+			<controlURL>controlURL_MetaData</controlURL>
+			<eventSubURL></eventSubURL>
+			<serviceId>urn:upnp-org:serviceId:Metadata</serviceId>
+		 </service>
+         <service>
+            <serviceType>urn:schemas-upnp-org:service:SwitchPower:1</serviceType>
+            <SCPDURL>__scpd__Binary.xml</SCPDURL>
+            <controlURL>controlURL_Binary</controlURL>
+            <eventSubURL>eventURL_Binary</eventSubURL>
+            <serviceId>urn:upnp-org:serviceId:SwitchPower</serviceId>
+         </service>
+      </serviceList>
+      <modelName>Generic Light</modelName>
+      <modelDescription>Domus Generic light device</modelDescription>
+   </device>
+</root>
