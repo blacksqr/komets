@@ -2,13 +2,13 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_BinaryCaffetiere Pipo_UPNP_Binary
-method Pipo_UPNP_BinaryCaffetiere constructor {t metadata canvas x y {f_image Comets/UPNP/Caffetiere.GIF}} {
+method Pipo_UPNP_BinaryCaffetiere constructor {L_tag_value t metadata canvas x y {f_image Comets/UPNP/Caffetiere.gif}} {
 	image create photo photo_of_$objName -file $::env(ROOT_COMETS)$f_image
 	set this(is_on) 2
 	set this(canvas) $canvas
 		$this(canvas) create image $x $y -image photo_of_$objName -tags [list $objName]
 	
-	this inherited $t $metadata
+	this inherited $t $metadata $L_tag_value
 	this update_presentation
 }
 

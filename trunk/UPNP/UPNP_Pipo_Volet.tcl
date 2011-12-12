@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_Volet UPNP_device
-method Pipo_UPNP_Volet constructor {t metadata canvas x1 y1 x2 y2} {
+method Pipo_UPNP_Volet constructor {L_tag_value t metadata canvas x1 y1 x2 y2} {
 	this inherited $t
 	set this(metadata) $metadata
 	set this(Position) Stopped
@@ -32,7 +32,7 @@ method Pipo_UPNP_Volet constructor {t metadata canvas x1 y1 x2 y2} {
 																							  controlURL_Volet     __control_${objName}_Volet.php \
 																							  controlURL_MetaData  __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_Volet       __event_${objName}_Volet.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network

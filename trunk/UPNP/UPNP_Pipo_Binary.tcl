@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_Binary UPNP_device
-method Pipo_UPNP_Binary constructor {t metadata} {
+method Pipo_UPNP_Binary constructor {t metadata L_tag_value} {
 	this inherited $t
 	set this(metadata)    $metadata
 	set this(Status)      0
@@ -31,7 +31,7 @@ method Pipo_UPNP_Binary constructor {t metadata} {
 																							  controlURL_Binary      __control_${objName}_Binary.php \
 																							  controlURL_MetaData    __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_access    __event_${objName}_Binary.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network
@@ -49,6 +49,11 @@ method Pipo_UPNP_Binary Read_Event_Subscription_from_socket {sock} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_Binary Process_result {mtd ns_res L_res} {
 	return [this Process_L_result $mtd $ns_res $L_res]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Pipo_UPNP_Binary GetMetadata {args} {
+	return [list _ReturnValue $this(metadata)]
 }
 
 #___________________________________________________________________________________________________________________________________________

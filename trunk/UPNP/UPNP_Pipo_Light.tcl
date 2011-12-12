@@ -2,13 +2,14 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_Light UPNP_device
-method Pipo_UPNP_Light constructor {t metadata canvas x y {r 15}} {
+method Pipo_UPNP_Light constructor {L_tag_value t metadata canvas x y {r 15}} {
 	this inherited $t
 	set this(metadata)   $metadata
 	set this(switch)     0
 	set this(LoadLevel)  90
 	set this(MinLevel)   0
 	
+	set this(x) $x; set this(y) $y; set this(r) $r
 	set this(canvas)     $canvas
 		$this(canvas) create oval [expr $x - $r] [expr $y - $r] [expr $x + $r] [expr $y + $r] -fill black -tags [list $objName Pipo_UPNP_Light Light]
 		
@@ -45,7 +46,7 @@ method Pipo_UPNP_Light constructor {t metadata canvas x y {r 15}} {
 																							  controlURL_MetaData     __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_SwitchPower    __event_${objName}_SwitchPower.php \
 																							  eventURL_Dimming        __event_${objName}_Dimming.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network
@@ -115,10 +116,19 @@ method Pipo_UPNP_Light SetLoadLevelTarget {args} {
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_Light update_presentation {} {
+# 90 50 20
 	if {$this(switch)} {
-		 set i [format %X [expr int(min(99, $this(LoadLevel)) * 0.16)]]
-		} else {set i 0}
-	
-	$this(canvas) itemconfigure $objName -fill #$i${i}0
+		 set c [format %X [expr int(min(99, $this(LoadLevel)) * 0.16)]]
+		 set c F
+		 set loadlevel $this(LoadLevel)
+		} else {set c 0; set loadlevel 0}
+	set color #${c}${c}5
+	puts "\Color of $objName : $color"
+	set x $this(x); set y $this(y); set r $this(r)
+	$this(canvas) delete $objName
+	for {set i [expr min(2, int($loadlevel / 30))]} {$i >= 0} {incr i -1} {
+		 set R [expr (1+$i/2.0) * $r]
+		 $this(canvas) create oval [expr $x - $R] [expr $y - $R] [expr $x + $R] [expr $y + $R] -fill $color -tags [list $objName Pipo_UPNP_Light Light]
+		}
 }
 Trace Pipo_UPNP_Light update_presentation
