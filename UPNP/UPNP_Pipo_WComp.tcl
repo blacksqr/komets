@@ -241,19 +241,24 @@ method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 # Trace Pipo_WComp Trigger_CB_after_event
 
 #___________________________________________________________________________________________________________________________________________
-method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
+method Pipo_WComp OnEvents {rule_name L_UDN_var_names CB D_vars} {
 	set this(MultiInput_for_$rule_name) [dict create]
-	foreach {UDN var_name} $L_UDN_var_name {
-		 dict set this(MultiInput_for_$rule_name) $var_name defined 0
+	foreach {L_UDN upnp_var_name var_name} $L_UDN_var_names {
+		 foreach UDN $L_UDN {
+			  dict set this(MultiInput_for_$rule_name) var $var_name var_defined 0
+			  dict set this(MultiInput_for_$rule_name) UDN $UDN var_for_UDN $var_name
+			  dict set this(MultiInput_for_$rule_name) UDN $UDN upnp_var    $upnp_var_name
+			 }
 		}
 
-	foreach {UDN var_name} $L_UDN_var_name {
-		 if {$UDN == ""} {continue}
-		 set service_id [$this(CU) get_service_having_variable $UDN $var_name]
-		 if {$service_id != ""} {
-			 dict set this(MultiInput_for_$rule_name) $var_name service $service_id
-			 if {[catch {$this(CU) Subscribe_to_UPNP_events $UDN $service_id $rule_name [list $objName MultiInput_Trigger_CB_after_event $rule_name $var_name $D_vars $CB]} err]} {
-				 puts stderr "Error during subscription in OnEvents $rule_name :\n\tUDN : $UDN\n\tservice : $service_id\n\terr : $err"
+	foreach {L_UDN upnp_var_name var_name} $L_UDN_var_names {
+		 foreach UDN $L_UDN {
+			 set service_id [$this(CU) get_service_having_variable $UDN $upnp_var_name]
+			 if {$service_id != ""} {
+				 dict set this(MultiInput_for_$rule_name) var $var_name service $service_id
+				 if {[catch {$this(CU) Subscribe_to_UPNP_events $UDN $service_id $rule_name [list $objName MultiInput_Trigger_CB_after_event $rule_name $UDN $upnp_var_name $D_vars $CB]} err]} {
+					 puts stderr "Error during subscription in OnEvents $rule_name :\n\tUDN : $UDN\n\tservice : $service_id\n\terr : $err"
+					} else {puts stderr "In device ${UDN}, there is no service having the variable $upnp_var_name"}
 				}
 			}
 		}
@@ -261,9 +266,9 @@ method Pipo_WComp OnEvents {rule_name L_UDN_var_name CB D_vars} {
 }
 # Trace Pipo_WComp OnEvents
 #___________________________________________________________________________________________________________________________________________
-method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars CB event} {
+method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name UDN upnp_var_name D_vars CB event} {
 	if {![dict exists $this(D_rules) $rule_name]} {return}
-	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {
+	if {0 && [dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {
 		 # puts "Rule $rule_name is not selected...bypass"; 
 		 return
 		}
@@ -271,16 +276,19 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars C
 	# Set the value upcoming inside the dictionnary
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}
-	
+
 	# Create variables packed inside the event notification
 	if {[catch {set doc [dom parse [string trim $event]]} err]} {puts stderr "Error parsing the UPNP event in objName Trigger_CB_after_event:\n\trule_name : $rule_name\n\tD_vars : $D_vars\n\tCB : $CB\n\tevent : $event"} else {
 		 set root [$doc documentElement]; set ns_root [$root namespace]
 		 foreach p [$root selectNodes -namespace [list ns $ns_root] "//ns:property/* | //property/*"] {
 			 set [$p nodeName] [$p asText]
-			 if {[$p nodeName] == $var_name} {
+			 # puts "set [$p nodeName] [$p asText]; // upnp_var_name = $upnp_var_name"
+			 if {[$p nodeName] == $upnp_var_name} {
 				 set found_var_name 1
-				 dict set this(MultiInput_for_$rule_name) $var_name defined 1
-				 dict set this(MultiInput_for_$rule_name) $var_name value [set $var_name]
+				 # puts "var $upnp_var_name is defined for $UDN"
+				 set var_name [dict get $this(MultiInput_for_$rule_name) UDN $UDN var_for_UDN]
+				 dict set this(MultiInput_for_$rule_name) var $var_name var_defined 1
+				 dict set this(MultiInput_for_$rule_name) var $var_name value [set $upnp_var_name]
 				}
 			}
 		 $doc delete	
@@ -289,9 +297,9 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name var_name D_vars C
 	# If the variable is defined and all values are defined, trigger the callback
 	if {$found_var_name} {
 		 set CB_processable 1
-		 dict for {var var_descr} $this(MultiInput_for_$rule_name) {
-			 if {![dict get $var_descr defined]} {
-				  puts "\tVariable $var is not defined..."
+		 dict for {var var_descr} [dict get $this(MultiInput_for_$rule_name) var] {
+			 if {![dict get $var_descr var_defined]} {
+				  # puts "\tVariable is not defined for $UDN ..."
 				  set CB_processable 0
 				  break
 				 } else {set $var [dict get $var_descr value]
