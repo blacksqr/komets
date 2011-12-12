@@ -17,6 +17,7 @@ method Proxy_Pipo_Sonos SetMute {args} {
 	this update_presentation
 	return $rep
 }
+Trace Proxy_Pipo_Sonos SetMute
 
 #___________________________________________________________________________________________________________________________________________
 method Proxy_Pipo_Sonos SetVolume {args} {
