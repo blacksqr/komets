@@ -201,6 +201,9 @@ method Pipo_WComp SelectAA {str} {
 	regexp {^ContextSet_[0-9]*_AA_[0-9]*_(.*)\|([0-1])$} $rule_name reco rule_name is_selected
 	puts "\t$rule_name is_selected $is_selected"
 	if {[catch {dict set this(D_rules) $rule_name is_selected $is_selected} err]} {puts stderr "Error while selecting an AA : \n\t$objName SelectAA [list $str]\n\terr : $err"}
+	if {$is_selected} {
+		 this Apply_rule $rule_name
+		}
 }
 Trace Pipo_WComp SelectAA
 
@@ -215,7 +218,10 @@ method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp Trigger_CB_after_event {rule_name var_name D_vars CB event} {
 	if {![dict exists $this(D_rules) $rule_name]} {puts stderr "No rule named $rule_name"; return}
-	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {puts "Rule $rule_name is not selected...bypass"; return}
+	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {
+		 # puts "Rule $rule_name is not selected...bypass"; 
+		 return
+		}
 	
 	set found_var_name 0
 	dict for {var val} $D_vars {set $var $val}
