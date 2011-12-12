@@ -495,7 +495,7 @@ method UPNP_device Generate_control_description_for_comet {C} {
 #___________________________________________________________________________________________________________________________________________
 #_________________________________________________ Generate a device based on descriptions _________________________________________________
 #___________________________________________________________________________________________________________________________________________
-method UPNP_device Generate_device_description_from_xml_file {f_name L_control_mappings L_event_mappings} {
+method UPNP_device Generate_device_description_from_xml_file {f_name L_control_mappings L_event_mappings {L_tag_value {}}} {
 	set f [open $f_name r]; set str_xml [read $f]; close $f
 	dom parse $str_xml doc
 	$doc documentElement root; set ns_root [$root namespace]
@@ -507,6 +507,7 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 			set n [$doc createElementNS $ns_root URLBase]
 			set t [$doc createTextNode "http://$class(ip)/Comets/UPNP/"]; $n appendChild $t
 			$p appendChild $n
+		# Update controls
 		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:controlURL | //controlURL"] {
 			 set val [$n asText]
 			 puts "controlURL : $val"
@@ -517,6 +518,8 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 				 puts "\tnow value is : [$n asText]"
 				}
 			}
+			
+		# Update events
 		foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:eventSubURL | //eventSubURL"] {
 			 set val [$n asText]
 			 puts "eventURL : $val"
@@ -527,6 +530,14 @@ method UPNP_device Generate_device_description_from_xml_file {f_name L_control_m
 				 puts "\tnow value is : [$n asText]"
 				}
 			}
+		
+		# Configure some tags
+		foreach {tag value} $L_tag_value {
+			 set node [$root selectNodes -namespace [list ns $ns_root] "//ns:$tag | //$tag"]
+			 if {[llength $node] != 1} {puts stderr "There are [llength $node] tag $tag instead of 1 !"; continue}
+			 [$node childNodes] nodeValue $value
+			}
+		
 		# Write the new file
 		set f [open $::env(ROOT_COMETS)/Comets/UPNP/${objName}.xml w]
 			fconfigure $f -encoding utf-8

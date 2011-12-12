@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_TemperatureManager UPNP_device 
-method Pipo_UPNP_TemperatureManager constructor {t metadata {dt_temperature_change 1000}} {
+method Pipo_UPNP_TemperatureManager constructor {L_tag_value t metadata {dt_temperature_change 1000}} {
 	this inherited $t
 	set this(metadata)   $metadata
 	set this(CurTemp)    12
@@ -32,7 +32,7 @@ method Pipo_UPNP_TemperatureManager constructor {t metadata {dt_temperature_chan
 																							  controlURL_TemperatureManagement  __control_${objName}_TemperatureManager.php \
 																							  controlURL_MetaData               __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_TemperatureManagement    __event_${objName}_TemperatureManager.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network

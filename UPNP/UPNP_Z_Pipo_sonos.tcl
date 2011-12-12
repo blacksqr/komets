@@ -2,8 +2,8 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Proxy_Pipo_Sonos Proxy_UPNP_Sonos
-method Proxy_Pipo_Sonos constructor {t metadata canvas x y} {
-	this inherited $t PIPO_SONOS $metadata 
+method Proxy_Pipo_Sonos constructor {L_tag_value t metadata canvas x y} {
+	this inherited $L_tag_value $t PIPO_SONOS $metadata 
 	image create photo photo_of_$objName -file $::env(ROOT_COMETS)Comets/UPNP/caissonsRCF.gif
 	set this(no_sound) 2
 	set this(canvas) $canvas

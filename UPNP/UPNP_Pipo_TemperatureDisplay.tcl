@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_TemperatureDisplay UPNP_device
-method Pipo_UPNP_TemperatureDisplay constructor {t metadata canvas x y} {
+method Pipo_UPNP_TemperatureDisplay constructor {L_tag_value t metadata canvas x y} {
 	this inherited $t
 	set this(metadata)    $metadata
 	set this(temperature) 12
@@ -32,7 +32,7 @@ method Pipo_UPNP_TemperatureDisplay constructor {t metadata canvas x y} {
 																							  controlURL_TemperatureDisplay     __control_${objName}_TemperatureDisplay.php \
 																							  controlURL_MetaData  __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_TemperatureDisplay       __event_${objName}_TemperatureDisplay.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network

@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Proxy_UPNP_Sonos UPNP_device
-method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
+method Proxy_UPNP_Sonos constructor {L_tag_value t UDN_of_the_target metadata} {
 	this inherited $t
 	set this(metadata)          $metadata
 	set this(UDN_of_the_target) $UDN_of_the_target
@@ -32,7 +32,7 @@ method Proxy_UPNP_Sonos constructor {t UDN_of_the_target metadata} {
 																							  controlURL_access  __control_${objName}_proxySonos.php \
 																							  /upnp/fb9e473a-f276-4930-b511-376d61dd0a3e    __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_access    __event_${objName}_proxySonos.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network

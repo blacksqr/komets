@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_PresenceZones UPNP_device
-method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata {mode_simulation Wizard}} {
+method Pipo_UPNP_PresenceZones constructor {L_tag_value t canvas coords metadata {mode_simulation Wizard}} {
 	this inherited $t
 	set this(metadata)       $metadata
 	set this(OccupancyState) Indeterminate
@@ -27,7 +27,7 @@ method Pipo_UPNP_PresenceZones constructor {t canvas coords metadata {mode_simul
 																							  /upnp/fb9e473a-f276-4930-b511-376d61dd0a3e    __control_${objName}_HouseStatus.php \
 																						      /upnp/fb9e473a-f276-4930-b511-376d61dd0a3e    __control_${objName}_Metadata.php \
 																					 ]	[list /upnp/Event/fb9e473a-f276-4930-b511-376d61dd0a3e:HouseStatus    __event_${objName}_HouseStatus.php \
-																						]
+																						] $L_tag_value
 																						
 	# Graphic part polygons in the canvas
 	set this(canvas) $canvas
@@ -61,7 +61,7 @@ method Pipo_UPNP_PresenceZones Process_result {mtd ns_res L_res} {
 #___________________________________________________________________________________________________________________________________________
 method Pipo_UPNP_PresenceZones set_Occupied {b} {
 	set L [list Unoccupied Occupied]
-	set C [list red green]
+	set C [list #292 #9F9]
 	if {$this(OccupancyState) != [lindex $L $b]} {
 		 set this(OccupancyState) [lindex $L $b]
 		 $this(canvas) itemconfigure $this(poly_id) -fill [lindex $C $b]

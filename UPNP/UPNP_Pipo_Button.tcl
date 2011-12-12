@@ -2,7 +2,7 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Pipo_UPNP_Button UPNP_device
-method Pipo_UPNP_Button constructor {t metadata canvas x y {r 15}} {
+method Pipo_UPNP_Button constructor {L_tag_value t metadata canvas x y {r 15}} {
 	this inherited $t
 	set this(metadata)     $metadata
 	set this(state_button) 1
@@ -10,7 +10,7 @@ method Pipo_UPNP_Button constructor {t metadata canvas x y {r 15}} {
 	set this(canvas)     $canvas
 		$this(canvas) create rect [expr $x - $r] [expr $y - $r] [expr $x + $r] [expr $y + $r] -fill #777 -tags [list $objName Pipo_UPNP_Button Button]
 		incr r -2
-		$this(canvas) create oval [expr $x - $r] [expr $y - $r] [expr $x + $r] [expr $y + $r] -fill #9F9 -tags [list $objName Pressoir_$objName Pipo_UPNP_Button Button]
+		$this(canvas) create oval [expr $x - $r] [expr $y - $r] [expr $x + $r] [expr $y + $r] -fill #F22 -tags [list $objName Pressoir_$objName Pipo_UPNP_Button Button]
 		
 		$this(canvas) bind $objName <ButtonPress> "$objName PressButton"
 		
@@ -36,7 +36,7 @@ method Pipo_UPNP_Button constructor {t metadata canvas x y {r 15}} {
 																							  controlURL_Button    __control_${objName}_Button.php \
 																							  controlURL_MetaData  __control_${objName}_Metadata.php \
 																					 ]	[list eventURL_Button      __event_${objName}_Button.php \
-																						]
+																						] $L_tag_value
 																						
 
 	# Terminate, now publish the device on the network

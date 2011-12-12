@@ -165,7 +165,7 @@ method Pipo_WComp get_L_UDN_having_D_metadata {D_metadata} {
 		}
 	return $L_rep
 }
-Trace Pipo_WComp get_L_UDN_having_D_metadata
+# Trace Pipo_WComp get_L_UDN_having_D_metadata
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp AddAA_from_file {f_name} {
 	set f [open $f_name r]; set str [read $f]; close $f
@@ -205,7 +205,7 @@ method Pipo_WComp SelectAA {str} {
 		 this Apply_rule $rule_name
 		}
 }
-Trace Pipo_WComp SelectAA
+# Trace Pipo_WComp SelectAA
 
 #___________________________________________________________________________________________________________________________________________
 method Pipo_WComp OnEvent {rule_name L_UDN var_name CB D_vars} {
