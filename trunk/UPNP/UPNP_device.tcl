@@ -82,7 +82,7 @@ Content-Length: 0\n\n"
 method UPNP_device Received_M-SEARCH {} {
 	this send_heartbeat 0
 }
-Trace UPNP_device Received_M-SEARCH
+# Trace UPNP_device Received_M-SEARCH
 
 #___________________________________________________________________________________________________________________________________________
 method UPNP_device Emit_event {service L_var_val} {
