@@ -21,7 +21,8 @@ method UPNP_device constructor {timeout} {
 	set this(udp_sock)     [udp_open]
 	fconfigure $this(udp_sock) -buffering none -blocking 0
 	fconfigure $this(udp_sock) -mcastadd "239.255.255.250" -remote [list "239.255.255.250" 1900]
-	fconfigure $this(udp_sock) -encoding utf-8 -translation {lf crlf}
+	# fconfigure $this(udp_sock) -encoding utf-8 -translation {lf crlf}
+	fconfigure $this(udp_sock) -encoding utf-8
 	
 	# Open TCP server for SOAP actions management
 	set this(tcp_server)      [socket -server "$objName New_connection " 0]
@@ -80,6 +81,7 @@ Content-Length: 0\n\n"
 method UPNP_device Received_M-SEARCH {} {
 	this send_heartbeat 0
 }
+Trace UPNP_device Received_M-SEARCH
 
 #___________________________________________________________________________________________________________________________________________
 method UPNP_device Emit_event {service L_var_val} {
