@@ -9,7 +9,7 @@ method Pipo_UPNP_TemperatureDisplay constructor {L_tag_value t metadata canvas x
 	
 	set this(canvas)     $canvas
 		$this(canvas) create rect $x $y $x $y -fill white -tags [list $objName rect_$objName]
-		$this(canvas) create text $x $y -anchor nw -justify left -text $this(temperature) -tags [list $objName text_$objName Pipo_UPNP_TemperatureDisplay TemperatureDisplay]
+		$this(canvas) create text $x $y -anchor nw -font "Arial 26" -justify left -text $this(temperature) -tags [list $objName text_$objName Pipo_UPNP_TemperatureDisplay TemperatureDisplay]
 	# Part related to the UPNP device
 	 set str_srv [this Generate_control_description_for_service $objName]
 	 set f [open $::env(ROOT_COMETS)/Comets/UPNP/__control_${objName}_TemperatureDisplay.php w]
