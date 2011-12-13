@@ -286,7 +286,7 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name UDN upnp_var_name
 	if {[dict exists $this(D_rules) $rule_name is_selected] && ![dict get $this(D_rules) $rule_name is_selected]} {
 		 # puts "Rule $rule_name is not selected...bypass"; 
 		 return
-		} else {puts "Try to apply rule $rule_name"}
+		} 
 
 	# Set the value upcoming inside the dictionnary
 	set found_var_name 0
@@ -302,7 +302,7 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name UDN upnp_var_name
 				 set found_var_name 1
 				 # puts "var $upnp_var_name is defined for $UDN"
 				 set L_var_name [dict get $this(MultiInput_for_$rule_name) UDN $UDN L_var_for_UDN]
-				 puts "MultiTrigger : settings L_vars : $L_var_name"
+				 # puts "MultiTrigger : settings L_vars : $L_var_name"
 				 foreach var_name $L_var_name {
 					  dict set this(MultiInput_for_$rule_name) var $var_name var_defined 1
 					  dict set this(MultiInput_for_$rule_name) var $var_name value [set $upnp_var_name]
