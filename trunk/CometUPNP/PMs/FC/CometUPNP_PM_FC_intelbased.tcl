@@ -188,11 +188,10 @@ Content-Length: 0
 
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased ReEmitLastEvent_of {UDN service_id} {
-	catch {set UUID       [dict get $this(D_UPNP_Subscription) UDN $UDN $service_id]
-		   set last_event [dict get $this(D_UPNP_Subscription) UUID $UUID last_event]
-		   this Apply_CB_for_UPNP_event $UUID $last_event
-		   # puts "Should re-Emit for $UUID a message of [string bytelength $last_event] bytes..."
-		  }
+	if {[catch {set UUID       [dict get $this(D_UPNP_Subscription) UDN $UDN $service_id]
+			    set last_event [dict get $this(D_UPNP_Subscription) UUID $UUID last_event]
+			    if {$last_event != ""} {this Apply_CB_for_UPNP_event $UUID $last_event}
+			   } err]} {puts stderr "Error while re-emiting event for $UDN -> $service_id"}
 }
 
 #___________________________________________________________________________________________________________________________________________
