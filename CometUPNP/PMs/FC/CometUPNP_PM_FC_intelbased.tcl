@@ -34,6 +34,8 @@ method CometUPNP_PM_FC_intelbased constructor {name descr args} {
  set this(eventing_server)      [socket -server "$objName New_UPNP_eventing_connection" 0]
  set this(eventing_server_port) [lindex [fconfigure $this(eventing_server) -sockname] end]
  set this(IP) [this get_IP]
+ 
+ set this(D_UPNP_Subscription) [dict create]
   
  # Terminate with configuration's parameters
  eval "$objName configure $args"
@@ -110,21 +112,23 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan read_chan} {
 						 puts stderr "not enough bytes in the UPNP message ([dict get $dict_rep CONTENT-LENGTH:] needed), we have [string bytelength $xml] bytes :\n$xml"
 						 return
 						} 
-					} 
+					}
 				 
-				 puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
+				 # puts "CometUPNP_PM_FC_intelbased::Eventing_msg"
 				 if {[dict exists $dict_rep "SID:"]} {
 					 set UUID [dict get $dict_rep "SID:"]
-					 if {[info exists this(index_of_UUID,$UUID)] && [info exists this($this(index_of_UUID,$UUID))]} {
-						 # puts "dict : [dict get $this($this(index_of_UUID,$UUID)) CB]"
-						 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
-							 # puts $CB
-							 set CB "$CB [list $xml]"
-							 eval $CB
-							}
-						} else {puts stderr "Variable do not exist for $UUID, let's retry just after we get the SID?"
-							    after idle "$objName Eventing_msg $chan 1"
-							   }
+					 dict set this(D_UPNP_Subscription) UUID $UUID last_event $xml
+					 this Apply_CB_for_UPNP_event $UUID $xml $chan
+					 # if {[info exists this(index_of_UUID,$UUID)] && [info exists this($this(index_of_UUID,$UUID))]} {
+						 ##puts "dict : [dict get $this($this(index_of_UUID,$UUID)) CB]"
+						 # foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
+							 ##puts $CB
+							 # set CB "$CB [list $xml]"
+							 # eval $CB
+							# }
+						# } else {puts stderr "Variable do not exist for $UUID, let's retry just after we get the SID?"
+							    # after idle "$objName Eventing_msg $chan 1"
+							   # }
 					} else {puts stderr "No SID in the UPNP eventing message???:\n\tmsg : $msg"}
 				 catch {close $chan}
 				}
@@ -132,6 +136,21 @@ method CometUPNP_PM_FC_intelbased Eventing_msg {chan read_chan} {
 	} err]} {puts stderr "Error while reading chan $chan :\n\terr : $err"}
 }
 # Trace CometUPNP_PM_FC_intelbased Eventing_msg 
+
+#___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased Apply_CB_for_UPNP_event {UUID xml {chan {}}} {
+	if {[info exists this(index_of_UUID,$UUID)] && [info exists this($this(index_of_UUID,$UUID))]} {
+		 # puts "dict : [dict get $this($this(index_of_UUID,$UUID)) CB]"
+		 foreach {id CB} [dict get $this($this(index_of_UUID,$UUID)) CB] {
+			 # puts $CB
+			 set CB "$CB [list $xml]"
+			 eval $CB
+			}
+		} else {puts stderr "Variable do not exist for $UUID, let's retry just after we get the SID?"
+				if {$chan != ""} {after idle "$objName Eventing_msg $chan 1"}
+			   }
+}
+
 #___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased get_eventing_CB {UDN service_id} {
 	return [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) CB]
@@ -168,6 +187,15 @@ Content-Length: 0
 }
 
 #___________________________________________________________________________________________________________________________________________
+method CometUPNP_PM_FC_intelbased ReEmitLastEvent_of {UDN service_id} {
+	catch {set UUID       [dict get $this(D_UPNP_Subscription) UDN $UDN $service_id]
+		   set last_event [dict get $this(D_UPNP_Subscription) UUID $UUID last_event]
+		   this Apply_CB_for_UPNP_event $UUID $last_event
+		   # puts "Should re-Emit for $UUID a message of [string bytelength $last_event] bytes..."
+		  }
+}
+
+#___________________________________________________________________________________________________________________________________________
 method CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events {UDN service_id ID_subscribe CB} {
 	if {![regexp {^http://(.*):(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP PORT]} {
 		 if {![regexp {^http://(.*)$} [this get_item_of_dict_devices [list $UDN IP_port]] reco IP]} {puts stderr "No port specified in $objName Subscribe_to_UPNP_events $UDN"; return;}
@@ -198,9 +226,11 @@ Content-Length: 0
 			 set S [socket -async $IP $PORT]
 			 fconfigure $S -blocking 0
 			 fileevent $S writable "puts $S [list $msg]; flush $S; fileevent $S writable {}; fileevent $S readable \[list $objName Read_UPNP_subscribe_to_eventing_response $S $UDN $service_id\];"
-			}
+			 set do_reEmit 0
+			} else {set do_reEmit 1}
 			
 		 this Add_eventing_CB $UDN $service_id $ID_subscribe $CB
+		 if {$do_reEmit} {this ReEmitLastEvent_of $UDN $service_id}
 		}
 }
 # Trace CometUPNP_PM_FC_intelbased Subscribe_to_UPNP_events
@@ -230,6 +260,11 @@ method CometUPNP_PM_FC_intelbased Read_UPNP_subscribe_to_eventing_response {S UD
 	 set TIMEOUT [dict get $dict_rep "TIMEOUT:"]
 		regexp {^Second-(.*)$} $TIMEOUT reco TIMEOUT
 	 dict set this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT $TIMEOUT
+	 
+	 dict set this(D_UPNP_Subscription) UUID $UUID UDN        $UDN
+	 dict set this(D_UPNP_Subscription) UUID $UUID service_id $service_id
+	 dict set this(D_UPNP_Subscription) UUID $UUID last_event ""
+	 dict set this(D_UPNP_Subscription) UDN  $UDN  $service_id $UUID
 	 
 	 # Launch a timer to subscribe again...
 	 after [expr [dict get $this(UPNP_eventing_CB,${UDN},${service_id}) TIMEOUT]*1000 - 10000] [list puts "RESUBSCRIBE IS NEEDED FOR $UDN $service_id"]
