@@ -425,7 +425,7 @@ proc B207_Line_v {n {align left}} {
      $nf Calculer_boites
      #$nf Afficher_boites 1
      set boite_out [$nf Boite_noeud_et_fils_glob]
-     set boite_in  [$nf Boite_noeud_et_fils]
+     set boite_in  [$nf Boite_noeud_et_fils]     
        set v [expr $y - [$boite_in BG_Y]]; if { abs([$nf Py] - $v) > 0.0001 } {$nf Py $v}
 	   switch $align {
 	     left   {set v [expr -[$boite_in BG_X]]                 ; if { abs([$nf Px] - $v) > 0.0001 } {$nf Px $v} }
