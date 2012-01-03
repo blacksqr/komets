@@ -191,7 +191,7 @@ method CometUPNP_PM_FC_intelbased ReEmitLastEvent_of {UDN service_id} {
 	if {[catch {set UUID       [dict get $this(D_UPNP_Subscription) UDN $UDN $service_id]
 			    set last_event [dict get $this(D_UPNP_Subscription) UUID $UUID last_event]
 			    if {$last_event != ""} {this Apply_CB_for_UPNP_event $UUID $last_event}
-			   } err]} {puts stderr "Error while re-emiting event for $UDN -> $service_id"}
+			   } err]} {puts stderr "Error while re-emiting event for $UDN -> $service_id :\n$err"}
 }
 
 #___________________________________________________________________________________________________________________________________________
