@@ -76,7 +76,12 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
  set tx [this get_video_width]
  set ty [this get_video_height]
  
- if {$s != "WEBCAM"} {
+ set num_cam 0
+ if {$s == "WEBCAM" || [regexp {^WEBCAM([0-9])$} $s reco num_cam]} {
+	 set is_webcam 1
+	} else {set is_webcam 0}
+ 
+ if {!$is_webcam} {
    $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 [this get_last_buffer]
    
    set texture [$this(img) Info_texture]
@@ -116,6 +121,8 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_BIGre Update_B207_img {} {
  if {$this(img_has_to_be_updated)} {
+   if {[this get_video_source] == "WEBCAM" && ![[this get_visu_cam] EstPret]} {puts "Camera not ready"; return}
+   
    $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
    this decr_buffer_use $this(buffer_for_update)
    set this(buffer_for_update) ""

@@ -1,6 +1,6 @@
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-#_______________________________________________ Définition of the presentations __________________________________________________
+#_______________________________________________ Définition of the presentations ___________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 inherit Video_PM_FC_ffmpeg Physical_model
@@ -125,10 +125,15 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
    FFMPEG_Close_video_stream       $tmp_id
    puts "End of closing"
   }
+  
+ set num_cam 0
+ if {$s == "WEBCAM" || [regexp {^WEBCAM([0-9])$} $s reco num_cam]} {
+	 set is_webcam 1
+	} else {set is_webcam 0}
 
- if {$s == "WEBCAM"} {
+ if {$is_webcam} {
    set this(ffmpeg_id) ""
-   set visu_cam [Visu_Cam]; set this(visu_cam) $visu_cam
+   set visu_cam [Visu_Cam $num_cam]; set this(visu_cam) $visu_cam
 	   set texture [$visu_cam Info_texture]
 	   set tx [$texture Taille_reelle_x]; if {$tx == 0} {set tx 1}
 	   set ty [$texture Taille_reelle_y]; if {$ty == 0} {set ty 1}
