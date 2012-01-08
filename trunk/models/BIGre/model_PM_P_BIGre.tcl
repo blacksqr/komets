@@ -117,7 +117,7 @@ method PM_BIGre Etirement {ex {ey ""}} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre Show_elements_prims {b L_prims} {
- foreach p $L_prims {$p Afficher_noeud $b; $p Gerer_contacts $b; $p Ne_pas_pre_rendre [expr 1-$b]}
+ foreach p $L_prims {$p Afficher_noeud $b; $p Gerer_contacts $b; $p Ne_pas_pre_rendre [expr 1-$b]; $p Pre_rendu_exeptionnel $b}
 }
 
 #___________________________________________________________________________________________________________________________________________
