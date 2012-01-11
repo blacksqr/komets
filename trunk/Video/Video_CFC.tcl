@@ -17,6 +17,7 @@ method Video_CFC constructor {} {
  set this(video_framerate) 0
  set this(video_nbFrames)  0
  set this(num_frame)       0
+ set this(video_time_base) 0
  
  set this(B207_texture)    ""
  set this(visu_cam)        ""
@@ -29,7 +30,7 @@ method Video_CFC constructor {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_CFC [list num_frame mode audio_canal video_source L_infos_sound video_nbFrames video_width video_height last_buffer cb_audio nb_channels sample_rate video_framerate B207_texture visu_cam]
+Generate_accessors Video_CFC [list video_time_base num_frame mode audio_canal video_source L_infos_sound video_nbFrames video_width video_height last_buffer cb_audio nb_channels sample_rate video_framerate B207_texture visu_cam]
 
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC set_video_source {src canal} {
@@ -96,6 +97,7 @@ proc P_L_methodes_get_Video {} {return [list {get_L_infos_sound { }} {get_video_
 											 {get_B207_texture {}} {get_visu_cam {}} \
 											 {get_resolution {}} \
 											 {get_num_frame {}} \
+											 {get_video_time_base {}} \
 											 {get_cb_audio {}} {get_nb_channels {}} {get_sample_rate {}} {get_video_framerate {}} \
 											 ]}
 proc P_L_methodes_set_Video {} {return [list {set_L_infos_sound {v}} {set_video_width {v}} {set_video_height {v}} {set_video_source {s audio_canal}} \
@@ -104,6 +106,7 @@ proc P_L_methodes_set_Video {} {return [list {set_L_infos_sound {v}} {set_video_
 											 {set_audio_canal {v}} \
 											 {set_B207_texture {v}} {set_visu_cam {v}} \
 											 {set_resolution {x y}} \
+											 {set_video_time_base {v}} \
 											 {set_cb_audio {v}} {set_nb_channels {v}} {set_sample_rate {v}} {set_video_framerate {v}} \
 											 ]}
 

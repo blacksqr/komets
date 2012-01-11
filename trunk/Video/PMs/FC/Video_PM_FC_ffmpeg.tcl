@@ -155,6 +155,8 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 			 error $error_message
 			}
           
+		  
+		  
           FFMPEG_set_Synchronisation_threshold $this(ffmpeg_id) 0.11
           set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
           set tx [FFMPEG_Width  $this(ffmpeg_id)]
@@ -188,7 +190,12 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  this Init_Pool_video_buffer   30
 		  
 		  this go_to_frame 0
-		  
+		  # Video information
+		  set this(video_time_base) [FFMPEG_get_Video_time_base $this(ffmpeg_id)]
+		  puts "video_time_base = $this(video_time_base)"
+		  this prim_set_video_time_base $this(video_time_base)
+		  puts "video_time_base = $this(video_time_base) ... [this get_video_time_base]"
+
 		  if {$unlock} {puts "UnLock"; FFMPEG_UnLock $this(ffmpeg_id)}
           puts "Info audio (Video_PM_P_BIGre $objName):\n\tbuf_len : $buf_len\n\tframerate : [FFMPEG_getFramerate $this(ffmpeg_id)]\n\tSample rate : $sample_rate\n\tnb channels : [FFMPEG_Nb_channels $this(ffmpeg_id)]\n\tcb_audio : $cb_audio\n\tnb frames : [FFMPEG_get_nb_total_video_frames $this(ffmpeg_id)]\n\tbuffer size : [FFMPEG_Audio_buffer_size $this(ffmpeg_id)]"
 		  this Update_frame 1
@@ -209,9 +216,20 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
  
  set this(is_updating) 1
  
+ # Faire une vérification avec l'information ptd de la video plutot...
  set ms [clock milliseconds]; 
+ set dt [expr $ms - [this get_ffmpeg_start_ms]]
+ lassign [this get_readable_video_buffer] current_video_pts buf_r
+ set current_video_dt [expr $current_video_pts * $this(video_time_base)]
+ if {($dt + 5)/1000.0 >= $current_video_dt} {set force_update 1}
+ #set pts_update
+ # puts "Next video pts : $current_video_dt  /  time = $dt"
+ 
  set num [expr int(($ms - [this get_ffmpeg_start_ms])*$this(ffmpeg_frame_rate)/1000.0)]
- if {$force_update || $num != [this get_ffmpeg_frame_num]} {
+ if {$force_update } {
+		#|| $num != [this get_ffmpeg_frame_num]
+		set num [expr 1+[this get_ffmpeg_frame_num]]
+ 
    # get images and put them from readable buffer
    lassign [this get_readable_video_buffer] current_video_pts buf_r
    this set_ffmpeg_frame_num        $num; [this get_Common_FC] set_num_frame $num
