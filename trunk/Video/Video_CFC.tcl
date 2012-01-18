@@ -49,7 +49,7 @@ method Video_CFC Stop        {} {set this(mode) "STOP"}
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC go_to_time  {t}  {}
 #___________________________________________________________________________________________________________________________________________
-method Video_CFC go_to_frame {nb} {}
+method Video_CFC go_to_frame {nb {set_video_pts 1}} {}
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC Update_image {buffer} {}
 
@@ -101,7 +101,7 @@ proc P_L_methodes_get_Video {} {return [list {get_L_infos_sound { }} {get_video_
 											 {get_cb_audio {}} {get_nb_channels {}} {get_sample_rate {}} {get_video_framerate {}} \
 											 ]}
 proc P_L_methodes_set_Video {} {return [list {set_L_infos_sound {v}} {set_video_width {v}} {set_video_height {v}} {set_video_source {s audio_canal}} \
-                                             {Close_video {}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} {Update_image {buffer}} \
+                                             {Close_video {}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb {set_video_pts 1}}} {Update_image {buffer}} \
 											 {set_video_nbFrames {v}} \
 											 {set_audio_canal {v}} \
 											 {set_B207_texture {v}} {set_visu_cam {v}} \

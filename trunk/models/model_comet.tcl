@@ -192,8 +192,7 @@ proc Methodes_get_LC {classe L_methodes o_reference} {
                                  set params       [lindex $methode 1]
                                  append cmd $methode_name " \{"
                                  #// Adding parameters
-                                 foreach param $params {#// Managing the parameters
-                                                        append cmd $param " "}
+                                 append cmd $params
                                append cmd "\} \{"
                                  #// Default comportment is to call equivalent funcion for each Logical Model
                                  append cmd {return [} $o_reference { } $methode_name { }
@@ -217,8 +216,7 @@ proc Methodes_set_LC {classe L_methodes o_reference attrib_L} {
                                  set params       [lindex $methode 1]
                                  append cmd $methode_name " \{"
                                  #// Adding parameters
-                                 foreach param $params {#// Managing the parameters
-                                                        append cmd $param " "}
+								 append cmd $params
                               append cmd "\} \{"
                                 if {$o_reference != ""} {
                                   append cmd $o_reference { } $methode_name { }
