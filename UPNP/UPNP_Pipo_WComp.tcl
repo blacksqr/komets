@@ -306,6 +306,7 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name UDN upnp_var_name
 				 foreach var_name $L_var_name {
 					  dict set this(MultiInput_for_$rule_name) var $var_name var_defined 1
 					  dict set this(MultiInput_for_$rule_name) var $var_name value [set $upnp_var_name]
+					  puts "set $var_name [set $upnp_var_name]"
 					 }
 				}
 			}
@@ -325,7 +326,9 @@ method Pipo_WComp MultiInput_Trigger_CB_after_event {rule_name UDN upnp_var_name
 			}
 		 
 		 # Trigger Callback?
-		 if {$CB_processable} {if {[catch {eval $CB} err]} {puts stderr "Error inside the callback of MultiInput rule $rule_name :\n\terr : $err"}}
+		 if {$CB_processable} {
+			 if {[catch {eval $CB} err]} {puts stderr "Error inside the callback of MultiInput rule $rule_name :\n\terr : $err"}
+			}
 		} else {puts "\tno var found...bypass"}
 }
 # Trace Pipo_WComp MultiInput_Trigger_CB_after_event
