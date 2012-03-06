@@ -12,10 +12,21 @@ var tuio = {
 		 this.Tab = L;
 		 this.length = L.length;
 		 this.item = function(i) {return this.Tab[i];}
-		 this.push = function(e) {return this.Tab.push(e);}
+		 this.splice = function(index, nb) {
+			 this.Tab.splice(index, nb);
+			 this.length = this.Tab.length;
+			},
+		 this.identifiedTouch = function(id) {
+			 for(var i = 0; i < this.length; i++) {
+				 if(this.Tab[i].identifier == id) return this.Tab[i];
+				}
+			 return null;
+			}
+		 this.push = function(e) {this.Tab.push(e); this.length = this.Tab.length;}
 		 this.setTarget = function(i, n) {return this.Tab[i].target = n;}
 		},
-	cursors: [],
+		
+	cursors: null, //[],
 
   // Data structure for associating cursors with objects
 	_data: {},
@@ -120,7 +131,11 @@ var tuio = {
 
 			case 5:
 				// console.log('a pointer disappears... data: ' + data);
-				this.cursors.splice(this.cursors.indexOf(data), 1);
+				var index_of_touch;
+				for(index_of_touch = 0; index_of_touch < this.cursors.length; index_of_touch++) {
+					 if(this.cursors.item(index_of_touch).identifier == data.identifier) break;
+					}
+				this.cursors.splice(index_of_touch, 1);
 				this._touchend(data);
 				break;
 
@@ -134,6 +149,8 @@ var tuio = {
 	}
 
 };
+
+tuio.cursors = new tuio.Pipo_TouchList([]);
 
 function tuio_callback(type, sid, fid, x, y, angle)	{
 	tuio.callback(type, sid, fid, x, y, angle);

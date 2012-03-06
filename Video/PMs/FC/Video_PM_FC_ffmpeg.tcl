@@ -47,6 +47,8 @@ method Video_PM_FC_ffmpeg constructor {name descr args} {
       
    # Synchronization
    set this(is_go_to_frame) 0
+   set this(last_dt)  0
+   set this(delta_sync_audio_video) 0
    
  # Terminate with configuration's parameters
  eval "$objName configure $args"
@@ -79,7 +81,7 @@ Inject_code Video_PM_FC_ffmpeg Pause {} {}
 Inject_code Video_PM_FC_ffmpeg Stop  {} {
  set this(will_reupdate) 0
  FFMPEG_set_Video_pts_for_audio $this(ffmpeg_id) 0
- this go_to_frame 0 0
+ this go_to_frame 0
  this Update_frame 1
  set this(will_reupdate) 0
 }
@@ -100,12 +102,19 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
    
    FFMPEG_Info_for_sound_Drain_all     $this(ffmpeg_id); FFMPEG_set_Video_pts_for_audio $this(ffmpeg_id) 0
    
+   set this(delta_sync_audio_video) [this get_sync_audio_video]; puts "delta_sync_audio_video : $this(delta_sync_audio_video)"
+   
    set this(ffmpeg_frame_num) $nb; [this get_Common_FC] set_num_frame $nb
    lassign [this get_readable_video_buffer] current_video_pts buf_r
    FFMPEG_Lock       $this(ffmpeg_id)
-   FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r
+   # for {set i 0} {$i < 30} {incr i} {
+	 set rep [FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r]
+   # }
+   # puts "FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r\n\t-> $rep"
    FFMPEG_UnLock     $this(ffmpeg_id)
+   this Next_video_buffer
    this Fill_video_pool
+   this Update_frame 1
 
    lassign [this get_readable_video_buffer] current_video_pts buf_r
    set current_video_dt [expr $current_video_pts * $this(video_time_base)]
@@ -122,6 +131,25 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
   }
 }
 # Trace Video_PM_FC_ffmpeg go_to_frame
+
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_FC_ffmpeg get_sync_audio_video {} {
+   set T0 [FFMPEG_get_first_time      $this(ffmpeg_id)]
+   set nb [FFMPEG_get_num_last_buffer $this(ffmpeg_id)]
+
+   set ch [FFMPEG_Nb_channels         $this(ffmpeg_id)]
+   set rt [FFMPEG_Sound_sample_rate   $this(ffmpeg_id)]
+   
+   set dt [FFMPEG_get_delta_from_first_time $this(ffmpeg_id)]
+   set dt_pkt [expr 8192.0 / (2 * $ch * $rt)]
+   
+   set computed_nb [expr int($dt / $dt_pkt)]
+   
+   set next_time_audio_pkt [expr (1 + $nb) * $dt_pkt]
+   
+   puts "\t$dt_pkt s  -> [expr $nb - $computed_nb] pkt préchargés soit [expr ($nb - $computed_nb) * $dt_pkt]"
+   return [expr $next_time_audio_pkt - $dt]
+}
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg set_resolution {x y} {
@@ -247,14 +275,19 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
 	 set dt [FFMPEG_get_delta_from_t0 $this(ffmpeg_id)]
 	 lassign [this get_readable_video_buffer] current_video_pts buf_r
 	 set current_video_dt [expr $current_video_pts * $this(video_time_base)]
-	 if {($dt + 0.005) >= $current_video_dt} {set force_update 1; set num [expr 1+[this get_ffmpeg_frame_num]]} else {set num [this get_ffmpeg_frame_num]}
+	 if {($dt - $this(delta_sync_audio_video) + 0.005) >= $current_video_dt} {set force_update 1; set num [expr 1+[this get_ffmpeg_frame_num]]} else {set num [this get_ffmpeg_frame_num]}
 
+	 # if {$this(last_dt) == $dt} {puts "Two time the same dt???"} else {puts "$dt |${num}| $current_video_dt"}
+	 # set this(last_dt) $dt
+	 
 	 if {$force_update } {
 	   # get images and put them from readable buffer
 	   lassign [this get_readable_video_buffer] current_video_pts buf_r
 	   this set_ffmpeg_frame_num        $num; [this get_Common_FC] set_num_frame $num
 	   this set_last_buffer             $buf_r
 	   this prim_Update_image           $buf_r
+
+	   # puts "Update image num=$num\n\t- $this(index_current_video_buffer) : $buf_r"
 	 
 	   lassign [this get_writable_video_buffer] video_pts buf_w
 	   FFMPEG_Lock     $this(ffmpeg_id)
@@ -302,7 +335,7 @@ method Video_PM_FC_ffmpeg Init_Pool_video_buffer {nb} {
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg Fill_video_pool {} {
- for {set i 0} {$i < ($this(nb_video_buffers) / 2)} {incr i} {
+ for {set i 0} {$i < ($this(nb_video_buffers)/2)} {incr i} {
    set index [expr ($this(index_current_video_buffer) + $i) % $this(nb_video_buffers)]
    lassign [this get_video_buffer_indexed $index] video_pts buf
    
@@ -310,6 +343,16 @@ method Video_PM_FC_ffmpeg Fill_video_pool {} {
    set video_pts [FFMPEG_get_Video_pts $this(ffmpeg_id)]
    
    this set_video_buffer_indexed $index [list $video_pts $buf]
+   # puts "\t- $index : $video_pts $buf"
+  }
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Video_PM_FC_ffmpeg Display_video_pool {} {
+ for {set i 0} {$i < $this(nb_video_buffers)} {incr i} {
+   set index [expr ($this(index_current_video_buffer) + $i) % $this(nb_video_buffers)]
+   lassign [this get_video_buffer_indexed $index] video_pts buf
+   puts "\t- $index : $video_pts $buf"
   }
 }
 
