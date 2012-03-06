@@ -72,5 +72,6 @@ method Pipo_UPNP_Button PressButton {} {
 	set this(state_button) 0
 	this Emit_event urn:upnp-org:serviceId:Button [list Value $this(state_button)]
 	set this(state_button) 1
+	this Emit_event urn:upnp-org:serviceId:Button [list Value $this(state_button)]
 }
 # Trace Pipo_UPNP_Button PressButton
