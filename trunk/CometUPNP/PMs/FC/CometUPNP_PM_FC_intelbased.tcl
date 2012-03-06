@@ -328,7 +328,9 @@ method CometUPNP_PM_FC_intelbased new_UPNP_message {msg_name} {
 				     }
     UPNP_server_port {set this(UPNP_server_port) $UDN; puts "\n____________________________________________________________________\nUPNP_server_port : $this(UPNP_server_port)"}
 	         ERROR   {puts stderr "ERROR from UPNP :\n$msg"}
-			 INFOS	 {puts "UPNP $msg"}
+			 INFOS	 {
+						# puts "UPNP $msg"
+					 }
 	}
 }
 
