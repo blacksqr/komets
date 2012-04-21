@@ -469,8 +469,8 @@ method PhysicalHTML_root Render {strm_name {dec {}}} {
  this Render_daughters rep "$dec  "
  
  if {![this get_html_compatibility_strict_mode]} {
-	 append rep "  " "  " {<p id="p_debug" style="display:block;"></p>}
-	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:block; width:100%; height:100px;"></textarea>}
+	 append rep "  " "  " {<p id="p_debug" style="display:none;"></p>}
+	 append rep "  " "  " {<textarea id="Ajax_Raw" style="display:none; width:100%; height:100px;"></textarea>}
 	 append rep "  " "  " <form [this Style_class] {name="root" method="post" action="} [this get_PHP_page] {">} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="} $this(server_port) {" id="Comet_port" name="Comet_port" />} "\n"
 	 append rep "  " "  " "  " {<input type="hidden" value="" id="IP_client" name="IP_client" />} "\n"

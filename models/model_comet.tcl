@@ -573,6 +573,14 @@ Inject_code Comet_element set_GDD_id {
 } {} __ADD_RELATED_STYLE__
 
 #_________________________________________________________________________________________________________
+method Comet_element set_default_css_style_file {v} {
+	if {$v != $this(default_css_style_file)} {
+		 set this(default_css_style_file) $v
+		 set this(default_css_style_still_applied) 0
+		}
+}
+
+#_________________________________________________________________________________________________________
 method Comet_element Apply_default_style {} {
  Apply_style_on $objName [list] [this get_default_op_gdd_file] [this get_default_css_style_file]
  set this(default_css_style_still_applied) 1
@@ -1455,6 +1463,12 @@ method Logical_consistency get_fct_is_validable {}  {return [$this(FC) get_fct_i
 method Logical_consistency set_fct_is_validable {v} {$this(FC) set_fct_is_validable $v; return $v}
 
 #_________________________________________________________________________________________________________
+method Logical_consistency set_default_css_style_file {v} {
+	this inherited $v
+	foreach LM [this get_L_LM] {$LM set_default_css_style_file $v}
+}
+
+#_________________________________________________________________________________________________________
 #____________________________________________ Logical model_______________________________________________
 #_________________________________________________________________________________________________________
 inherit Logical_model Comet_element
@@ -2113,8 +2127,15 @@ method Logical_model Is_PM_active {PM} {
 }
 
 #_________________________________________________________________________________________________________
+method Logical_model set_default_css_style_file {v} {
+	this inherited $v
+	foreach PM [this get_L_actives_PM] {$PM set_default_css_style_file $v}
+}
+
+#_________________________________________________________________________________________________________
 method Logical_model set_PM_active   {PM} {set added [Add_element this(L_actives_PM) $PM]
-                                           if {$added} {# Add PM in the hierarchy
+                                           $PM set_default_css_style_file [this get_default_css_style_file]
+										   if {$added} {# Add PM in the hierarchy
                                                         this Add_PM $PM
                                                         $PM set_LM $objName
 														#catch {$PM Hide_Elements}
@@ -2875,7 +2896,11 @@ method Physical_model soft_type {} {return [${objName}_cou_ptf get_soft_type]}
 
 #_________________________________________________________________________________________________________
 method Physical_model get_or_create_prims {root} {return [this get_prim_handle]}
-method Physical_model Add_prim_mother   {c Lprims {index -1}} {return 1}
+method Physical_model Add_prim_mother   {c Lprims {index -1}} {
+	if {!$this(default_css_style_still_applied)} {this Apply_default_style}
+	return 1
+	}
+# Trace Physical_model Add_prim_mother
 method Physical_model Sub_prim_mother   {c Lprims {index -1}} {return 1}
 method Physical_model Add_prim_daughter {c Lprims {index -1}} {set rep 1
                                                              foreach p $Lprims {
@@ -2922,6 +2947,7 @@ global debug
                                                                              if {$prev_exists} {
                                                                                if {[$m Is_still_branched_to $root]} {
                                                                                  if {$debug} {puts "    STILL BRANCHED"}
+																				 $m   Add_prim_mother   $objName $root
 																				 return 2
                                                                                 } else {if {$debug} {puts "    PREV EXISTS"
 																				                     puts "    $objName Add_prim_daughter $m       $prim_daughters $index"
@@ -2929,7 +2955,7 @@ global debug
 																				        this Add_prim_daughter $m       $prim_daughters $index
 																						if {$debug} {puts "    $m   Add_prim_mother   $objName $root"}
                                                                                         $m   Add_prim_mother   $objName $root
-                                                                                        return 1
+																						return 1
                                                                                        }
                                                                               } else {
 																			     if {$debug} {puts "    NON PREV EXISTS"}
