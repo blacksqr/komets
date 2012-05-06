@@ -82,7 +82,8 @@ var tuio = {
   _get_target_touches: function(element) {
     var targetTouches = new this.Pipo_TouchList([]);
     for (var i = 0; i < this.cursors.length; i++) {
-      var touch = this.cursors[i];
+      var touch = this.cursors.item(i);
+	  // console.log('touch = cursor[' + i + '] = ' + touch);
       if (touch.target == element) {
         targetTouches.push(touch);
       }
