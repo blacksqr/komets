@@ -7,9 +7,9 @@ inherit PM_SVG PM_HTML
 method PM_SVG constructor {name descr args} {
  this inherited $name $descr
  [[this get_cou] get_ptf] maj Ptf_SVG
- set this(drag_function) ""
- set this(L_draggable) [list ]
-
+ set this(drag_function)  ""
+ set this(L_draggable)    [list ]
+ set this(L_rotozoomable) [list ]
 }
 
 #_________________________________________________________________________________________________________
@@ -99,23 +99,25 @@ method PM_SVG Generate_windows_descr {id x y width height border_width str_svg_n
 }
 
 #___________________________________________________________________________________________________________________________________________
-method PM_SVG Draggable {SVG_group L_drag_element {direct_mode 1}} {
- if {$direct_mode == 1  &&  $L_drag_element == $this(L_draggable)} {return ""}
+method PM_SVG Draggable {SVG_group L_drag_element {fct_start null} {fct_drag null} {fct_stop null}} {
+ if {$L_drag_element == $this(L_draggable)} {return ""}
+ set this(L_draggable) $L_drag_element
  
- set cmd ""
- foreach n $this(L_draggable) {
-	append cmd "\$('#$n').draggable('destroy');\n"
- }
- 
- set this(L_draggable) $L_drag_element 
- foreach n $this(L_draggable) {
-	 append cmd "document.getElementById('$n').setAttribute('onmousedown', \"COMET_SVG_start_drag('${SVG_group}', '${n}', evt);\");"
- }
- 
- if {$direct_mode == 1} {
-	this send_jquery_message "Draggable" $cmd 
-  }
+ set cmd "Draggable('${SVG_group}', \['[join $L_drag_element {, }]'\], ${fct_start}, ${fct_drag}, ${fct_stop});\n"
+ this set_after_render_js  Draggable $cmd
+ this send_jquery_message "Draggable$objName" $cmd 
   
  return $cmd
 }
 
+#___________________________________________________________________________________________________________________________________________
+method PM_SVG RotoZoomable {SVG_group L_rotozoomable_elements} {
+ if {$L_rotozoomable_elements == $this(L_rotozoomable)} {return ""}
+ set this(L_rotozoomable) $L_rotozoomable_elements
+ 
+ set cmd "RotoZoomable('${SVG_group}', \['[join $L_rotozoomable_elements {, }]'\], null, null, null, null, null, null);\n"
+ this set_after_render_js  RotoZoomable $cmd
+ this send_jquery_message "RotoZoomable$objName" $cmd 
+  
+ return $cmd
+}

@@ -85,9 +85,15 @@ eval $cmd
 #___________________________________________________________________________________________________________________________________________
 method PM_Universal Render {strm_name {dec {}}} {
  upvar $strm_name strm
- append strm $dec "<div [this Style_class]>\n"
-   this Render_daughters strm $dec
- append strm $dec "</div>\n"
+ if {[${objName}_cou_ptf get_daughter_soft_type] == "PHP_HTML"} {
+	 append strm $dec "<div [this Style_class]>\n"
+	   this Render_daughters strm $dec
+	 append strm $dec "</div>\n"
+	} else  {
+			 append strm $dec "<g [this Style_class]>\n"
+			   this Render_daughters strm $dec
+			 append strm $dec "</g>\n"
+			}
 }
 
 #___________________________________________________________________________________________________________________________________________

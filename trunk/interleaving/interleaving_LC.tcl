@@ -91,7 +91,9 @@ method LogicalInterleaving constructor {name descr args} {
                                                              {Interleaving_PM_P_HTML Ptf_HTML}                \
                                                              {CometInterleaving_PM_P_ALX_TXT Ptf_ALX_TXT}     \
 															 {Interleaving_PM_P_FLEX Ptf_FLEX}				  \
+															 {CometInterleaving_PM_P_basic_SVG Ptf_SVG} 	  \
                                                        ] $objName]
+													   
 
 # Managing the subCOmets names
  set this(num_sub) 0

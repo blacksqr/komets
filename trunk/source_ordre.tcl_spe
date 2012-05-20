@@ -45,8 +45,10 @@ if {[catch {set_B207_files_root $::env(B207_LIBRARY)/} err]} {puts "Impossible t
 #___________________________________________________________________________________________________________________________________________
 source gml_Object.tcl
 
-Comet_files_root     [pwd]/../
-
+set current_path [pwd]
+	cd ..
+	Comet_files_root     [pwd]/
+cd $current_path
 
 cd models
   eval [source_recusrif models]

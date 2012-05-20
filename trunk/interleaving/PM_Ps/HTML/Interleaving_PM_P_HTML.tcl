@@ -20,18 +20,18 @@ method Interleaving_PM_P_HTML Render {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method Interleaving_PM_P_HTML maj_interleaved_daughters {} {}
 
-method Container_PM_P_HTML Column {nb} {
-    if {$nb > 1} {
-	this add_html_style [list "-moz-column-count" "$nb"]
-	this add_html_style [list "-webkit-column-count" "$nb"] 
-   }
-}
-method PM_HTML Border {width style color {radius {}}} {
-	lassign $color r g b a 	
-	this add_html_style [list "border" "${width}px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
-	if {$radius != {}} {
-		this add_html_style [list "-moz-border-radius" "${radius}px"];
-		this add_html_style [list "-webkit-border-radius" "${radius}px"];
-		this add_html_style [list "border-radius" "${radius}px"];
-	}
-}
+# method Container_PM_P_HTML Column {nb} {
+    # if {$nb > 1} {
+	# this add_html_style [list "-moz-column-count" "$nb"]
+	# this add_html_style [list "-webkit-column-count" "$nb"] 
+   # }
+# }
+# method PM_HTML Border {width style color {radius {}}} {
+	# lassign $color r g b a 	
+	# this add_html_style [list "border" "${width}px $style rgba([expr int(256 * $r)],[expr int(256 * $g)],[expr int(256 * $b)],$a)"];
+	# if {$radius != {}} {
+		# this add_html_style [list "-moz-border-radius" "${radius}px"];
+		# this add_html_style [list "-webkit-border-radius" "${radius}px"];
+		# this add_html_style [list "border-radius" "${radius}px"];
+	# }
+# }

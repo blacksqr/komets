@@ -8,6 +8,7 @@ method LogicalImage constructor {name descr args} {
 															 {Image_PM_P_BIGre Ptf_BIGre}  \
                                                              {Image_PM_P_HTML Ptf_HTML}    \
 															 {Image_PM_P_FLEX Ptf_FLEX}	   \
+															 {Image_PM_P_SVG Ptf_SVG} 	   \
                                                        ] $objName]
 
  eval "$objName configure $args"
