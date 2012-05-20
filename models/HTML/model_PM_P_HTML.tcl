@@ -10,9 +10,10 @@ method PM_HTML constructor {name descr args} {
  set ptf [$this(cou) get_ptf]
  $ptf maj Ptf_HTML
 
- set this(L_tags)        {}
- set this(embeded_style) {}
- set this(html_style)    {}
+ set this(L_tags)          {}
+ set this(embeded_style)   {}
+ set this(html_style)      {}
+ set this(after_render_js) [dict create]
  
  set this(id_for_style)  $objName
 
@@ -34,6 +35,17 @@ method PM_HTML constructor {name descr args} {
 # eval "$objName configure $args"
 }
 
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML get_after_render_js {key} {if {$key == ""} {return $this(after_render_js)} else {return [dict get $this(after_render_js) $key]}}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML set_after_render_js {key js_cmd} {dict set this(after_render_js) $key $js_cmd}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_HTML unset_after_render_js {key} {dict unset this(after_render_js) $key}
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML load_HTML_from_file        {file_name L_maps} {
  set   f [open $file_name r]
@@ -186,13 +198,14 @@ method PM_HTML Render_all {strm_name {dec {}}} {
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Render {strm_name {dec {}}} {
  upvar $strm_name strm
-this MAGELLAN_Designer_constraint
+ this MAGELLAN_Designer_constraint
  this Render_daughters strm $dec
 }
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Render_post_JS {strm_name {dec {}}} {
  upvar $strm_name strm
+ dict for {k v} $this(after_render_js) {append strm $v "\n"}
  this Render_daughters_post_JS strm $dec
 }
 

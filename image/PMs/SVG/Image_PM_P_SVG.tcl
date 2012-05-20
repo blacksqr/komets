@@ -1,22 +1,22 @@
 #_________________________________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-inherit Image_PM_P_HTML PM_HTML
+inherit Image_PM_P_SVG PM_SVG
 #___________________________________________________________________________________________________________________________________________
-method Image_PM_P_HTML constructor {name descr args} {
+method Image_PM_P_SVG constructor {name descr args} {
  this inherited $name $descr
-   this set_GDD_id CT_Image_AUI_CUI_basic_HTML
+   this set_GDD_id CT_Image_FUI_basic_SVG
  eval "$objName configure $args"
  return $objName
 }
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
-Methodes_set_LC Image_PM_P_HTML [P_L_methodes_set_Image] {} {}
-Methodes_get_LC Image_PM_P_HTML [P_L_methodes_get_Image] {$this(FC)}
+Methodes_set_LC Image_PM_P_SVG [P_L_methodes_set_Image] {} {}
+Methodes_get_LC Image_PM_P_SVG [P_L_methodes_get_Image] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-method Image_PM_P_HTML get_img_file_name {} {
+method Image_PM_P_SVG get_img_file_name {} {
  set img_path [[this get_Common_FC] get_img_file_name]
  set comet_path [Comet_files_root]
  set length [string length $comet_path]
@@ -26,7 +26,7 @@ method Image_PM_P_HTML get_img_file_name {} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Image_PM_P_HTML load_img {v} {
+method Image_PM_P_SVG load_img {v} {
  set root    [this get_L_roots] 
  set methode "attr"
  set cmd     "\$('#$objName').attr('src','$v');\n"
@@ -37,19 +37,28 @@ method Image_PM_P_HTML load_img {v} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-method Image_PM_P_HTML Render {strm_name {dec {}}} {
+method Image_PM_P_SVG Render {strm_name {dec {}}} {
  upvar $strm_name strm
  
  set img_path   [this get_img_file_name]
  set comet_path [Comet_files_root]
  set length [string length $comet_path]
- if {[string equal -length $length [string tolower $comet_path] [string tolower $img_path]]} {
+ if {[string equal -nocase -length $length $comet_path $img_path]} {
    set img_path [string range $img_path $length end]
   }
  
- append strm "$dec" <img [this Style_class] { src="} $img_path {" alt="} [this get_name] {" />} "\n"
-
+ append strm $dec "<g [this Style_class] ><image id=\"core_$objName\" x=\"0\" y=\"0\" width=\"320px\" height=\"200px\" xlink:href=\"" $img_path "\" />\n"
  this Render_daughters strm "$dec  "
-
+ append strm $dec "</g>"
+ 
 }
 
+#___________________________________________________________________________________________________________________________________________
+method Image_PM_P_SVG Draggable {} {
+	this inherited $objName [list core_$objName]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Image_PM_P_SVG RotoZoomable {} {
+	this inherited $objName [list core_$objName]
+}

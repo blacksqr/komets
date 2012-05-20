@@ -691,7 +691,7 @@ method Comet_element get_L_roots {} {
 #_________________________________________________________________________________________________________
 method Comet_element Has_for_styles {Ls} {
  foreach s $Ls {
-   if {[this Has_for_style $s]} {} else {return 0}
+   if {![this Has_for_style $s]} {return 0}
   }
  return 1
 }

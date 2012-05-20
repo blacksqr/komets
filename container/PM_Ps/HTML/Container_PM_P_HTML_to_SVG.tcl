@@ -89,3 +89,13 @@ method Container_PM_P_HTML_to_SVG Render_JS {strm_name marker {dec {}}} {
  
  this Render_daughters_JS strm $marker $dec
 }
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG Draggable {} {
+	this inherited ${objName}_canvas_g_root [list ${objName}_canvas_g_root]
+}
+
+#___________________________________________________________________________________________________________________________________________
+method Container_PM_P_HTML_to_SVG RotoZoomable {} {
+	this inherited ${objName}_canvas_g_root [list ${objName}_canvas_g_root]
+}

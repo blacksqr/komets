@@ -25,3 +25,6 @@ proc U_fine_tuned_factory_for_encaps {LM ptf_for_mothers ptf_for_daughters PM_ty
  
  return $rep
 }
+
+# Add_U_fine_tuned_factory_for_encaps $objName Ptf_TK Ptf_TK_CANVAS CometGraphBuilder_PM_P_TK_CANVAS_basic {Container_FUI_bridge_TK_to_CANVAS_frame(,$obj())}
+# $obj Substitute_by [U_fine_tuned_factory_for_encaps [$obj get_LM] Ptf_HTML Ptf_SVG CometInterleaving_PM_P_basic_SVG {Container_FUI_bridge_HTML_to_SVG_frame(,$obj())}]
