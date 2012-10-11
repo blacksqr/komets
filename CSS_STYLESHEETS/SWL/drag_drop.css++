@@ -1,5 +1,10 @@
+#$current {
+	FCT_Eval : puts "Apply global style on $obj";
+}
+
 #$current[soft_type == BIGre] {
-  FCT_Eval : Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/B207_drag_drop.css++";
+  FCT_Eval : puts "B207 style Applied on $obj"
+		---  Apply_style_on $obj [list] "[Comet_files_root]Comets/CSS_STYLESHEETS/gdd/Common_GDD_requests.css++" "[Comet_files_root]Comets/CSS_STYLESHEETS/SWL/B207_drag_drop.css++";
 }
 
 
