@@ -1463,6 +1463,12 @@ method Logical_consistency get_fct_is_validable {}  {return [$this(FC) get_fct_i
 method Logical_consistency set_fct_is_validable {v} {$this(FC) set_fct_is_validable $v; return $v}
 
 #_________________________________________________________________________________________________________
+method Logical_consistency set_default_op_gdd_file {v} {
+	this inherited $v
+	foreach LM [this get_L_LM] {$LM set_default_op_gdd_file $v}
+}
+
+#_________________________________________________________________________________________________________
 method Logical_consistency set_default_css_style_file {v} {
 	this inherited $v
 	foreach LM [this get_L_LM] {$LM set_default_css_style_file $v}
@@ -2121,9 +2127,17 @@ method Logical_model Sub_daughter {m} {
  return $res
 }
 
+
 #_________________________________________________________________________________________________________
 method Logical_model Is_PM_active {PM} {
  return [expr [lsearch $this(L_actives_PM) $PM] != -1]
+}
+
+
+#_________________________________________________________________________________________________________
+method Logical_model set_default_op_gdd_file {v} {
+	this inherited $v
+	foreach PM [this get_L_actives_PM] {$PM set_default_op_gdd_file $v}
 }
 
 #_________________________________________________________________________________________________________
@@ -2134,6 +2148,7 @@ method Logical_model set_default_css_style_file {v} {
 
 #_________________________________________________________________________________________________________
 method Logical_model set_PM_active   {PM} {set added [Add_element this(L_actives_PM) $PM]
+										   $PM set_default_op_gdd_file    [this get_default_op_gdd_file]
                                            $PM set_default_css_style_file [this get_default_css_style_file]
 										   if {$added} {# Add PM in the hierarchy
                                                         this Add_PM $PM

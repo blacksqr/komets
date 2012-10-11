@@ -67,7 +67,11 @@ method CometSWL constructor {name descr args} {
  set this(LM_FC) ${objName}_LM_FC
  CometSWL_LM_FC $this(LM_FC) $this(LM_FC) "The LM FC of $name"
    this Add_LM $this(LM_FC)
-   
+
+   this set_default_op_gdd_file    [Comet_files_root]Comets/CSS_STYLESHEETS/GDD/Common_GDD_requests.css++
+   this set_default_css_style_file [Comet_files_root]Comets/CSS_STYLESHEETS/SWL/drag_drop.css++
+
+
  eval "$objName configure $args"
  return $objName
 }
