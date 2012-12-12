@@ -27,7 +27,7 @@ method LogicalVideo set_PM_active {PM} {
 }
 
 #___________________________________________________________________________________________________________________________________________
-proc P_L_methodes_set_Video_COMET_RE {} {return [list {set_video_source {s audio_canal}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} \
+proc P_L_methodes_set_Video_COMET_RE {} {return [list {set_delta_sync_audio_video {v}} {set_video_source {s audio_canal}} {Play {}} {Pause {}} {Stop {}} {go_to_time {t}} {go_to_frame {nb}} \
 											          ]}
 Generate_LM_setters LogicalVideo [P_L_methodes_set_Video_COMET_RE]
 

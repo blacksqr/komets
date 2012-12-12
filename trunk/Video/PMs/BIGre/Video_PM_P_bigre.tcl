@@ -94,8 +94,9 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
    this Origine $this(video_x) $this(video_y)
    
    # Audio with Fmod
-   set buf_len [expr int(2 * [this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
-   set buf_len 8192
+   # set buf_len [expr 2 * int([this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
+   set buf_len [expr 4*[FFMPEG_FSOUND_GetBufferLengthTotal]]
+   this prim_set_delta_sync_audio_video 0
    if {$buf_len > 0} {
 		   if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
 		   set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
