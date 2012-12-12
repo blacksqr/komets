@@ -24,6 +24,7 @@ proc P_L_methodes_set_Video_FC_COMET_RE {} {return [list {set_L_infos_sound {v}}
 														 {set_B207_texture {v}} {set_visu_cam {v}} \
 														 {set_resolution {x y}} \
 														 {set_video_time_base {v}} \
+														 {set_delta_sync_audio_video {v}} \
 														 ]}
 Generate_LM_setters LogicalVideo_FC [P_L_methodes_set_Video_FC_COMET_RE]
 

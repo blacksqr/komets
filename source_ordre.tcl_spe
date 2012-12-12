@@ -38,7 +38,7 @@ proc get_B207_files_root { } {global PM_BIGre_B207_files_root; return $PM_BIGre_
 proc set_B207_files_root {r} {global PM_BIGre_B207_files_root; set PM_BIGre_B207_files_root $r;}
 
  
-if {[catch {set_B207_files_root $::env(B207_LIBRARY)/} err]} {puts "Impossible to find in system variable the location of B207 library..."}
+if {[catch {set_B207_files_root $::env(B207_LIBRARY)} err]} {puts "Impossible to find in system variable the location of B207 library..."}
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________

@@ -92,7 +92,13 @@ method Video_PM_P_TK Play_audio_stream_locally {b} {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_TK Open_audio_stream {} {
  if {[this get_video_source] == ""} {return}
- set buf_len [expr int(2 * [this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
+ set buf_len [expr 2 * int([this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
+ set buf_len [expr 4*[FFMPEG_FSOUND_GetBufferLengthTotal]]
+ # set delta [expr [this get_nb_channels] * $buf_len / 4.0 / [this get_sample_rate]]
+ set delta 0
+ 
+ this prim_set_delta_sync_audio_video $delta
+ 
  if {$buf_len > 0} {
 	 if {[this get_nb_channels] == 2} {set mono_stereo [FFMPEG_FSOUND_Stereo]} else {set mono_stereo [FFMPEG_FSOUND_Mono]}
 	 set this(FMOD_audio_stream) [FFMPEG_Get_a_new_FSOUND_STREAM [this get_cb_audio] \
@@ -108,9 +114,12 @@ method Video_PM_P_TK Open_audio_stream {} {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_TK Close_audio_stream {} {
  if {$this(FMOD_audio_stream) != ""} {
-   FFMPEG_close_FSOUND_STREAM $this(FMOD_audio_stream)
+	puts "FFMPEG_close_FSOUND_STREAM $this(FMOD_audio_stream)"
+	FFMPEG_close_FSOUND_STREAM $this(FMOD_audio_stream)
+	puts "Done FFMPEG_close_FSOUND_STREAM $this(FMOD_audio_stream)"
   }
 }
+Trace Video_PM_P_TK Close_audio_stream
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_P_TK Close_video {} {
@@ -147,4 +156,4 @@ Inject_code Video_PM_P_TK set_video_source {}  {
  # puts "End of $objName Video_PM_P_TK::set_video_source"
 }
 
-# Trace Video_PM_P_TK set_video_source
+Trace Video_PM_P_TK set_video_source
