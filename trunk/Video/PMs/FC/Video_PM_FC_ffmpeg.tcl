@@ -60,7 +60,7 @@ Methodes_set_LC Video_PM_FC_ffmpeg [P_L_methodes_set_Video] {} {}
 Methodes_get_LC Video_PM_FC_ffmpeg [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
-Generate_accessors Video_PM_FC_ffmpeg [list ffmpeg_rap_img ffmpeg_start_ms ffmpeg_frame_num]
+Generate_accessors Video_PM_FC_ffmpeg [list ffmpeg_rap_img ffmpeg_frame_num]
 
 #___________________________________________________________________________________________________________________________________________
 Generate_PM_setters Video_PM_FC_ffmpeg [P_L_methodes_set_Video_FC_COMET_RE]
@@ -68,13 +68,12 @@ Generate_PM_setters Video_PM_FC_ffmpeg [P_L_methodes_set_Video_FC_COMET_RE]
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg Play  {} {
  if {!$this(will_reupdate)} {
-     FFMPEG_set_time_t0_now $this(ffmpeg_id)
-	 this set_ffmpeg_start_ms [FFMPEG_get_time_t0_as_double $this(ffmpeg_id)]
-	 # puts "Reset start ms to [this get_ffmpeg_start_ms] = $ms - 1000 * [this get_ffmpeg_frame_num] / double($this(ffmpeg_frame_rate)"
+	 # set rep [FFMPEG_Commit_audio_buffers $this(ffmpeg_id)]
+	 # puts "\tFFMPEG_Commit_audio_buffers -> $rep"
 	 this Update_frame
 	} else {puts "still playing..."}
 }
-
+Trace Video_PM_FC_ffmpeg Play
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_FC_ffmpeg Pause {} {}
 #___________________________________________________________________________________________________________________________________________
@@ -97,7 +96,7 @@ Inject_code Video_PM_FC_ffmpeg go_to_time {} {
 Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
  if {[this get_video_source] != "WEBCAM" && $this(ffmpeg_id) != "" && [this get_video_source] != ""} {
    set this(is_go_to_frame) 1
-   if {$this(is_updating)} {
+   if {0 && $this(is_updating)} {
 	 after 3 [list $objName go_to_frame $nb $set_video_pts]
 	 return
 	}
@@ -123,14 +122,13 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
    if {$set_video_pts} {
 	    lassign [this get_readable_video_buffer] current_video_pts buf_r
 	    FFMPEG_set_Video_pts_for_audio $this(ffmpeg_id) $current_video_pts
-		FFMPEG_set_time_t0_from_video $this(ffmpeg_id)
-		this set_ffmpeg_start_ms [FFMPEG_get_time_t0_as_double $this(ffmpeg_id)]
 	   }
 
    set this(is_go_to_frame) 0
-  }
+  } else {puts stderr [list [this get_video_source] $this(ffmpeg_id) [this get_video_source]]
+		 }
 }
-# Trace Video_PM_FC_ffmpeg go_to_frame
+Trace Video_PM_FC_ffmpeg go_to_frame
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg set_resolution {x y} {
@@ -184,7 +182,7 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
   } else {
           if {$this(ffmpeg_id) != ""} {FFMPEG_Lock $this(ffmpeg_id); puts "Lock"; set unlock 1} else {set unlock 0}
           set this(ffmpeg_id) [FFMPEG_Open_video_stream $s]
-		  set error_message [FFMPEG_get_error_message $this(ffmpeg_id)]
+		  set error_message   [FFMPEG_get_error_message $this(ffmpeg_id)]
 		  if {$error_message != ""} {
 		     set tmp_id $this(ffmpeg_id); set this(ffmpeg_id) ""
 			 puts "Error with stream $tmp_id"
@@ -194,8 +192,6 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 			 
 			 error "Error while trying to open $s on $canal_audio :\n$error_message"
 			}
-          
-		  
 		  
           set t  [FFMPEG_startAcquisition $this(ffmpeg_id)]
           set tx [FFMPEG_Width  $this(ffmpeg_id)]
@@ -203,7 +199,6 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  this prim_set_video_width  $tx
 		  this prim_set_video_height $ty
 		  
-          set this(ffmpeg_start_ms)   [clock milliseconds]; 
 		  set this(ffmpeg_frame_num)  0
 		  set this(ffmpeg_numFrames)  [FFMPEG_numFrames    $this(ffmpeg_id)]
           set this(ffmpeg_frame_rate) [FFMPEG_getFramerate $this(ffmpeg_id)]
@@ -231,6 +226,11 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  this prim_set_cb_audio        $cb_audio
 		  this prim_set_video_nbFrames  [FFMPEG_get_nb_total_video_frames $this(ffmpeg_id)]
 		  
+		  # if {[FFMPEG_get_audio_codec_name $this(ffmpeg_id)] == "aac"} {
+			 # this prim_set_delta_sync_audio_video [expr 16384.0/2/$sample_rate]
+			# } else {this prim_set_delta_sync_audio_video [expr -16384.0/4/$sample_rate]}
+		  this prim_set_delta_sync_audio_video [expr -16384.0/4/$sample_rate]
+		  
 		  set this(video_buffer_size)   $t
 		  this Init_Pool_video_buffer   30
 		  
@@ -243,7 +243,7 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  if {!$this(will_reupdate)} {this Update_frame 1}
          }
 		 
- # puts "  End of $objName Video_PM_FC_ffmpeg::set_video_source"
+ puts "  End of $objName $objName Video_PM_FC_ffmpeg::set_video_source"
  set this(is_updating) 0
 }
 Trace Video_PM_FC_ffmpeg set_video_source
@@ -251,14 +251,13 @@ Trace Video_PM_FC_ffmpeg set_video_source
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg info_play {} {
 	set video_time_base $this(video_time_base)
-	set dt [FFMPEG_get_delta_from_t0 $this(ffmpeg_id)]
 	set ifscb [FFMPEG_Info_for_sound_CB $this(ffmpeg_id)]
 	set audio_start [FFMPEG_get_audio_clock_start $this(ffmpeg_id)]
 	# set first [$ifscb ]
 	lassign [this get_readable_video_buffer] current_video_pts buf_r
 	set current_video_dt [expr $current_video_pts * $this(video_time_base)]
 	puts "Info about the play position :"
-	foreach att [list dt current_video_dt current_video_pts video_time_base ifscb audio_start] {
+	foreach att [list current_video_dt current_video_pts video_time_base ifscb audio_start] {
 		puts [format "%20s : %s" $att [subst $$att]]
 		}
 }
@@ -273,8 +272,6 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
 
 	 # Faire une vérification avec l'information ptd de la video plutot...
 	 # set ms [clock milliseconds]; 
-	 # set dt [expr $ms - [this get_ffmpeg_start_ms]]
-	 # set dt [FFMPEG_get_delta_from_t0 $this(ffmpeg_id)]
 	 set dt [FFMPEG_get_delta_from_first_time $this(ffmpeg_id)]
 	 # puts "[expr $dt - $dt2] : $dt / $dt2"
 	 lassign [this get_readable_video_buffer] current_video_pts buf_r
@@ -283,6 +280,7 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
 	 set dt_audio         [this get_delta_sync_audio_video]
 	 # puts "$audio_start + $dt_audio"
 	 if {$dt + $audio_start + $dt_audio >= $current_video_dt} {
+		  # puts "$dt + $audio_start + $dt_audio >= $current_video_dt"
 		  set force_update 1
 		  set num [expr 1+[this get_ffmpeg_frame_num]]
 		 } else {set num [this get_ffmpeg_frame_num]
@@ -294,6 +292,7 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
 	 if {$force_update } {
 	   # get images and put them from readable buffer
 	   lassign [this get_readable_video_buffer] current_video_pts buf_r
+	   # puts "Read buffer $current_video_pts $buf_r"
 	   this set_ffmpeg_frame_num        $num; [this get_Common_FC] set_num_frame $num
 	   this set_last_buffer             $buf_r
 	   this prim_Update_image           $buf_r
@@ -301,13 +300,14 @@ method Video_PM_FC_ffmpeg Update_frame {{force_update 0}} {
 	   # puts "Update image num=$num\n\t- $this(index_current_video_buffer) : $buf_r"
 	 
 	   lassign [this get_writable_video_buffer] video_pts buf_w
-	   # FFMPEG_Lock     $this(ffmpeg_id)
-	   FFMPEG_getImage $this(ffmpeg_id) $buf_w
+
+	   # FFMPEG_getImage $this(ffmpeg_id) $buf_w
 	   if {[this get_mode] == "PLAY"} {
 			 # puts "$dt + $audio_start + $dt_audio >= $current_video_dt"
 			 FFMPEG_Commit_audio_buffers $this(ffmpeg_id)
 			}
-	   # FFMPEG_UnLock   $this(ffmpeg_id)
+	   FFMPEG_getImage $this(ffmpeg_id) $buf_w; # XXX DEBUG
+	   
 	   set video_pts [FFMPEG_get_Video_pts $this(ffmpeg_id)]
 	   this set_video_buffer_indexed [this get_index_writable_video_buffer] [list $video_pts $buf_w]
 	   
@@ -360,6 +360,10 @@ method Video_PM_FC_ffmpeg Fill_video_pool {} {
    this set_video_buffer_indexed $index [list $video_pts $buf]
    # puts "\t- $index : $video_pts $buf"
   }
+
+ puts "Fill_video_pool, now [FFMPEG_get_nb_temp_audio_buffers $this(ffmpeg_id)] packets waiting"
+ set rep [FFMPEG_Commit_audio_buffers $this(ffmpeg_id)]
+ puts "\tFFMPEG_Commit_audio_buffers -> $rep"
  # puts "\tDone"
 }
 

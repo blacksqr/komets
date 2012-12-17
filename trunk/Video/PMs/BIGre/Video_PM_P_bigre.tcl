@@ -49,6 +49,32 @@ Generate_PM_setters Video_PM_P_BIGre [P_L_methodes_set_Video_COMET_RE]
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre Play {
+	 set ifscb [this get_L_infos_sound]
+	 if {$ifscb != ""} {
+		 puts "\topen state = [FFMPEG_FSOUND_STREAM_GetOpenState $this(B207_audio_stream)]"
+		 set rep [FFMPEG_FSOUND_STREAM_Play $ifscb $this(B207_audio_stream) [this get_audio_canal]]
+		 puts "\trep = $rep"
+		} else {puts "\t$objName has no associated ifscb"}
+} {}
+Trace Video_PM_P_BIGre Play
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre Stop {
+	 set ifscb [this get_L_infos_sound]
+	 if {$ifscb != ""} {
+		 set rep [FFMPEG_FSOUND_STREAM_Stop $ifscb $this(B207_audio_stream)]
+		 puts "\trep = $rep"
+		} else {puts "\t$objName has no associated ifscb"}
+} {}
+Trace Video_PM_P_BIGre Stop
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_BIGre go_to_frame {
+	 this Stop
+} {}
+
+#___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_P_BIGre Update_image {} {
  set this(img_has_to_be_updated) 1
  if {$this(buffer_for_update) != ""} {
@@ -96,16 +122,22 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
    # Audio with Fmod
    # set buf_len [expr 2 * int([this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
    set buf_len [expr 4*[FFMPEG_FSOUND_GetBufferLengthTotal]]
-   this prim_set_delta_sync_audio_video 0
+   # this prim_set_delta_sync_audio_video 0
    if {$buf_len > 0} {
-		   if {[this get_nb_channels] == 2} {set mono_stereo [FSOUND_Stereo]} else {set mono_stereo [FSOUND_Mono]}
-		   set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
-															  $audio_canal \
-															  $buf_len \
-															  [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] \
-															  [this get_sample_rate] \
-															  [this get_L_infos_sound] \
-															  ]
+			 if {[this get_nb_channels] == 2} {set mono_stereo [FFMPEG_FSOUND_Stereo]} else {set mono_stereo [FFMPEG_FSOUND_Mono]}
+			 set this(B207_audio_stream) [FFMPEG_Get_a_new_FSOUND_STREAM [this get_cb_audio] \
+																			$buf_len \
+																			[expr $mono_stereo | [FFMPEG_FSOUND_signed] | [FFMPEG_FSOUND_16b]] \
+																			[this get_sample_rate] \
+																			[this get_L_infos_sound] \
+																		 ]
+		   # set this(B207_audio_stream) [N_i_mere Nouveau_flux [this get_cb_audio] \
+															  # $audio_canal \
+															  # $buf_len \
+															  # [expr $mono_stereo | [FSOUND_signed] | [FSOUND_16b]] \
+															  # [this get_sample_rate] \
+															  # [this get_L_infos_sound] \
+															  # ]
 		}
   } else {set texture [this get_B207_texture]
           if {$texture != "" && $texture != "NULL"} {

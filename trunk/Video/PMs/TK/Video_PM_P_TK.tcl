@@ -57,6 +57,37 @@ method Video_PM_P_TK get_or_create_prims {root} {
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_TK Play {
+	if {$this(play_audio_stream)} {
+		 set ifscb [this get_L_infos_sound]
+		 if {$ifscb != ""} {
+			 puts "\topen state = [FFMPEG_FSOUND_STREAM_GetOpenState $this(FMOD_audio_stream)]"
+			 set rep [FFMPEG_FSOUND_STREAM_Play $ifscb $this(FMOD_audio_stream) [this get_audio_canal]]
+			 puts "\trep = $rep"
+			} else {puts "\t$objName has no associated ifscb"}
+		} 
+} {}
+Trace Video_PM_P_TK Play
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_TK Stop {
+	if {$this(play_audio_stream)} {
+		 set ifscb [this get_L_infos_sound]
+		 if {$ifscb != ""} {
+			 set rep [FFMPEG_FSOUND_STREAM_Stop $ifscb $this(FMOD_audio_stream)]
+			 puts "\trep = $rep"
+			} else {puts "\t$objName has no associated ifscb"}
+		}
+} {}
+Trace Video_PM_P_TK Stop
+
+#___________________________________________________________________________________________________________________________________________
+Inject_code Video_PM_P_TK go_to_frame {
+	 this Stop
+} {}
+
+#___________________________________________________________________________________________________________________________________________
 method Video_PM_P_TK Play_video_stream_locally {b} {
  set this(play_video_stream) $b
 }
@@ -71,10 +102,6 @@ Inject_code Video_PM_P_TK Update_image {} {
    global $buf_name
    
    Void2Photo $buffer $this(photo) $this(photo_tx) $this(photo_ty) 3
-   
-   #set $buf_name $this(entete)
-   #FFMPEG_Convert_void_to_binary_tcl_var $buffer [expr 3 * $tx * $ty] $buf_name 1
-   #$this(photo) put [subst $$buf_name] -format "raw -max 255 -nomap 1"
   }
 }
 # Trace Video_PM_P_TK Update_image
@@ -92,17 +119,15 @@ method Video_PM_P_TK Play_audio_stream_locally {b} {
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_P_TK Open_audio_stream {} {
  if {[this get_video_source] == ""} {return}
- set buf_len [expr 2 * int([this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
+ # set buf_len [expr 2 * int([this get_nb_channels] * [this get_sample_rate] / [this get_video_framerate])]
  set buf_len [expr 4*[FFMPEG_FSOUND_GetBufferLengthTotal]]
  # set delta [expr [this get_nb_channels] * $buf_len / 4.0 / [this get_sample_rate]]
- set delta 0
- 
- this prim_set_delta_sync_audio_video $delta
+ # set delta 0
+ # this prim_set_delta_sync_audio_video $delta
  
  if {$buf_len > 0} {
 	 if {[this get_nb_channels] == 2} {set mono_stereo [FFMPEG_FSOUND_Stereo]} else {set mono_stereo [FFMPEG_FSOUND_Mono]}
 	 set this(FMOD_audio_stream) [FFMPEG_Get_a_new_FSOUND_STREAM [this get_cb_audio] \
-																	[this get_audio_canal] \
 																	$buf_len \
 																	[expr $mono_stereo | [FFMPEG_FSOUND_signed] | [FFMPEG_FSOUND_16b]] \
 																	[this get_sample_rate] \
