@@ -76,11 +76,11 @@ Inject_code Video_PM_P_TK Stop {
 		 set ifscb [this get_L_infos_sound]
 		 if {$ifscb != ""} {
 			 set rep [FFMPEG_FSOUND_STREAM_Stop $ifscb $this(FMOD_audio_stream)]
-			 puts "\trep = $rep"
+			 # puts "\trep = $rep"
 			} else {puts "\t$objName has no associated ifscb"}
 		}
 } {}
-Trace Video_PM_P_TK Stop
+# Trace Video_PM_P_TK Stop
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_P_TK go_to_frame {

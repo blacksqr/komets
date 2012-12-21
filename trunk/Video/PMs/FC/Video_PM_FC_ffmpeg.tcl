@@ -80,9 +80,7 @@ Inject_code Video_PM_FC_ffmpeg Pause {} {}
 Inject_code Video_PM_FC_ffmpeg Stop  {} {
  set this(will_reupdate) 0
  if {$this(ffmpeg_id) != ""} {
-	  FFMPEG_set_Video_pts_for_audio $this(ffmpeg_id) 0
 	  this go_to_frame 0
-	  # this Update_frame 1
 	 }
  set this(will_reupdate) 0
 }
@@ -105,15 +103,14 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
       
    set this(ffmpeg_frame_num) $nb; [this get_Common_FC] set_num_frame $nb
    lassign [this get_readable_video_buffer] current_video_pts buf_r
-   # FFMPEG_Lock       $this(ffmpeg_id)
-   # for {set i 0} {$i < 30} {incr i} {
-	 set rep [FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r]
-   # }
-   # puts "FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r\n\t-> $rep"
-   # FFMPEG_UnLock     $this(ffmpeg_id)
-   this Next_video_buffer
+   
+   set rep [FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r]
+   puts "FFMPEG_getImageNr $this(ffmpeg_id) $this(ffmpeg_frame_num) $buf_r => $rep"
+   # this Next_video_buffer
    this Fill_video_pool
-   if {!$this(will_reupdate)} {this Update_frame 1}
+   # if {!$this(will_reupdate)} {this Update_frame 1}
+   lassign [this get_readable_video_buffer] current_video_pts buf_r
+   this prim_Update_image           $buf_r
 
    lassign [this get_readable_video_buffer] current_video_pts buf_r
    set current_video_dt [expr $current_video_pts * $this(video_time_base)]
@@ -128,7 +125,7 @@ Inject_code Video_PM_FC_ffmpeg go_to_frame {} {
   } else {puts stderr [list [this get_video_source] $this(ffmpeg_id) [this get_video_source]]
 		 }
 }
-Trace Video_PM_FC_ffmpeg go_to_frame
+# Trace Video_PM_FC_ffmpeg go_to_frame
 
 #___________________________________________________________________________________________________________________________________________
 method Video_PM_FC_ffmpeg set_resolution {x y} {
@@ -260,6 +257,12 @@ method Video_PM_FC_ffmpeg info_play {} {
 	foreach att [list current_video_dt current_video_pts video_time_base ifscb audio_start] {
 		puts [format "%20s : %s" $att [subst $$att]]
 		}
+	puts "__________________________________________________________________"
+	for {set i 0} {$i < ($this(nb_video_buffers))} {incr i} {
+		 puts -nonewline [format %2d $i]
+		 if {$this(index_current_video_buffer) == $i} {puts -nonewline " > "} else {puts -nonewline " | "}
+		 puts [this get_video_buffer_indexed $i] 
+		}
 }
 
 #___________________________________________________________________________________________________________________________________________
@@ -361,9 +364,9 @@ method Video_PM_FC_ffmpeg Fill_video_pool {} {
    # puts "\t- $index : $video_pts $buf"
   }
 
- puts "Fill_video_pool, now [FFMPEG_get_nb_temp_audio_buffers $this(ffmpeg_id)] packets waiting"
+ # puts "Fill_video_pool, now [FFMPEG_get_nb_temp_audio_buffers $this(ffmpeg_id)] packets waiting"
  set rep [FFMPEG_Commit_audio_buffers $this(ffmpeg_id)]
- puts "\tFFMPEG_Commit_audio_buffers -> $rep"
+ # puts "\tFFMPEG_Commit_audio_buffers -> $rep"
  # puts "\tDone"
 }
 

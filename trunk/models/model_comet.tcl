@@ -22,8 +22,9 @@ proc Eval_perf {cmd nb} {
 
 #_________________________________________________________________________________________________________
 proc Traces {C {stream ""}} {
- foreach m [gmlObject info methods $C] {
-   catch "Trace $C $m $stream"
+ set L [lremove [gmlObject info methods $C] [gmlObject info methods [lindex [gmlObject info classes $C] 0]]]
+ foreach m $L {
+   catch [list Trace $C $m $stream]
   }
 }
 
