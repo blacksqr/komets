@@ -229,7 +229,7 @@ method Video_PM_FC_ffmpeg set_video_source {s canal_audio}  {
 		  this prim_set_delta_sync_audio_video [expr -16384.0/4/$sample_rate]
 		  
 		  set this(video_buffer_size)   $t
-		  this Init_Pool_video_buffer   30
+		  this Init_Pool_video_buffer   100
 		  
 		  this go_to_frame 0
 		 
@@ -258,11 +258,15 @@ method Video_PM_FC_ffmpeg info_play {} {
 		puts [format "%20s : %s" $att [subst $$att]]
 		}
 	puts "__________________________________________________________________"
-	for {set i 0} {$i < ($this(nb_video_buffers))} {incr i} {
-		 puts -nonewline [format %2d $i]
-		 if {$this(index_current_video_buffer) == $i} {puts -nonewline " > "} else {puts -nonewline " | "}
-		 puts [this get_video_buffer_indexed $i] 
-		}
+	puts "\taudio sample rate : [this get_sample_rate]"
+	puts "\taudio nb channels : [this get_nb_channels]"
+	puts "\tvideo frame rate  : [this get_video_framerate]"
+
+	# for {set i 0} {$i < ($this(nb_video_buffers))} {incr i} {
+		 # puts -nonewline [format %2d $i]
+		 # if {$this(index_current_video_buffer) == $i} {puts -nonewline " > "} else {puts -nonewline " | "}
+		 # puts [this get_video_buffer_indexed $i] 
+		# }
 }
 
 #___________________________________________________________________________________________________________________________________________
