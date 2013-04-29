@@ -17,12 +17,39 @@ proc get_xml_from {ad {t 2000}} {
 
   set nb_problems [dict get $UPNP_server_D_device_with_pb $ad]
 	#
-  if {[catch {set token [::http::geturl $ad -timeout $t -handler http_callback]} err]} {
-		 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" [string range $err 0 64]]
-		 dict set UPNP_server_D_device_with_pb $ad [expr 1 + $nb_problems]
-		 return "BLOC_CALL"
+  # puts "::http::geturl $ad"
+  # if {[catch {set token [::http::geturl $ad -timeout $t]}]} {
+	  if {[catch {set token [::http::geturl $ad -keepalive 1 -timeout $t -handler http_callback]} err]} {
+			 send_msg_to_comet [list ERROR "get_xml_from $ad  :  connection problem\n::http::geturl $ad -timeout $t -handler http_callback\n" [string range $err 0 64]]
+			 dict set UPNP_server_D_device_with_pb $ad [expr 1 + $nb_problems]
+			 return "BLOC_CALL"
+			}
+	# }
+
+  set D_meta [::http::meta $token]
+  if {[dict exists $D_meta Connection] && [dict get $D_meta Connection] == "Keep-Alive"} {
+	 # puts "Keep alive man"
+	 ::http::cleanup $token
+	 if {[regexp {^http://([0-9\.]*)(.*)$} $ad reco ip ressource]} {
+		 set port 80
+		 regexp {^\:([0-9]*)(.*)$} $ressource reco port ressource
+		 # puts "Pipo connection at $ip $port"
+		 set sock [socket $ip $port]
+		 set msg "GET $ressource HTTP/1.1\nHost: $ip\n"
+		 puts $sock $msg; flush $sock; set nb_nop 0; set msg ""
+		 while {![eof $sock] && $nb_nop < 3} {
+			  set line [gets $sock]
+			  if {$line == ""} {
+				incr nb_nop
+				} else  {if {$nb_nop > 0} {append msg $line "\n"}
+						}
+			 }
+		 close $sock
+		 return $msg
 		}
-		
+
+	}
+  # puts "\tstatus : [::http::status $token]"
   switch [::http::status $token] {
 	 ok      {set rep [::http::data $token]
 			  if {![regexp {^[ \t\n]*<\?xml} $rep]} {set rep [string range $rep [string first "<?xml" $rep] end-4]}
@@ -48,6 +75,7 @@ proc http_callback {sock token} {
 	array set meta $state(meta)
 	set data [read $sock]; set nbytes [string bytelength $data]
 	
+	# if {[info exists meta(Connection)]} {puts "--> Connection : $meta(Connection)"}
 	if {[info exists meta(Transfer-Encoding)] && $meta(Transfer-Encoding) == "chunked"} {
 		 # Some data left?
 		 if {![info exist state(data_left)]} {set state(data_left) ""}
@@ -439,8 +467,11 @@ proc http_callback {sock token} {
 	   set ad_of_xml [dict get $UPNP_server_L_devices $UDN LocationURL]
 	   set str_xml   [get_xml_from $ad_of_xml]
 	   if {$str_xml != "BLOC_CALL"} {
+			if {$str_xml == ""} {
+				 send_msg_to_comet [list ERROR "Empty device description at $ad_of_xml"]
+				}
 			if {[catch {set_description_from_thread $UDN str_xml} err]} {
-				 send_msg_to_comet [list ERROR "set_description_from_thread from [dict get $UPNP_server_L_devices $UDN LocationURL]" $err]
+				 send_msg_to_comet [list ERROR "--> Device_added : set_description_from_thread from : $ad_of_xml\ngot :\n$str_xml" $err]
 				 global UPNP_server_D_device_with_pb
 				 dict set UPNP_server_D_device_with_pb $ad_of_xml [expr 1 + [dict get $UPNP_server_D_device_with_pb $ad_of_xml]]
 				} else {dict set UPNP_server_L_devices $UDN got_device_description "DONE"}
@@ -598,6 +629,10 @@ proc http_callback {sock token} {
 				   }
 	   dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "WIP"
 	   set str_xml [get_xml_from $ad]
+	   if {$str_xml == ""} {
+			 send_msg_to_comet [list ERROR "Empty service description at $ad"]
+			}
+	   # send_msg_to_comet [list ERROR "\tget_xml_from $ad"]
 	   if {$str_xml != "BLOC_CALL"} {
 			 if {[catch {set res_set_descr [set_service_description $UDN $service_id str_xml]} err]} {
 				 send_msg_to_comet [list ERROR "set_service_description $UDN $service_id str_xml\n\tstr_xml : $str_xml" $err]
@@ -608,8 +643,11 @@ proc http_callback {sock token} {
 							} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "DONE"}
 					   }
 			} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "UNDONE"
-				    send_msg_to_comet [list INFOS "Error accessing $service_id at $ad"]
-					set an_error_occured 1
+				    if {$str_xml != ""} {
+						 send_msg_to_comet [list INFOS "Error accessing $service_id at $ad"]
+						 set an_error_occured 1
+						} else {dict set UPNP_server_L_devices $UDN ServiceList $service_id get_description_state "DONE"
+							   }
 				   }
 	  }
 
@@ -622,7 +660,7 @@ proc http_callback {sock token} {
 	proc set_service_description {UDN service_id data_name} {
 	 upvar $data_name data
 	 if {[catch {set doc [dom parse $data]} err]} {
-	   send_msg_to_comet [list ERROR "in parsing xml in set_service_description from $UDN -> $service_id" $err]
+	   send_msg_to_comet [list ERROR "---> in parsing xml in set_service_description from $UDN -> $service_id" $err]
 	   return 0
 	  }
 	  

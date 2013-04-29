@@ -11,17 +11,22 @@ method Video_PM_P_BIGre constructor {name descr args} {
     
    this set_GDD_id CT_Video_AUI_CUI_basic_B207
 
-   set this(img) [B_image]
+   set this(node_root_for_daughters) [B_noeud]
+   
+   set this(img) [B_image]; $this(img) Afficher_noeud 0; $this(img) Noeud_touchable 0
    $this(img) Inverser_y 1
 
    set this(primitives_handle) [B_polygone]
    $this(primitives_handle) abonner_a_LR_parcours [$this(primitives_handle) LR_Av_pre_rendu] [$this(rap_placement) Rappel]
 
-   set this(rap_img_update)        [B_rappel [Interp_TCL] "$objName Update_B207_img"]
-   N_i_mere abonner_a_fin_simulation [$this(rap_img_update) Rappel]
+   $this(primitives_handle) Ajouter_fils $this(img)
+   $this(primitives_handle) Ajouter_fils $this(node_root_for_daughters)
+   
+   # set this(rap_img_update)        [B_rappel [Interp_TCL] "$objName Update_B207_img"]
+   # N_i_mere abonner_a_fin_simulation [$this(rap_img_update) Rappel]
    
  this set_prim_handle        $this(primitives_handle)
- this set_root_for_daughters $this(primitives_handle)
+ this set_root_for_daughters $this(node_root_for_daughters)
  $this(primitives_handle) Translucidite 0
  
  set this(video_x)  0; set this(video_y)  0
@@ -52,10 +57,10 @@ Generate_PM_setters Video_PM_P_BIGre [P_L_methodes_set_Video_COMET_RE]
 Inject_code Video_PM_P_BIGre Play {
 	 set ifscb [this get_L_infos_sound]
 	 if {$ifscb != ""} {
-		 puts "\topen state = [FFMPEG_FSOUND_STREAM_GetOpenState $this(B207_audio_stream)]"
+		 # puts "\topen state = [FFMPEG_FSOUND_STREAM_GetOpenState $this(B207_audio_stream)]"
 		 set rep [FFMPEG_FSOUND_STREAM_Play $ifscb $this(B207_audio_stream) [this get_audio_canal]]
-		 puts "\trep = $rep"
-		} else {puts "\t$objName has no associated ifscb"}
+		 # puts "\trep = $rep"
+		} else {puts stderr "\t$objName has no associated ifscb"}
 } {}
 Trace Video_PM_P_BIGre Play
 
@@ -64,8 +69,8 @@ Inject_code Video_PM_P_BIGre Stop {
 	 set ifscb [this get_L_infos_sound]
 	 if {$ifscb != ""} {
 		 set rep [FFMPEG_FSOUND_STREAM_Stop $ifscb $this(B207_audio_stream)]
-		 puts "\trep = $rep"
-		} else {puts "\t$objName has no associated ifscb"}
+		 # puts "\trep = $rep"
+		} else {puts stderr "\t$objName has no associated ifscb"}
 } {}
 Trace Video_PM_P_BIGre Stop
 
@@ -81,18 +86,23 @@ Inject_code Video_PM_P_BIGre Update_image {} {
    this decr_buffer_use $this(buffer_for_update)
   }
  set this(buffer_for_update) $buffer
- this incr_buffer_use   $buffer
+ this incr_buffer_use   	 $buffer
+ 
+ if {$buffer != ""} {
+	 # puts [list $this(img) Threaded_maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)]
+	 $this(img) Threaded_maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
+	}
 }
 
 #___________________________________________________________________________________________________________________________________________
 Inject_code Video_PM_P_BIGre Close_video {} {
    # Close the previous audio flow
    if {$this(B207_audio_stream) != ""} {
-     puts "    Close previous audio stream $this(B207_audio_stream) ..."
+     # puts "    Close previous audio stream $this(B207_audio_stream) ..."
 	 while {[N_i_mere Fermer_flux $this(B207_audio_stream)] == 0} {
 	   puts "    waiting for stream to be ready"
 	  }
-	 puts "    ... done !"
+	 # puts "    ... done !"
 	}   
 }
 Trace Video_PM_P_BIGre Close_video
@@ -108,7 +118,10 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
 	} else {set is_webcam 0}
  
  if {!$is_webcam} {
+   # puts "\tUpdate texture"
    $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 [this get_last_buffer]
+   # $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 NULL
+   # puts "\tUpdate texture done..."
    
    set texture [$this(img) Info_texture]
    $this(primitives_handle) Vider
@@ -148,7 +161,9 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
 		    this Origine $this(video_x) $this(video_y)
 		   } else {puts "Try again to get the WEBCAM info..."; after 100 "[this get_LC] set_B207_texture \[[this get_visu_cam] Info_texture\]; $objName set_video_source WEBCAM $audio_canal"}
          }
+	# puts "End of $objName set_video_source"
 }
+# Trace Video_PM_P_BIGre set_video_source
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
@@ -156,13 +171,18 @@ Inject_code Video_PM_P_BIGre set_video_source {}  {
 method Video_PM_P_BIGre Update_B207_img {} {
  if {$this(img_has_to_be_updated)} {
    if {[this get_video_source] == "WEBCAM" && ![[this get_visu_cam] EstPret]} {puts "Camera not ready"; return}
-   
-   $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
-   this decr_buffer_use $this(buffer_for_update)
-   set this(buffer_for_update) ""
-   set this(img_has_to_be_updated) 0
+   if {$this(buffer_for_update) != ""} {
+	    puts -nonewline "$objName Video_PM_P_BIGre::Update_B207_img"
+	    $this(img) maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
+	    # $this(img) Threaded_maj_raw_with_transfo [this get_video_width] [this get_video_height] [GL_rvb] 3 [GL_rvba] 4 $this(buffer_for_update)
+		this decr_buffer_use $this(buffer_for_update)
+	    set this(buffer_for_update) ""
+	    set this(img_has_to_be_updated) 0
+	    puts "...done"
+	   }
   }
 }
+# Trace Video_PM_P_BIGre Update_B207_img
 
 #___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________

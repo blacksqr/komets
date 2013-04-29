@@ -305,6 +305,7 @@ proc Manage_CallbackList {c L_m pos args} {
      append cmd "  \}\n"
    append cmd "\}\n"
    eval $cmd
+   
 # Generate the callback accessors
    eval "Generate_accessors $c L_CB_$m"
 # Generate the callback accessors for subscribing
@@ -330,7 +331,7 @@ proc Manage_CallbackList {c L_m pos args} {
    eval $cmd
 # Generate the callback mechanism
    set    cmd_to_trigger "  foreach CB \$this(L_CB_$m) {\n"
-   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts \"Error in CallBack for \$objName $m\\n  \$err\"}\n"
+   append cmd_to_trigger "    if {\[catch \[lindex \$CB 1\] err\]} {puts stderr \"Error in CallBack for \$objName $m\\n\tCB : \$CB\n\tFull info: \$::errorInfo\"}\n"
    append cmd_to_trigger "   }\n"
    set cmd "method $c $m \{$L_args\} \{\n"
      if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
