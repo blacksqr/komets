@@ -108,7 +108,7 @@ Inject_code Video_PM_P_TK Update_image {} {
    set buf_name buf_video_for_Video_PM_P_TK_of_[this get_LC]
    global $buf_name
    
-   Void2Photo $buffer $this(photo) $this(photo_tx) $this(photo_ty) 3
+   if {$buffer != ""} {Void2Photo $buffer $this(photo) $this(photo_tx) $this(photo_ty) 3}
   }
 }
 # Trace Video_PM_P_TK Update_image

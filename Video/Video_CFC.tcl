@@ -64,7 +64,7 @@ method Video_CFC decr_buffer_use {buffer} {
 
 #___________________________________________________________________________________________________________________________________________
 method Video_CFC incr_buffer_use {buffer} {
- if {[info exists this(count,$buffer)]} {set this(count,$buffer) 0}
+ if {![info exists this(count,$buffer)]} {set this(count,$buffer) 0}
  incr this(count,$buffer) 1
 }
 

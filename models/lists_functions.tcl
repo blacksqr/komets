@@ -5,8 +5,9 @@ proc Generate_dict_accessors {class L_dict_name} {
 		set cmd "method $class set_$d {v} {set this($d) \$v}"                     ; eval $cmd
 		set cmd "method $class get_item_of_$d {keys} {eval \"dict get \\\$this($d) \$keys\"}"; eval $cmd
 		set cmd "method $class set_item_of_$d {keys val} {eval \"dict set this($d) \$keys \\\$val\"}"  ; eval $cmd
-		set cmd "method $class remove_item_of_$d {key} {set this($d) \[dict remove \$this($d) \$key\]}"; eval $cmd
+		set cmd "method $class remove_item_of_$d {key} {eval \"dict unset this($d) \$key\"}"; eval $cmd
 		set cmd "method $class has_item_$d {keys} {return \[eval \"dict exists \\\$this($d) \$keys\"\]}"; eval $cmd
+		set cmd "method $class length_of_$d {} {return \[dict size \$this($d)\]}"; eval $cmd
 		}
 }
 
@@ -14,12 +15,16 @@ proc Generate_dict_accessors {class L_dict_name} {
 # Some list procedures
 #____________________________________________________________________________________
 proc Generate_List_accessor {class L_name suffixe} {
- set cmd "method $class get_$suffixe { } {return \$this($L_name)}"                  ; eval $cmd
- set cmd "method $class set_$suffixe {L} {set this($L_name) \$L}"                   ; eval $cmd
- set cmd "method $class Add_$suffixe {L} {set this($L_name) \[Liste_Union \$this($L_name) \$L\]}"           ; eval $cmd
- set cmd "method $class Sub_$suffixe {L} {return \[Sub_list    this($L_name) \$L\]}"; eval $cmd
- set cmd "method $class Contains_${suffixe} {e} {return \[expr \[lsearch \$this($L_name) \$e\] >= 0\]}"; eval $cmd
- set cmd "method $class Index_of_${suffixe} {e} {return \[lsearch \$this($L_name) \$e\]}"; eval $cmd
+ set cmd "method $class get_$suffixe { } {return \$this($L_name)}"										; eval $cmd
+ set cmd "method $class set_$suffixe {L} {this Sub_$suffixe \$this($L_name); this Add_$suffixe \$L}"	; eval $cmd
+ set cmd "method $class Add_$suffixe {L} {set this($L_name) \[Liste_Union \$this($L_name) \$L\]}"		; eval $cmd
+ set cmd "method $class Sub_$suffixe {L} {
+ set rep \[Sub_list    this($L_name) \$L\]
+# INSERT CALLBACKS HERE
+return \$rep}"																							; eval $cmd
+ set cmd "method $class Contains_${suffixe} {e} {return \[expr \[lsearch \$this($L_name) \$e\] >= 0\]}"	; eval $cmd
+ set cmd "method $class Index_of_${suffixe} {e} {return \[lsearch \$this($L_name) \$e\]}"				; eval $cmd
+ set cmd "method $class llength_${suffixe} {} {return \[llength \$this($L_name)\]}"						; eval $cmd
 }
 
 #____________________________________________________________________________________
