@@ -1,5 +1,6 @@
 set DEFINE_MODEL_COMET 1 
 
+
 #_________________________________________________________________________________________________________
 proc Check_that {str_to_eval expected_result} {
  set rep [eval $str_to_eval]
@@ -337,22 +338,13 @@ proc Manage_CallbackList {c L_m pos args} {
      if {[regexp "(.*)# INSERT CALLBACKS HERE(.*)" $body rep avant apres]} {
        append cmd $avant {# INSERT CALLBACKS HERE} "\n"
 	   append cmd $cmd_to_trigger
-       #append cmd " this Trigger_L_CB_$m $L_CB_name"
-       #  foreach a $argL {append cmd " \$$a"}
-       #  foreach a $args {append cmd " \$$a"}
        append cmd "\n" $apres
       } else {switch $pos {
                 begin {append cmd $cmd_to_trigger
-				       #append cmd " this Trigger_L_CB_$m $L_CB_name"
-                       #  foreach a $argL {append cmd " \$$a"}
-                       #  foreach a $args {append cmd " \$$a"}
                        append cmd "\n" $body "\n"
                       }
                 end   {append cmd $body "\n"
                        append cmd $cmd_to_trigger
-					   #append cmd " this Trigger_L_CB_$m $L_CB_name"
-                       #  foreach a $argL {append cmd " \$$a"}
-                       #  foreach a $args {append cmd " \$$a"}
                        append cmd "\n"
                       }
                }
@@ -2325,7 +2317,7 @@ method Logical_model Try_to_connect_PM_with {PM PMDs index} {
 
 #_________________________________________________________________________________________________________
 method Logical_model Connect_PM_descendants {{L_PM ""} {L_LM ""} {dec " "}} {
-global debug
+ global debug
  if {$debug} {puts "$objName Connect_PM_descendants {$L_PM} {$L_LM}"}
  #puts "<${objName}::Connect_PM_descendants $L_PM>"
 # puts "$dec$objName Connect_PM_descendants \{$L_PM\} \{$L_LM\}"
@@ -2408,7 +2400,8 @@ global debug
                 $LMD Connect_PM_descendants $L_PMD
 				if {$debug} {puts "</${objName}::Connect_PM_descendants_CASE_1>"}
                }
-       default {puts "____ AU SECOURS !!! $PM à plusieurs fils chez $LMD ($L_PMD)!!!____"}
+       default  {puts stderr "____ AU SECOURS !!! $PM à plusieurs fils chez $LMD ($L_PMD)!!!____"
+				}
       }
     }
   }
@@ -2944,58 +2937,60 @@ method Physical_model Is_still_branched_to {prim} {
 
 #_________________________________________________________________________________________________________
 method Physical_model Add_daughter    {m {index -1}} {
-global debug
-                                                      if {$debug} {puts "  $objName Physical_model::Add_daughter $m $index"}
-                                                      set rep [this inherited $m $index]
-                                                      if {$rep == 1} {set root [this get_root_for_daughters]
-                                                                      if {$debug} {puts "    root : $root"}
-																	  if {[string equal $root {}]} {return 1}
-                                                                             if {[string equal $root NULL]} {this Sub_daughter $m;
-                                                                                                             if {$debug} {puts "   !!! : La racine d'attache des fils de $objName est NULL, on retire $m"}
-                                                                                                             return 0}
+	global debug
+	  if {$debug} {puts "  $objName Physical_model::Add_daughter $m $index"}
+	  set rep [this inherited $m $index]
+	  if {$rep == 1} {set root [this get_root_for_daughters]
+					  if {$debug} {puts "    root : $root"}
+					  if {[string equal $root {}]} {return 1}
+							 if {[string equal $root NULL]} {this Sub_daughter $m;
+															 if {$debug} {puts "   !!! : La racine d'attache des fils de $objName est NULL, on retire $m"}
+															 return 0}
 #                                                                             set prev_prim_daughters [$m get_prim_handle $root]
-                                                                             set prev_exists    [$m Do_prims_still_exist]
-                                                                             set prim_daughters [$m get_or_create_prims $root]
-                                                                             if {[string equal $prim_daughters NULL]} {this Sub_daughter $m;
-                                                                                                                       if {$debug} {puts "   !!! $objName : La poignée de $m est NULL, on le retire"}
-                                                                                                                       return 0}
+							 set prev_exists    [$m Do_prims_still_exist]
+							 set prim_daughters [$m get_or_create_prims $root]
+							 if {[string equal $prim_daughters NULL]} {this Sub_daughter $m;
+																	   if {$debug} {puts "   !!! $objName : La poignée de $m est NULL, on le retire"}
+																	   return 0}
 
-                                                                             $this(LM) set_PM_active $objName
-                                                                             if {$prev_exists} {
-                                                                               if {[$m Is_still_branched_to $root]} {
-                                                                                 if {$debug} {puts "    STILL BRANCHED"}
-																				 $m   Add_prim_mother   $objName $root
-																				 return 2
-                                                                                } else {if {$debug} {puts "    PREV EXISTS"
-																				                     puts "    $objName Add_prim_daughter $m       $prim_daughters $index"
-																									}
-																				        this Add_prim_daughter $m       $prim_daughters $index
-																						if {$debug} {puts "    $m   Add_prim_mother   $objName $root"}
-                                                                                        $m   Add_prim_mother   $objName $root
-																						return 1
-                                                                                       }
-                                                                              } else {
-																			     if {$debug} {puts "    NON PREV EXISTS"}
-                                                                                 this Add_prim_daughter $m       $prim_daughters $index
-																				 if {$debug} {puts "    $m   Add_prim_mother   $objName $root"}
-                                                                                 $m   Add_prim_mother   $objName $root
-                                                                                 return 1
-                                                                                }
-                                                                            } else {if {$debug} {puts "    initial rep == $rep"}}
-                                                      if {$debug} {puts "    => $rep"}
-													  return $rep
-                                                     }
+							 $this(LM) set_PM_active $objName
+							 if {$prev_exists} {
+							   if {[$m Is_still_branched_to $root]} {
+								 if {$debug} {puts "    STILL BRANCHED"}
+								 $m   Add_prim_mother   $objName $root
+								 return 2
+								} else {if {$debug} {puts "    PREV EXISTS"
+													 puts "    $objName Add_prim_daughter $m       $prim_daughters $index"
+													}
+										this Add_prim_daughter $m       $prim_daughters $index
+										if {$debug} {puts "    $m   Add_prim_mother   $objName $root"}
+										$m   Add_prim_mother   $objName $root
+										return 1
+									   }
+							  } else {
+								 if {$debug} {puts "    NON PREV EXISTS"}
+								 this Add_prim_daughter $m       $prim_daughters $index
+								 if {$debug} {puts "    $m   Add_prim_mother   $objName $root"}
+								 $m   Add_prim_mother   $objName $root
+								 return 1
+								}
+							} else {if {$debug} {puts "    initial rep == $rep"}}
+	  if {$debug} {puts "    => $rep"}
+	  return $rep
+	 }
 #_________________________________________________________________________________________________________
-method Physical_model Sub_daughter    {m} {global debug
-										   if {$debug} {puts "$objName Physical_model::Sub_daughter $m"}
-										   set rep [this inherited $m]
-                                           if {[expr $rep == 1]} {set pos [lsearch $this(L_mothers) $m]
-										                            
-																    if {$debug} {puts "$objName Sub_prim_daughter $m {[$m get_prim_handle $pos]} $pos"}
-                                                                  this Sub_prim_daughter $m [$m get_prim_handle $pos] $pos
+method Physical_model Sub_daughter    {m} {
+	global debug
+   if {$debug} {puts "$objName Physical_model::Sub_daughter $m"}
+   set rep [this inherited $m]
+   if {[expr $rep == 1]} {set pos [lsearch $this(L_mothers) $m]
+							
+							if {$debug} {puts "$objName Sub_prim_daughter $m {[$m get_prim_handle $pos]} $pos"}
+						  this Sub_prim_daughter $m [$m get_prim_handle $pos] $pos
 #                                                                  #$m set_prim_handle NULL
-                                                                  return 1}
-                                           return 0}
+						  return 1}
+   return 0
+}
 
 #_________________________________________________________________________________________________________
 #_________________________________________________________________________________________________________

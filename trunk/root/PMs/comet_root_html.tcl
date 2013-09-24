@@ -77,20 +77,47 @@ Inject_code PhysicalHTML_root Add_L_js_files_link {} {
 Generate_List_accessor PhysicalHTML_root L_PM_to_sub L_PM_to_sub
 Generate_List_accessor PhysicalHTML_root L_PM_to_add L_PM_to_add
 
+
+
+
+
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
+# gets the stack up to the caller
+proc get_stack {} {
+    set result {}
+    for {set i [expr {[info level] -1}]} {$i >0} {incr i -1} {
+        lappend result [info level $i]
+    }
+    return $result
+}
+
+# formats the stack for display
+proc format_stack {stackList} {
+    return "\twhile executing: [join $stackList \n\twhile\ executing:\ ]"
+}
+
+
+
+#___________________________________________________________________________________________________________________________________________
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Add_L_PM_to_sub {L_PM} {
  incr this(version_server)
  lappend this(L_PM_to_sub) [list $this(version_server) $L_PM]
  set this(concat_send,$this(version_server)) [list $L_PM ""]
 }
-
+# Trace PhysicalHTML_root Add_L_PM_to_sub
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Add_L_PM_to_add {L_PM} {
+	# puts stderr [format_stack [get_stack]]
  incr this(version_server)
  lappend this(L_PM_to_add) [list $this(version_server) $L_PM]
  set this(concat_send,$this(version_server)) [list $L_PM ""]
 }
-
+# Trace PhysicalHTML_root Add_L_PM_to_add
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root CB_plug_under_new_roots {r} {}
 
@@ -591,14 +618,14 @@ method PhysicalHTML_root Concat_update_supp {} {
   # Update the list of elements to sub
   set nL [list]
     foreach e [this get_L_PM_to_sub] {
-	  if {[lindex $e 0] > $mini} {lappend nL $e}
+	  if {[lindex $e 0] > $mini} {lappend nL [lindex $e 1]}
 	 }
   this set_L_PM_to_sub $nL
 
   # Update the list of elements to add
   set nL [list ]; 
     foreach e [this get_L_PM_to_add] {
-	  if {[lindex $e 0] > $mini} {lappend nL $e}
+	  if {[lindex $e 0] > $mini} {lappend nL [lindex $e 1]}
 	 }
   this set_L_PM_to_add $nL
  }
@@ -779,11 +806,14 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
 	} 
  }
  
+ # puts "this(L_PM_really_sub) : $this(L_PM_really_sub)"
+ # puts "this(L_PM_really_add) : $this(L_PM_really_add)"
  this Minimize_L_add_sub this(L_PM_really_sub); 
  this Minimize_L_add_sub this(L_PM_really_add); 
  
  
  foreach e $this(L_PM_really_sub) {
+	# puts "Ma boucle L_PM_really_sub : {$e}" 
 	append strm [this Sub_JS $e] "\n"
 	#puts "\nMa boucle L_PM_really_sub    :   $strm" 
  } 
@@ -801,6 +831,7 @@ method PhysicalHTML_root Cmd_vserver_to_vclient {vclient strm_name} {
  set this(L_PM_really_sub) [list]
  set this(L_PM_really_add) [list]
 }
+# Trace PhysicalHTML_root Cmd_vserver_to_vclient
 
 #___________________________________________________________________________________________________________________________________________
 method PhysicalHTML_root Is_update {clientversion} {
