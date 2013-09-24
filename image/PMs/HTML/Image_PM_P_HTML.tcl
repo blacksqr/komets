@@ -27,7 +27,7 @@ method Image_PM_P_HTML get_img_file_name {} {
 
 #___________________________________________________________________________________________________________________________________________
 method Image_PM_P_HTML load_img {v} {
- set root    [this get_L_roots] 
+ set root    [this get_L_roots]
  set methode "attr"
  set cmd     "\$('#$objName').attr('src','$v');\n"
 

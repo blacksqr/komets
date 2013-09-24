@@ -154,7 +154,7 @@ method PM_BIGre On_click {cmd} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre On_wheel_down {cmd} {
- puts "$objName On_wheel_down {$cmd}"
+ # puts "$objName On_wheel_down {$cmd}"
  if {![info exists this(rap_on_wheel_down)]} {
    set this(rap_on_wheel_down) [B_rappel [Interp_TCL]]
    [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_wheel_down) Rappel] [ALX_pointeur_enfonce]
@@ -164,7 +164,7 @@ method PM_BIGre On_wheel_down {cmd} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_BIGre On_wheel_up {cmd} {
- puts "$objName On_wheel_up {$cmd}"
+ # puts "$objName On_wheel_up {$cmd}"
  if {![info exists this(rap_on_wheel_up)]} {
    set this(rap_on_wheel_up) [B_rappel [Interp_TCL]]
    [this get_prim_handle] abonner_a_detection_pointeur [$this(rap_on_wheel_up) Rappel] [ALX_pointeur_enfonce]
@@ -537,6 +537,17 @@ method PM_BIGre C_B_Eval {args} {
 }
 
 #___________________________________________________________________________________________________________________________________________
+method PM_BIGre Draggable {args} {
+	puts stderr "Take care of implementing $objName PM_BIGre::Draggable"
+}
+
+#___________________________________________________________________________________________________________________________________________
+method PM_BIGre RotoZoomable {args} {
+	puts stderr "Take care of implementing $objName PM_BIGre::RotoZoomable"
+}
+
+
+#___________________________________________________________________________________________________________________________________________
 #___________________________________________________________________________________________________________________________________________
 # Functions udefull for ECA                                                                                                                _
 #___________________________________________________________________________________________________________________________________________
@@ -760,4 +771,5 @@ proc C_GDD {L_comet fct root} {
   }
 
 }
+
 

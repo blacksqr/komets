@@ -311,28 +311,24 @@ method PM_HTML Do_in_root {cmd} {
  if {$this(PM_root) != ""} {
    eval "$this(PM_root) $cmd"
   }
-  
-#XXX set root [this get_L_roots] 
-#XXX if {[lsearch [gmlObject info classes $root] PhysicalHTML_root] != -1} {
-#XXX     eval "$root $cmd"
-#XXX }
 }
 
 #_________________________________________________________________________________________________________
 method PM_HTML Sub_daughter {e} {
  set rep [this inherited $e]
-   if {$rep} {catch "$e set_PM_root {}"}
-   if {$class(enable_AJAX_UPDATE)} {this Do_in_root "Add_L_PM_to_sub $e"}
+   if {$rep} {catch [eval [list $e set_PM_root {}]]}
+   if {$class(enable_AJAX_UPDATE)} {this Do_in_root [list Add_L_PM_to_sub $e]}
  return $rep
 }
-
+# Trace PM_HTML Sub_daughter
 #_________________________________________________________________________________________________________
 method PM_HTML Add_daughter {e {index -1}} {
  set rep [this inherited $e $index]
    this set_PM_root $this(PM_root)
-   if {$class(enable_AJAX_UPDATE)} {this Do_in_root "Add_L_PM_to_add $e"}
+   if {$class(enable_AJAX_UPDATE)} {this Do_in_root [list Add_L_PM_to_add $e]}
  return $rep
 }
+# Trace PM_HTML Add_daughter
 
 #_________________________________________________________________________________________________________
 method PM_HTML set_html_style {lstyles {id {}}} {
@@ -406,6 +402,7 @@ method PM_HTML Add_JS {e} {
 	 set strm {}; $e Render strm
 	 set strm [$e Encode_param_for_JS $strm]
 	 
+	 # puts "-> $objName PM_HTML::Add_JS {$e}"
 	 set cmd "\$('#$e').remove();"
 	 if { $tailletot-1 > $pos} {
 		set objAfter [lindex [this get_daughters] [expr $pos+1]]
@@ -425,6 +422,7 @@ method PM_HTML Add_JS {e} {
 
 #___________________________________________________________________________________________________________________________________________
 method PM_HTML Sub_JS {e} {
+ # puts "-> $objName PM_HTML::Sub_JS {$e}"
  set cmd "\$('#$e').remove();"
  return $cmd
 }
