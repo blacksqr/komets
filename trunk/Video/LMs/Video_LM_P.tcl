@@ -20,10 +20,10 @@ Methodes_get_LC LogicalVideo [P_L_methodes_get_Video] {$this(FC)}
 
 #___________________________________________________________________________________________________________________________________________
 method LogicalVideo set_PM_active {PM} {
- this inherited $PM
- if {[string equal [this get_LC] {}]} {return}
- set s [this get_video_source]
- if {![string equal $s {}]} {$PM set_video_source $s [this get_audio_canal]}
+	this inherited $PM
+	if {[string equal [this get_LC] {}]} {return}
+	set s [this get_video_source]
+	if {![string equal $s {}]} {$PM set_video_source $s [this get_audio_canal]}
 }
 
 #___________________________________________________________________________________________________________________________________________

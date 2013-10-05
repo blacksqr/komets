@@ -316,7 +316,8 @@ method PM_HTML Do_in_root {cmd} {
 #_________________________________________________________________________________________________________
 method PM_HTML Sub_daughter {e} {
  set rep [this inherited $e]
-   if {$rep} {catch [eval [list $e set_PM_root {}]]}
+   if {$rep} {catch {$e set_PM_root {}}}
+   # if {$rep} {catch [eval [list $e set_PM_root {}]]}
    if {$class(enable_AJAX_UPDATE)} {this Do_in_root [list Add_L_PM_to_sub $e]}
  return $rep
 }

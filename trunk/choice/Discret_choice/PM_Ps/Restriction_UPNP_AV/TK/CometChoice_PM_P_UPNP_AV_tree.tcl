@@ -207,39 +207,58 @@ method CometChoice_PM_P_UPNP_AV_tree Update_tree {{L_devices {}}} {
 #___________________________________________________________________________________________________________________________________________
 method CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from {UDN service parent_tree_id object_id title} {
 	# Create an item in the tree
-	set tree_id ${UDN}_$object_id
+	set tree_id [string map [list " " "" "\\" "/" "\n" ""] ${UDN}_$object_id]
+	puts "Creating tree_id : $tree_id"
 	if {![$this(tree) exists $tree_id]} {
 		 $this(tree) insert $parent_tree_id end -id $tree_id -tags $tree_id -text $title
 		} else  {$this(tree) delete [$this(tree) children $tree_id]
 				}
 	if {$parent_tree_id == ""} {set this(tree_id_of,$UDN) $tree_id}
-	$this(tree) tag bind $tree_id <ButtonPress-1> [list $objName Update_items_with [string map [list "%" "%%"] $tree_id]]
-	
-	$this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item {$UDN} {$service} {$object_id} \$UPNP_res"
+	# $this(tree) tag bind $tree_id <ButtonPress-1> [list $objName Update_items_with [string map [list "%" "%%"] $tree_id]]
+	# $this(comet_UPNP) soap_call $UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""] "$objName Update_item {$UDN} {$service} {$object_id} \$UPNP_res"
+	$this(tree) tag bind $tree_id \
+						 <ButtonPress-1> \
+						 [list $objName Develop_tree_item $UDN $service $object_id $tree_id]
 }
-Trace CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from
+# Trace CometChoice_PM_P_UPNP_AV_tree Browse_recursively_from
+
 #___________________________________________________________________________________________________________________________________________
-method CometChoice_PM_P_UPNP_AV_tree Update_item {UDN service object_id rep} {
+method CometChoice_PM_P_UPNP_AV_tree Develop_tree_item {UDN service object_id tree_id} {
+	$this(comet_UPNP) soap_call	$UDN $service Browse [list $object_id "BrowseDirectChildren" res 0 0 ""]	\
+													 "$objName Update_item {[list $UDN $service $object_id $tree_id]} \$UPNP_res"
+}
+# Trace CometChoice_PM_P_UPNP_AV_tree Develop_tree_item
+set pipoAV ""
+#___________________________________________________________________________________________________________________________________________
+method CometChoice_PM_P_UPNP_AV_tree Update_item {L_UDN_service_object_id_tree_id rep} {
+	lassign $L_UDN_service_object_id_tree_id UDN service object_id tree_id
+	global pipoAV
+	set pipoAV $rep
 	if {[dict exists $rep Result]} {
 		set xml [string map [list "&" "&amp;"] [dict get $rep Result]]
 		if {[catch {set doc [dom parse $xml]} err]} {
-			 puts "Error in $objName CometChoice_PM_P_UPNP_AV_tree::Update_item $UDN $object_id\n$err\n________________________________________\n$xml"
+			 puts stderr "Error in $objName CometChoice_PM_P_UPNP_AV_tree::Update_item $UDN $object_id\n$err\n________________________________________\n$xml"
 			} else  {set root [$doc documentElement]; set ns_root [$root namespace]
 					 # Explore sub containers
+					 # puts "\tExploring subcontainer"
 					 foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:container"] {
 						 set id    [$n getAttribute id]
 						 set title [[$n selectNodes -namespace [list ns $ns_root] "./dc:title"] asText]
 						 # Recursive call
-						 this Browse_recursively_from $UDN $service ${UDN}_$object_id $id $title
+						 set parent_id [string map [list " " "" "\\" "/" "\n" ""] ${UDN}_$object_id]
+						 this Browse_recursively_from $UDN $service $parent_id $id $title
 						}
 					 # Explore contained items
+					 # puts "\tExploring items"
 					 set L_items [list]
 					 foreach n [$root selectNodes -namespace [list ns $ns_root] "//ns:item"] {
+						 puts -nonewline "."
 						 lappend L_items [dict create title [[$n selectNodes -namespace [list ns $ns_root] "./dc:title"] asText] res [[$n selectNodes -namespace [list ns $ns_root] "./ns:res\[last()\]"] asText]]
 						}
-					 set this(items,${UDN}_$object_id) $L_items
-					 # puts "Update_item => $object_id : [llength $L_items] items\n"
+					 set this(items,$tree_id) $L_items
+					 puts "Update_item => $object_id : [llength $L_items] items\n"
 					 $doc delete
+					 this Update_items_with [string map [list "%" "%%"] $tree_id]
 					}
 		}
 }
@@ -249,12 +268,13 @@ method CometChoice_PM_P_UPNP_AV_tree Update_items_with {tree_id} {
 	set this(current_tree_id) $tree_id
 	$this(tk_L_items) delete 0 end
 	if {[info exists this(items,$tree_id)]} {
+		 puts "\tThere are some items"
 		 foreach item $this(items,$tree_id) {
 			 $this(tk_L_items) insert end [dict get $item title]
 			}
-		}
+		} else {puts "\tThere are NO items"}
 }
-
+Trace CometChoice_PM_P_UPNP_AV_tree Update_items_with
 #___________________________________________________________________________________________________________________________________________
 method CometChoice_PM_P_UPNP_AV_tree Display_item_info {i} {
 	$this(text_item_descr) configure -state normal

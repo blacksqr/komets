@@ -306,7 +306,7 @@ method CometUPNP_PM_FC_intelbased Read_data {chan} {
 		  set this(${chan},msg) [string range $this(${chan},msg) $this(${chan},msg_attended_length) end]
 		  set this(${chan},msg_attended_length) -1
 		  
-		  if {[catch {this new_UPNP_message msg} err]} {puts stderr "ERROR while receiving new message :\n\tmsg : $msg\n\terr : $err\n______stack:\n$::errorInfo"}
+		  if {[catch {this new_UPNP_message msg} err]} {puts stderr "ERROR while receiving new message :\n\tmsg : [string range $msg 0 50]\n\terr : $err\n______stack:\n$::errorInfo"}
 		 } else {break}
   }
 }
@@ -372,7 +372,7 @@ method CometUPNP_PM_FC_intelbased get_soap_proxy {UDN service action} {
 
 proc CometUPNP_PM_FC_intelbased__SOAP_ParseProc {procVarName xml} {
 	if {[catch {set rep [SOAP::parse_soap_response $procVarName $xml]} err]} {
-		 puts stderr "Error while parsing SOAP respons: $err"
+		 puts stderr "Error while parsing SOAP respons:\n $::errorInfo"
 		 set rep ""
 		}
 	return $rep
@@ -444,6 +444,6 @@ method CometUPNP_PM_FC_intelbased soap_reply {xml CB} {
 		}
  $doc delete
  
- if {[catch {eval $CB} err]} {puts stderr "Error in the CB of the soap action:\n\t CB : $CB\n\tUPNP_res : $UPNP_res\n\txml : $xml\n\terr : $err"}
+ if {[catch {eval $CB} err]} {puts stderr "Error in the CB of the soap action:\n\t CB : $CB\n\tUPNP_res : [string range $UPNP_res 0 50]\n\txml : [string range $xml 0 50]\n\terr : $err"}
 }
 # Trace CometUPNP_PM_FC_intelbased soap_reply
