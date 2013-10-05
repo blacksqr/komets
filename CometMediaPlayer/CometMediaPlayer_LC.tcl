@@ -2,33 +2,37 @@ inherit CometMediaPlayer Logical_consistency
 
 #___________________________________________________________________________________________________________________________________________
 method CometMediaPlayer constructor {name descr args} {
- this inherited $name $descr
- this set_GDD_id CT_CometMediaPlayer
+	this inherited $name $descr
+	this set_GDD_id CT_CometMediaPlayer
 
- # Common functionnal core
- set CFC ${objName}_CFC; CometMediaPlayer_CFC $CFC; this set_Common_FC $CFC
+	# Common functionnal core
+	set CFC ${objName}_CFC; CometMediaPlayer_CFC $CFC; this set_Common_FC $CFC
 
- # List of Lofical models
- set this(LM_FC) ${objName}_LM_FC
- CometMediaPlayer_LM_FC $this(LM_FC) $this(LM_FC) "The LM FC of $name"
-   this Add_LM $this(LM_FC)
- set this(LM_LP) ${objName}_LM_LP
- CometMediaPlayer_LM_LP $this(LM_LP) $this(LM_LP) "The LM LP of $name"
-   this Add_LM $this(LM_LP)
-   
- # Nested COMETs
- set this(C_Video)        [CPool get_a_comet CometVideo  -set_name "Video player" -Add_style_class [list PLAYER VIDEO]]
- set this(C_choice_media) [CPool get_a_comet CometChoice -set_name "Load media"   -Add_style_class [list CHOICE NEW MEDIA] -set_nb_max_choices 999]
- set this(C_list_medias)  [CPool get_a_comet CometChoice -set_name "Play list"    -Add_style_class [list LIST MEDIAS]]
- 
- # Subscription
- $this(C_choice_media) Subscribe_to_set_currents $objName "$objName Add_L_medias \$lc" UNIQUE
- $this(C_list_medias)  Subscribe_to_set_currents $objName "$objName set_media_source \[\$lc get_text\]" UNIQUE
- $this(C_Video)        Subscribe_to_Update_image $objName "$objName go_to_frame \[$this(C_Video) get_num_frame\]" UNIQUE
+	# List of Lofical models
+	set this(LM_FC) ${objName}_LM_FC
+	CometMediaPlayer_LM_FC $this(LM_FC) $this(LM_FC) "The LM FC of $name"
+	this Add_LM $this(LM_FC)
+	set this(LM_LP) ${objName}_LM_LP
+	CometMediaPlayer_LM_LP $this(LM_LP) $this(LM_LP) "The LM LP of $name"
+	this Add_LM $this(LM_LP)
 
- # Evaluate optionnal parameters
- eval "$objName configure $args"
- return $objName
+	# Nested COMETs
+	set this(C_Video)        [CPool get_a_comet CometVideo  -set_name "Video player" -Add_style_class [list PLAYER VIDEO]]
+	set this(C_choice_media) [CPool get_a_comet CometChoice -set_name "Load media"   -Add_style_class [list CHOICE NEW MEDIA] -set_nb_max_choices 999]
+	set this(C_list_medias)  [CPool get_a_comet CometChoice -set_name "Play list"    -Add_style_class [list LIST MEDIAS]]
+
+	# Subscription
+	$this(C_choice_media) Subscribe_to_set_currents $objName "$objName Add_L_medias \$lc" UNIQUE
+	$this(C_list_medias)  Subscribe_to_set_currents $objName "$objName set_media_source \[\$lc get_text\]" UNIQUE
+	$this(C_Video)        Subscribe_to_Update_image $objName "$objName go_to_frame \[$this(C_Video) get_num_frame\]" UNIQUE
+
+	# Default style
+	this set_default_css_style_file $::env(ROOT_COMETS)Comets/CometMediaPlayer/PMs/CSSpp/basic_U_style.css++
+
+
+	# Evaluate optionnal parameters
+	eval "$objName configure $args"
+	return $objName
 }
 
 #___________________________________________________________________________________________________________________________________________

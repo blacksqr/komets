@@ -45,9 +45,6 @@ method CometMediaPlayer_PM_P_U_basic constructor {name descr args} {
    $this(volume)       Subscribe_to_set_val  $objName "$objName inner_set_volume \$v" UNIQUE
    $this(position)     Subscribe_to_set_val  $objName "$objName prim_go_to_frame \$v" UNIQUE
    
-   # Default style
-   this set_default_css_style_file $::env(ROOT_COMETS)/Comets/CometMediaPlayer/PMs/CSSpp/basic_U_style.css++
-   
  eval "$objName configure $args"
  return $objName
 }
